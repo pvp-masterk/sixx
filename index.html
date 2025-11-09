@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Cool Website</title>
+
+  <style>
+    /* -------- BASIC STYLES -------- */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", Arial, sans-serif;
+      background: linear-gradient(135deg, #4e54c8, #8f94fb);
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    header {
+      padding: 1.5rem;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: 1px;
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem;
+    }
+
+    main p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 30px;
+      background: #00d4ff;
+      color: #000;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      background: #fff;
+      color: #333;
+    }
+
+    footer {
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      font-size: 0.9rem;
+    }
+
+    /* -------- MOBILE -------- */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+      main p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome to My Website</h1>
+  </header>
+
+  <main>
+    <p>Test</p>
+    <button onclick="sayHello()">Click Me</button>
+  </main>
+
+  <footer>
+    <p>© 2025 MyWebsite. All rights reserved.</p>
+  </footer>
+
+  <script>
+    function sayHello() {
+      const name = prompt("What's your name?");
+      if (name) {
+        alert(`Welcome, ${name}!`);
+      } else {
+        alert("Welcome, stranger!");
+      }
+    }
+  </script>
+</body>
+</html>
