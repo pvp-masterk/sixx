@@ -4,75 +4,208 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>/six Clan</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
-  /* ======================= RESET & BASE ======================= */
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
-  body{
-    font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-    color:#e8e6f3;
-    background:#050006;
-    overflow:auto;
-    -webkit-font-smoothing:antialiased;
-  }
+/* ======================= RESET & BASE ======================= */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color:#e7e4f9;
+  background:#050009;
+  overflow:auto;
+  -webkit-font-smoothing:antialiased;
+}
 
-  /* ======================= BACKGROUND ======================= */
-  .bg-wrap{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
-  .bg-layer{position:absolute;inset:-20%;transform:scale(1.1);filter:blur(60px);mix-blend-mode:screen;opacity:0.9;transition:opacity .6s ease;}
-  .bg-layer.one{background:radial-gradient(closest-side at 10% 20%, #2d004f 0%, transparent 35%), radial-gradient(closest-side at 80% 80%, #45003b 0%, transparent 30%);}
-  .bg-layer.two{background:linear-gradient(120deg, rgba(156,81,255,0.18), rgba(84,0,110,0.18));opacity:0.7;}
-  .fog{position:absolute;inset:-10%;background:radial-gradient(circle at 20% 30%, rgba(140,40,220,0.06), transparent 10%), radial-gradient(circle at 80% 70%, rgba(25,0,40,0.08), transparent 15%);filter:blur(30px);animation:drift 25s linear infinite;}
-  @keyframes drift{0%{transform:translateY(0)}50%{transform:translateY(-4%) translateX(2%)}100%{transform:translateY(0)}}
+/* ======================= BACKGROUND ======================= */
+.bg-wrap{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.bg-layer{
+  position:absolute;inset:-20%;
+  transform:scale(1.1);
+  filter:blur(60px);
+  mix-blend-mode:screen;
+  opacity:0.9;
+  transition:opacity .6s ease;
+}
+.bg-layer.one{
+  background:radial-gradient(closest-side at 10% 20%, #2a0060 0%, transparent 35%),
+              radial-gradient(closest-side at 80% 80%, #5a0090 0%, transparent 30%);
+}
+.bg-layer.two{
+  background:linear-gradient(120deg, rgba(156,81,255,0.22), rgba(84,0,110,0.18));
+  opacity:0.7;
+}
+.fog{
+  position:absolute;inset:-10%;
+  background:radial-gradient(circle at 20% 30%, rgba(180,0,255,0.05), transparent 10%),
+             radial-gradient(circle at 80% 70%, rgba(60,0,80,0.08), transparent 15%);
+  filter:blur(35px);
+  animation:drift 25s linear infinite;
+}
+@keyframes drift{
+  0%{transform:translateY(0)}
+  50%{transform:translateY(-4%) translateX(2%)}
+  100%{transform:translateY(0)}
+}
 
-  /* ======================= CUSTOM /SIX FONT ======================= */
-  .six-text{
-    font-family:'Cinzel Decorative', serif;
-    background:linear-gradient(90deg,#e6ccff,#b380ff,#ffffff);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    text-shadow:0 0 18px rgba(180,120,255,0.4);
-    letter-spacing:2px;
-    font-weight:700;
-    display:inline-block;
-    animation:shine 4s linear infinite;
-  }
-  @keyframes shine{
-    0%{filter:brightness(1)}
-    50%{filter:brightness(1.4)}
-    100%{filter:brightness(1)}
-  }
+/* ======================= CUSTOM /SIX FONT ======================= */
+.six-text{
+  font-family:"Orbitron", sans-serif;
+  text-transform:uppercase;
+  background:linear-gradient(90deg,#d2b0ff,#a54fff,#ffffff);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:0 0 20px rgba(160,90,255,0.55);
+  letter-spacing:2px;
+  display:inline-block;
+  animation:shine 4s linear infinite;
+}
+@keyframes shine{
+  0%{filter:brightness(1)}
+  50%{filter:brightness(1.5)}
+  100%{filter:brightness(1)}
+}
 
-  /* ======================= LANDING ======================= */
-  .landing{position:relative;z-index:10;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 20px;}
-  .brand-big{font-size:clamp(64px,18vw,180px);font-weight:800;letter-spacing:6px;line-height:0.84;color:transparent;-webkit-background-clip:text;background-clip:text;background-image:linear-gradient(180deg,#caa3ff,#8b3adb 50%,#4a0b4f 100%);text-shadow:0 12px 40px rgba(74,11,79,0.55);}
-  .enter-card{margin-top:24px;border-radius:20px;padding:20px 28px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(10px);cursor:pointer;transition:.2s;}
-  .enter-card:hover{transform:translateY(-4px) scale(1.02);}
-  .tagline{max-width:700px;color:#d9d5ef;opacity:0.92;font-size:16px;line-height:1.6;}
+/* ======================= LANDING ======================= */
+.landing{
+  position:relative;z-index:10;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;
+  padding:40px 20px;
+}
+.brand-big{
+  font-family:"Orbitron", sans-serif;
+  font-size:clamp(72px,18vw,180px);
+  font-weight:800;
+  letter-spacing:8px;
+  line-height:0.84;
+  color:transparent;
+  -webkit-background-clip:text;background-clip:text;
+  background-image:linear-gradient(180deg,#b678ff,#7a00d3 50%,#30004f 100%);
+  text-shadow:0 0 30px rgba(130,0,255,0.6), 0 0 80px rgba(100,0,200,0.4);
+  animation:float 6s ease-in-out infinite alternate;
+}
+@keyframes float{
+  0%{transform:translateY(0)}
+  100%{transform:translateY(-10px)}
+}
+.enter-card{
+  margin-top:32px;
+  border-radius:20px;
+  padding:20px 28px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.07);
+  backdrop-filter:blur(12px);
+  cursor:pointer;
+  transition:.3s;
+}
+.enter-card:hover{
+  transform:translateY(-4px) scale(1.03);
+  box-shadow:0 0 30px rgba(150,60,255,0.4);
+}
+.tagline{
+  max-width:700px;
+  color:#d9d5ef;
+  opacity:0.92;
+  font-size:17px;
+  line-height:1.7;
+}
 
-  /* ======================= APP ======================= */
-  .app{position:relative;z-index:20;max-width:1200px;margin:40px auto;padding:40px 28px;border-radius:18px;background:linear-gradient(180deg,rgba(18,4,23,0.55),rgba(8,3,12,0.6));border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(10px);box-shadow:0 30px 80px rgba(3,0,10,0.65);transform:translateY(28px);opacity:0;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.9,.2,1);}
-  .app.active{transform:translateY(0);opacity:1;}
-  .clan-title{font-size:34px;font-weight:800;background:linear-gradient(90deg,#d3afff,#9a4bff);-webkit-background-clip:text;color:transparent;letter-spacing:2px;}
-  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.05));border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:18px;backdrop-filter:blur(8px);}
+/* ======================= APP ======================= */
+.app{
+  position:relative;z-index:20;
+  max-width:1200px;
+  margin:40px auto;
+  padding:40px 28px;
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(25,0,40,0.65),rgba(10,0,20,0.7));
+  border:1px solid rgba(255,255,255,0.04);
+  backdrop-filter:blur(12px);
+  box-shadow:0 30px 90px rgba(100,0,200,0.5);
+  transform:translateY(28px);
+  opacity:0;
+  transition:opacity .6s ease,transform .6s cubic-bezier(.2,.9,.2,1);
+}
+.app.active{transform:translateY(0);opacity:1;}
 
-  /* BUTTONS */
-  .discord-btn{width:100%;height:48px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(90deg,#6a28d1,#3b0a8a);color:white;font-weight:700;transition:transform .2s,box-shadow .2s;}
-  .discord-btn:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(120,50,200,0.4);}
+.clan-title{
+  font-family:"Orbitron", sans-serif;
+  font-size:38px;
+  background:linear-gradient(90deg,#c0a4ff,#a54fff);
+  -webkit-background-clip:text;
+  color:transparent;
+  letter-spacing:3px;
+  text-shadow:0 0 18px rgba(140,60,255,0.4);
+}
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(0,0,0,0.05));
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:12px;
+  padding:20px;
+  backdrop-filter:blur(10px);
+  margin-bottom:20px;
+}
+.section-title{
+  font-weight:700;
+  font-size:18px;
+  margin-bottom:8px;
+  color:#d4c7ff;
+  letter-spacing:1px;
+}
+.role-pill,.member-row{
+  color:#b9aafc;
+  font-size:15px;
+}
 
-  footer{text-align:center;margin:36px 0 80px;color:#bfb6e9;opacity:0.9;font-size:13px;}
+/* ======================= BUTTONS ======================= */
+.discord-btn{
+  width:100%;
+  height:48px;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  background:linear-gradient(90deg,#7a00ff,#3b008a);
+  color:white;
+  font-weight:700;
+  transition:transform .25s,box-shadow .25s;
+}
+.discord-btn:hover{
+  transform:translateY(-4px);
+  box-shadow:0 0 25px rgba(150,60,255,0.6);
+}
 
+/* ======================= FOOTER ======================= */
+footer{
+  text-align:center;
+  margin:36px 0 80px;
+  color:#bfb6e9;
+  opacity:0.85;
+  font-size:13px;
+  letter-spacing:0.3px;
+}
 </style>
 </head>
 <body>
-  <div class="bg-wrap"><div class="bg-layer one"></div><div class="bg-layer two"></div><div class="fog"></div></div>
+  <div class="bg-wrap">
+    <div class="bg-layer one"></div>
+    <div class="bg-layer two"></div>
+    <div class="fog"></div>
+  </div>
 
   <section class="landing" id="landing">
     <div class="landing-inner" id="landingInner" role="button" tabindex="0" onclick="enterSite()">
       <div class="brand-big">/SIX</div>
       <div class="enter-card">
-        <div class="tagline">Click to enter the world of /six — where your placeholder description goes here.</div>
+        <div class="tagline">Click to enter.</div>
       </div>
     </div>
   </section>
@@ -81,28 +214,29 @@
     <div class="header-row">
       <div>
         <div class="clan-title">/six</div>
-        <div class="meta">Your placeholder clan tagline here.</div>
+        <div class="meta">Forged in chaos. United by victory.</div>
       </div>
-      <div><input class="editable" value="Add date"></div>
+      <div><input class="editable" value="Nov 2025"></div>
     </div>
 
-    <div class="card" style="margin-bottom:18px">
+    <div class="card">
       <div class="section-title">Roster</div>
       <div class="roster-list">
-        <div class="role-pill">Placeholder member info</div>
+        <div class="role-pill">Member: ExamplePlayer</div>
       </div>
     </div>
 
     <div class="card">
       <div class="section-title">Members & Tiers</div>
-      <div class="member-row">Placeholder member data</div>
+      <div class="member-row">ExamplePlayer — Leader</div>
     </div>
 
-    <footer>© 2025 /six — Placeholder footer text</footer>
+    <button class="discord-btn">Join our Discord</button>
+    <footer>© 2025 /six — All rights reserved</footer>
   </main>
 
 <script>
-/* auto-detect /six and style it */
+/* Auto-detect and style /six text */
 function styleSixText(root=document.body){
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   let nodes = [];
@@ -115,9 +249,11 @@ function styleSixText(root=document.body){
     }
   });
 }
+
 window.addEventListener('load',()=>{
   styleSixText();
 });
+
 function enterSite(){
   document.getElementById('landing').style.display='none';
   const app=document.getElementById('app');
