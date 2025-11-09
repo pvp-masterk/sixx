@@ -931,28 +931,34 @@ body.text-hover .cursor-ring {
   from { transform: scale(0.8); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
-.sais-text {
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #fff;
-  text-shadow:
-    0 0 10px #00ffff,
-    0 0 20px #00aaff,
-    0 0 40px #00ffff,
-    0 0 60px #0099ff;
-  animation: glowPulseSAIS 3s ease-in-out infinite alternate;
-}
-
-@keyframes glowPulseSAIS {
-  0% {
-    text-shadow: 0 0 10px #00ffff, 0 0 20px #00aaff, 0 0 40px #00ffff;
+ .six-text{
+    font-family: 'Diecide Remain', sans-serif;
+    background: linear-gradient(135deg, #c77dff, #9d4edd, #7b2cbf);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 20px rgba(180, 80, 255, 0.6), 
+                 0 0 40px rgba(140, 40, 220, 0.4);
+    letter-spacing: 1.5px;
+    font-weight: 900;
+    display: inline-block;
+    position: relative;
+    animation: textGlow 3s ease-in-out infinite alternate;
   }
-  100% {
-    text-shadow: 0 0 20px #00ffff, 0 0 50px #00ccff, 0 0 80px #00ffff;
+  
+  @keyframes textGlow {
+    0% {
+      text-shadow: 0 0 20px rgba(180, 80, 255, 0.6), 
+                   0 0 40px rgba(140, 40, 220, 0.4);
+      transform: scale(1);
+    }
+    100% {
+      text-shadow: 0 0 25px rgba(200, 100, 255, 0.8), 
+                   0 0 50px rgba(160, 60, 240, 0.6),
+                   0 0 60px rgba(120, 20, 200, 0.4);
+      transform: scale(1.02);
+    }
   }
-}
 
 
 </style>
