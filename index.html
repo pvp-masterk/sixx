@@ -701,16 +701,19 @@ body.text-hover .cursor-ring {
 }
 
 .discord-card {
-  background: linear-gradient(135deg, #2b1a3d, #3c2660);
-  border: 2px solid rgba(150, 90, 255, 0.5);
-  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(80, 40, 120, 0.4), rgba(50, 10, 80, 0.3));
+  border: 1px solid rgba(180, 120, 255, 0.2);
+  border-radius: 16px;
   padding: 20px 30px;
   display: flex;
   align-items: center;
   gap: 20px;
-  box-shadow: 0 0 25px rgba(120, 70, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(30, 0, 60, 0.4);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;       /* Full width like other cards */
+  max-width: 100%;   /* Ensures it fits container */
 }
+
 .discord-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 0 35px rgba(150, 90, 255, 0.5);
@@ -719,12 +722,16 @@ body.text-hover .cursor-ring {
 .discord-icon {
   width: 80px;
   height: 80px;
-  border-radius: 18px;
-  border: 3px solid violet;
-  box-shadow: 0 0 20px violet;
+  border-radius: 12px;
+  border: 2px solid rgba(180, 120, 255, 0.5);
+  box-shadow: 0 0 20px rgba(180, 120, 255, 0.3);
 }
 
 .discord-info {
+  flex: 1;               /* Take up remaining space */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   color: #fff;
 }
 
@@ -748,7 +755,7 @@ body.text-hover .cursor-ring {
 }
 
 .discord-progress {
-  width: 200px;
+  width: 100%;           /* Full width of the info section */
   height: 8px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
