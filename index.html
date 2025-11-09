@@ -326,6 +326,54 @@
     font-weight: 600;
   }
 
+  /* ======== GOLDEN ANIMATION ======== */
+@keyframes goldGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.member-card.golden {
+  border: 2px solid transparent;
+  background: linear-gradient(145deg, rgba(50, 20, 80, 0.3), rgba(30, 10, 50, 0.2));
+  position: relative;
+  border-radius: 12px;
+  padding: 20px;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.member-card.golden::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 2px;
+  background: linear-gradient(90deg, #ffd700, #ffcc33, #ff9900, #ffd700);
+  background-size: 300% 300%;
+  animation: goldGradient 3s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  z-index: -1;
+}
+
+.member-card.golden .member-name {
+  background: linear-gradient(90deg, #ffd700, #ffcc33, #ff9900, #ffd700);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+  animation: goldGradient 3s linear infinite;
+}
+
+
   /* BUTTONS */
   .discord-btn{
     width:100%;
@@ -421,29 +469,34 @@ Every Server they Join.</div>
     </div>
 
     <div class="card">
-      <div class="section-title">Members & Tiers</div>
-      <div class="member-grid">
-        <div class="member-card">
-          <div class="member-name">Liar</div>
-          <div class="member-role">Founder & Leader</div>
-          <div class="member-tier">Tier: Unknown</div>
-        </div>
-        <div class="member-card">
-          <div class="member-name">Toofles</div>
-          <div class="member-role">Co-Leader</div>
-          <div class="member-tier">Tier: Unknown</div>
-        </div>
-        <div class="member-card">
-          <div class="member-name">PVP_MASTERK</div>
-          <div class="member-role">Developer/Grinder</div>
-          <div class="member-tier">Tier: Unknown</div>
-        </div>
-        <div class="member-card">
-          <div class="member-name">Killers</div>
-          <div class="member-role">PvPer/Grinder</div>
-          <div class="member-tier">Tier: Unknown</div>
-      </div>
+  <div class="section-title">Members & Tiers</div>
+  <div class="member-grid">
+    <div class="member-card">
+      <div class="member-name">Liar</div>
+      <div class="member-role">Founder & Leader</div>
+      <div class="member-tier">Tier: Unknown</div>
     </div>
+
+    <div class="member-card">
+      <div class="member-name">Toofles</div>
+      <div class="member-role">Co-Leader</div>
+      <div class="member-tier">Tier: Unknown</div>
+    </div>
+
+    <div class="member-card golden">
+      <div class="member-name">PVP_MASTERK</div>
+      <div class="member-role">Developer/Grinder</div>
+      <div class="member-tier">Tier: Unknown</div>
+    </div>
+
+    <div class="member-card golden">
+      <div class="member-name">Killers</div>
+      <div class="member-role">PvPer/Grinder</div>
+      <div class="member-tier">Tier: Unknown</div>
+    </div>
+  </div>
+</div>
+
     
     <button class="discord-btn">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
