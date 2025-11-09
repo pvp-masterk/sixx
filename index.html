@@ -1,129 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>/six Clan</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
-<style>
-  /* ======================= RESET & BASE ======================= */
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
-  body{
-    font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-    color:#e8e6f3;
-    background:#050006;
-    overflow:auto;
-    -webkit-font-smoothing:antialiased;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>/Six</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Parisienne&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: radial-gradient(circle at center, #5e2b97, #2b004f 80%);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: white;
+      margin: 0;
+      font-family: 'Great Vibes', cursive;
+    }
 
-  /* ======================= BACKGROUND ======================= */
-  .bg-wrap{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
-  .bg-layer{position:absolute;inset:-20%;transform:scale(1.1);filter:blur(60px);mix-blend-mode:screen;opacity:0.9;transition:opacity .6s ease;}
-  .bg-layer.one{background:radial-gradient(closest-side at 10% 20%, #2d004f 0%, transparent 35%), radial-gradient(closest-side at 80% 80%, #45003b 0%, transparent 30%);}
-  .bg-layer.two{background:linear-gradient(120deg, rgba(156,81,255,0.18), rgba(84,0,110,0.18));opacity:0.7;}
-  .fog{position:absolute;inset:-10%;background:radial-gradient(circle at 20% 30%, rgba(140,40,220,0.06), transparent 10%), radial-gradient(circle at 80% 70%, rgba(25,0,40,0.08), transparent 15%);filter:blur(30px);animation:drift 25s linear infinite;}
-  @keyframes drift{0%{transform:translateY(0)}50%{transform:translateY(-4%) translateX(2%)}100%{transform:translateY(0)}}
+    h1 {
+      font-size: 120px;
+      background: linear-gradient(90deg, #a04dff, #4c008c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(150, 0, 255, 0.6), 0 0 60px rgba(100, 0, 200, 0.5);
+      letter-spacing: 2px;
+      margin: 0;
+    }
 
-  /* ======================= CUSTOM /SIX FONT ======================= */
-  .six-text{
-    font-family:'Cinzel Decorative', serif;
-    background:linear-gradient(90deg,#e6ccff,#b380ff,#ffffff);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    text-shadow:0 0 18px rgba(180,120,255,0.4);
-    letter-spacing:2px;
-    font-weight:700;
-    display:inline-block;
-    animation:shine 4s linear infinite;
-  }
-  @keyframes shine{
-    0%{filter:brightness(1)}
-    50%{filter:brightness(1.4)}
-    100%{filter:brightness(1)}
-  }
+    h1 span {
+      font-family: 'Parisienne', cursive;
+    }
 
-  /* ======================= LANDING ======================= */
-  .landing{position:relative;z-index:10;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 20px;}
-  .brand-big{font-size:clamp(64px,18vw,180px);font-weight:800;letter-spacing:6px;line-height:0.84;color:transparent;-webkit-background-clip:text;background-clip:text;background-image:linear-gradient(180deg,#caa3ff,#8b3adb 50%,#4a0b4f 100%);text-shadow:0 12px 40px rgba(74,11,79,0.55);}
-  .enter-card{margin-top:24px;border-radius:20px;padding:20px 28px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(10px);cursor:pointer;transition:.2s;}
-  .enter-card:hover{transform:translateY(-4px) scale(1.02);}
-  .tagline{max-width:700px;color:#d9d5ef;opacity:0.92;font-size:16px;line-height:1.6;}
+    p {
+      margin-top: 20px;
+      font-size: 18px;
+      opacity: 0.8;
+      font-family: 'Poppins', sans-serif;
+    }
 
-  /* ======================= APP ======================= */
-  .app{position:relative;z-index:20;max-width:1200px;margin:40px auto;padding:40px 28px;border-radius:18px;background:linear-gradient(180deg,rgba(18,4,23,0.55),rgba(8,3,12,0.6));border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(10px);box-shadow:0 30px 80px rgba(3,0,10,0.65);transform:translateY(28px);opacity:0;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.9,.2,1);}
-  .app.active{transform:translateY(0);opacity:1;}
-  .clan-title{font-size:34px;font-weight:800;background:linear-gradient(90deg,#d3afff,#9a4bff);-webkit-background-clip:text;color:transparent;letter-spacing:2px;}
-  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.05));border:1px solid rgba(255,255,255,0.04);border-radius:12px;padding:18px;backdrop-filter:blur(8px);}
+    button {
+      margin-top: 30px;
+      background: linear-gradient(90deg, #a04dff, #4c008c);
+      border: none;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(150, 0, 255, 0.6);
+      transition: all 0.3s ease;
+    }
 
-  /* BUTTONS */
-  .discord-btn{width:100%;height:48px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(90deg,#6a28d1,#3b0a8a);color:white;font-weight:700;transition:transform .2s,box-shadow .2s;}
-  .discord-btn:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(120,50,200,0.4);}
-
-  footer{text-align:center;margin:36px 0 80px;color:#bfb6e9;opacity:0.9;font-size:13px;}
-
-</style>
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 40px rgba(150, 0, 255, 0.8);
+    }
+  </style>
 </head>
 <body>
-  <div class="bg-wrap"><div class="bg-layer one"></div><div class="bg-layer two"></div><div class="fog"></div></div>
-
-  <section class="landing" id="landing">
-    <div class="landing-inner" id="landingInner" role="button" tabindex="0" onclick="enterSite()">
-      <div class="brand-big">/SIX</div>
-      <div class="enter-card">
-        <div class="tagline">Click to enter the world of /six — where your placeholder description goes here.</div>
-      </div>
-    </div>
-  </section>
-
-  <main class="app" id="app" aria-hidden="true">
-    <div class="header-row">
-      <div>
-        <div class="clan-title">/six</div>
-        <div class="meta">Your placeholder clan tagline here.</div>
-      </div>
-      <div><input class="editable" value="Add date"></div>
-    </div>
-
-    <div class="card" style="margin-bottom:18px">
-      <div class="section-title">Roster</div>
-      <div class="roster-list">
-        <div class="role-pill">Placeholder member info</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-title">Members & Tiers</div>
-      <div class="member-row">Placeholder member data</div>
-    </div>
-
-    <footer>© 2025 /six — Placeholder footer text</footer>
-  </main>
-
-<script>
-/* auto-detect /six and style it */
-function styleSixText(root=document.body){
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  let nodes = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode);
-  nodes.forEach(node=>{
-    if(node.nodeValue.includes('/six')){
-      const span = document.createElement('span');
-      span.innerHTML = node.nodeValue.replace(/\/six/gi,'<span class="six-text">/six</span>');
-      node.parentNode.replaceChild(span,node);
-    }
-  });
-}
-window.addEventListener('load',()=>{
-  styleSixText();
-});
-function enterSite(){
-  document.getElementById('landing').style.display='none';
-  const app=document.getElementById('app');
-  app.classList.add('active');
-  app.setAttribute('aria-hidden','false');
-}
-</script>
+  <h1>/Six</h1>
+  <p>a majestic and elite clan</p>
+  <button>ENTER</button>
 </body>
 </html>
