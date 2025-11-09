@@ -3,107 +3,272 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Cool Website</title>
-
+  <title>/six Clan</title>
   <style>
-    /* -------- BASIC STYLES -------- */
+    /* -------- BASE -------- */
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      margin: 0;
-      font-family: "Poppins", Arial, sans-serif;
-      background: linear-gradient(135deg, #4e54c8, #8f94fb);
-      color: #fff;
-      text-align: center;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top, #1a001f, #050007 80%);
+      color: #eee;
+      overflow-x: hidden;
     }
 
     header {
-      padding: 1.5rem;
-      background: rgba(0, 0, 0, 0.2);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
       backdrop-filter: blur(10px);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      background: rgba(15, 0, 25, 0.45);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      z-index: 10;
     }
 
     header h1 {
-      margin: 0;
-      font-size: 2rem;
+      font-size: 1.8rem;
+      background: linear-gradient(90deg, #9d4edd, #b5179e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    nav {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .glass-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      padding: 10px 20px;
+      border-radius: 12px;
+      color: #ddd;
+      font-size: 0.95rem;
+      text-transform: uppercase;
       letter-spacing: 1px;
+      transition: 0.3s ease;
+      cursor: pointer;
+    }
+
+    .glass-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transform: translateY(-2px);
     }
 
     main {
-      flex: 1;
-      padding: 2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+    }
+
+    main h2 {
+      font-size: 2.8rem;
+      background: linear-gradient(90deg, #c77dff, #9d4edd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+      font-weight: 700;
     }
 
     main p {
-      font-size: 1.2rem;
-      opacity: 0.9;
+      max-width: 700px;
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #bbb;
     }
 
-    button {
-      margin-top: 1.5rem;
-      padding: 12px 25px;
-      border: none;
-      border-radius: 30px;
-      background: #00d4ff;
-      color: #000;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-      background: #fff;
-      color: #333;
+    .btn-group {
+      margin-top: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
     footer {
-      padding: 1rem;
-      background: rgba(0, 0, 0, 0.2);
-      font-size: 0.9rem;
+      text-align: center;
+      padding: 1rem 0;
+      font-size: 0.85rem;
+      color: #888;
+      background: rgba(0, 0, 0, 0.3);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
     }
 
-    /* -------- MOBILE -------- */
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 1.5rem;
+    /* -------- MODAL -------- */
+    .modal-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 0, 20, 0.7);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.3s ease;
+      z-index: 50;
+    }
+
+    .modal-bg.active {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .modal {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem 2.5rem;
+      text-align: center;
+      backdrop-filter: blur(14px);
+      max-width: 400px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .modal h3 {
+      font-size: 1.5rem;
+      background: linear-gradient(90deg, #b5179e, #7209b7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+    }
+
+    .modal p {
+      color: #ccc;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .modal button {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.2s ease;
+    }
+
+    .modal button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
       }
-      main p {
-        font-size: 1rem;
+      to {
+        transform: translateY(0);
+        opacity: 1;
       }
+    }
+
+    /* -------- SMOOTH ANIMATIONS -------- */
+    html {
+      scroll-behavior: smooth;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Welcome to My Website</h1>
+    <h1>/six</h1>
+    <nav>
+      <button class="glass-btn" onclick="showAnnouncement('Welcome to /six Clan — the elite Minecraft team of SwiftSMP and beyond.')">Announcement</button>
+      <button class="glass-btn" onclick="scrollToSection('about')">About</button>
+      <button class="glass-btn" onclick="scrollToSection('servers')">Servers</button>
+      <button class="glass-btn" onclick="scrollToSection('join')">Join</button>
+    </nav>
   </header>
 
-  <main>
-    <p>Test</p>
-    <button onclick="sayHello()">Click Me</button>
+  <main id="about">
+    <h2>The /six Clan</h2>
+    <p>
+      /six is a clan that represents one of the best pvpers in minecraft.
+      join our discord for more info
+    </p>
+
+    <div class="btn-group">
+      <button class="glass-btn" onclick="showAnnouncement('To join, open a ticket on our discord server.')">Join Us</button>
+      <button class="glass-btn" onclick="showAnnouncement('Many more coming soon')">Upcoming Event</button>
+      <button class="glass-btn" onclick="showAnnouncement('Open a ticket in our discord to form allies, schedule a clan war or more stuff.')">Contact</button>
+    </div>
   </main>
 
+  <section id="servers" style="padding: 5rem 2rem; text-align: center;">
+    <h2>Servers We Play On</h2>
+    <p style="max-width: 700px; margin: 1rem auto; color: #bbb;">
+      We are active and running on many diff servers such as Swift.  
+      Each player represents /six with their strength and skills.
+    </p>
+  </section>
+
+  <section id="join" style="padding: 5rem 2rem; text-align: center;">
+    <h2>Join the Legacy</h2>
+    <p style="max-width: 700px; margin: 1rem auto; color: #bbb;">
+      Think you have what it takes to stand with the best?  
+      Join /six and be part of a clan where skill meets strategy.  
+      Only the most dedicated survive.
+    </p>
+  </section>
+
   <footer>
-    <p>© 2025 MyWebsite. All rights reserved.</p>
+    <p>© 2025 /six Clan — All Rights Reserved.</p>
   </footer>
 
+  <!-- Modal -->
+  <div class="modal-bg" id="announcementModal">
+    <div class="modal">
+      <h3>Announcement</h3>
+      <p id="modalMessage"></p>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
   <script>
-    function sayHello() {
-      const name = prompt("What's your name?");
-      if (name) {
-        alert(`Welcome, ${name}!`);
-      } else {
-        alert("Welcome, stranger!");
-      }
+    const modalBg = document.getElementById("announcementModal");
+    const modalMessage = document.getElementById("modalMessage");
+
+    function showAnnouncement(message) {
+      modalMessage.textContent = message;
+      modalBg.classList.add("active");
     }
+
+    function closeModal() {
+      modalBg.classList.remove("active");
+    }
+
+    function scrollToSection(id) {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    window.onload = () => {
+      setTimeout(() => {
+        showAnnouncement("Welcome to /six.");
+      }, 600);
+    };
   </script>
 </body>
 </html>
