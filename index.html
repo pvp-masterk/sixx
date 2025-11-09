@@ -4,200 +4,373 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>/six Clan</title>
-
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ======================= RESET & BASE ======================= */
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{
-  font-family:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  color:#e7e4f9;
-  background:#050009;
-  overflow:auto;
-  -webkit-font-smoothing:antialiased;
-}
+  /* ======================= RESET & BASE ======================= */
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family: 'Exo 2', sans-serif;
+    color:#e8e6f3;
+    background:#050006;
+    overflow:auto;
+    -webkit-font-smoothing:antialiased;
+    line-height: 1.6;
+  }
 
-/* ======================= BACKGROUND ======================= */
-.bg-wrap{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
-.bg-layer{
-  position:absolute;inset:-20%;
-  transform:scale(1.1);
-  filter:blur(60px);
-  mix-blend-mode:screen;
-  opacity:0.9;
-  transition:opacity .6s ease;
-}
-.bg-layer.one{
-  background:radial-gradient(closest-side at 10% 20%, #2a0060 0%, transparent 35%),
-              radial-gradient(closest-side at 80% 80%, #5a0090 0%, transparent 30%);
-}
-.bg-layer.two{
-  background:linear-gradient(120deg, rgba(156,81,255,0.22), rgba(84,0,110,0.18));
-  opacity:0.7;
-}
-.fog{
-  position:absolute;inset:-10%;
-  background:radial-gradient(circle at 20% 30%, rgba(180,0,255,0.05), transparent 10%),
-             radial-gradient(circle at 80% 70%, rgba(60,0,80,0.08), transparent 15%);
-  filter:blur(35px);
-  animation:drift 25s linear infinite;
-}
-@keyframes drift{
-  0%{transform:translateY(0)}
-  50%{transform:translateY(-4%) translateX(2%)}
-  100%{transform:translateY(0)}
-}
+  /* ======================= BACKGROUND ======================= */
+  .bg-wrap{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .bg-layer{
+    position:absolute;
+    inset:-20%;
+    transform:scale(1.1);
+    filter:blur(60px);
+    mix-blend-mode:screen;
+    opacity:0.9;
+    transition:opacity .6s ease;
+  }
+  .bg-layer.one{
+    background:radial-gradient(closest-side at 10% 20%, #2d004f 0%, transparent 35%), 
+               radial-gradient(closest-side at 80% 80%, #45003b 0%, transparent 30%);
+  }
+  .bg-layer.two{
+    background:linear-gradient(120deg, rgba(100, 0, 150, 0.25), rgba(60, 0, 100, 0.25));
+    opacity:0.7;
+  }
+  .bg-layer.three{
+    background: radial-gradient(circle at 50% 50%, rgba(80, 0, 120, 0.2), transparent 70%);
+    opacity: 0.5;
+  }
+  .fog{
+    position:absolute;
+    inset:-10%;
+    background:radial-gradient(circle at 20% 30%, rgba(100, 40, 180, 0.1), transparent 10%), 
+               radial-gradient(circle at 80% 70%, rgba(25, 0, 60, 0.1), transparent 15%);
+    filter:blur(30px);
+    animation:drift 25s linear infinite;
+  }
+  @keyframes drift{
+    0%{transform:translateY(0) rotate(0deg)}
+    50%{transform:translateY(-4%) translateX(2%) rotate(1deg)}
+    100%{transform:translateY(0) rotate(0deg)}
+  }
 
-/* ======================= CUSTOM /SIX FONT ======================= */
-.six-text{
-  font-family:"Orbitron", sans-serif;
-  text-transform:uppercase;
-  background:linear-gradient(90deg,#d2b0ff,#a54fff,#ffffff);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  text-shadow:0 0 20px rgba(160,90,255,0.55);
-  letter-spacing:2px;
-  display:inline-block;
-  animation:shine 4s linear infinite;
-}
-@keyframes shine{
-  0%{filter:brightness(1)}
-  50%{filter:brightness(1.5)}
-  100%{filter:brightness(1)}
-}
+  /* ======================= CUSTOM /SIX FONT ======================= */
+  .six-text{
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(135deg, #c77dff, #9d4edd, #7b2cbf);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 20px rgba(180, 80, 255, 0.6), 
+                 0 0 40px rgba(140, 40, 220, 0.4);
+    letter-spacing: 1.5px;
+    font-weight: 900;
+    display: inline-block;
+    position: relative;
+    animation: textGlow 3s ease-in-out infinite alternate;
+  }
+  
+  @keyframes textGlow {
+    0% {
+      text-shadow: 0 0 20px rgba(180, 80, 255, 0.6), 
+                   0 0 40px rgba(140, 40, 220, 0.4);
+      transform: scale(1);
+    }
+    100% {
+      text-shadow: 0 0 25px rgba(200, 100, 255, 0.8), 
+                   0 0 50px rgba(160, 60, 240, 0.6),
+                   0 0 60px rgba(120, 20, 200, 0.4);
+      transform: scale(1.02);
+    }
+  }
 
-/* ======================= LANDING ======================= */
-.landing{
-  position:relative;z-index:10;
-  min-height:100vh;
-  display:flex;align-items:center;justify-content:center;
-  text-align:center;
-  padding:40px 20px;
-}
-.brand-big{
-  font-family:"Orbitron", sans-serif;
-  font-size:clamp(72px,18vw,180px);
-  font-weight:800;
-  letter-spacing:8px;
-  line-height:0.84;
-  color:transparent;
-  -webkit-background-clip:text;background-clip:text;
-  background-image:linear-gradient(180deg,#b678ff,#7a00d3 50%,#30004f 100%);
-  text-shadow:0 0 30px rgba(130,0,255,0.6), 0 0 80px rgba(100,0,200,0.4);
-  animation:float 6s ease-in-out infinite alternate;
-}
-@keyframes float{
-  0%{transform:translateY(0)}
-  100%{transform:translateY(-10px)}
-}
-.enter-card{
-  margin-top:32px;
-  border-radius:20px;
-  padding:20px 28px;
-  background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));
-  border:1px solid rgba(255,255,255,0.07);
-  backdrop-filter:blur(12px);
-  cursor:pointer;
-  transition:.3s;
-}
-.enter-card:hover{
-  transform:translateY(-4px) scale(1.03);
-  box-shadow:0 0 30px rgba(150,60,255,0.4);
-}
-.tagline{
-  max-width:700px;
-  color:#d9d5ef;
-  opacity:0.92;
-  font-size:17px;
-  line-height:1.7;
-}
+  /* ======================= LANDING ======================= */
+  .landing{
+    position:relative;
+    z-index:10;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:40px 20px;
+    cursor: pointer;
+  }
+  .brand-big{
+    font-size:clamp(64px, 18vw, 180px);
+    font-weight:900;
+    letter-spacing:8px;
+    line-height:0.84;
+    color:transparent;
+    -webkit-background-clip:text;
+    background-clip:text;
+    background-image:linear-gradient(180deg, #e0aaff, #9d4edd 40%, #5a189a 100%);
+    text-shadow: 0 12px 40px rgba(90, 24, 154, 0.7);
+    margin-bottom: 20px;
+    font-family: 'Orbitron', sans-serif;
+    position: relative;
+    animation: pulse 4s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
 
-/* ======================= APP ======================= */
-.app{
-  position:relative;z-index:20;
-  max-width:1200px;
-  margin:40px auto;
-  padding:40px 28px;
-  border-radius:18px;
-  background:linear-gradient(180deg,rgba(25,0,40,0.65),rgba(10,0,20,0.7));
-  border:1px solid rgba(255,255,255,0.04);
-  backdrop-filter:blur(12px);
-  box-shadow:0 30px 90px rgba(100,0,200,0.5);
-  transform:translateY(28px);
-  opacity:0;
-  transition:opacity .6s ease,transform .6s cubic-bezier(.2,.9,.2,1);
-}
-.app.active{transform:translateY(0);opacity:1;}
+  .enter-card{
+    margin-top:24px;
+    border-radius:20px;
+    padding:24px 32px;
+    background: linear-gradient(145deg, rgba(90, 24, 154, 0.15), rgba(45, 0, 90, 0.1));
+    border: 1px solid rgba(180, 120, 255, 0.2);
+    backdrop-filter: blur(15px);
+    cursor:pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 10px 30px rgba(30, 0, 60, 0.3);
+    max-width: 700px;
+  }
+  .enter-card:hover{
+    transform:translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(90, 24, 154, 0.4);
+    border: 1px solid rgba(200, 140, 255, 0.3);
+  }
+  .tagline{
+    color:#e2d9ff;
+    opacity:0.92;
+    font-size:18px;
+    line-height:1.6;
+    font-weight: 400;
+  }
 
-.clan-title{
-  font-family:"Orbitron", sans-serif;
-  font-size:38px;
-  background:linear-gradient(90deg,#c0a4ff,#a54fff);
-  -webkit-background-clip:text;
-  color:transparent;
-  letter-spacing:3px;
-  text-shadow:0 0 18px rgba(140,60,255,0.4);
-}
-.card{
-  background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(0,0,0,0.05));
-  border:1px solid rgba(255,255,255,0.05);
-  border-radius:12px;
-  padding:20px;
-  backdrop-filter:blur(10px);
-  margin-bottom:20px;
-}
-.section-title{
-  font-weight:700;
-  font-size:18px;
-  margin-bottom:8px;
-  color:#d4c7ff;
-  letter-spacing:1px;
-}
-.role-pill,.member-row{
-  color:#b9aafc;
-  font-size:15px;
-}
+  /* ======================= APP ======================= */
+  .app{
+    position:relative;
+    z-index:20;
+    max-width:1200px;
+    margin:40px auto;
+    padding:40px 28px;
+    border-radius:24px;
+    background: linear-gradient(145deg, rgba(20, 5, 35, 0.7), rgba(10, 2, 20, 0.8));
+    border: 1px solid rgba(150, 80, 220, 0.15);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 30px 80px rgba(5, 0, 15, 0.8);
+    transform:translateY(28px);
+    opacity:0;
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2, 0.9, 0.2, 1);
+  }
+  .app.active{
+    transform:translateY(0);
+    opacity:1;
+  }
+  
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(150, 80, 220, 0.2);
+  }
+  
+  .clan-title{
+    font-size:42px;
+    font-weight:800;
+    background:linear-gradient(90deg, #e0aaff, #c77dff, #9d4edd);
+    -webkit-background-clip:text;
+    color:transparent;
+    letter-spacing:3px;
+    font-family: 'Orbitron', sans-serif;
+  }
+  
+  .meta {
+    margin-top: 8px;
+    color: #c9b6ff;
+    font-size: 18px;
+    font-weight: 500;
+  }
+  
+  .editable {
+    background: rgba(30, 10, 50, 0.5);
+    border: 1px solid rgba(150, 80, 220, 0.3);
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: #e2d9ff;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 16px;
+    transition: all 0.3s;
+  }
+  
+  .editable:focus {
+    outline: none;
+    border-color: rgba(200, 140, 255, 0.6);
+    box-shadow: 0 0 0 2px rgba(150, 80, 220, 0.2);
+  }
 
-/* ======================= BUTTONS ======================= */
-.discord-btn{
-  width:100%;
-  height:48px;
-  border-radius:10px;
-  border:none;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  background:linear-gradient(90deg,#7a00ff,#3b008a);
-  color:white;
-  font-weight:700;
-  transition:transform .25s,box-shadow .25s;
-}
-.discord-btn:hover{
-  transform:translateY(-4px);
-  box-shadow:0 0 25px rgba(150,60,255,0.6);
-}
+  /* CARDS */
+  .card{
+    background: linear-gradient(145deg, rgba(40, 15, 70, 0.4), rgba(20, 5, 40, 0.3));
+    border: 1px solid rgba(150, 80, 220, 0.15);
+    border-radius:16px;
+    padding:24px;
+    backdrop-filter: blur(10px);
+    margin-bottom: 24px;
+    transition: all 0.3s;
+    box-shadow: 0 8px 25px rgba(10, 0, 25, 0.4);
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(20, 0, 40, 0.5);
+    border-color: rgba(180, 100, 255, 0.25);
+  }
+  
+  .section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #d8c7ff;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(150, 80, 220, 0.2);
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+  }
+  
+  .roster-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  
+  .role-pill {
+    background: linear-gradient(90deg, rgba(90, 24, 154, 0.3), rgba(60, 10, 120, 0.2));
+    border: 1px solid rgba(150, 80, 220, 0.2);
+    border-radius: 50px;
+    padding: 12px 20px;
+    text-align: center;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  
+  .role-pill:hover {
+    background: linear-gradient(90deg, rgba(110, 44, 174, 0.4), rgba(80, 30, 140, 0.3));
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(90, 24, 154, 0.3);
+  }
+  
+  .member-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .member-card {
+    background: linear-gradient(145deg, rgba(50, 20, 80, 0.3), rgba(30, 10, 50, 0.2));
+    border: 1px solid rgba(150, 80, 220, 0.15);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s;
+  }
+  
+  .member-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(180, 100, 255, 0.3);
+    box-shadow: 0 8px 20px rgba(20, 0, 40, 0.4);
+  }
+  
+  .member-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #e0aaff;
+    margin-bottom: 8px;
+  }
+  
+  .member-role {
+    color: #c9b6ff;
+    font-weight: 500;
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+  
+  .member-tier {
+    display: inline-block;
+    background: linear-gradient(90deg, #5a189a, #7b2cbf);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+  }
 
-/* ======================= FOOTER ======================= */
-footer{
-  text-align:center;
-  margin:36px 0 80px;
-  color:#bfb6e9;
-  opacity:0.85;
-  font-size:13px;
-  letter-spacing:0.3px;
-}
+  /* BUTTONS */
+  .discord-btn{
+    width:100%;
+    height:52px;
+    border-radius:12px;
+    border:none;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    background:linear-gradient(90deg, #7b2cbf, #5a189a);
+    color:white;
+    font-weight:700;
+    font-size: 18px;
+    transition: all 0.3s;
+    font-family: 'Exo 2', sans-serif;
+    margin-top: 20px;
+    box-shadow: 0 5px 15px rgba(90, 24, 154, 0.4);
+  }
+  .discord-btn:hover{
+    transform:translateY(-5px);
+    box-shadow: 0 10px 25px rgba(120, 50, 200, 0.5);
+    background:linear-gradient(90deg, #8a3fd4, #6a28d1);
+  }
+
+  footer{
+    text-align:center;
+    margin:40px 0 20px;
+    color:#bfb6e9;
+    opacity:0.9;
+    font-size:14px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(150, 80, 220, 0.2);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .header-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    
+    .editable {
+      width: 100%;
+    }
+    
+    .brand-big {
+      letter-spacing: 4px;
+    }
+    
+    .roster-list, .member-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 </head>
 <body>
   <div class="bg-wrap">
     <div class="bg-layer one"></div>
     <div class="bg-layer two"></div>
+    <div class="bg-layer three"></div>
     <div class="fog"></div>
   </div>
 
@@ -205,7 +378,7 @@ footer{
     <div class="landing-inner" id="landingInner" role="button" tabindex="0" onclick="enterSite()">
       <div class="brand-big">/SIX</div>
       <div class="enter-card">
-        <div class="tagline">Click to enter.</div>
+        <div class="tagline">Click to enter the world of <span class="six-text">/six</span> — where elite Minecraft players unite to dominate the competition and build legendary creations together.</div>
       </div>
     </div>
   </section>
@@ -214,35 +387,77 @@ footer{
     <div class="header-row">
       <div>
         <div class="clan-title">/six</div>
-        <div class="meta">Forged in chaos. United by victory.</div>
+        <div class="meta">Elite Minecraft Clan • Established 2023 • Competitive & Creative</div>
       </div>
-      <div><input class="editable" value="Nov 2025"></div>
+      <div><input class="editable" value="Last Updated: Today"></div>
     </div>
 
-    <div class="card">
-      <div class="section-title">Roster</div>
+    <div class="card" style="margin-bottom:24px">
+      <div class="section-title">Clan Roster</div>
       <div class="roster-list">
-        <div class="role-pill">Member: ExamplePlayer</div>
+        <div class="role-pill">Founder: ShadowNinja</div>
+        <div class="role-pill">Co-Leader: DiamondMiner</div>
+        <div class="role-pill">PVP Specialist: NetherKnight</div>
+        <div class="role-pill">Builder: CraftMaster</div>
+        <div class="role-pill">Redstone Engineer: TechWizard</div>
+        <div class="role-pill">Strategist: EndWalker</div>
       </div>
     </div>
 
     <div class="card">
       <div class="section-title">Members & Tiers</div>
-      <div class="member-row">ExamplePlayer — Leader</div>
+      <div class="member-grid">
+        <div class="member-card">
+          <div class="member-name">ShadowNinja</div>
+          <div class="member-role">Founder & Leader</div>
+          <div class="member-tier">Tier: Diamond</div>
+        </div>
+        <div class="member-card">
+          <div class="member-name">DiamondMiner</div>
+          <div class="member-role">Co-Leader</div>
+          <div class="member-tier">Tier: Diamond</div>
+        </div>
+        <div class="member-card">
+          <div class="member-name">NetherKnight</div>
+          <div class="member-role">PVP Specialist</div>
+          <div class="member-tier">Tier: Gold</div>
+        </div>
+        <div class="member-card">
+          <div class="member-name">CraftMaster</div>
+          <div class="member-role">Master Builder</div>
+          <div class="member-tier">Tier: Gold</div>
+        </div>
+        <div class="member-card">
+          <div class="member-name">TechWizard</div>
+          <div class="member-role">Redstone Engineer</div>
+          <div class="member-tier">Tier: Silver</div>
+        </div>
+        <div class="member-card">
+          <div class="member-name">EndWalker</div>
+          <div class="member-role">Strategist</div>
+          <div class="member-tier">Tier: Silver</div>
+        </div>
+      </div>
     </div>
+    
+    <button class="discord-btn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.18.33.25c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.83 2.12-1.89 2.12z"/>
+      </svg>
+      Join Our Discord
+    </button>
 
-    <button class="discord-btn">Join our Discord</button>
-    <footer>© 2025 /six — All rights reserved</footer>
+    <footer>© 2025 <span class="six-text">/six</span> Clan — All rights reserved. Proudly building and competing in the Minecraft universe.</footer>
   </main>
 
 <script>
-/* Auto-detect and style /six text */
+/* auto-detect /six and style it */
 function styleSixText(root=document.body){
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   let nodes = [];
   while (walker.nextNode()) nodes.push(walker.currentNode);
   nodes.forEach(node=>{
-    if(node.nodeValue.includes('/six')){
+    if(node.nodeValue && node.nodeValue.includes('/six')){
       const span = document.createElement('span');
       span.innerHTML = node.nodeValue.replace(/\/six/gi,'<span class="six-text">/six</span>');
       node.parentNode.replaceChild(span,node);
@@ -259,7 +474,25 @@ function enterSite(){
   const app=document.getElementById('app');
   app.classList.add('active');
   app.setAttribute('aria-hidden','false');
+  
+  // Re-apply styling to any dynamically added content
+  setTimeout(() => {
+    styleSixText(app);
+  }, 100);
 }
+
+// Add some interactive effects
+document.addEventListener('DOMContentLoaded', function() {
+  // Add parallax effect to background
+  document.addEventListener('mousemove', function(e) {
+    const x = e.clientX / window.innerWidth;
+    const y = e.clientY / window.innerHeight;
+    
+    document.querySelector('.bg-layer.one').style.transform = `translate(${x * 20}px, ${y * 20}px) scale(1.1)`;
+    document.querySelector('.bg-layer.two').style.transform = `translate(${x * -15}px, ${y * -15}px) scale(1.1)`;
+    document.querySelector('.bg-layer.three').style.transform = `translate(${x * 10}px, ${y * 10}px) scale(1.1)`;
+  });
+});
 </script>
 </body>
 </html>
