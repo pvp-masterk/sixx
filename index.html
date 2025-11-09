@@ -326,7 +326,7 @@
     font-weight: 600;
   }
 
-  /* ======== GOLDEN ANIMATION ======== */
+ /* ======== GOLDEN ANIMATION ======== */
 @keyframes goldGradient {
   0% {
     background-position: 0% 50%;
@@ -338,7 +338,7 @@
 
 .member-card.golden {
   border: 2px solid transparent;
-  background: linear-gradient(145deg, rgba(50, 20, 80, 0.3), rgba(30, 10, 50, 0.2));
+  background: linear-gradient(145deg, #2a1f09, #3b2b0d);
   position: relative;
   border-radius: 12px;
   padding: 20px;
@@ -354,7 +354,7 @@
   padding: 2px;
   background: linear-gradient(90deg, #ffd700, #ffcc33, #ff9900, #ffd700);
   background-size: 300% 300%;
-  animation: goldGradient 3s linear infinite;
+  animation: goldGradient 6s linear infinite;
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -364,13 +364,24 @@
 }
 
 .member-card.golden .member-name {
-  background: linear-gradient(90deg, #ffd700, #ffcc33, #ff9900, #ffd700);
+  background: linear-gradient(90deg, #ffea00, #ffd700, #ffcc33, #ffea00);
   background-size: 300% 300%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   font-weight: 800;
-  animation: goldGradient 3s linear infinite;
+  animation: goldGradient 6s linear infinite;
+}
+
+.member-card.golden .member-tier {
+  background: linear-gradient(90deg, #ffd700, #ffcc33, #ff9900, #ffd700);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+  animation: goldGradient 6s linear infinite;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
 }
 
 
