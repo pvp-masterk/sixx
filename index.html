@@ -848,6 +848,89 @@ body.text-hover .cursor-ring {
   z-index: 2000;
 }
 .notification.error { background: red; }
+/* 🏴 Banner Gallery */
+.gallery-section {
+  padding: 80px 5%;
+  background: rgba(10, 10, 15, 0.85);
+  text-align: center;
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 -4px 40px rgba(0, 0, 0, 0.5);
+}
+
+.gallery-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5em;
+  margin-bottom: 40px;
+  color: #fff;
+  text-shadow: 0 0 15px #ff00ff, 0 0 30px #9900ff;
+  letter-spacing: 3px;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 30px;
+  justify-items: center;
+}
+
+.banner-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(30, 0, 50, 0.9), rgba(0, 0, 20, 0.9));
+  box-shadow: 0 0 25px rgba(150, 0, 255, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.banner-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 35px rgba(255, 0, 255, 0.7);
+}
+
+.banner-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.banner-card:hover .banner-img {
+  opacity: 1;
+}
+
+.banner-caption {
+  display: block;
+  padding: 10px;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 1em;
+  color: #fff;
+  text-shadow: 0 0 8px #ff00ff;
+  background: rgba(255, 0, 255, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.banner-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+}
+.modal-img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(255, 0, 255, 0.6);
+  animation: zoomIn 0.3s ease;
+}
+@keyframes zoomIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
 
 
 </style>
@@ -916,6 +999,29 @@ Every Server they Join.</div>
     </div>
   </div>
 </div>
+    <!-- 🏴 Clan Banner Gallery -->
+<section id="gallery" class="gallery-section">
+  <h2 class="gallery-title">/SIX Banner Gallery</h2>
+  <div class="gallery-grid">
+    <div class="banner-card">
+      <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1409814312582643762/quality_restoration_20250826161611300.jpg?ex=691248a5&is=6910f725&hm=c88e4edb0ff6272ee38e76e2defcc6dc9083d90cb3110814df009963d6448c15&" alt="Banner 1" class="banner-img" />
+      <span class="banner-caption">Discord /SIX</span>
+    </div>
+    <div class="banner-card">
+      <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1401944987473547284/lv_0_20250804230545.gif?ex=69120003&is=6910ae83&hm=df857a55f48ae991aa9a21bc3861f78ec3d58255d1c81baca5d19bbcdb2367dd&" alt="Banner 2" class="banner-img" />
+      <span class="banner-caption">SAIS</span>
+    </div>
+    <div class="banner-card">
+      <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1400024103142035487/Picsart_25-07-30_15-51-21-892.png?ex=6912434d&is=6910f1cd&hm=d4b8dd0301e620cef924f649d03fd9df71b1d1bc79e331ac82d2ae0161bfe323&" alt="Banner 3" class="banner-img" />
+      <span class="banner-caption">/SIX Discord 2</span>
+    </div>
+    <div class="banner-card">
+      <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1391335858023432192/quality_restoration_20250706162944658.jpg?ex=6911a2fe&is=6910517e&hm=e95e29495b0ce1097708621dd9b6c42caf52d4de16029f23ca60f11dc6ffaa25&" alt="Banner 4" class="banner-img" />
+      <span class="banner-caption">/SIX HIGHNOON</span>
+    </div>
+  </div>
+</section>
+
 
     <button class="clanwar-btn">Request Clan War</button>
 
@@ -1175,6 +1281,20 @@ window.addEventListener('click', e => {
   if (e.target === rulesModal) rulesModal.style.display = 'none';
   if (e.target === applicationModal) applicationModal.style.display = 'none';
 });
+</script>
+<script>
+  document.querySelectorAll('.banner-img').forEach(img => {
+    img.addEventListener('click', () => {
+      const modal = document.createElement('div');
+      modal.classList.add('banner-modal');
+      modal.innerHTML = `
+        <div class="modal-bg"></div>
+        <img src="${img.src}" class="modal-img" alt="Banner">
+      `;
+      document.body.appendChild(modal);
+      modal.addEventListener('click', () => modal.remove());
+    });
+  });
 </script>
 
 </body>
