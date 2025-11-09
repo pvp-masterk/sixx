@@ -618,14 +618,24 @@
       grid-template-columns: 1fr;
     }
   }
-  /* ===== CUSTOM CURSOR ===== */
-.cursor-dot, .cursor-ring {
+  /* ===== CUSTOM CURSOR (Optimized + Centered + Click Pulse) ===== */
+.cursor {
   position: fixed;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 9999;
+}
+
+.cursor-dot, .cursor-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
   transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .cursor-dot {
@@ -633,7 +643,7 @@
   height: 8px;
   background-color: #b066ff;
   border-radius: 50%;
-  transition: transform 0.1s ease;
+  z-index: 2;
 }
 
 .cursor-ring {
@@ -642,7 +652,8 @@
   border: 2px solid #b066ff;
   border-radius: 50%;
   opacity: 0.6;
-  transition: transform 0.2s ease-out, width 0.2s ease, height 0.2s ease;
+  z-index: 1;
+  transition: transform 0.15s ease-out, width 0.15s, height 0.15s;
 }
 
 /* Hide default cursor */
@@ -650,22 +661,39 @@ body, a, button, input, textarea {
   cursor: none !important;
 }
 
-/* Text cursor replacement */
-.text-cursor {
-  cursor: none !important;
+/* Text hover effect */
+body.text-hover .cursor-dot {
+  background-color: #d599ff;
+  transform: translate(-50%, -50%) scale(1.4);
 }
 
-/* When hovering text elements */
-.text-hover .cursor-ring {
-  width: 24px;
-  height: 24px;
+body.text-hover .cursor-ring {
   border-color: #d599ff;
+  width: 28px;
+  height: 28px;
   opacity: 0.8;
 }
-.text-hover .cursor-dot {
-  transform: scale(1.3);
-  background-color: #d599ff;
+
+/* Click pulse effect */
+.cursor-ring.click-pulse {
+  animation: cursorPulse 0.4s ease-out;
 }
+
+@keyframes cursorPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+}
+
 
 </style>
 </head>
@@ -788,33 +816,45 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.bg-layer.three').style.transform = `translate(${x * 10}px, ${y * 10}px) scale(1.1)`;
   });
 });
-</script>
-  <div class="cursor-dot"></div>
-<div class="cursor-ring"></div>
 <script>
-const cursorDot = document.querySelector('.cursor-dot');
-const cursorRing = document.querySelector('.cursor-ring');
-let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+const dot = document.querySelector('.cursor-dot');
+const ring = document.querySelector('.cursor-ring');
+
+let mouseX = 0, mouseY = 0;
+let ringX = 0, ringY = 0;
 
 document.addEventListener('mousemove', (e) => {
   mouseX = e.clientX;
   mouseY = e.clientY;
-  cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+  dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
 });
 
 function animate() {
-  ringX += (mouseX - ringX) * 0.15;
-  ringY += (mouseY - ringY) * 0.15;
-  cursorRing.style.transform = `translate(${ringX}px, ${ringY}px)`;
+  ringX += (mouseX - ringX) * 0.2;
+  ringY += (mouseY - ringY) * 0.2;
+  ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
   requestAnimationFrame(animate);
 }
 animate();
 
-// Detect when hovering text
-const textElements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, a, button');
-textElements.forEach(el => {
-  el.addEventListener('mouseenter', () => document.body.classList.add('text-hover'));
-  el.addEventListener('mouseleave', () => document.body.classList.remove('text-hover'));
+// Smooth text hover detection (optimized)
+document.addEventListener('mouseover', (e) => {
+  if (e.target.closest('a, button, p, span, h1, h2, h3, h4, h5, h6')) {
+    document.body.classList.add('text-hover');
+  }
+});
+document.addEventListener('mouseout', (e) => {
+  if (e.target.closest('a, button, p, span, h1, h2, h3, h4, h5, h6')) {
+    document.body.classList.remove('text-hover');
+  }
+});
+
+// Click pulse effect
+document.addEventListener('mousedown', () => {
+  ring.classList.add('click-pulse');
+});
+document.addEventListener('mouseup', () => {
+  setTimeout(() => ring.classList.remove('click-pulse'), 150);
 });
 </script>
 </body>
