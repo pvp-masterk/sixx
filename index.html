@@ -931,6 +931,28 @@ body.text-hover .cursor-ring {
   from { transform: scale(0.8); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+.sais-text {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow:
+    0 0 10px #00ffff,
+    0 0 20px #00aaff,
+    0 0 40px #00ffff,
+    0 0 60px #0099ff;
+  animation: glowPulseSAIS 3s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulseSAIS {
+  0% {
+    text-shadow: 0 0 10px #00ffff, 0 0 20px #00aaff, 0 0 40px #00ffff;
+  }
+  100% {
+    text-shadow: 0 0 20px #00ffff, 0 0 50px #00ccff, 0 0 80px #00ffff;
+  }
+}
 
 
 </style>
@@ -1080,22 +1102,32 @@ Every Server they Join.</div>
 
 <script>
 /* auto-detect /six and style it */
-function styleSixText(root=document.body){
+function styleSixText(root = document.body) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  let nodes = [];
+  const nodes = [];
   while (walker.nextNode()) nodes.push(walker.currentNode);
-  nodes.forEach(node=>{
-    if(node.nodeValue && node.nodeValue.includes('/six')){
-      const span = document.createElement('span');
-      span.innerHTML = node.nodeValue.replace(/\/six/gi,'<span class="six-text">/six</span>');
-      node.parentNode.replaceChild(span,node);
+
+  nodes.forEach(node => {
+    if (node.nodeValue) {
+      const text = node.nodeValue;
+
+      // Match both /six and SAIS (case-insensitive)
+      if (/(\/six|sais)/i.test(text)) {
+        const span = document.createElement('span');
+        span.innerHTML = text.replace(/(\/six|sais)/gi, match => {
+          const cls = match.toLowerCase() === '/six' ? 'six-text' : 'sais-text';
+          return `<span class="${cls}">${match}</span>`;
+        });
+        node.parentNode.replaceChild(span, node);
+      }
     }
   });
 }
 
-window.addEventListener('load',()=>{
+window.addEventListener('load', () => {
   styleSixText();
 });
+
 
 function enterSite(){
   document.getElementById('landing').style.display='none';
