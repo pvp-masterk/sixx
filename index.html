@@ -693,6 +693,76 @@ body.text-hover .cursor-ring {
     opacity: 0.6;
   }
 }
+.discord-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
+  animation: fadeIn 1.5s ease;
+}
+
+.discord-card {
+  background: linear-gradient(135deg, #2b1a3d, #3c2660);
+  border: 2px solid rgba(150, 90, 255, 0.5);
+  border-radius: 20px;
+  padding: 20px 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 0 25px rgba(120, 70, 255, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.discord-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 35px rgba(150, 90, 255, 0.5);
+}
+
+.discord-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 18px;
+  border: 3px solid violet;
+  box-shadow: 0 0 20px violet;
+}
+
+.discord-info {
+  color: #fff;
+}
+
+.discord-name {
+  font-family: 'Diecide_Remain', sans-serif;
+  font-size: 28px;
+  color: #c9a2ff;
+  text-shadow: 0 0 10px #a96cff;
+  margin-bottom: 5px;
+}
+
+.discord-date {
+  font-size: 15px;
+  opacity: 0.8;
+}
+
+.discord-members {
+  margin-top: 8px;
+  font-weight: bold;
+  color: #b589ff;
+}
+
+.discord-progress {
+  width: 200px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+#progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #b77bff, #8f3fff);
+  transition: width 1s ease;
+  border-radius: 5px;
+}
 
 
 </style>
@@ -761,6 +831,22 @@ Every Server they Join.</div>
     </div>
   </div>
 </div>
+
+    <section class="discord-section">
+  <div class="discord-card">
+    <img id="discord-icon" class="discord-icon" src="" alt="Discord Icon" />
+    <div class="discord-info">
+      <div class="discord-name">/six</div>
+      <div class="discord-date">Created: <span id="discord-date">Loading...</span></div>
+      <div class="discord-members">
+        <span id="member-count">0</span> / <span id="member-goal">200</span> Members
+      </div>
+      <div class="discord-progress">
+        <div id="progress-bar"></div>
+      </div>
+    </div>
+  </div>
+</section>
 
     
     <button class="discord-btn">
@@ -862,5 +948,32 @@ document.addEventListener('mouseup', () => {
   setTimeout(() => ring.classList.remove('click-pulse'), 150);
 });
 </script>
+  <script>
+async function loadDiscordStats() {
+  const invite = "tu6rpKhenw"; // Replace with your real invite code
+  const goal = 1000; // Set your member goal
+
+  try {
+    const res = await fetch(`https://discord.com/api/v9/invites/${invite}?with_counts=true`);
+    const data = await res.json();
+
+    const guild = data.guild;
+    const memberCount = data.approximate_member_count;
+
+    document.getElementById("discord-icon").src = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
+    document.getElementById("discord-date").innerText = new Date(parseInt(guild.id) / 4194304 + 1420070400000).toDateString();
+    document.getElementById("member-count").innerText = memberCount;
+    document.getElementById("member-goal").innerText = goal;
+
+    const progress = Math.min((memberCount / goal) * 100, 100);
+    document.getElementById("progress-bar").style.width = progress + "%";
+  } catch (err) {
+    console.error("Failed to load Discord stats:", err);
+  }
+}
+
+loadDiscordStats();
+</script>
+
 </body>
 </html>
