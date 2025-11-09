@@ -931,34 +931,6 @@ body.text-hover .cursor-ring {
   from { transform: scale(0.8); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
- .six-text{
-    font-family: 'Diecide Remain', sans-serif;
-    background: linear-gradient(135deg, #c77dff, #9d4edd, #7b2cbf);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0 0 20px rgba(180, 80, 255, 0.6), 
-                 0 0 40px rgba(140, 40, 220, 0.4);
-    letter-spacing: 1.5px;
-    font-weight: 900;
-    display: inline-block;
-    position: relative;
-    animation: textGlow 3s ease-in-out infinite alternate;
-  }
-  
-  @keyframes textGlow {
-    0% {
-      text-shadow: 0 0 20px rgba(180, 80, 255, 0.6), 
-                   0 0 40px rgba(140, 40, 220, 0.4);
-      transform: scale(1);
-    }
-    100% {
-      text-shadow: 0 0 25px rgba(200, 100, 255, 0.8), 
-                   0 0 50px rgba(160, 60, 240, 0.6),
-                   0 0 60px rgba(120, 20, 200, 0.4);
-      transform: scale(1.02);
-    }
-  }
 
 
 </style>
@@ -1121,8 +1093,7 @@ function styleSixText(root = document.body) {
       if (/(\/six|sais)/i.test(text)) {
         const span = document.createElement('span');
         span.innerHTML = text.replace(/(\/six|sais)/gi, match => {
-          const cls = match.toLowerCase() === '/six' ? 'six-text' : 'sais-text';
-          return `<span class="${cls}">${match}</span>`;
+          return `<span class="six-text">${match}</span>`;
         });
         node.parentNode.replaceChild(span, node);
       }
@@ -1133,6 +1104,7 @@ function styleSixText(root = document.body) {
 window.addEventListener('load', () => {
   styleSixText();
 });
+
 
 
 function enterSite(){
