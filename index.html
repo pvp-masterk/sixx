@@ -383,6 +383,65 @@
   animation: goldGradient 6s linear infinite;
   text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
 }
+  /* ======== DIAMOND ANIMATION ======== */
+@keyframes diamondShine {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.member-card.diamond {
+  border: 2px solid transparent;
+  background: linear-gradient(145deg, #0a1b2a, #102437);
+  position: relative;
+  border-radius: 12px;
+  padding: 20px;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.member-card.diamond::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 2px;
+  background: linear-gradient(90deg, #00e5ff, #33ccff, #99ffff, #00e5ff);
+  background-size: 300% 300%;
+  animation: diamondShine 6s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  z-index: -1;
+}
+
+.member-card.diamond .member-name {
+  background: linear-gradient(90deg, #a0faff, #66e0ff, #99ffff, #ccffff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+  animation: diamondShine 6s linear infinite;
+  text-shadow: 0 0 6px rgba(160, 255, 255, 0.5);
+}
+
+.member-card.diamond .member-tier {
+  background: linear-gradient(90deg, #a0faff, #66e0ff, #99ffff, #ccffff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+  animation: diamondShine 6s linear infinite;
+  text-shadow: 0 0 5px rgba(160, 255, 255, 0.3);
+}
+
 
 
   /* BUTTONS */
@@ -482,13 +541,13 @@ Every Server they Join.</div>
     <div class="card">
   <div class="section-title">Members & Tiers</div>
   <div class="member-grid">
-    <div class="member-card">
+    <div class="member-card diamond">
       <div class="member-name">Liar</div>
       <div class="member-role">Founder & Leader</div>
       <div class="member-tier">Tier: Unknown</div>
     </div>
 
-    <div class="member-card">
+    <div class="member-card diamond">
       <div class="member-name">Toofles</div>
       <div class="member-role">Co-Leader</div>
       <div class="member-tier">Tier: Unknown</div>
