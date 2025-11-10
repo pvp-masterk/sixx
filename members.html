@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>/six Clan - Members</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     /* ======================= RESET & BASE ======================= */
     *{box-sizing:border-box;margin:0;padding:0}
@@ -294,7 +295,7 @@
       transform: translateX(-50%);
     }
 
-    /* Member Cards */
+    /* Member Cards - FLIP STYLES */
     .member-tree-card {
       background: linear-gradient(145deg, rgba(50, 20, 80, 0.3), rgba(30, 10, 50, 0.2));
       border: 1px solid rgba(150, 80, 220, 0.15);
@@ -309,12 +310,46 @@
       align-items: center;
       width: 220px;
       z-index: 2;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
     }
 
     .member-tree-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-5px) rotateY(5deg);
       border-color: rgba(180, 100, 255, 0.3);
       box-shadow: 0 8px 20px rgba(20, 0, 40, 0.4);
+    }
+
+    .member-tree-card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      background: linear-gradient(145deg, rgba(50, 20, 80, 0.9), rgba(30, 10, 50, 0.8));
+      overflow-y: auto;
+    }
+
+    .card-back-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
     }
 
     .member-avatar {
@@ -367,11 +402,77 @@
     }
 
     .crystal-icon {
-      background-image: url('assets/icons/crystalpvp.png');
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23bb86fc"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>');
     }
 
     .sword-icon {
-      background-image: url('assets/icons/swordpvp.png');
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2303dac6"><path d="M6.92 5H5l9 9 1-.94m4.96 6.06l.9.9a1 1 0 0 1 0 1.41l-1.27 1.27a1 1 0 0 1-1.41 0l-.9-.9a1 1 0 0 1 0-1.41l1.27-1.27a1 1 0 0 1 1.41 0z"/></svg>');
+    }
+
+    /* Card Themes */
+    .member-tree-card.purple-theme {
+      background: linear-gradient(145deg, rgba(80, 20, 120, 0.4), rgba(50, 10, 80, 0.3));
+      border: 1px solid rgba(180, 100, 255, 0.3);
+    }
+
+    .member-tree-card.black-theme {
+      background: linear-gradient(145deg, rgba(20, 20, 30, 0.7), rgba(10, 10, 20, 0.6));
+      border: 1px solid rgba(100, 100, 120, 0.3);
+    }
+
+    .member-tree-card.purple-theme .card-back {
+      background: linear-gradient(145deg, rgba(80, 20, 120, 0.9), rgba(50, 10, 80, 0.8));
+    }
+
+    .member-tree-card.black-theme .card-back {
+      background: linear-gradient(145deg, rgba(30, 30, 40, 0.9), rgba(20, 20, 30, 0.8));
+    }
+
+    /* Social Icons */
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .social-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .social-icon:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    /* Backside content */
+    .back-tier {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #e0aaff;
+    }
+
+    .back-username {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #ffffff;
+    }
+
+    .back-socials-title {
+      font-size: 14px;
+      color: #c9b6ff;
+      margin-bottom: 10px;
     }
 
     /* Member card special styles */
@@ -637,7 +738,7 @@
   </main>
 
   <script>
-    // Member data with proper hierarchy
+    // Enhanced member data with customization options
     const members = [
       { 
         name: "Lair", 
@@ -646,7 +747,19 @@
         swordTier: "HT1", 
         avatar: "https://minotar.net/avatar/Lair/128.png",
         cardType: "diamond",
-        level: 1
+        level: 1,
+        // Customization options
+        theme: "purple-theme", // "purple-theme" or "black-theme"
+        showCrystalPvP: true,
+        showSwordPvP: true,
+        // Backside information
+        socials: {
+          discord: "Lair#1234",
+          youtube: "LairGaming",
+          tiktok: "@lair_clips",
+          twitter: "@lair_official"
+        },
+        backgroundImage: "" // URL to custom background image
       },
       { 
         name: "Toofles", 
@@ -655,16 +768,31 @@
         swordTier: "HT1", 
         avatar: "https://minotar.net/avatar/Toofles/128.png",
         cardType: "diamond",
-        level: 2
+        level: 2,
+        theme: "purple-theme",
+        showCrystalPvP: true,
+        showSwordPvP: true,
+        socials: {
+          discord: "Toofles#5678",
+          youtube: "TooflesPlays",
+          tiktok: "@toofles_fun"
+        }
       },
       { 
         name: "Bicolandia", 
         rank: "Co-Leader", 
         crystalTier: "HT1", 
         swordTier: "HT1", 
-        avatar: "https://minotar.net/avatar/Toofles/128.png",
+        avatar: "https://minotar.net/avatar/Bicolandia/128.png",
         cardType: "diamond",
-        level: 2
+        level: 2,
+        theme: "black-theme", // Example of black theme
+        showCrystalPvP: true,
+        showSwordPvP: false, // Only crystal PvP
+        socials: {
+          discord: "Bicolandia#9012",
+          tiktok: "@bicolandia_pvp"
+        }
       },
       { 
         name: "PVP_MASTERK", 
@@ -673,7 +801,15 @@
         swordTier: "HT1", 
         avatar: "https://minotar.net/avatar/PVP_MASTERK/128.png",
         cardType: "golden",
-        level: 3
+        level: 3,
+        theme: "purple-theme",
+        showCrystalPvP: false, // Only sword PvP
+        showSwordPvP: true,
+        socials: {
+          discord: "PVP_MASTERK#3456",
+          youtube: "PVP MasterK",
+          twitter: "@pvp_masterk"
+        }
       },
       { 
         name: "Killers", 
@@ -682,53 +818,93 @@
         swordTier: "HT3", 
         avatar: "https://minotar.net/avatar/Killers/128.png",
         cardType: "golden",
-        level: 3
+        level: 3,
+        theme: "purple-theme",
+        showCrystalPvP: true,
+        showSwordPvP: true,
+        socials: {
+          discord: "Killers#7890",
+          tiktok: "@killers_clips"
+        }
       },
       { 
         name: "PenguinGUY", 
         rank: "PvPer", 
         crystalTier: "HT3", 
         swordTier: "HT3", 
-        avatar: "https://minotar.net/avatar/Killers/128.png",
+        avatar: "https://minotar.net/avatar/PenguinGUY/128.png",
         cardType: "golden",
-        level: 3
+        level: 3,
+        theme: "purple-theme",
+        showCrystalPvP: true,
+        showSwordPvP: true,
+        socials: {
+          discord: "PenguinGUY#1234",
+          youtube: "PenguinGUY Gaming"
+        }
       },
       { 
         name: "IllyProg", 
         rank: "PvPer", 
         crystalTier: "HT3", 
         swordTier: "HT3", 
-        avatar: "https://minotar.net/avatar/Killers/128.png",
+        avatar: "https://minotar.net/avatar/IllyProg/128.png",
         cardType: "golden",
-        level: 4
+        level: 4,
+        theme: "purple-theme",
+        showCrystalPvP: true,
+        showSwordPvP: true,
+        socials: {
+          discord: "IllyProg#5678",
+          tiktok: "@illyprog_pvp"
+        }
       },
       { 
         name: "Chad", 
         rank: "PvPer", 
         crystalTier: "HT3", 
         swordTier: "HT3", 
-        avatar: "https://minotar.net/avatar/Killers/128.png",
+        avatar: "https://minotar.net/avatar/Chad/128.png",
         cardType: "golden",
-        level: 4
+        level: 4,
+        theme: "purple-theme",
+        showCrystalPvP: true,
+        showSwordPvP: true,
+        socials: {
+          discord: "Chad#9012",
+          youtube: "Chad Gaming"
+        }
       },
       { 
         name: "Draco", 
         rank: "PvPer", 
         crystalTier: "HT3", 
         swordTier: "HT3", 
-        avatar: "https://minotar.net/avatar/Killers/128.png",
+        avatar: "https://minotar.net/avatar/Draco/128.png",
         cardType: "golden",
-        level: 4
+        level: 4,
+        theme: "purple-theme",
+        showCrystalPvP: true,
+        showSwordPvP: true,
+        socials: {
+          discord: "Draco#3456",
+          tiktok: "@draco_pvp"
+        }
       },
-      
       { 
         name: "Nefusho", 
         rank: "Member", 
         crystalTier: "LT10", 
         swordTier: "LT10", 
-        avatar: "https://minotar.net/avatar/NewRecruit/128.png",
+        avatar: "https://minotar.net/avatar/Nefusho/128.png",
         cardType: "bronze",
-        level: 4
+        level: 4,
+        theme: "purple-theme",
+        showCrystalPvP: true,
+        showSwordPvP: true,
+        socials: {
+          discord: "Nefusho#7890"
+        }
       }
     ];
 
@@ -771,24 +947,84 @@
           nodeDiv.className = 'tree-node';
           
           const card = document.createElement('div');
-          card.className = `member-tree-card ${member.cardType}`;
-          card.innerHTML = `
+          card.className = `member-tree-card ${member.cardType} ${member.theme}`;
+          
+          // Front of the card
+          const cardFront = document.createElement('div');
+          cardFront.className = 'card-front';
+          
+          let tierHTML = '';
+          if (member.showCrystalPvP) {
+            tierHTML += `
+              <div class="member-tier">
+                <span class="crystal-tier">
+                  <span class="tier-icon crystal-icon"></span>
+                  ${member.crystalTier}
+                </span>
+              </div>
+            `;
+          }
+          
+          if (member.showSwordPvP) {
+            tierHTML += `
+              <div class="member-tier">
+                <span class="sword-tier">
+                  <span class="tier-icon sword-icon"></span>
+                  ${member.swordTier}
+                </span>
+              </div>
+            `;
+          }
+          
+          cardFront.innerHTML = `
             <img src="${member.avatar}" alt="${member.name}" class="member-avatar">
             <div class="member-name">${member.name}</div>
             <div class="member-rank">${member.rank}</div>
-            <div class="member-tier">
-              <span class="crystal-tier">
-                <span class="tier-icon crystal-icon"></span>
-                ${member.crystalTier}
-              </span>
-            </div>
-            <div class="member-tier">
-              <span class="sword-tier">
-                <span class="tier-icon sword-icon"></span>
-                ${member.swordTier}
-              </span>
+            ${tierHTML}
+            <div class="click-hint">Click to flip</div>
+          `;
+          
+          // Back of the card
+          const cardBack = document.createElement('div');
+          cardBack.className = 'card-back';
+          
+          // Generate social icons HTML
+          let socialIconsHTML = '';
+          if (member.socials) {
+            if (member.socials.discord) {
+              socialIconsHTML += `<a href="#" class="social-icon"><i class="fab fa-discord"></i></a>`;
+            }
+            if (member.socials.youtube) {
+              socialIconsHTML += `<a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>`;
+            }
+            if (member.socials.tiktok) {
+              socialIconsHTML += `<a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>`;
+            }
+            if (member.socials.twitter) {
+              socialIconsHTML += `<a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>`;
+            }
+          }
+          
+          cardBack.innerHTML = `
+            <div class="card-back-content">
+              <div class="back-tier">${member.crystalTier}</div>
+              <img src="${member.avatar}" alt="${member.name}" class="member-avatar">
+              <div class="back-username">${member.name}</div>
+              <div class="back-socials-title">Socials:</div>
+              <div class="social-icons">
+                ${socialIconsHTML}
+              </div>
+              <div class="click-hint">Click to flip back</div>
             </div>
           `;
+          
+          card.appendChild(cardFront);
+          card.appendChild(cardBack);
+          
+          // Add flip functionality
+          card.addEventListener('click', function() {
+            this.classList.toggle('flipped');
+          });
           
           nodeDiv.appendChild(card);
           levelDiv.appendChild(nodeDiv);
