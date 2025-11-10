@@ -9,20 +9,25 @@
     /* ========== RESET ========== */
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%}
-    body{font-family:'Exo 2',sans-serif;background:#050006;color:#e8e6f3}
+    body{font-family:'Exo 2',sans-serif;background:#050006;color:#e8e6f3;overflow-x:hidden}
 
     /* ========== APP LAYOUT ========== */
-    .app{max-width:1200px;margin:40px auto;padding:28px;border-radius:18px;background:linear-gradient(145deg, rgba(20,5,35,0.7), rgba(10,2,20,0.8));border:1px solid rgba(150,80,220,0.15);backdrop-filter:blur(12px)}
+    .app{max-width:1200px;margin:40px auto;padding:28px;border-radius:18px;background:linear-gradient(145deg, rgba(20,5,35,0.7), rgba(10,2,20,0.8));border:1px solid rgba(150,80,220,0.15);backdrop-filter:blur(12px);position:relative;z-index:1}
     .header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
     .clan-title{font-size:36px;font-weight:800;background:linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd);-webkit-background-clip:text;color:transparent}
 
     /* ========== MEMBER TREE ========== */
     .member-tree-container{position:relative;padding:30px 10px}
-    .tree-structure{display:flex;flex-direction:column;align-items:center;gap:40px}
-    .tree-level{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+    .tree-structure{display:flex;flex-direction:column;align-items:center;gap:40px;position:relative}
+    .tree-level{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2}
+
+    /* ========== TREE WITH CHAINS ========== */
+    .tree-connections{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
+    .chain{position:absolute;background:linear-gradient(90deg, rgba(157, 77, 221, 0.4), rgba(192, 132, 252, 0.4), rgba(157, 77, 221, 0.4));border-radius:2px;transform-origin:0 50%}
+    .chain-link{position:absolute;width:12px;height:12px;border-radius:50%;background:rgba(157, 77, 221, 0.7);border:1px solid rgba(224, 170, 255, 0.5);box-shadow:0 0 8px rgba(157, 77, 221, 0.5)}
 
     /* ========== FLIP CARD BASE ========== */
-    .member-node{perspective:1200px;width:220px}
+    .member-node{perspective:1200px;width:220px;position:relative;z-index:2}
     .flip-card{width:220px;height:320px;position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.9,.3,1);cursor:pointer;border-radius:14px}
     .flip-card.is-flipped{transform:rotateY(180deg)}
     .flip-face{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:18px;border:1px solid rgba(150,80,220,0.12);box-shadow:0 8px 25px rgba(10,0,25,0.45)}
@@ -36,8 +41,10 @@
     .theme-black .flip-face.front{background:linear-gradient(145deg, rgba(12,12,12,0.95), rgba(22,22,22,0.95));border:1px solid rgba(255,255,255,0.04)}
     .theme-black .member-name,.theme-black .member-rank{color:#ddd}
 
-    /* If individual card has backgroundImage set (applied inline by JS) we'll show it behind content */
-    .bg-img{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.22;filter:blur(1px)}
+    /* Fixed background image styling - no transparency issue */
+    .bg-img{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.22;filter:blur(1px);z-index:-1}
+    .flip-face.front{position:relative;overflow:hidden}
+    .flip-face.front .content-wrapper{position:relative;z-index:2}
 
     /* ========== AVATAR / TEXT ========== */
     .member-avatar{width:86px;height:86px;border-radius:50%;border:2px solid rgba(180,100,255,0.35);box-shadow:0 6px 18px rgba(100,30,140,0.2);margin-top:6px}
@@ -51,23 +58,54 @@
     /* colors for tier types */
     .tier-crystal{color:#bb86fc}
     .tier-sword{color:#7ee3d6}
+    .tier-nethpot{color:#ff9e64}
+    .tier-smp{color:#64ffa4}
 
     /* ========== BACK FACE LAYOUT ========== */
     .back-top{width:100%;text-align:center;font-weight:800;padding-top:6px}
     .back-avatar{width:72px;height:72px;border-radius:50%;border:2px solid rgba(255,255,255,0.06);margin:8px auto}
     .back-name{font-weight:900;font-size:16px}
     .socials{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-    .social-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.03);font-size:13px}
+    .social-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.03);font-size:13px;transition:all 0.3s ease;text-decoration:none;color:#e8e6f3}
+    .social-btn:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.2)}
     .social-icon{width:18px;height:18px;background-size:contain;background-repeat:no-repeat;background-position:center}
+
+    /* Social button specific colors */
+    .social-btn[data-social="tiktok"]{border-left:3px solid #ff0050}
+    .social-btn[data-social="youtube"]{border-left:3px solid #ff0000}
+    .social-btn[data-social="discord"]{border-left:3px solid #5865f2}
+    .social-btn[data-social="twitch"]{border-left:3px solid #9146ff}
 
     /* ========== CARD TYPE STYLES (keeps old special types) ========== */
     .member-tree-card.diamond .member-name{font-weight:900}
 
     /* ========== SMALL UX ========== */
     .controls{display:flex;gap:10px;align-items:center}
-    .sort-btn{padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,rgba(90,24,154,0.5),rgba(60,10,120,0.4));border:1px solid rgba(150,80,220,0.25);color:#e2d9ff;cursor:pointer}
+    .sort-btn{padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,rgba(90,24,154,0.5),rgba(60,10,120,0.4));border:1px solid rgba(150,80,220,0.25);color:#e2d9ff;cursor:pointer;transition:all 0.3s ease}
+    .sort-btn:hover{background:linear-gradient(90deg,rgba(110,34,174,0.6),rgba(80,20,140,0.5));transform:translateY(-2px)}
 
-    @media(max-width:720px){.flip-card{width:180px;height:290px}.member-node{width:180px}}
+    /* ========== GAME MODE SELECTOR ========== */
+    .game-mode-selector{display:flex;gap:10px;margin-top:15px;flex-wrap:wrap}
+    .game-mode-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:rgba(30,10,50,0.4);border:1px solid rgba(150,80,220,0.25);color:#e2d9ff;cursor:pointer;transition:all 0.3s ease}
+    .game-mode-btn.active{background:linear-gradient(90deg,rgba(90,24,154,0.7),rgba(60,10,120,0.6));border-color:rgba(200,120,255,0.5)}
+    .game-mode-btn:hover{background:rgba(40,15,70,0.6)}
+    .game-mode-icon{width:20px;height:20px;background-size:contain;background-repeat:no-repeat;background-position:center}
+
+    /* ========== ANIMATIONS ========== */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(157, 77, 221, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(157, 77, 221, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(157, 77, 221, 0); }
+    }
+    
+    .pulse { animation: pulse 2s infinite; }
+
+    @media(max-width:720px){
+      .flip-card{width:180px;height:290px}
+      .member-node{width:180px}
+      .header-row{flex-direction:column;align-items:flex-start;gap:15px}
+      .controls{width:100%;justify-content:flex-start}
+    }
   </style>
 </head>
 <body>
@@ -76,6 +114,29 @@
       <div>
         <div class="clan-title">/six Members</div>
         <div style="color:#c9b6ff;margin-top:6px">Click a card to flip — all customization comes from the script (members array)</div>
+        
+        <div class="game-mode-selector">
+          <div class="game-mode-btn active" data-mode="all">
+            <span class="game-mode-icon" style="background-image: url('assets/icons/all.png')"></span>
+            <span>All Modes</span>
+          </div>
+          <div class="game-mode-btn" data-mode="crystal">
+            <span class="game-mode-icon" style="background-image: url('https://media.discordapp.net/attachments/1360264592025976923/1437527360130912276/Screenshot_20251111-033709_1-removebg-preview.png?ex=6913912e&is=69123fae&hm=fa4e5b5602cbc868b72f9b7942edab2e71aa5992ebd90b48e19a2dbde3ae69c0&=&format=webp&quality=lossless')"></span>
+            <span>Crystal PvP</span>
+          </div>
+          <div class="game-mode-btn" data-mode="sword">
+            <span class="game-mode-icon" style="background-image: url('https://media.discordapp.net/attachments/1360264592025976923/1437527359413813389/Screenshot_20251111-033454_1-removebg-preview.png?ex=6913912e&is=69123fae&hm=08e46601b7387d41addf576199e5802cedd0cd04748c307ae1f7fdd5e432273e&=&format=webp&quality=lossless')"></span>
+            <span>Sword PvP</span>
+          </div>
+          <div class="game-mode-btn" data-mode="nethpot">
+            <span class="game-mode-icon" style="background-image: url('https://media.discordapp.net/attachments/1360264592025976923/1437527358562242671/Screenshot_20251111-033424_1-removebg-preview.png?ex=6913912e&is=69123fae&hm=47e33fb2f371dbf8baa5de0fd83316c466923f605e67a12b4db368f7a0150ca3&=&format=webp&quality=lossless')"></span>
+            <span>NethPot</span>
+          </div>
+          <div class="game-mode-btn" data-mode="smp">
+            <span class="game-mode-icon" style="background-image: url('https://media.discordapp.net/attachments/1360264592025976923/1437527360776962168/Screenshot_20251111-033731_1-removebg-preview.png?ex=6913912e&is=69123fae&hm=67b4de2b18eeb5cc007bcddeda25ca7d35dad40b999087f228a07ee5b7cf01b3&=&format=webp&quality=lossless')"></span>
+            <span>SMP</span>
+          </div>
+        </div>
       </div>
       <div class="controls">
         <button class="sort-btn" id="sortByRank">Sort by Rank</button>
@@ -83,7 +144,9 @@
       </div>
     </div>
 
-    <section class="member-tree-container" id="memberTree"></section>
+    <section class="member-tree-container" id="memberTree">
+      <div class="tree-connections" id="treeConnections"></div>
+    </section>
   </main>
 
   <script>
@@ -93,6 +156,14 @@
       youtube: 'assets/icons/youtube.png',
       discord: 'assets/icons/discord.png',
       twitch: 'assets/icons/twitch.png'
+    };
+
+    /* ========== GAME MODE ICONS ========== */
+    const GAME_MODE_ICONS = {
+      crystal: 'assets/icons/crystalpvp.png',
+      sword: 'assets/icons/swordpvp.png',
+      nethpot: 'assets/icons/nethpot.png',
+      smp: 'assets/icons/smp.png'
     };
 
     /* ========== MEMBERS ARRAY: toggle everything here. This is the only place to customize cards. ========== */
@@ -105,7 +176,13 @@
         // tiers are optional. If absent or null, don't render that tier.
         crystalTier: 'HT1', hasCrystal: true,
         swordTier: 'HT1', hasSword: true,
+        nethpotTier: 'HT2', hasNethpot: true,
+        smpTier: null, hasSmp: false,
         socials: ['discord','youtube'], // choose any keys from SOCIAL_ICONS
+        socialLinks: {
+          discord: 'https://discord.gg/example',
+          youtube: 'https://youtube.com/example'
+        },
         backgroundImage: null // or 'assets/backgrounds/special.jpg' (full-cover image)
       },
       {
@@ -114,7 +191,12 @@
         cardType: 'diamond', theme: 'purple',
         crystalTier: 'HT1', hasCrystal: true,
         swordTier: null, hasSword: false, // sword disabled here
+        nethpotTier: 'HT3', hasNethpot: true,
+        smpTier: 'Member', hasSmp: true,
         socials: ['discord'],
+        socialLinks: {
+          discord: 'https://discord.gg/example'
+        },
         backgroundImage: null
       },
       {
@@ -123,7 +205,13 @@
         cardType: 'golden', theme: 'black', // example of a black-theme card
         crystalTier: 'HT1', hasCrystal: true,
         swordTier: null, hasSword: false,
+        nethpotTier: null, hasNethpot: false,
+        smpTier: 'Builder', hasSmp: true,
         socials: ['twitch','youtube'],
+        socialLinks: {
+          twitch: 'https://twitch.tv/example',
+          youtube: 'https://youtube.com/example'
+        },
         backgroundImage: 'https://th.bing.com/th/id/R.9859b727dd8dc0fc2ba5ac213bbe1514?rik=kg8pTlS21q2W7Q&pid=ImgRaw&r=0'
       },
       {
@@ -132,7 +220,39 @@
         cardType: 'bronze', theme: 'purple',
         crystalTier: null, hasCrystal: false,
         swordTier: 'LT10', hasSword: true,
+        nethpotTier: 'LT5', hasNethpot: true,
+        smpTier: null, hasSmp: false,
         socials: [],
+        socialLinks: {},
+        backgroundImage: null
+      },
+      {
+        name: 'ShadowBlade', rank: 'PvP Specialist', level:3,
+        avatar: 'https://minotar.net/avatar/Steve/128.png',
+        cardType: 'golden', theme: 'purple',
+        crystalTier: 'HT2', hasCrystal: true,
+        swordTier: 'HT3', hasSword: true,
+        nethpotTier: 'HT1', hasNethpot: true,
+        smpTier: null, hasSmp: false,
+        socials: ['tiktok', 'discord'],
+        socialLinks: {
+          tiktok: 'https://tiktok.com/@example',
+          discord: 'https://discord.gg/example'
+        },
+        backgroundImage: null
+      },
+      {
+        name: 'BuilderPro', rank: 'SMP Architect', level:4,
+        avatar: 'https://minotar.net/avatar/Alex/128.png',
+        cardType: 'bronze', theme: 'black',
+        crystalTier: null, hasCrystal: false,
+        swordTier: null, hasSword: false,
+        nethpotTier: null, hasNethpot: false,
+        smpTier: 'Master Builder', hasSmp: true,
+        socials: ['youtube'],
+        socialLinks: {
+          youtube: 'https://youtube.com/example'
+        },
         backgroundImage: null
       }
     ];
@@ -140,29 +260,48 @@
     /* Tier order for sorting (High -> Low). If member has both, we'll use crystalTier for tier-sort priority; fallback to swordTier. */
     const tierOrder = ['HT1','HT2','HT3','HT4','HT5','LT1','LT2','LT3','LT4','LT5'];
 
+    // Track current game mode filter
+    let currentGameMode = 'all';
+
     /* ======= RENDERING ======= */
     function renderMemberTree(sortBy='rank'){
       const container = document.getElementById('memberTree');
-      container.innerHTML='';
+      container.innerHTML='<div class="tree-connections" id="treeConnections"></div>';
+      const connectionsContainer = document.getElementById('treeConnections');
 
       // optionally sort
       const list = [...members];
+      
+      // Apply game mode filter
+      const filteredList = list.filter(member => {
+        if (currentGameMode === 'all') return true;
+        if (currentGameMode === 'crystal') return member.hasCrystal;
+        if (currentGameMode === 'sword') return member.hasSword;
+        if (currentGameMode === 'nethpot') return member.hasNethpot;
+        if (currentGameMode === 'smp') return member.hasSmp;
+        return true;
+      });
+      
       if(sortBy === 'tier'){
-        list.sort((a,b)=>{
-          const aTier = a.hasCrystal && a.crystalTier ? a.crystalTier : (a.hasSword && a.swordTier ? a.swordTier : null);
-          const bTier = b.hasCrystal && b.crystalTier ? b.crystalTier : (b.hasSword && b.swordTier ? b.swordTier : null);
+        filteredList.sort((a,b)=>{
+          const aTier = a.hasCrystal && a.crystalTier ? a.crystalTier : 
+                       (a.hasSword && a.swordTier ? a.swordTier : 
+                       (a.hasNethpot && a.nethpotTier ? a.nethpotTier : null));
+          const bTier = b.hasCrystal && b.crystalTier ? b.crystalTier : 
+                       (b.hasSword && b.swordTier ? b.swordTier : 
+                       (b.hasNethpot && b.nethpotTier ? b.nethpotTier : null));
           const ai = aTier ? tierOrder.indexOf(aTier) : tierOrder.length;
           const bi = bTier ? tierOrder.indexOf(bTier) : tierOrder.length;
           return ai - bi;
         });
       } else {
         // default: sort by level then name
-        list.sort((a,b)=> (a.level||99)-(b.level||99) || a.name.localeCompare(b.name));
+        filteredList.sort((a,b)=> (a.level||99)-(b.level||99) || a.name.localeCompare(b.name));
       }
 
       // group by level
       const levels = {};
-      list.forEach(m=>{const lv = m.level||99; (levels[lv]=levels[lv]||[]).push(m)});
+      filteredList.forEach(m=>{const lv = m.level||99; (levels[lv]=levels[lv]||[]).push(m)});
 
       const tree = document.createElement('div'); tree.className='tree-structure';
       Object.keys(levels).sort((a,b)=>a-b).forEach(lv=>{
@@ -177,6 +316,9 @@
       document.querySelectorAll('.flip-card').forEach(card=>{
         card.addEventListener('click', ()=> card.classList.toggle('is-flipped'));
       });
+
+      // Draw chains after DOM is rendered
+      setTimeout(() => drawChains(levels, connectionsContainer), 100);
     }
 
     function createMemberNode(member){
@@ -188,11 +330,22 @@
 
       // FRONT
       const front = document.createElement('div'); front.className='flip-face front';
-      if(member.backgroundImage){ const bgdiv = document.createElement('div'); bgdiv.className='bg-img'; bgdiv.style.backgroundImage = `url(${member.backgroundImage})`; front.appendChild(bgdiv); }
+      const contentWrapper = document.createElement('div'); contentWrapper.className = 'content-wrapper';
+      
+      if(member.backgroundImage){ 
+        const bgdiv = document.createElement('div'); 
+        bgdiv.className='bg-img'; 
+        bgdiv.style.backgroundImage = `url(${member.backgroundImage})`; 
+        front.appendChild(bgdiv); 
+      }
+      
       const avatar = document.createElement('img'); avatar.className='member-avatar'; avatar.src = member.avatar; avatar.alt = member.name;
       const nameEl = document.createElement('div'); nameEl.className='member-name'; nameEl.textContent = member.name;
       const rankEl = document.createElement('div'); rankEl.className='member-rank'; rankEl.textContent = member.rank || '';
-      front.appendChild(avatar); front.appendChild(nameEl); front.appendChild(rankEl);
+      
+      contentWrapper.appendChild(avatar); 
+      contentWrapper.appendChild(nameEl); 
+      contentWrapper.appendChild(rankEl);
 
       // tiers (render only if enabled)
       const tierRow = document.createElement('div'); tierRow.className='tier-row';
@@ -212,7 +365,25 @@
         t.appendChild(txt);
         tierRow.appendChild(t);
       }
-      front.appendChild(tierRow);
+      if(member.hasNethpot && member.nethpotTier){
+        const t = document.createElement('div'); t.className='tier-item tier-nethpot';
+        const icon = document.createElement('span'); icon.className='tier-icon'; icon.style.backgroundImage = "url('assets/icons/nethpot.png')";
+        t.appendChild(icon);
+        const txt = document.createElement('span'); txt.textContent = member.nethpotTier;
+        t.appendChild(txt);
+        tierRow.appendChild(t);
+      }
+      if(member.hasSmp && member.smpTier){
+        const t = document.createElement('div'); t.className='tier-item tier-smp';
+        const icon = document.createElement('span'); icon.className='tier-icon'; icon.style.backgroundImage = "url('assets/icons/smp.png')";
+        t.appendChild(icon);
+        const txt = document.createElement('span'); txt.textContent = member.smpTier;
+        t.appendChild(txt);
+        tierRow.appendChild(t);
+      }
+      
+      contentWrapper.appendChild(tierRow);
+      front.appendChild(contentWrapper);
 
       // BACK
       const back = document.createElement('div'); back.className='flip-face back';
@@ -224,6 +395,8 @@
       const combined = [];
       if(member.hasCrystal && member.crystalTier) combined.push(`<span style="display:inline-flex;align-items:center;gap:6px"><img src="assets/icons/crystalpvp.png" style="width:16px;height:16px;vertical-align:middle"> ${member.crystalTier}</span>`);
       if(member.hasSword && member.swordTier) combined.push(`<span style="display:inline-flex;align-items:center;gap:6px"><img src="assets/icons/swordpvp.png" style="width:16px;height:16px;vertical-align:middle"> ${member.swordTier}</span>`);
+      if(member.hasNethpot && member.nethpotTier) combined.push(`<span style="display:inline-flex;align-items:center;gap:6px"><img src="assets/icons/nethpot.png" style="width:16px;height:16px;vertical-align:middle"> ${member.nethpotTier}</span>`);
+      if(member.hasSmp && member.smpTier) combined.push(`<span style="display:inline-flex;align-items:center;gap:6px"><img src="assets/icons/smp.png" style="width:16px;height:16px;vertical-align:middle"> ${member.smpTier}</span>`);
       tierLabel.innerHTML = combined.length ? combined.join(' &nbsp; ') : 'No PvP tiers';
       backTop.appendChild(tierLabel);
 
@@ -236,7 +409,12 @@
       // socials (selectable through script: member.socials array)
       const socialsWrap = document.createElement('div'); socialsWrap.className='socials';
       (member.socials || []).forEach(s => {
-        const btn = document.createElement('a'); btn.className='social-btn'; btn.href='#'; btn.setAttribute('data-social', s);
+        const btn = document.createElement('a'); 
+        btn.className='social-btn'; 
+        btn.href=member.socialLinks[s] || '#'; 
+        btn.setAttribute('data-social', s);
+        btn.target = '_blank';
+        
         const icon = document.createElement('span'); icon.className='social-icon';
         icon.style.backgroundImage = `url(${SOCIAL_ICONS[s] || ''})`;
         const label = document.createElement('span'); label.textContent = s.charAt(0).toUpperCase() + s.slice(1);
@@ -250,32 +428,109 @@
       themeWrapper.appendChild(wrapper);
       node.appendChild(themeWrapper);
 
-      // If user desires a black-only override for a few cards, set member.theme='black' in the array above.
-
       return node;
+    }
+
+    function drawChains(levels, container) {
+      const levelKeys = Object.keys(levels).sort((a, b) => a - b);
+      
+      // Draw chains between levels
+      for (let i = 0; i < levelKeys.length - 1; i++) {
+        const currentLevel = levels[levelKeys[i]];
+        const nextLevel = levels[levelKeys[i + 1]];
+        
+        // Connect each member in current level to one or two members in next level
+        currentLevel.forEach((member, memberIndex) => {
+          const memberNode = document.querySelector(`.member-node:has(.member-name:contains("${member.name}")`);
+          if (!memberNode) return;
+          
+          const memberRect = memberNode.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          
+          const startX = memberRect.left + memberRect.width / 2 - containerRect.left;
+          const startY = memberRect.top + memberRect.height - containerRect.top;
+          
+          // Connect to one or two members in next level
+          const connections = [];
+          if (nextLevel.length === 1) {
+            connections.push(0);
+          } else {
+            // Distribute connections
+            const connectionIndex = Math.floor(memberIndex * nextLevel.length / currentLevel.length);
+            connections.push(connectionIndex);
+            if (currentLevel.length < nextLevel.length && memberIndex < nextLevel.length - 1) {
+              connections.push(connectionIndex + 1);
+            }
+          }
+          
+          connections.forEach(connIndex => {
+            if (connIndex >= nextLevel.length) return;
+            
+            const nextMember = nextLevel[connIndex];
+            const nextMemberNode = document.querySelector(`.member-node:has(.member-name:contains("${nextMember.name}")`);
+            if (!nextMemberNode) return;
+            
+            const nextMemberRect = nextMemberNode.getBoundingClientRect();
+            const endX = nextMemberRect.left + nextMemberRect.width / 2 - containerRect.left;
+            const endY = nextMemberRect.top - containerRect.top;
+            
+            // Create chain
+            const chain = document.createElement('div');
+            chain.className = 'chain';
+            
+            const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+            const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+            
+            chain.style.width = `${length}px`;
+            chain.style.height = '4px';
+            chain.style.left = `${startX}px`;
+            chain.style.top = `${startY}px`;
+            chain.style.transform = `rotate(${angle}deg)`;
+            
+            container.appendChild(chain);
+            
+            // Add chain links
+            const linkCount = Math.floor(length / 30);
+            for (let i = 0; i < linkCount; i++) {
+              const link = document.createElement('div');
+              link.className = 'chain-link';
+              const progress = i / (linkCount - 1);
+              const linkX = startX + (endX - startX) * progress;
+              const linkY = startY + (endY - startY) * progress;
+              
+              link.style.left = `${linkX - 6}px`;
+              link.style.top = `${linkY - 6}px`;
+              
+              // Add pulsing animation to some links
+              if (i % 3 === 0) {
+                link.classList.add('pulse');
+              }
+              
+              container.appendChild(link);
+            }
+          });
+        });
+      }
     }
 
     // initial render
     document.addEventListener('DOMContentLoaded', ()=>{
       renderMemberTree();
+      
+      // Sort buttons
       document.getElementById('sortByRank').addEventListener('click', ()=>renderMemberTree('rank'));
       document.getElementById('sortByTier').addEventListener('click', ()=>renderMemberTree('tier'));
+      
+      // Game mode buttons
+      document.querySelectorAll('.game-mode-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.game-mode-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentGameMode = this.getAttribute('data-mode');
+          renderMemberTree();
+        });
+      });
     });
-
-    /* ========== NOTES FOR YOU (how to customize) ==========
-       - All visual customizations come from the `members` array near the top of this script.
-         * theme: 'purple' or 'black'
-         * hasCrystal / hasSword: booleans to turn each tier on/off for that member
-         * crystalTier / swordTier: text to display (e.g. 'HT1' or 'LT10')
-         * socials: array of keys from SOCIAL_ICONS (e.g. ['tiktok','discord'])
-         * backgroundImage: optional path to an image to show behind the card front
-       - To make every card purple by default, set theme: 'purple' on each member (or change default in createMemberNode)
-       - To make a few cards black, put theme: 'black' on those member objects only.
-       - The flip behaviour is automatic on click (toggle). Back shows: tier(s) at top, avatar, bold username, socials.
-       - Tier icons are centered with the tier text using inline-flex/align-items:center so they sit middle-of-line.
-
-       If you want, I can also: add per-social links (instead of '#'), add tooltips, or provide a small UI to toggle flip programmatically.
-    */
   </script>
 </body>
 </html>
