@@ -618,81 +618,7 @@
       grid-template-columns: 1fr;
     }
   }
-  /* ===== CUSTOM CURSOR (Optimized + Centered + Click Pulse) ===== */
-.cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-.cursor-dot, .cursor-ring {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.cursor-dot {
-  width: 8px;
-  height: 8px;
-  background-color: #b066ff;
-  border-radius: 50%;
-  z-index: 2;
-}
-
-.cursor-ring {
-  width: 36px;
-  height: 36px;
-  border: 2px solid #b066ff;
-  border-radius: 50%;
-  opacity: 0.6;
-  z-index: 1;
-  transition: transform 0.15s ease-out, width 0.15s, height 0.15s;
-}
-
-/* Hide default cursor */
-body, a, button, input, textarea {
-  cursor: none !important;
-}
-
-/* Text hover effect */
-body.text-hover .cursor-dot {
-  background-color: #d599ff;
-  transform: translate(-50%, -50%) scale(1.4);
-}
-
-body.text-hover .cursor-ring {
-  border-color: #d599ff;
-  width: 28px;
-  height: 28px;
-  opacity: 0.8;
-}
-
-/* Click pulse effect */
-.cursor-ring.click-pulse {
-  animation: cursorPulse 0.4s ease-out;
-}
-
-@keyframes cursorPulse {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.8);
-    opacity: 0.2;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.6;
-  }
-}
+ 
 .discord-section {
   display: flex;
   justify-content: center;
@@ -1132,51 +1058,8 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
-  <div class="cursor">
-  <div class="cursor-dot"></div>
-  <div class="cursor-ring"></div>
-</div>
-<script>
-const dot = document.querySelector('.cursor-dot');
-const ring = document.querySelector('.cursor-ring');
+  
 
-let mouseX = 0, mouseY = 0;
-let ringX = 0, ringY = 0;
-
-document.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-  dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
-});
-
-function animate() {
-  ringX += (mouseX - ringX) * 0.2;
-  ringY += (mouseY - ringY) * 0.2;
-  ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-  requestAnimationFrame(animate);
-}
-animate();
-
-// Smooth text hover detection (optimized)
-document.addEventListener('mouseover', (e) => {
-  if (e.target.closest('a, button, p, span, h1, h2, h3, h4, h5, h6')) {
-    document.body.classList.add('text-hover');
-  }
-});
-document.addEventListener('mouseout', (e) => {
-  if (e.target.closest('a, button, p, span, h1, h2, h3, h4, h5, h6')) {
-    document.body.classList.remove('text-hover');
-  }
-});
-
-// Click pulse effect
-document.addEventListener('mousedown', () => {
-  ring.classList.add('click-pulse');
-});
-document.addEventListener('mouseup', () => {
-  setTimeout(() => ring.classList.remove('click-pulse'), 150);
-});
-</script>
   <script>
 async function loadDiscordStats() {
   const invite = "tu6rpKhenw"; // Replace with your real invite code
