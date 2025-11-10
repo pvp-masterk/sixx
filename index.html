@@ -4,25 +4,24 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>/six Clan</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-@font-face {
-  font-family: 'Diecide Remain';
-  src: url('fonts/DeicideRemain.otf') format('opentype');
-  font-display: swap;
-}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   /* ======================= RESET & BASE ======================= */
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
   body{
-    font-family: 'Exo 2', sans-serif;
+    font-family: 'Inter', sans-serif;
     color:#e8e6f3;
     background:#050006;
-    overflow:auto;
+    overflow-x:hidden;
     -webkit-font-smoothing:antialiased;
     line-height: 1.6;
+  }
+
+  /* ======================= PERFORMANCE OPTIMIZATIONS ======================= */
+  .bg-layer, .fog {
+    will-change: transform;
+    transform: translateZ(0);
   }
 
   /* ======================= BACKGROUND ======================= */
@@ -37,7 +36,7 @@
     position:absolute;
     inset:-20%;
     transform:scale(1.1);
-    filter:blur(60px);
+    filter:blur(40px); /* Reduced for performance */
     mix-blend-mode:screen;
     opacity:0.9;
     transition:opacity .6s ease;
@@ -59,42 +58,41 @@
     inset:-10%;
     background:radial-gradient(circle at 20% 30%, rgba(100, 40, 180, 0.1), transparent 10%), 
                radial-gradient(circle at 80% 70%, rgba(25, 0, 60, 0.1), transparent 15%);
-    filter:blur(30px);
-    animation:drift 25s linear infinite;
+    filter:blur(20px); /* Reduced for performance */
+    animation:drift 40s linear infinite; /* Slower for performance */
   }
   @keyframes drift{
     0%{transform:translateY(0) rotate(0deg)}
-    50%{transform:translateY(-4%) translateX(2%) rotate(1deg)}
+    50%{transform:translateY(-2%) translateX(1%) rotate(0.5deg)}
     100%{transform:translateY(0) rotate(0deg)}
   }
 
   /* ======================= CUSTOM /SIX FONT ======================= */
   .six-text{
-    font-family: 'Diecide Remain', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     background: linear-gradient(135deg, #c77dff, #9d4edd, #7b2cbf);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    text-shadow: 0 0 20px rgba(180, 80, 255, 0.6), 
-                 0 0 40px rgba(140, 40, 220, 0.4);
+    text-shadow: 0 0 15px rgba(180, 80, 255, 0.6), 
+                 0 0 30px rgba(140, 40, 220, 0.4);
     letter-spacing: 1.5px;
     font-weight: 900;
     display: inline-block;
     position: relative;
-    animation: textGlow 3s ease-in-out infinite alternate;
+    animation: textGlow 4s ease-in-out infinite alternate; /* Slower for performance */
   }
   
   @keyframes textGlow {
     0% {
-      text-shadow: 0 0 20px rgba(180, 80, 255, 0.6), 
-                   0 0 40px rgba(140, 40, 220, 0.4);
+      text-shadow: 0 0 15px rgba(180, 80, 255, 0.6), 
+                   0 0 30px rgba(140, 40, 220, 0.4);
       transform: scale(1);
     }
     100% {
-      text-shadow: 0 0 25px rgba(200, 100, 255, 0.8), 
-                   0 0 50px rgba(160, 60, 240, 0.6),
-                   0 0 60px rgba(120, 20, 200, 0.4);
-      transform: scale(1.02);
+      text-shadow: 0 0 20px rgba(200, 100, 255, 0.8), 
+                   0 0 40px rgba(160, 60, 240, 0.6);
+      transform: scale(1.01);
     }
   }
 
@@ -121,14 +119,14 @@
     background-image:linear-gradient(180deg, #e0aaff, #9d4edd 40%, #5a189a 100%);
     text-shadow: 0 12px 40px rgba(90, 24, 154, 0.7);
     margin-bottom: 20px;
-    font-family: 'Diecide Remain', sans-serif;
+    font-family: 'Orbitron', sans-serif;
     position: relative;
-    animation: pulse 4s ease-in-out infinite;
+    animation: pulse 6s ease-in-out infinite; /* Slower for performance */
   }
   
   @keyframes pulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
+    50% { transform: scale(1.02); }
   }
 
   .enter-card{
@@ -144,7 +142,7 @@
     max-width: 700px;
   }
   .enter-card:hover{
-    transform:translateY(-8px) scale(1.02);
+    transform:translateY(-5px) scale(1.01);
     box-shadow: 0 15px 40px rgba(90, 24, 154, 0.4);
     border: 1px solid rgba(200, 140, 255, 0.3);
   }
@@ -164,8 +162,6 @@
   color: #e0aaff;
   text-shadow: 0 0 8px rgba(160, 80, 255, 0.6);
 }
-
-
 
   /* ======================= APP ======================= */
   .app{
@@ -220,7 +216,7 @@
     border-radius: 8px;
     padding: 10px 15px;
     color: #e2d9ff;
-    font-family: 'Exo 2', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     transition: all 0.3s;
   }
@@ -231,7 +227,7 @@
     box-shadow: 0 0 0 2px rgba(150, 80, 220, 0.2);
   }
 
-  /* CARDS */
+  /* CARDS - Consistent styling */
   .card{
     background: linear-gradient(145deg, rgba(40, 15, 70, 0.4), rgba(20, 5, 40, 0.3));
     border: 1px solid rgba(150, 80, 220, 0.15);
@@ -294,6 +290,8 @@
     border-radius: 12px;
     padding: 20px;
     transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
   }
   
   .member-card:hover {
@@ -326,241 +324,191 @@
     font-weight: 600;
   }
 
- /* ======== GOLDEN ANIMATION ======== */
-@keyframes goldGradient {
-  0% {
-    background-position: 0% 50%;
+  /* ======== TIER ANIMATIONS ======== */
+  @keyframes gradientFlow {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 200% 50%;
+    }
   }
-  100% {
-    background-position: 200% 50%;
+
+  .member-card.diamond {
+    border: 2px solid transparent;
+    background: linear-gradient(145deg, #0a1b2a, #102437);
+    position: relative;
   }
-}
 
-.member-card.golden {
-  border: 2px solid transparent;
-  background: linear-gradient(145deg, #2a1f09, #3b2b0d);
-  position: relative;
-  border-radius: 12px;
-  padding: 20px;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.member-card.golden::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 2px;
-  background: linear-gradient(90deg, #ffd700, #ffcc33, #ff9900, #ffd700);
-  background-size: 300% 300%;
-  animation: goldGradient 6s linear infinite;
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  z-index: -1;
-}
-
-.member-card.golden .member-name {
-  background: linear-gradient(90deg, #ffea00, #ffd700, #ffcc33, #ffea00);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 800;
-  animation: goldGradient 6s linear infinite;
-}
-
-.member-card.golden .member-tier {
-  background: linear-gradient(90deg, #ffd700, #ffcc33, #ff9900, #ffd700);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 700;
-  animation: goldGradient 6s linear infinite;
-  text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
-}
-  /* ======== DIAMOND ANIMATION ======== */
-@keyframes diamondShine {
-  0% {
-    background-position: 0% 50%;
+  .member-card.diamond::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 2px;
+    background: linear-gradient(90deg, #00e5ff, #33ccff, #99ffff, #00e5ff);
+    background-size: 300% 300%;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    z-index: -1;
   }
-  100% {
-    background-position: 200% 50%;
+
+  .member-card.diamond .member-name {
+    background: linear-gradient(90deg, #a0faff, #66e0ff, #99ffff, #ccffff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
+    text-shadow: 0 0 6px rgba(160, 255, 255, 0.5);
   }
-}
 
-.member-card.diamond {
-  border: 2px solid transparent;
-  background: linear-gradient(145deg, #0a1b2a, #102437);
-  position: relative;
-  border-radius: 12px;
-  padding: 20px;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.member-card.diamond::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 2px;
-  background: linear-gradient(90deg, #00e5ff, #33ccff, #99ffff, #00e5ff);
-  background-size: 300% 300%;
-  animation: diamondShine 6s linear infinite;
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  z-index: -1;
-}
-
-.member-card.diamond .member-name {
-  background: linear-gradient(90deg, #a0faff, #66e0ff, #99ffff, #ccffff);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 800;
-  animation: diamondShine 6s linear infinite;
-  text-shadow: 0 0 6px rgba(160, 255, 255, 0.5);
-}
-
-.member-card.diamond .member-tier {
-  background: linear-gradient(90deg, #a0faff, #66e0ff, #99ffff, #ccffff);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 700;
-  animation: diamondShine 6s linear infinite;
-  text-shadow: 0 0 5px rgba(160, 255, 255, 0.3);
-}
-
-  /* ======== BRONZE ANIMATION ======== */
-@keyframes bronzeFlow {
-  0% {
-    background-position: 0% 50%;
+  .member-card.diamond .member-tier {
+    background: linear-gradient(90deg, #a0faff, #66e0ff, #99ffff, #ccffff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
+    text-shadow: 0 0 5px rgba(160, 255, 255, 0.3);
   }
-  100% {
-    background-position: 200% 50%;
+
+  .member-card.golden {
+    border: 2px solid transparent;
+    background: linear-gradient(145deg, #2a1f09, #3b2b0d);
   }
-}
 
-.member-card.bronze {
-  border: 2px solid transparent;
-  background: linear-gradient(145deg, #2b1508, #3a1e0b);
-  position: relative;
-  border-radius: 12px;
-  padding: 20px;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.member-card.bronze::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 2px;
-  background: linear-gradient(90deg, #cd7f32, #d98b46, #b87333, #cd7f32);
-  background-size: 300% 300%;
-  animation: bronzeFlow 6s linear infinite;
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  z-index: -1;
-}
-
-.member-card.bronze .member-name {
-  background: linear-gradient(90deg, #ffb46a, #e6893f, #ff9a56, #ffb46a);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 800;
-  animation: bronzeFlow 6s linear infinite;
-  text-shadow: 0 0 6px rgba(255, 160, 80, 0.4);
-}
-
-.member-card.bronze .member-tier {
-  background: linear-gradient(90deg, #ffb46a, #e6893f, #ff9a56, #ffb46a);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 700;
-  animation: bronzeFlow 6s linear infinite;
-  text-shadow: 0 0 5px rgba(255, 140, 60, 0.3);
-}
-/* ======== SILVER ANIMATION ======== */
-@keyframes silverWave {
-  0% {
-    background-position: 0% 50%;
+  .member-card.golden::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 2px;
+    background: linear-gradient(90deg, #ffd700, #ffcc33, #ff9900, #ffd700);
+    background-size: 300% 300%;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    z-index: -1;
   }
-  100% {
-    background-position: 200% 50%;
+
+  .member-card.golden .member-name {
+    background: linear-gradient(90deg, #ffea00, #ffd700, #ffcc33, #ffea00);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
   }
-}
 
-.member-card.silver {
-  border: 2px solid transparent;
-  background: linear-gradient(145deg, #1a1a1a, #222222);
-  position: relative;
-  border-radius: 12px;
-  padding: 20px;
-  overflow: hidden;
-  z-index: 0;
-}
+  .member-card.golden .member-tier {
+    background: linear-gradient(90deg, #ffd700, #ffcc33, #ff9900, #ffd700);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+  }
 
-.member-card.silver::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 2px;
-  background: linear-gradient(90deg, #cccccc, #f2f2f2, #b0b0b0, #cccccc);
-  background-size: 300% 300%;
-  animation: silverWave 6s linear infinite;
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  z-index: -1;
-}
+  .member-card.bronze {
+    border: 2px solid transparent;
+    background: linear-gradient(145deg, #2b1508, #3a1e0b);
+  }
 
-.member-card.silver .member-name {
-  background: linear-gradient(90deg, #ffffff, #e0e0e0, #cccccc, #ffffff);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 800;
-  animation: silverWave 6s linear infinite;
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
-}
+  .member-card.bronze::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 2px;
+    background: linear-gradient(90deg, #cd7f32, #d98b46, #b87333, #cd7f32);
+    background-size: 300% 300%;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    z-index: -1;
+  }
 
-.member-card.silver .member-tier {
-  background: linear-gradient(90deg, #ffffff, #e0e0e0, #cccccc, #ffffff);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 700;
-  animation: silverWave 6s linear infinite;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-}
+  .member-card.bronze .member-name {
+    background: linear-gradient(90deg, #ffb46a, #e6893f, #ff9a56, #ffb46a);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
+    text-shadow: 0 0 6px rgba(255, 160, 80, 0.4);
+  }
 
+  .member-card.bronze .member-tier {
+    background: linear-gradient(90deg, #ffb46a, #e6893f, #ff9a56, #ffb46a);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
+    text-shadow: 0 0 5px rgba(255, 140, 60, 0.3);
+  }
 
+  .member-card.silver {
+    border: 2px solid transparent;
+    background: linear-gradient(145deg, #1a1a1a, #222222);
+  }
 
+  .member-card.silver::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 2px;
+    background: linear-gradient(90deg, #cccccc, #f2f2f2, #b0b0b0, #cccccc);
+    background-size: 300% 300%;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    z-index: -1;
+  }
+
+  .member-card.silver .member-name {
+    background: linear-gradient(90deg, #ffffff, #e0e0e0, #cccccc, #ffffff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+  }
+
+  .member-card.silver .member-tier {
+    background: linear-gradient(90deg, #ffffff, #e0e0e0, #cccccc, #ffffff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+    animation: gradientFlow 8s linear infinite; /* Slower for performance */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  }
 
   /* BUTTONS */
   .discord-btn{
@@ -578,7 +526,7 @@
     font-weight:700;
     font-size: 18px;
     transition: all 0.3s;
-    font-family: 'Exo 2', sans-serif;
+    font-family: 'Inter', sans-serif;
     margin-top: 20px;
     box-shadow: 0 5px 15px rgba(90, 24, 154, 0.4);
   }
@@ -597,6 +545,331 @@
     padding-top: 20px;
     border-top: 1px solid rgba(150, 80, 220, 0.2);
   }
+
+  /* ======================= SECTIONS ======================= */
+  /* Consistent styling for all sections */
+  .section {
+    padding: 80px 5%;
+    background: rgba(10, 10, 15, 0.85);
+    text-align: center;
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 -4px 40px rgba(0, 0, 0, 0.5);
+    margin-bottom: 30px;
+    border-radius: 16px;
+  }
+
+  .section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5em;
+    margin-bottom: 40px;
+    color: #fff;
+    text-shadow: 0 0 15px #ff00ff, 0 0 30px #9900ff;
+    letter-spacing: 3px;
+  }
+
+  /* Gallery Section */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    justify-items: center;
+  }
+
+  .banner-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(30, 0, 50, 0.9), rgba(0, 0, 20, 0.9));
+    box-shadow: 0 0 25px rgba(150, 0, 255, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .banner-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 35px rgba(255, 0, 255, 0.7);
+  }
+
+  .banner-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+  }
+
+  .banner-card:hover .banner-img {
+    opacity: 1;
+  }
+
+  .banner-caption {
+    display: block;
+    padding: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1em;
+    color: #fff;
+    text-shadow: 0 0 8px #ff00ff;
+    background: rgba(255, 0, 255, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Socials Section */
+  .socials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 35px;
+    justify-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .social-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    height: 180px;
+    background: linear-gradient(145deg, rgba(30, 0, 50, 0.85), rgba(10, 0, 20, 0.85));
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow:
+      0 0 25px rgba(255, 0, 255, 0.15),
+      inset 0 0 10px rgba(255, 255, 255, 0.03);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .social-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top left, rgba(255,0,255,0.1), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .social-card:hover::before {
+    opacity: 1;
+  }
+
+  .social-card:hover {
+    transform: translateY(-6px) scale(1.04);
+    box-shadow: 0 0 35px rgba(255, 0, 255, 0.4),
+                inset 0 0 15px rgba(255, 255, 255, 0.05);
+  }
+
+  .social-icon {
+    width: 55px;
+    height: 55px;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 10px rgba(255, 0, 255, 0.5));
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+
+  .social-card:hover .social-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.8));
+  }
+
+  .social-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1em;
+    color: #fff;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+  }
+
+  .social-card:hover .social-name {
+    opacity: 1;
+  }
+
+  /* Discord Section */
+  .discord-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 60px;
+  }
+
+  .discord-card {
+    background: linear-gradient(145deg, rgba(80, 40, 120, 0.4), rgba(50, 10, 80, 0.3));
+    border: 1px solid rgba(180, 120, 255, 0.2);
+    border-radius: 16px;
+    padding: 20px 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 8px 25px rgba(30, 0, 60, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .discord-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 35px rgba(150, 90, 255, 0.5);
+  }
+
+  .discord-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    border: 2px solid rgba(180, 120, 255, 0.5);
+    box-shadow: 0 0 20px rgba(180, 120, 255, 0.3);
+  }
+
+  .discord-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #fff;
+  }
+
+  .discord-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    color: #c9a2ff;
+    text-shadow: 0 0 10px #a96cff;
+    margin-bottom: 5px;
+  }
+
+  .discord-date {
+    font-size: 15px;
+    opacity: 0.8;
+  }
+
+  .discord-members {
+    margin-top: 8px;
+    font-weight: bold;
+    color: #b589ff;
+  }
+
+  .discord-progress {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 5px;
+  }
+
+  #progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #b77bff, #8f3fff);
+    transition: width 1s ease;
+    border-radius: 5px;
+  }
+
+  /* Clan War Button */
+  .clanwar-btn {
+    padding: 12px 24px;
+    background: linear-gradient(90deg, #7b2cbf, #5a189a);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 20px;
+  }
+  .clanwar-btn:hover {
+    background: linear-gradient(90deg, #8a3fd4, #6a28d1);
+  }
+
+  /* Modal Styles */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .modal-content {
+    background: linear-gradient(145deg, rgba(40, 15, 70, 0.8), rgba(20, 5, 40, 0.8));
+    padding: 30px;
+    border-radius: 20px;
+    width: 400px;
+    max-width: 90%;
+    color: #fff;
+    text-align: center;
+  }
+
+  .modal-content h2 {
+    margin-bottom: 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 24px;
+  }
+
+  .modal-content label {
+    display: block;
+    text-align: left;
+    margin-bottom: 15px;
+    font-weight: 500;
+  }
+
+  .modal-content input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin-top: 5px;
+  }
+
+  .modal-content button {
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: none;
+    background: #7b2cbf;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+
+  .banner-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+  }
+  .modal-img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(255, 0, 255, 0.6);
+    animation: zoomIn 0.3s ease;
+  }
+  @keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  /* Notification */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: green;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 12px;
+    display: none;
+    font-weight: 600;
+    z-index: 2000;
+  }
+  .notification.error { background: red; }
 
   /* Responsive adjustments */
   @media (max-width: 768px) {
@@ -617,342 +890,12 @@
     .roster-list, .member-grid {
       grid-template-columns: 1fr;
     }
+    
+    .discord-card {
+      flex-direction: column;
+      text-align: center;
+    }
   }
- 
-.discord-section {
-  display: flex;
-  justify-content: center;
-  margin-top: 60px;
-  animation: fadeIn 1.5s ease;
-}
-
-.discord-card {
-  background: linear-gradient(145deg, rgba(80, 40, 120, 0.4), rgba(50, 10, 80, 0.3));
-  border: 1px solid rgba(180, 120, 255, 0.2);
-  border-radius: 16px;
-  padding: 20px 30px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  box-shadow: 0 8px 25px rgba(30, 0, 60, 0.4);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  width: 100%;       /* Full width like other cards */
-  max-width: 100%;   /* Ensures it fits container */
-}
-
-.discord-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 35px rgba(150, 90, 255, 0.5);
-}
-
-.discord-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
-  border: 2px solid rgba(180, 120, 255, 0.5);
-  box-shadow: 0 0 20px rgba(180, 120, 255, 0.3);
-}
-
-.discord-info {
-  flex: 1;               /* Take up remaining space */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: #fff;
-}
-
-.discord-name {
-  font-family: 'Diecide_Remain', sans-serif;
-  font-size: 28px;
-  color: #c9a2ff;
-  text-shadow: 0 0 10px #a96cff;
-  margin-bottom: 5px;
-}
-
-.discord-date {
-  font-size: 15px;
-  opacity: 0.8;
-}
-
-.discord-members {
-  margin-top: 8px;
-  font-weight: bold;
-  color: #b589ff;
-}
-
-.discord-progress {
-  width: 100%;           /* Full width of the info section */
-  height: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
-  overflow: hidden;
-  margin-top: 5px;
-}
-
-#progress-bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #b77bff, #8f3fff);
-  transition: width 1s ease;
-  border-radius: 5px;
-}
-.clanwar-btn {
-  padding: 12px 24px;
-  background: linear-gradient(90deg, #7b2cbf, #5a189a);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.clanwar-btn:hover {
-  background: linear-gradient(90deg, #8a3fd4, #6a28d1);
-}
-
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-.modal-content {
-  background: linear-gradient(145deg, rgba(40, 15, 70, 0.8), rgba(20, 5, 40, 0.8));
-  padding: 30px;
-  border-radius: 20px;
-  width: 400px;
-  max-width: 90%;
-  color: #fff;
-  text-align: center;
-}
-
-.modal-content h2 {
-  margin-bottom: 20px;
-  font-family: 'Diecide_Remain', sans-serif;
-  font-size: 24px;
-}
-
-.modal-content label {
-  display: block;
-  text-align: left;
-  margin-bottom: 15px;
-  font-weight: 500;
-}
-
-.modal-content input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  margin-top: 5px;
-}
-
-.modal-content button {
-  padding: 10px 20px;
-  border-radius: 12px;
-  border: none;
-  background: #7b2cbf;
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 15px;
-}
-
-.notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: green;
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 12px;
-  display: none;
-  font-weight: 600;
-  z-index: 2000;
-}
-.notification.error { background: red; }
-/* 🏴 Banner Gallery */
-.gallery-section {
-  padding: 80px 5%;
-  background: rgba(10, 10, 15, 0.85);
-  text-align: center;
-  backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 -4px 40px rgba(0, 0, 0, 0.5);
-}
-
-.gallery-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 2.5em;
-  margin-bottom: 40px;
-  color: #fff;
-  text-shadow: 0 0 15px #ff00ff, 0 0 30px #9900ff;
-  letter-spacing: 3px;
-}
-
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 30px;
-  justify-items: center;
-}
-
-.banner-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 18px;
-  background: linear-gradient(145deg, rgba(30, 0, 50, 0.9), rgba(0, 0, 20, 0.9));
-  box-shadow: 0 0 25px rgba(150, 0, 255, 0.4);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.banner-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 35px rgba(255, 0, 255, 0.7);
-}
-
-.banner-img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  opacity: 0.9;
-  transition: opacity 0.3s ease;
-}
-
-.banner-card:hover .banner-img {
-  opacity: 1;
-}
-
-.banner-caption {
-  display: block;
-  padding: 10px;
-  font-family: 'Exo 2', sans-serif;
-  font-size: 1em;
-  color: #fff;
-  text-shadow: 0 0 8px #ff00ff;
-  background: rgba(255, 0, 255, 0.15);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-.banner-modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
-  z-index: 9999;
-}
-.modal-img {
-  max-width: 90%;
-  max-height: 90%;
-  border-radius: 12px;
-  box-shadow: 0 0 40px rgba(255, 0, 255, 0.6);
-  animation: zoomIn 0.3s ease;
-}
-@keyframes zoomIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-/* === 🌌 /SIX Socials Section === */
-.socials-section {
-  padding: 100px 5%;
-  background: rgba(10, 10, 20, 0.9);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(14px);
-  box-shadow: inset 0 0 40px rgba(255, 0, 255, 0.08),
-              0 0 50px rgba(150, 0, 255, 0.15);
-  text-align: center;
-}
-
-.section-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 2.4em;
-  color: #fff;
-  text-shadow: 0 0 15px #ff00ff, 0 0 30px #a000ff;
-  margin-bottom: 60px;
-  letter-spacing: 2px;
-}
-
-.socials-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 35px;
-  justify-items: center;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.social-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 180px;
-  height: 180px;
-  background: linear-gradient(145deg, rgba(30, 0, 50, 0.85), rgba(10, 0, 20, 0.85));
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow:
-    0 0 25px rgba(255, 0, 255, 0.15),
-    inset 0 0 10px rgba(255, 255, 255, 0.03);
-  transition: all 0.3s ease;
-  text-decoration: none;
-  overflow: hidden;
-  position: relative;
-}
-
-.social-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top left, rgba(255,0,255,0.1), transparent 60%);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.social-card:hover::before {
-  opacity: 1;
-}
-
-.social-card:hover {
-  transform: translateY(-6px) scale(1.04);
-  box-shadow: 0 0 35px rgba(255, 0, 255, 0.4),
-              inset 0 0 15px rgba(255, 255, 255, 0.05);
-}
-
-.social-icon {
-  width: 55px;
-  height: 55px;
-  margin-bottom: 16px;
-  filter: drop-shadow(0 0 10px rgba(255, 0, 255, 0.5));
-  transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.social-card:hover .social-icon {
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 15px rgba(255, 0, 255, 0.8));
-}
-
-.social-name {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 1.1em;
-  color: #fff;
-  letter-spacing: 1px;
-  text-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
-  opacity: 0.9;
-  transition: opacity 0.3s ease;
-}
-
-.social-card:hover .social-name {
-  opacity: 1;
-}
-
-
 </style>
 </head>
 <body>
@@ -992,94 +935,89 @@ Every Server they Join.</div>
     </div>
 
     <div class="card">
-  <div class="section-title">Members & Tiers</div>
-  <div class="member-grid">
-    <div class="member-card diamond">
-      <div class="member-name">Liar</div>
-      <div class="member-role">Founder & Leader</div>
-      <div class="member-tier">Tier: Unknown</div>
+      <div class="section-title">Members & Tiers</div>
+      <div class="member-grid">
+        <div class="member-card diamond">
+          <div class="member-name">Liar</div>
+          <div class="member-role">Founder & Leader</div>
+          <div class="member-tier">Tier: Unknown</div>
+        </div>
+
+        <div class="member-card diamond">
+          <div class="member-name">Toofles</div>
+          <div class="member-role">Co-Leader</div>
+          <div class="member-tier">Tier: Unknown</div>
+        </div>
+
+        <div class="member-card golden">
+          <div class="member-name">PVP_MASTERK</div>
+          <div class="member-role">Developer/Grinder</div>
+          <div class="member-tier">Tier: Unknown</div>
+        </div>
+
+        <div class="member-card golden">
+          <div class="member-name">Killers</div>
+          <div class="member-role">PvPer/Grinder</div>
+          <div class="member-tier">Tier: Unknown</div>
+        </div>
+      </div>
     </div>
 
-    <div class="member-card diamond">
-      <div class="member-name">Toofles</div>
-      <div class="member-role">Co-Leader</div>
-      <div class="member-tier">Tier: Unknown</div>
-    </div>
-
-    <div class="member-card golden">
-      <div class="member-name">PVP_MASTERK</div>
-      <div class="member-role">Developer/Grinder</div>
-      <div class="member-tier">Tier: Unknown</div>
-    </div>
-
-    <div class="member-card golden">
-      <div class="member-name">Killers</div>
-      <div class="member-role">PvPer/Grinder</div>
-      <div class="member-tier">Tier: Unknown</div>
-    </div>
-  </div>
-</div>
     <!-- 🏴 Clan Banner Gallery -->
-<section id="gallery" class="gallery-section">
-  <h2 class="gallery-title">/six Banner Gallery</h2>
-  <div class="gallery-grid">
-    <div class="banner-card">
-      <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1409814312582643762/quality_restoration_20250826161611300.jpg?ex=691248a5&is=6910f725&hm=c88e4edb0ff6272ee38e76e2defcc6dc9083d90cb3110814df009963d6448c15&" alt="Banner 1" class="banner-img" />
-      <span class="banner-caption">/six Discord</span>
-    </div>
-    <div class="banner-card">
-      <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1401944987473547284/lv_0_20250804230545.gif?ex=69120003&is=6910ae83&hm=df857a55f48ae991aa9a21bc3861f78ec3d58255d1c81baca5d19bbcdb2367dd&" alt="Banner 2" class="banner-img" />
-      <span class="banner-caption">SAIS</span>
-    </div>
-    <div class="banner-card">
-      <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1400024103142035487/Picsart_25-07-30_15-51-21-892.png?ex=6912434d&is=6910f1cd&hm=d4b8dd0301e620cef924f649d03fd9df71b1d1bc79e331ac82d2ae0161bfe323&" alt="Banner 3" class="banner-img" />
-      <span class="banner-caption">/six Discord 2</span>
-    </div>
-    <div class="banner-card">
-      <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1391335858023432192/quality_restoration_20250706162944658.jpg?ex=6911a2fe&is=6910517e&hm=e95e29495b0ce1097708621dd9b6c42caf52d4de16029f23ca60f11dc6ffaa25&" alt="Banner 4" class="banner-img" />
-      <span class="banner-caption">/six HIGHNOON</span>
-    </div>
-  </div>
-</section>
+    <section id="gallery" class="section">
+      <h2 class="section-title">/six Banner Gallery</h2>
+      <div class="gallery-grid">
+        <div class="banner-card">
+          <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1409814312582643762/quality_restoration_20250826161611300.jpg?ex=691248a5&is=6910f725&hm=c88e4edb0ff6272ee38e76e2defcc6dc9083d90cb3110814df009963d6448c15&" alt="Banner 1" class="banner-img" />
+          <span class="banner-caption">/six Discord</span>
+        </div>
+        <div class="banner-card">
+          <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1401944987473547284/lv_0_20250804230545.gif?ex=69120003&is=6910ae83&hm=df857a55f48ae991aa9a21bc3861f78ec3d58255d1c81baca5d19bbcdb2367dd&" alt="Banner 2" class="banner-img" />
+          <span class="banner-caption">SAIS</span>
+        </div>
+        <div class="banner-card">
+          <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1400024103142035487/Picsart_25-07-30_15-51-21-892.png?ex=6912434d&is=6910f1cd&hm=d4b8dd0301e620cef924f649d03fd9df71b1d1bc79e331ac82d2ae0161bfe323&" alt="Banner 3" class="banner-img" />
+          <span class="banner-caption">/six Discord 2</span>
+        </div>
+        <div class="banner-card">
+          <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1391335858023432192/quality_restoration_20250706162944658.jpg?ex=6911a2fe&is=6910517e&hm=e95e29495b0ce1097708621dd9b6c42caf52d4de16029f23ca60f11dc6ffaa25&" alt="Banner 4" class="banner-img" />
+          <span class="banner-caption">/six HIGHNOON</span>
+        </div>
+      </div>
+    </section>
 
     <!-- 🌌 /SIX — Socials Section -->
-<section id="socials" class="socials-section">
-  <h2 class="socials-title">Contacts of <span class="six-text">/six</span></h2>
-  <div class="socials-grid">
-  
-<a href="https://discord.gg/tu6rpKhenw" class="social-card" target="_blank">
-      <img src="https://cdn.discordapp.com/icons/1360258839429255208/3ea76fc8a0cd48df0e3ce22e89d84305.png?size=4096" alt="Discord" class="social-icon">
-      <span class="social-name">Discord</span>
-    </a>
-   
- <a href="https://tiktok.com/@xissais" class="social-card" target="_blank">
-      <img src="assets/icons/tiktok.svg" alt="TikTok" class="social-icon">
-      <span class="social-name">TikTok</span>
-    </a>
-  </div>
-</section>
-
-
+    <section id="socials" class="section">
+      <h2 class="section-title">Contacts of <span class="six-text">/six</span></h2>
+      <div class="socials-grid">
+        <a href="https://discord.gg/tu6rpKhenw" class="social-card" target="_blank">
+          <img src="https://cdn.discordapp.com/icons/1360258839429255208/3ea76fc8a0cd48df0e3ce22e89d84305.png?size=4096" alt="Discord" class="social-icon">
+          <span class="social-name">Discord</span>
+        </a>
+        <a href="https://tiktok.com/@xissais" class="social-card" target="_blank">
+          <img src="assets/icons/tiktok.svg" alt="TikTok" class="social-icon">
+          <span class="social-name">TikTok</span>
+        </a>
+      </div>
+    </section>
 
     <button class="clanwar-btn">Request Clan War</button>
 
     <section class="discord-section">
-  <div class="discord-card">
-    <img id="discord-icon" class="discord-icon" src="" alt="Discord Icon" />
-    <div class="discord-info">
-      <div class="discord-name">/six</div>
-      <div class="discord-date">Created: <span id="discord-date">Loading...</span></div>
-      <div class="discord-members">
-        <span id="member-count">0</span> / <span id="member-goal">200</span> Members
+      <div class="discord-card">
+        <img id="discord-icon" class="discord-icon" src="" alt="Discord Icon" />
+        <div class="discord-info">
+          <div class="discord-name">/six</div>
+          <div class="discord-date">Created: <span id="discord-date">Loading...</span></div>
+          <div class="discord-members">
+            <span id="member-count">0</span> / <span id="member-goal">200</span> Members
+          </div>
+          <div class="discord-progress">
+            <div id="progress-bar"></div>
+          </div>
+        </div>
       </div>
-      <div class="discord-progress">
-        <div id="progress-bar"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-    
+    </section>
 
     <button class="discord-btn">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -1090,217 +1028,216 @@ Every Server they Join.</div>
 
     <footer>© 2025 <span class="six-text">/six</span> Clan - All rights reserved.</footer>
   </main>
-<!-- Rules Modal -->
-<div class="modal" id="rules-modal">
-  <div class="modal-content">
-    <h2>Clan War Rules</h2>
-    <p><!-- Placeholder for rules -->Rules go here.</p>
-    <button id="understood-btn">Understood</button>
+
+  <!-- Rules Modal -->
+  <div class="modal" id="rules-modal">
+    <div class="modal-content">
+      <h2>Clan War Rules</h2>
+      <p><!-- Placeholder for rules -->Rules go here.</p>
+      <button id="understood-btn">Understood</button>
+    </div>
   </div>
-</div>
 
-<!-- Application Modal -->
-<div class="modal" id="application-modal">
-  <div class="modal-content">
-    <h2>Clan War Application</h2>
-    <form id="clanwar-form">
-      <label>* Clan Name:
-        <input type="text" name="clan_name" required placeholder="Enter your clan name">
-      </label>
-      <!-- Add more questions here easily -->
-      <button type="submit">Submit</button>
-    </form>
+  <!-- Application Modal -->
+  <div class="modal" id="application-modal">
+    <div class="modal-content">
+      <h2>Clan War Application</h2>
+      <form id="clanwar-form">
+        <label>* Clan Name:
+          <input type="text" name="clan_name" required placeholder="Enter your clan name">
+        </label>
+        <!-- Add more questions here easily -->
+        <button type="submit">Submit</button>
+      </form>
+    </div>
   </div>
-</div>
 
-<!-- Notifications -->
-<div id="notification" class="notification"></div>
-
-<script>
-/* auto-detect /six and style it */
-function styleSixText(root = document.body) {
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  const nodes = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode);
-
-  nodes.forEach(node => {
-    if (node.nodeValue) {
-      const text = node.nodeValue;
-
-      // Match both /six and SAIS (case-insensitive)
-      if (/(\/six|sais)/i.test(text)) {
-        const span = document.createElement('span');
-        span.innerHTML = text.replace(/(\/six|sais)/gi, match => {
-          return `<span class="six-text">${match}</span>`;
-        });
-        node.parentNode.replaceChild(span, node);
-      }
-    }
-  });
-}
-
-window.addEventListener('load', () => {
-  styleSixText();
-});
-
-
-
-function enterSite(){
-  document.getElementById('landing').style.display='none';
-  const app=document.getElementById('app');
-  app.classList.add('active');
-  app.setAttribute('aria-hidden','false');
-  
-  // Re-apply styling to any dynamically added content
-  setTimeout(() => {
-    styleSixText(app);
-  }, 100);
-}
-
-// Add some interactive effects
-document.addEventListener('DOMContentLoaded', function() {
-  // Add parallax effect to background
-  document.addEventListener('mousemove', function(e) {
-    const x = e.clientX / window.innerWidth;
-    const y = e.clientY / window.innerHeight;
-    
-    document.querySelector('.bg-layer.one').style.transform = `translate(${x * 20}px, ${y * 20}px) scale(1.1)`;
-    document.querySelector('.bg-layer.two').style.transform = `translate(${x * -15}px, ${y * -15}px) scale(1.1)`;
-    document.querySelector('.bg-layer.three').style.transform = `translate(${x * 10}px, ${y * 10}px) scale(1.1)`;
-  });
-});
-</script>
-  
+  <!-- Notifications -->
+  <div id="notification" class="notification"></div>
 
   <script>
-async function loadDiscordStats() {
-  const invite = "tu6rpKhenw"; // Replace with your real invite code
-  const goal = 1000; // Set your member goal
+    /* auto-detect /six and style it */
+    function styleSixText(root = document.body) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
 
-  try {
-    const res = await fetch(`https://discord.com/api/v9/invites/${invite}?with_counts=true`);
-    const data = await res.json();
+      nodes.forEach(node => {
+        if (node.nodeValue) {
+          const text = node.nodeValue;
 
-    const guild = data.guild;
-    const memberCount = data.approximate_member_count;
+          // Match both /six and SAIS (case-insensitive)
+          if (/(\/six|sais)/i.test(text)) {
+            const span = document.createElement('span');
+            span.innerHTML = text.replace(/(\/six|sais)/gi, match => {
+              return `<span class="six-text">${match}</span>`;
+            });
+            node.parentNode.replaceChild(span, node);
+          }
+        }
+      });
+    }
 
-    document.getElementById("discord-icon").src = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
-    document.getElementById("discord-date").innerText = new Date(parseInt(guild.id) / 4194304 + 1420070400000).toDateString();
-    document.getElementById("member-count").innerText = memberCount;
-    document.getElementById("member-goal").innerText = goal;
-
-    const progress = Math.min((memberCount / goal) * 100, 100);
-    document.getElementById("progress-bar").style.width = progress + "%";
-  } catch (err) {
-    console.error("Failed to load Discord stats:", err);
-  }
-}
-
-loadDiscordStats();
-</script>
-<script>
-const clanwarBtn = document.querySelector('.clanwar-btn');
-const rulesModal = document.getElementById('rules-modal');
-const applicationModal = document.getElementById('application-modal');
-const understoodBtn = document.getElementById('understood-btn');
-const form = document.getElementById('clanwar-form');
-const notification = document.getElementById('notification');
-
-// 1. Open Rules Modal
-clanwarBtn.addEventListener('click', () => {
-  rulesModal.style.display = 'flex';
-});
-
-// 2. Understood -> Open Application Modal
-understoodBtn.addEventListener('click', () => {
-  rulesModal.style.display = 'none';
-  applicationModal.style.display = 'flex';
-});
-
-// 3. Submit Form
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  // Check if all required inputs are filled
-  const inputs = form.querySelectorAll('input[required]');
-  for (let input of inputs) {
-    if (!input.value.trim()) return; // required
-  }
-
-  // Show loading buffer
-  const submitBtn = form.querySelector('button[type="submit"]');
-  const originalText = submitBtn.innerText;
-  submitBtn.innerText = "Submitting...";
-  submitBtn.disabled = true;
-
-  // Collect form data
-  const data = {};
-  inputs.forEach(input => data[input.name] = input.value);
-
-  try {
-    // Send to Discord Webhook
-    const webhookURL = "https://discord.com/api/webhooks/1437169737321943081/-cCSQGQ4GL6MS-1tb5Bke89AZ_dasIT4D0S3I-fgvny2Cxj50b1f2Nua6CDptZr6VCxq"; // replace
-    const payload = {
-      content: null,
-      embeds: [{
-        title: "New Clan War Application",
-        color: 0x9146FF,
-        fields: Object.keys(data).map(key => ({
-          name: key,
-          value: data[key],
-          inline: false
-        }))
-      }]
-    };
-
-    const res = await fetch(webhookURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    window.addEventListener('load', () => {
+      styleSixText();
     });
 
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    function enterSite(){
+      document.getElementById('landing').style.display='none';
+      const app=document.getElementById('app');
+      app.classList.add('active');
+      app.setAttribute('aria-hidden','false');
+      
+      // Re-apply styling to any dynamically added content
+      setTimeout(() => {
+        styleSixText(app);
+      }, 100);
+    }
 
-    // Success
-    applicationModal.style.display = 'none';
-    showNotification("Your application for the clanwar has been submitted, you will be contacted through discord shortly.", false);
-  } catch (err) {
-    showNotification(`Failed to submit: ${err.message}`, true);
-  } finally {
-    submitBtn.innerText = originalText;
-    submitBtn.disabled = false;
-    form.reset();
-  }
-});
-
-// 4. Show Notification
-function showNotification(message, isError) {
-  notification.innerText = message;
-  notification.className = isError ? 'notification error' : 'notification';
-  notification.style.display = 'block';
-  setTimeout(() => notification.style.display = 'none', 5000);
-}
-
-// Optional: Close modal by clicking outside
-window.addEventListener('click', e => {
-  if (e.target === rulesModal) rulesModal.style.display = 'none';
-  if (e.target === applicationModal) applicationModal.style.display = 'none';
-});
-</script>
-<script>
-  document.querySelectorAll('.banner-img').forEach(img => {
-    img.addEventListener('click', () => {
-      const modal = document.createElement('div');
-      modal.classList.add('banner-modal');
-      modal.innerHTML = `
-        <div class="modal-bg"></div>
-        <img src="${img.src}" class="modal-img" alt="Banner">
-      `;
-      document.body.appendChild(modal);
-      modal.addEventListener('click', () => modal.remove());
+    // Add some interactive effects
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add parallax effect to background
+      document.addEventListener('mousemove', function(e) {
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        
+        document.querySelector('.bg-layer.one').style.transform = `translate(${x * 10}px, ${y * 10}px) scale(1.1)`;
+        document.querySelector('.bg-layer.two').style.transform = `translate(${x * -8}px, ${y * -8}px) scale(1.1)`;
+        document.querySelector('.bg-layer.three').style.transform = `translate(${x * 5}px, ${y * 5}px) scale(1.1)`;
+      });
     });
-  });
-</script>
+  </script>
 
+  <script>
+    async function loadDiscordStats() {
+      const invite = "tu6rpKhenw"; // Replace with your real invite code
+      const goal = 1000; // Set your member goal
+
+      try {
+        const res = await fetch(`https://discord.com/api/v9/invites/${invite}?with_counts=true`);
+        const data = await res.json();
+
+        const guild = data.guild;
+        const memberCount = data.approximate_member_count;
+
+        document.getElementById("discord-icon").src = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
+        document.getElementById("discord-date").innerText = new Date(parseInt(guild.id) / 4194304 + 1420070400000).toDateString();
+        document.getElementById("member-count").innerText = memberCount;
+        document.getElementById("member-goal").innerText = goal;
+
+        const progress = Math.min((memberCount / goal) * 100, 100);
+        document.getElementById("progress-bar").style.width = progress + "%";
+      } catch (err) {
+        console.error("Failed to load Discord stats:", err);
+      }
+    }
+
+    loadDiscordStats();
+  </script>
+
+  <script>
+    const clanwarBtn = document.querySelector('.clanwar-btn');
+    const rulesModal = document.getElementById('rules-modal');
+    const applicationModal = document.getElementById('application-modal');
+    const understoodBtn = document.getElementById('understood-btn');
+    const form = document.getElementById('clanwar-form');
+    const notification = document.getElementById('notification');
+
+    // 1. Open Rules Modal
+    clanwarBtn.addEventListener('click', () => {
+      rulesModal.style.display = 'flex';
+    });
+
+    // 2. Understood -> Open Application Modal
+    understoodBtn.addEventListener('click', () => {
+      rulesModal.style.display = 'none';
+      applicationModal.style.display = 'flex';
+    });
+
+    // 3. Submit Form
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Check if all required inputs are filled
+      const inputs = form.querySelectorAll('input[required]');
+      for (let input of inputs) {
+        if (!input.value.trim()) return; // required
+      }
+
+      // Show loading buffer
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerText;
+      submitBtn.innerText = "Submitting...";
+      submitBtn.disabled = true;
+
+      // Collect form data
+      const data = {};
+      inputs.forEach(input => data[input.name] = input.value);
+
+      try {
+        // Send to Discord Webhook
+        const webhookURL = "https://discord.com/api/webhooks/1437169737321943081/-cCSQGQ4GL6MS-1tb5Bke89AZ_dasIT4D0S3I-fgvny2Cxj50b1f2Nua6CDptZr6VCxq"; // replace
+        const payload = {
+          content: null,
+          embeds: [{
+            title: "New Clan War Application",
+            color: 0x9146FF,
+            fields: Object.keys(data).map(key => ({
+              name: key,
+              value: data[key],
+              inline: false
+            }))
+          }]
+        };
+
+        const res = await fetch(webhookURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+        // Success
+        applicationModal.style.display = 'none';
+        showNotification("Your application for the clanwar has been submitted, you will be contacted through discord shortly.", false);
+      } catch (err) {
+        showNotification(`Failed to submit: ${err.message}`, true);
+      } finally {
+        submitBtn.innerText = originalText;
+        submitBtn.disabled = false;
+        form.reset();
+      }
+    });
+
+    // 4. Show Notification
+    function showNotification(message, isError) {
+      notification.innerText = message;
+      notification.className = isError ? 'notification error' : 'notification';
+      notification.style.display = 'block';
+      setTimeout(() => notification.style.display = 'none', 5000);
+    }
+
+    // Optional: Close modal by clicking outside
+    window.addEventListener('click', e => {
+      if (e.target === rulesModal) rulesModal.style.display = 'none';
+      if (e.target === applicationModal) applicationModal.style.display = 'none';
+    });
+  </script>
+
+  <script>
+    document.querySelectorAll('.banner-img').forEach(img => {
+      img.addEventListener('click', () => {
+        const modal = document.createElement('div');
+        modal.classList.add('banner-modal');
+        modal.innerHTML = `
+          <div class="modal-bg"></div>
+          <img src="${img.src}" class="modal-img" alt="Banner">
+        `;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', () => modal.remove());
+      });
+    });
+  </script>
 </body>
 </html>
