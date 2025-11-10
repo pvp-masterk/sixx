@@ -1102,20 +1102,17 @@ Every Server they Join.</div>
       </div>
     </div>
 
-    <!-- Enhanced Member Tree -->
-    <div class="card">
-      <div class="member-tree-header">
-        <div class="section-title">Member Tree</div>
-        <div class="sort-options">
-          <button class="sort-btn active" id="sortByRank">Sort by Rank</button>
-          <button class="sort-btn" id="sortByTier">Sort by Tier High to Low</button>
-        </div>
-      </div>
-      <div class="member-tree-container" id="memberTree">
-        <!-- Tree structure will be dynamically generated -->
-      </div>
+    <!-- Member Tree Notification -->
+<div class="card">
+  <div class="member-tree-notification">
+    <div class="notification-icon">❗</div>
+    <div class="notification-content">
+      <h3>Member Tree Has Been Moved</h3>
+      <p>The member tree is moved to its own page for more efficient performance.</p>
+      <a href="/members.html" class="view-tree-btn">View Member Tree</a>
     </div>
-
+  </div>
+</div>
     <!-- 🏴 Clan Banner Gallery -->
     <section id="gallery" class="gallery-section">
       <h2 class="gallery-title">/six Banner Gallery</h2>
@@ -1209,186 +1206,7 @@ Every Server they Join.</div>
   <div id="notification" class="notification"></div>
 
   <script>
-    // Member data with proper hierarchy
-    const members = [
-      { 
-        name: "Lair", 
-        rank: "Founder & Leader", 
-        crystalTier: "HT1", 
-        swordTier: "HT1", 
-        avatar: "https://minotar.net/avatar/Lair/128.png",
-        cardType: "diamond",
-        level: 1
-      },
-      { 
-        name: "Toofles", 
-        rank: "Co-Leader", 
-        crystalTier: "HT1", 
-        swordTier: "HT1", 
-        avatar: "https://minotar.net/avatar/Toofles/128.png",
-        cardType: "diamond",
-        level: 2
-      },
-      { 
-        name: "Bicolandia", 
-        rank: "Co-Leader", 
-        crystalTier: "HT1", 
-        swordTier: "HT1", 
-        avatar: "https://minotar.net/avatar/Toofles/128.png",
-        cardType: "diamond",
-        level: 2
-      },
-      { 
-        name: "PVP_MASTERK", 
-        rank: "Developer/Grinder", 
-        crystalTier: "HT1", 
-        swordTier: "HT1", 
-        avatar: "https://minotar.net/avatar/PVP_MASTERK/128.png",
-        cardType: "golden",
-        level: 3
-      },
-      { 
-        name: "Killers", 
-        rank: "PvPer/Grinder", 
-        crystalTier: "HT3", 
-        swordTier: "HT3", 
-        avatar: "https://minotar.net/avatar/Killers/128.png",
-        cardType: "golden",
-        level: 3
-      },
-      { 
-        name: "PenguinGUY", 
-        rank: "PvPer", 
-        crystalTier: "HT3", 
-        swordTier: "HT3", 
-        avatar: "https://minotar.net/avatar/Killers/128.png",
-        cardType: "golden",
-        level: 3
-      },
-      { 
-        name: "IllyProg", 
-        rank: "PvPer", 
-        crystalTier: "HT3", 
-        swordTier: "HT3", 
-        avatar: "https://minotar.net/avatar/Killers/128.png",
-        cardType: "golden",
-        level: 4
-      },
-      { 
-        name: "Chad", 
-        rank: "PvPer", 
-        crystalTier: "HT3", 
-        swordTier: "HT3", 
-        avatar: "https://minotar.net/avatar/Killers/128.png",
-        cardType: "golden",
-        level: 4
-      },
-      { 
-        name: "Draco", 
-        rank: "PvPer", 
-        crystalTier: "HT3", 
-        swordTier: "HT3", 
-        avatar: "https://minotar.net/avatar/Killers/128.png",
-        cardType: "golden",
-        level: 4
-      },
-      
-      { 
-        name: "Nefusho", 
-        rank: "Member", 
-        crystalTier: "LT10", 
-        swordTier: "LT10", 
-        avatar: "https://minotar.net/avatar/NewRecruit/128.png",
-        cardType: "bronze",
-        level: 4
-      }
-    ];
-
-    // Tier order for sorting (High to Low)
-    const tierOrder = ['HT1', 'HT2', 'HT3', 'HT4', 'HT5', 'LT1', 'LT2', 'LT3', 'LT4', 'LT5'];
-
-    // Function to render member tree as an actual tree structure
-    function renderMemberTree(sortBy = 'rank') {
-      const container = document.getElementById('memberTree');
-      container.innerHTML = '';
-      
-      let sortedMembers = [...members];
-      
-      if (sortBy === 'tier') {
-        sortedMembers.sort((a, b) => {
-          return tierOrder.indexOf(a.crystalTier) - tierOrder.indexOf(b.crystalTier);
-        });
-      }
-      
-      // Group members by level
-      const levels = {};
-      sortedMembers.forEach(member => {
-        if (!levels[member.level]) {
-          levels[member.level] = [];
-        }
-        levels[member.level].push(member);
-      });
-      
-      // Create tree structure
-      const treeStructure = document.createElement('div');
-      treeStructure.className = 'tree-structure';
-      
-      // Add each level
-      Object.keys(levels).sort().forEach(level => {
-        const levelDiv = document.createElement('div');
-        levelDiv.className = 'tree-level';
-        
-        levels[level].forEach(member => {
-          const nodeDiv = document.createElement('div');
-          nodeDiv.className = 'tree-node';
-          
-          const card = document.createElement('div');
-          card.className = `member-tree-card ${member.cardType}`;
-          card.innerHTML = `
-            <img src="${member.avatar}" alt="${member.name}" class="member-avatar">
-            <div class="member-name">${member.name}</div>
-            <div class="member-rank">${member.rank}</div>
-            <div class="member-tier">
-              <span class="crystal-tier">
-                <span class="tier-icon crystal-icon"></span>
-                ${member.crystalTier}
-              </span>
-            </div>
-            <div class="member-tier">
-              <span class="sword-tier">
-                <span class="tier-icon sword-icon"></span>
-                ${member.swordTier}
-              </span>
-            </div>
-          `;
-          
-          nodeDiv.appendChild(card);
-          levelDiv.appendChild(nodeDiv);
-        });
-        
-        treeStructure.appendChild(levelDiv);
-      });
-      
-      container.appendChild(treeStructure);
-    }
-
-    // Initialize member tree
-    document.addEventListener('DOMContentLoaded', function() {
-      renderMemberTree();
-      
-      // Set up sorting buttons
-      document.getElementById('sortByRank').addEventListener('click', function() {
-        document.getElementById('sortByRank').classList.add('active');
-        document.getElementById('sortByTier').classList.remove('active');
-        renderMemberTree('rank');
-      });
-      
-      document.getElementById('sortByTier').addEventListener('click', function() {
-        document.getElementById('sortByTier').classList.add('active');
-        document.getElementById('sortByRank').classList.remove('active');
-        renderMemberTree('tier');
-      });
-    });
+    
 
     // Auto-detect /six and style it
     function styleSixText(root = document.body) {
