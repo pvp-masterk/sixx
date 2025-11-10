@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>/six Clan</title>
+<title>/six</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ======================= RESET & BASE ======================= */
@@ -1063,6 +1063,55 @@ footer{
   .member-tree-card {
     width: 180px;
   }
+}
+  /* Member Tree Notification */
+.member-tree-notification {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: linear-gradient(145deg, rgba(50, 20, 80, 0.4), rgba(30, 10, 50, 0.3));
+  border-radius: 12px;
+  border: 1px solid rgba(180, 100, 255, 0.2);
+}
+
+.notification-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-content h3 {
+  font-size: 24px;
+  color: #e0aaff;
+  margin-bottom: 10px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.notification-content p {
+  color: #c9b6ff;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.view-tree-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: linear-gradient(90deg, #9d4edd, #7b2cbf);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s;
+  font-family: 'Exo 2', sans-serif;
+}
+
+.view-tree-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(90, 24, 154, 0.4);
 }
 </style>
 </head>
