@@ -857,6 +857,116 @@
   from { transform: scale(0.8); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+/* === 🌌 SOCIALS SECTION === */
+.socials-section {
+  padding: 100px 5%;
+  text-align: center;
+  background: rgba(10, 10, 15, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 60px rgba(150, 0, 255, 0.2);
+}
+
+.socials-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.6em;
+  color: #fff;
+  margin-bottom: 60px;
+  text-shadow: 0 0 15px #ff00ff, 0 0 30px #a000ff;
+  letter-spacing: 2px;
+}
+
+.socials-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+.social-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 140px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 25px rgba(255, 0, 255, 0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.social-card:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
+}
+
+.icon-wrap {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 8px rgba(255, 0, 255, 0.6));
+  transition: transform 0.3s ease;
+}
+
+.social-card:hover .icon-wrap {
+  transform: scale(1.2) rotate(5deg);
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  filter: brightness(1.1);
+}
+
+.social-name {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 1.1em;
+  color: #fff;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.social-card:hover .social-name {
+  opacity: 1;
+}
+
+/* Optional: subtle glass reflection sweep on hover */
+.social-card::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+  transform: rotate(25deg);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.social-card:hover::after {
+  opacity: 1;
+  animation: sweep 1s ease forwards;
+}
+
+@keyframes sweep {
+  0% { transform: translate(-100%, -100%) rotate(25deg); }
+  100% { transform: translate(100%, 100%) rotate(25deg); }
+}
 
 
 </style>
@@ -947,6 +1057,30 @@ Every Server they Join.</div>
     </div>
   </div>
 </section>
+
+    <!-- 🌌 /SIX — Socials Section -->
+<section id="socials" class="socials-section">
+  <h2 class="socials-title">Contacts of <span class="six-text">/six</span></h2>
+  <div class="socials-grid">
+    
+    <!-- Example social card -->
+    <a href="https://discord.gg/tu6rpKhenw" class="social-card discord" target="_blank">
+      <div class="icon-wrap">
+        <img src="assets/icons/discord.svg" alt="Discord" class="social-icon">
+      </div>
+      <span class="social-name">Discord</span>
+    </a>
+
+    <a href="https://tiktok.com/@xissais" class="social-card twitter" target="_blank">
+      <div class="icon-wrap">
+        <img src="assets/icons/twitter.svg" alt="TikTok" class="social-icon">
+      </div>
+      <span class="social-name">TikTok</span>
+    </a>
+
+  </div>
+</section>
+
 
 
     <button class="clanwar-btn">Request Clan War</button>
