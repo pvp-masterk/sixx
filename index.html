@@ -280,7 +280,7 @@ body{
   box-shadow: 0 5px 15px rgba(90, 24, 154, 0.3);
 }
 
-/* ======================= MEMBER TREE ======================= */
+/* ======================= ENHANCED MEMBER TREE ======================= */
 .member-tree-header {
   display: flex;
   justify-content: space-between;
@@ -319,12 +319,73 @@ body{
   border-color: rgba(200, 140, 255, 0.5);
 }
 
-.member-tree-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+/* Tree Structure */
+.member-tree-container {
+  position: relative;
+  min-height: 600px;
+  overflow: visible;
 }
 
+.tree-structure {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.tree-level {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-bottom: 60px;
+  position: relative;
+  width: 100%;
+}
+
+.tree-level:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 30px;
+  background: linear-gradient(to bottom, rgba(180, 100, 255, 0.6), transparent);
+}
+
+.tree-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.tree-node::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 30px;
+  background: linear-gradient(to bottom, rgba(180, 100, 255, 0.6), transparent);
+}
+
+.tree-node:not(:only-child)::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  width: calc(100% + 40px);
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(180, 100, 255, 0.6), transparent);
+  transform: translateX(-50%);
+}
+
+/* Member Cards */
 .member-tree-card {
   background: linear-gradient(145deg, rgba(50, 20, 80, 0.3), rgba(30, 10, 50, 0.2));
   border: 1px solid rgba(150, 80, 220, 0.15);
@@ -337,6 +398,8 @@ body{
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 220px;
+  z-index: 2;
 }
 
 .member-tree-card:hover {
@@ -386,21 +449,20 @@ body{
 }
 
 .tier-icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .crystal-icon {
-  background: #bb86fc;
-  border-radius: 50%;
-  box-shadow: 0 0 5px #bb86fc;
+  background-image: url('assets/icons/crystalpvp.png');
 }
 
 .sword-icon {
-  background: #03dac6;
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  box-shadow: 0 0 5px #03dac6;
+  background-image: url('assets/icons/swordpvp.png');
 }
 
 /* Member card special styles */
@@ -993,6 +1055,14 @@ footer{
     flex: 1;
     text-align: center;
   }
+  
+  .tree-level {
+    gap: 20px;
+  }
+  
+  .member-tree-card {
+    width: 180px;
+  }
 }
 </style>
 </head>
@@ -1032,72 +1102,19 @@ Every Server they Join.</div>
       </div>
     </div>
 
-    <section id="member-tree" class="relative w-full flex flex-col items-center justify-center py-16 px-4">
-  <div class="absolute inset-0 backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10"></div>
-  
-  <div class="relative z-10 w-full max-w-3xl text-center mb-10">
-    <h2 class="text-4xl font-semibold text-white/90 mb-4">Member Tree</h2>
-    <p class="text-white/60">A visual chain of our team, connected by tier.</p>
-    <button id="sortToggle" class="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all">
-      Sort: Tier High → Low
-    </button>
-  </div>
-
-  <div id="treeContainer" class="relative flex flex-col items-center space-y-10 z-10">
-    <!-- Cards will be dynamically inserted here -->
-  </div>
-</section>
-
-<script>
-const members = [
-  { name: "Nova", tier: "swordpvp", role: "Leader" },
-  { name: "Ray", tier: "swordpvp", role: "Co-Leader" },
-  { name: "Lyra", tier: "crystalpvp", role: "Member" },
-  { name: "Echo", tier: "crystalpvp", role: "Member" },
-];
-
-let sortHighToLow = true;
-
-const tierOrder = { swordpvp: 2, crystalpvp: 1 };
-const tierColors = { swordpvp: "from-blue-400/50 to-blue-600/30", crystalpvp: "from-purple-400/50 to-purple-600/30" };
-
-function renderTree() {
-  const container = document.getElementById("treeContainer");
-  container.innerHTML = "";
-  
-  const sorted = [...members].sort((a, b) =>
-    sortHighToLow
-      ? tierOrder[b.tier] - tierOrder[a.tier]
-      : tierOrder[a.tier] - tierOrder[b.tier]
-  );
-  
-  sorted.forEach((m, i) => {
-    const card = document.createElement("div");
-    card.className = `relative group w-64 p-4 rounded-2xl bg-gradient-to-br ${tierColors[m.tier]} backdrop-blur-xl border border-white/10 shadow-lg flex flex-col items-center transition-all hover:scale-105`;
-    card.innerHTML = `
-      <img src="/assets/icons/${m.tier}.png" alt="${m.tier}" class="w-10 h-10 mb-2 opacity-90">
-      <h3 class="text-xl text-white font-semibold">${m.name}</h3>
-      <p class="text-white/60 text-sm">${m.role}</p>
-    `;
-    container.appendChild(card);
-    
-    if (i < sorted.length - 1) {
-      const chain = document.createElement("div");
-      chain.className = "w-1 h-10 bg-gradient-to-b from-purple-400/70 to-purple-600/50 animate-pulse rounded-full shadow-[0_0_15px_rgba(168,85,247,0.8)]";
-      container.appendChild(chain);
-    }
-  });
-}
-
-document.getElementById("sortToggle").addEventListener("click", () => {
-  sortHighToLow = !sortHighToLow;
-  document.getElementById("sortToggle").innerText = `Sort: Tier ${sortHighToLow ? "High → Low" : "Low → High"}`;
-  renderTree();
-});
-
-renderTree();
-</script>
-
+    <!-- Enhanced Member Tree -->
+    <div class="card">
+      <div class="member-tree-header">
+        <div class="section-title">Member Tree</div>
+        <div class="sort-options">
+          <button class="sort-btn active" id="sortByRank">Sort by Rank</button>
+          <button class="sort-btn" id="sortByTier">Sort by Tier High to Low</button>
+        </div>
+      </div>
+      <div class="member-tree-container" id="memberTree">
+        <!-- Tree structure will be dynamically generated -->
+      </div>
+    </div>
 
     <!-- 🏴 Clan Banner Gallery -->
     <section id="gallery" class="gallery-section">
@@ -1192,6 +1209,158 @@ renderTree();
   <div id="notification" class="notification"></div>
 
   <script>
+    // Member data with proper hierarchy
+    const members = [
+      { 
+        name: "Lair", 
+        rank: "Founder & Leader", 
+        crystalTier: "HT1", 
+        swordTier: "HT1", 
+        avatar: "https://minotar.net/avatar/Lair/128.png",
+        cardType: "diamond",
+        level: 1
+      },
+      { 
+        name: "Toofles", 
+        rank: "Co-Leader", 
+        crystalTier: "HT1", 
+        swordTier: "HT1", 
+        avatar: "https://minotar.net/avatar/Toofles/128.png",
+        cardType: "diamond",
+        level: 1
+      },
+      { 
+        name: "PVP_MASTERK", 
+        rank: "Developer/Grinder", 
+        crystalTier: "HT2", 
+        swordTier: "HT2", 
+        avatar: "https://minotar.net/avatar/PVP_MASTERK/128.png",
+        cardType: "golden",
+        level: 2
+      },
+      { 
+        name: "Killers", 
+        rank: "PvPer/Grinder", 
+        crystalTier: "HT3", 
+        swordTier: "HT3", 
+        avatar: "https://minotar.net/avatar/Killers/128.png",
+        cardType: "golden",
+        level: 2
+      },
+      { 
+        name: "CrystalPro", 
+        rank: "PvPer", 
+        crystalTier: "LT2", 
+        swordTier: "HT4", 
+        avatar: "https://minotar.net/avatar/CrystalPro/128.png",
+        cardType: "silver",
+        level: 3
+      },
+      { 
+        name: "SwordMaster", 
+        rank: "PvPer", 
+        crystalTier: "HT4", 
+        swordTier: "LT1", 
+        avatar: "https://minotar.net/avatar/SwordMaster/128.png",
+        cardType: "silver",
+        level: 3
+      },
+      { 
+        name: "NewRecruit", 
+        rank: "Member", 
+        crystalTier: "LT5", 
+        swordTier: "LT5", 
+        avatar: "https://minotar.net/avatar/NewRecruit/128.png",
+        cardType: "bronze",
+        level: 4
+      }
+    ];
+
+    // Tier order for sorting (High to Low)
+    const tierOrder = ['HT1', 'HT2', 'HT3', 'HT4', 'HT5', 'LT1', 'LT2', 'LT3', 'LT4', 'LT5'];
+
+    // Function to render member tree as an actual tree structure
+    function renderMemberTree(sortBy = 'rank') {
+      const container = document.getElementById('memberTree');
+      container.innerHTML = '';
+      
+      let sortedMembers = [...members];
+      
+      if (sortBy === 'tier') {
+        sortedMembers.sort((a, b) => {
+          return tierOrder.indexOf(a.crystalTier) - tierOrder.indexOf(b.crystalTier);
+        });
+      }
+      
+      // Group members by level
+      const levels = {};
+      sortedMembers.forEach(member => {
+        if (!levels[member.level]) {
+          levels[member.level] = [];
+        }
+        levels[member.level].push(member);
+      });
+      
+      // Create tree structure
+      const treeStructure = document.createElement('div');
+      treeStructure.className = 'tree-structure';
+      
+      // Add each level
+      Object.keys(levels).sort().forEach(level => {
+        const levelDiv = document.createElement('div');
+        levelDiv.className = 'tree-level';
+        
+        levels[level].forEach(member => {
+          const nodeDiv = document.createElement('div');
+          nodeDiv.className = 'tree-node';
+          
+          const card = document.createElement('div');
+          card.className = `member-tree-card ${member.cardType}`;
+          card.innerHTML = `
+            <img src="${member.avatar}" alt="${member.name}" class="member-avatar">
+            <div class="member-name">${member.name}</div>
+            <div class="member-rank">${member.rank}</div>
+            <div class="member-tier">
+              <span class="crystal-tier">
+                <span class="tier-icon crystal-icon"></span>
+                ${member.crystalTier}
+              </span>
+            </div>
+            <div class="member-tier">
+              <span class="sword-tier">
+                <span class="tier-icon sword-icon"></span>
+                ${member.swordTier}
+              </span>
+            </div>
+          `;
+          
+          nodeDiv.appendChild(card);
+          levelDiv.appendChild(nodeDiv);
+        });
+        
+        treeStructure.appendChild(levelDiv);
+      });
+      
+      container.appendChild(treeStructure);
+    }
+
+    // Initialize member tree
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMemberTree();
+      
+      // Set up sorting buttons
+      document.getElementById('sortByRank').addEventListener('click', function() {
+        document.getElementById('sortByRank').classList.add('active');
+        document.getElementById('sortByTier').classList.remove('active');
+        renderMemberTree('rank');
+      });
+      
+      document.getElementById('sortByTier').addEventListener('click', function() {
+        document.getElementById('sortByTier').classList.add('active');
+        document.getElementById('sortByRank').classList.remove('active');
+        renderMemberTree('tier');
+      });
+    });
 
     // Auto-detect /six and style it
     function styleSixText(root = document.body) {
