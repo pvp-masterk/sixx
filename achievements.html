@@ -233,6 +233,25 @@ body{
     transform: scale(1.02);
   }
 }
+.glorious-word {
+  font-family: 'Diecide Remain', cursive;
+  background: linear-gradient(90deg, #FFD700, #FFA500, #FFFACD);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow:
+    0 0 10px rgba(255, 215, 0, 0.7),
+    0 0 20px rgba(255, 215, 0, 0.4);
+  animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
 </style>
 </head>
@@ -245,7 +264,7 @@ body{
 
 <header class="page-header">
   <h1>/SIX Achievements</h1>
-  <p>Glory earned through skill, honor, and history.</p>
+  <p>Our <span class="glorious-word">Glorious</span> Achievements.</p>
 </header>
 
 <section class="achievement-grid" id="achievementGrid">
