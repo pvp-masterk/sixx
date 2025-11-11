@@ -400,17 +400,33 @@ const achievements = [
 /* ===== RENDER ACHIEVEMENTS ===== */
 const grid = document.getElementById('achievementGrid');
 achievements.forEach((a,i)=>{
-  const card=document.createElement('div');
-  card.className='achievement-card';
-  card.innerHTML = `
-  <img src="${a.img}" class="achievement-img" alt="${a.title}">
-  <div class="achievement-info">
-    <h3>${a.title}</h3>
-    <p>${a.desc}</p>
-  </div>`;
-  card.addEventListener('click',()=>openModal(a));
+  const card = document.createElement('div');
+  card.className = 'achievement-card';
+
+  const img = document.createElement('img');
+  img.src = a.img;
+  img.className = 'achievement-img';
+  img.alt = a.title;
+
+  const info = document.createElement('div');
+  info.className = 'achievement-info';
+
+  const titleEl = document.createElement('h3');
+  titleEl.innerHTML = a.title; // ✅ render HTML spans properly
+
+  const descEl = document.createElement('p');
+  descEl.innerHTML = a.desc; // ✅ same for desc if it has styled spans
+
+  info.appendChild(titleEl);
+  info.appendChild(descEl);
+
+  card.appendChild(img);
+  card.appendChild(info);
+
+  card.addEventListener('click', () => openModal(a));
   grid.appendChild(card);
 });
+
 
 /* ===== MODAL HANDLING ===== */
 const modal=document.getElementById('achievementModal');
