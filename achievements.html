@@ -402,12 +402,12 @@ const grid = document.getElementById('achievementGrid');
 achievements.forEach((a,i)=>{
   const card=document.createElement('div');
   card.className='achievement-card';
-  card.innerHTML=`
-    <img src="${a.img}" class="achievement-img" alt="${a.title}">
-    <div class="achievement-info">
-      <h3>${a.title}</h3>
-      <p>${a.desc}</p>
-    </div>`;
+  card.innerHTML = `
+  <img src="${a.img}" class="achievement-img" alt="${a.title}">
+  <div class="achievement-info">
+    <h3>${a.title}</h3>
+    <p>${a.desc}</p>
+  </div>`;
   card.addEventListener('click',()=>openModal(a));
   grid.appendChild(card);
 });
