@@ -271,6 +271,47 @@ body{
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+/* gold-white gradient for TLCraft */
+.tlcraft-word {
+  font-family: 'Deicide Remain', cursive;
+  background: linear-gradient(90deg, #ffd700, #fff6cc, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow:
+    0 0 10px rgba(255, 215, 0, 0.7),
+    0 0 20px rgba(255, 255, 200, 0.5);
+  animation: tlShine 3s linear infinite;
+}
+
+@keyframes tlShine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* green-white gradient for galaxxxyy_ */
+.galaxy-word {
+  font-family: 'Deicide Remain', cursive;
+  background: linear-gradient(90deg, #00ff99, #ccffdd, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow:
+    0 0 10px rgba(0, 255, 100, 0.7),
+    0 0 20px rgba(200, 255, 200, 0.5);
+  animation: galaxyShine 3s linear infinite;
+}
+
+@keyframes galaxyShine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
 </style>
 </head>
@@ -341,6 +382,13 @@ const achievements = [
     img: "https://i.imgur.com/FqWgxIu.jpeg",
     extra: "Unlocked by: Entire Clan /SIX\\nDate: Oct 29, 2025"
   },
+  {
+  title: 'The <span class="green-word">Richest</span> in <span class="tlcraft-word">TLCraft</span>',
+  desc: 'First /six member to become the <span class="green-word">richest</span> on <span class="tlcraft-word">TLCraft SMP.</span>',
+  img: 'https://cdn.discordapp.com/attachments/1360264592025976923/1437795105766510793/Screenshot_2025-11-11-20-41-52-569_git.artdeell.mojo.jpg?ex=69148a8a&is=6913390a&hm=891204f4d63f25bcf33968e8035d743ab3a6adcf5394263767e54b92616dcb1b&', // (you can replace with any image)
+  extra: 'Unlocked by: <span class="crimson-word">galaxxxyy_</span><br>Date: Nov 11, 2025'
+},
+
   {
     title: "Shadow Forged",
     desc: "Craft your first legendary weapon.",
