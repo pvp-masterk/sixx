@@ -376,7 +376,7 @@ function openModal(a){
   modalImg.src=a.img;
   modalTitle.innerHTML=a.title; // allow gradient + color HTML
   modalDesc.textContent=a.desc;
-  modalExtra.textContent=a.extra;
+  modalExtra.innerHTML = a.extra;
   modal.classList.add('active');
 }
 closeModalBtn.addEventListener('click',()=>modal.classList.remove('active'));
