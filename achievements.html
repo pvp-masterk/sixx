@@ -135,27 +135,51 @@ body{
 }
 
 /* ===== MODAL ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.85);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
-  backdrop-filter:blur(10px);
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(5, 0, 10, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 9999;
+  animation: fadeIn 0.35s ease forwards;
 }
 .modal.active{display:flex;}
-.modal-content{
-  background:linear-gradient(145deg,rgba(40,15,70,.9),rgba(20,5,40,.9));
-  padding:30px;
-  border-radius:20px;
-  width:90%;
-  max-width:500px;
-  color:#fff;
-  text-align:center;
-  box-shadow:0 0 40px rgba(180,120,255,.4);
-  animation:zoomIn .35s ease;
+.modal-content {
+  position: relative;
+  width: 90%;
+  max-width: 480px;
+  padding: 40px 30px 50px;
+  border-radius: 28px;
+  text-align: center;
+  color: #fff;
+  backdrop-filter: blur(35px) saturate(180%);
+  -webkit-backdrop-filter: blur(35px) saturate(180%);
+  background: rgba(35, 10, 55, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    inset 0 0 15px rgba(255, 255, 255, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(160, 100, 255, 0.25);
+  overflow: hidden;
+  animation: zoomIn 0.35s ease forwards;
+}
+
+.modal-content::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 30% 10%,
+    rgba(255, 255, 255, 0.25),
+    transparent 60%
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+  pointer-events: none;
 }
 @keyframes zoomIn{
   from{transform:scale(.8);opacity:0;}
@@ -373,7 +397,7 @@ const achievements = [
   {
     title: 'The <span class="green-word">Richest</span> in <span class="gradient-word">SwiftSMP</span>',
     desc: "First /six member to be the richest on SwiftSMP's Season 9.",
-    img: "https://i.imgur.com/5YbQj1T.jpeg",
+    img: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
     extra: 'Unlocked by: <span class="crimson-word">The_Killers_</span><br>Date: Nov 11, 2025'
   }
 ];
