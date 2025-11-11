@@ -252,6 +252,25 @@ body{
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+.crimson-word {
+  font-family: 'Diecide Remain', cursive;
+  background: linear-gradient(90deg, #ff2b2b, #ff4545, #ff7676);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow:
+    0 0 10px rgba(255, 60, 60, 0.7),
+    0 0 20px rgba(255, 40, 40, 0.4);
+  animation: crimsonShine 3s linear infinite;
+}
+
+@keyframes crimsonShine {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
 </style>
 </head>
@@ -314,7 +333,7 @@ const achievements = [
     title: 'The <span class="green-word">Richest</span> in <span class="gradient-word">SwiftSMP</span>',
     desc: "First /six member to be the richest on SwiftSMP's Season 9.",
     img: "https://i.imgur.com/5YbQj1T.jpeg",
-    extra: "Unlocked by: The_Killers_\\nDate: Nov 11, 2025"
+    extra: "Unlocked by: <span class="crimson-word">The_Killers_</span>Date: Nov 11, 2025"
   },
   {
     title: "Crystal Conqueror",
