@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>/six – Achievements</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== BASE STYLES ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Exo 2',sans-serif;
+  color:#e8e6f3;
+  background:#050006;
+  overflow-x:hidden;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+.bg-wrap{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+.bg-layer{
+  position:absolute;
+  inset:-20%;
+  filter:blur(60px);
+  mix-blend-mode:screen;
+  opacity:.8;
+}
+.bg-layer.one{
+  background:radial-gradient(closest-side at 10% 20%, #2d004f 0%, transparent 35%),radial-gradient(closest-side at 80% 80%, #45003b 0%, transparent 30%);
+}
+.bg-layer.two{
+  background:linear-gradient(120deg, rgba(100,0,150,0.25), rgba(60,0,100,0.25));
+}
+.bg-layer.three{
+  background:radial-gradient(circle at 50% 50%, rgba(80,0,120,0.2), transparent 70%);
+}
+
+/* ===== TITLE ===== */
+.page-header{
+  text-align:center;
+  padding:80px 20px 40px;
+  position:relative;
+  z-index:10;
+}
+.page-header h1{
+  font-family:'Orbitron',sans-serif;
+  font-size:clamp(2.5rem,6vw,4.5rem);
+  background:linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd);
+  -webkit-background-clip:text;
+  color:transparent;
+  text-shadow:0 0 25px rgba(150,80,255,.5);
+  letter-spacing:3px;
+  margin-bottom:10px;
+}
+.page-header p{
+  color:#c9b6ff;
+  opacity:0.85;
+  font-size:1.1rem;
+}
+
+/* ===== ACHIEVEMENT GRID ===== */
+.achievement-grid{
+  position:relative;
+  z-index:10;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:35px;
+  padding:60px 5% 100px;
+  justify-items:center;
+}
+.achievement-card{
+  background:linear-gradient(145deg,rgba(40,15,70,.45),rgba(20,5,40,.35));
+  border:1px solid rgba(180,120,255,.2);
+  border-radius:18px;
+  overflow:hidden;
+  backdrop-filter:blur(15px);
+  cursor:pointer;
+  box-shadow:0 10px 25px rgba(20,0,40,.5);
+  transition:transform .3s,box-shadow .3s,border-color .3s;
+  position:relative;
+}
+.achievement-card:hover{
+  transform:translateY(-8px) scale(1.02);
+  box-shadow:0 15px 40px rgba(150,0,255,.4);
+  border-color:rgba(200,140,255,.4);
+}
+.achievement-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg,rgba(255,255,255,.08),transparent);
+  opacity:0;
+  transition:opacity .4s;
+}
+.achievement-card:hover::before{opacity:.6;}
+.achievement-img{
+  width:100%;
+  height:180px;
+  object-fit:cover;
+  border-bottom:1px solid rgba(200,150,255,.1);
+}
+.achievement-info{
+  padding:20px;
+  text-align:center;
+}
+.achievement-info h3{
+  font-family:'Orbitron',sans-serif;
+  font-size:1.4rem;
+  color:#e0aaff;
+  margin-bottom:10px;
+}
+.achievement-info p{
+  color:#c9b6ff;
+  font-size:0.95rem;
+  opacity:0.9;
+  line-height:1.4;
+}
+
+/* ===== MODAL ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.85);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+  backdrop-filter:blur(10px);
+}
+.modal.active{display:flex;}
+.modal-content{
+  background:linear-gradient(145deg,rgba(40,15,70,.9),rgba(20,5,40,.9));
+  padding:30px;
+  border-radius:20px;
+  width:90%;
+  max-width:500px;
+  color:#fff;
+  text-align:center;
+  box-shadow:0 0 40px rgba(180,120,255,.4);
+  animation:zoomIn .35s ease;
+}
+@keyframes zoomIn{
+  from{transform:scale(.8);opacity:0;}
+  to{transform:scale(1);opacity:1;}
+}
+.modal-content img{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-radius:12px;
+  margin-bottom:20px;
+}
+.modal-content h2{
+  font-family:'Orbitron',sans-serif;
+  color:#e0aaff;
+  margin-bottom:10px;
+}
+.modal-content p{
+  color:#c9b6ff;
+  margin-bottom:15px;
+  line-height:1.5;
+}
+.close-btn{
+  background:linear-gradient(90deg,#7b2cbf,#5a189a);
+  border:none;
+  padding:10px 20px;
+  color:#fff;
+  font-weight:700;
+  border-radius:10px;
+  cursor:pointer;
+  transition:.3s;
+}
+.close-btn:hover{
+  background:linear-gradient(90deg,#8a3fd4,#6a28d1);
+  transform:translateY(-2px);
+}
+
+/* ===== ANIMATED GRID BACK ===== */
+@keyframes pulseGlow{
+  0%,100%{box-shadow:0 0 25px rgba(150,0,255,.3);}
+  50%{box-shadow:0 0 40px rgba(150,0,255,.6);}
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="bg-layer one"></div>
+  <div class="bg-layer two"></div>
+  <div class="bg-layer three"></div>
+</div>
+
+<header class="page-header">
+  <h1>/SIX Achievements</h1>
+  <p>Glory earned through skill, honor, and history.</p>
+</header>
+
+<section class="achievement-grid" id="achievementGrid">
+  <!-- Achievements will be injected here -->
+</section>
+
+<!-- Modal -->
+<div class="modal" id="achievementModal">
+  <div class="modal-content">
+    <img id="modalImg" src="" alt="achievement">
+    <h2 id="modalTitle"></h2>
+    <p id="modalDesc"></p>
+    <p id="modalExtra"></p>
+    <button class="close-btn" id="closeModal">Close</button>
+  </div>
+</div>
+
+<script>
+/* ===== ACHIEVEMENT DATA ===== */
+const achievements = [
+  {
+    title: "The Richest in SwiftSMP",
+    desc: "Firsst /six member to be the richest on SwiftSMP's Season 9.",
+    img: "https://i.imgur.com/5YbQj1T.jpeg",
+    extra: "Unlocked by: The_Killers_\nDate: Nov 11, 2025"
+  },
+  {
+    title: "Crystal Conqueror",
+    desc: "Win 10 clan wars consecutively.",
+    img: "https://i.imgur.com/FqWgxIu.jpeg",
+    extra: "Unlocked by: Entire Clan /SIX\nDate: Oct 29, 2025"
+  },
+  {
+    title: "Shadow Forged",
+    desc: "Craft your first legendary weapon.",
+    img: "https://i.imgur.com/nTg4H3u.jpeg",
+    extra: "Unlocked by: Nova\nDate: Nov 5, 2025"
+  }
+];
+
+/* ===== RENDER ACHIEVEMENTS ===== */
+const grid = document.getElementById('achievementGrid');
+achievements.forEach((a,i)=>{
+  const card=document.createElement('div');
+  card.className='achievement-card';
+  card.innerHTML=`
+    <img src="${a.img}" class="achievement-img" alt="${a.title}">
+    <div class="achievement-info">
+      <h3>${a.title}</h3>
+      <p>${a.desc}</p>
+    </div>`;
+  card.addEventListener('click',()=>openModal(a));
+  grid.appendChild(card);
+});
+
+/* ===== MODAL HANDLING ===== */
+const modal=document.getElementById('achievementModal');
+const modalImg=document.getElementById('modalImg');
+const modalTitle=document.getElementById('modalTitle');
+const modalDesc=document.getElementById('modalDesc');
+const modalExtra=document.getElementById('modalExtra');
+const closeModalBtn=document.getElementById('closeModal');
+
+function openModal(a){
+  modalImg.src=a.img;
+  modalTitle.textContent=a.title;
+  modalDesc.textContent=a.desc;
+  modalExtra.textContent=a.extra;
+  modal.classList.add('active');
+}
+closeModalBtn.addEventListener('click',()=>modal.classList.remove('active'));
+modal.addEventListener('click',e=>{
+  if(e.target===modal) modal.classList.remove('active');
+});
+
+/* ===== ADD ACHIEVEMENT PROGRAMMATICALLY ===== */
+// Example usage:
+// addAchievement({title:'New Title', desc:'Description', img:'url', extra:'More info'})
+function addAchievement(a){
+  achievements.push(a);
+  const card=document.createElement('div');
+  card.className='achievement-card';
+  card.innerHTML=`
+    <img src="${a.img}" class="achievement-img" alt="${a.title}">
+    <div class="achievement-info">
+      <h3>${a.title}</h3>
+      <p>${a.desc}</p>
+    </div>`;
+  card.addEventListener('click',()=>openModal(a));
+  grid.appendChild(card);
+}
+</script>
+</body>
+</html>
