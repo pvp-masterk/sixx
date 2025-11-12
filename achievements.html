@@ -518,10 +518,125 @@ body{
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+/* === iOS Glass Sidebar === */
+.ios-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100vh;
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  background: rgba(30, 10, 50, 0.35);
+  border-right: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 0 40px rgba(120, 40, 200, 0.25);
+  padding: 30px 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  z-index: 999;
+  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.sidebar-header {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(180, 0, 255, 0.5);
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.sidebar-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-links li {
+  margin-bottom: 20px;
+}
+
+.nav-link {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 1.05rem;
+  padding: 10px 15px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #fff;
+  background: rgba(150, 50, 255, 0.15);
+  box-shadow: 0 0 15px rgba(160, 60, 255, 0.3);
+}
+
+/* Active Page Glow */
+.nav-link.active {
+  color: #fff;
+  background: linear-gradient(90deg, #7b2cbf, #5a189a);
+  box-shadow: 0 0 25px rgba(130, 50, 255, 0.5);
+}
+
+/* === Mobile Behavior === */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: rgba(50, 20, 80, 0.4);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 10px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(80, 30, 130, 0.5);
+}
+
+@media (max-width: 800px) {
+  .ios-sidebar {
+    transform: translateX(-100%);
+  }
+  .ios-sidebar.active {
+    transform: translateX(0);
+  }
+  .sidebar-toggle {
+    display: block;
+  }
+}
 
 </style>
 </head>
 <body>
+  <!-- Sidebar Navigation -->
+<nav class="ios-sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-title">/six</span>
+  </div>
+  <ul class="sidebar-links">
+    <li><a href="index.html" class="nav-link">Home</a></li>
+    <li><a href="achievements.html" class="nav-link">Achievements</a></li>
+    <li><a href="members.html" class="nav-link">Members</a></li>
+  </ul>
+</nav>
+
+<!-- Sidebar Toggle (for mobile) -->
+<button class="sidebar-toggle" onclick="toggleSidebar()">
+  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+</button>
+
 <div class="bg-wrap">
   <div class="bg-layer one"></div>
   <div class="bg-layer two"></div>
@@ -773,5 +888,19 @@ function addAchievement(a) {
   renderAchievements();
 }
 </script>
+  <script>
+function toggleSidebar() {
+  document.querySelector('.ios-sidebar').classList.toggle('active');
+}
+
+// Highlight active page
+const current = window.location.pathname.split('/').pop();
+document.querySelectorAll('.nav-link').forEach(link => {
+  if (link.getAttribute('href') === current) {
+    link.classList.add('active');
+  }
+});
+</script>
+
 </body>
 </html>
