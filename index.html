@@ -180,7 +180,30 @@ body{
 .nav-link.active{ background:linear-gradient(90deg,#7b2cbf,#5a189a); color:#fff; box-shadow:0 0 22px rgba(130,50,255,0.18); }
 
 /* mobile toggle (only shows when narrow) */
-.sidebar-toggle{ display:none; position:fixed; top:18px; left:18px; z-index:60; background: rgba(50,20,80,0.4); border-radius:10px; padding:10px; border:1px solid rgba(255,255,255,0.06); color:white; cursor:pointer; }
+.sidebar-toggle {
+  position: fixed;
+  top: 22px;
+  left: 22px;
+  z-index: 100;
+  background: rgba(40, 15, 70, 0.5);
+  border-radius: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(120,40,200,0.3);
+}
+.sidebar-toggle:hover {
+  background: rgba(70, 30, 120, 0.6);
+  transform: scale(1.05);
+}
+
 @media (max-width:880px){ .ios-sidebar{ transform: translateX(-100%);} .ios-sidebar.visible{ transform: translateX(0);} .sidebar-toggle{ display:block;} .app{ margin-left:18px; margin-right:18px; } .ios-sidebar{ width:220px; } }
 
 /* ======================= APP HEADER ROW ======================= */
