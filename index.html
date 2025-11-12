@@ -290,7 +290,7 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
     <div class="header-row">
       <div>
         <div class="clan-title">Home</div>
-        <div class="meta">/six — What is losing? • EST. 2024</div>
+        <div class="meta">/six</div>
       </div>
       <div><input class="editable" value="Last Updated: Today" aria-label="Last updated"></div>
     </div>
@@ -334,7 +334,7 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
       </div>
     </section>
 
-    <button class="clanwar-btn" id="clanwarBtn" aria-haspopup="dialog">Request Clan War</button>
+   
 
     <!-- Discord Info -->
     <section class="discord-section card" aria-label="Discord info">
@@ -558,90 +558,6 @@ function closeBannerModal(){
   }
 }
 
-/* ======================= Rules & Application Modals (Clan War) ======================= */
-const clanwarBtn = document.getElementById('clanwarBtn');
-const rulesModal = document.getElementById('rulesModal');
-const applicationModal = document.getElementById('applicationModal');
-const understoodBtn = document.getElementById('understoodBtn');
-const closeRulesBtn = document.getElementById('closeRulesBtn');
-const closeAppBtn = document.getElementById('closeAppBtn');
-const clanwarForm = document.getElementById('clanwarForm');
-
-clanwarBtn.addEventListener('click', () => {
-  rulesModal.classList.add('active');
-  rulesModal.setAttribute('aria-hidden','false');
-  document.body.style.overflow = 'hidden';
-});
-understoodBtn.addEventListener('click', () => {
-  rulesModal.classList.remove('active');
-  rulesModal.setAttribute('aria-hidden','true');
-  applicationModal.classList.add('active');
-  applicationModal.setAttribute('aria-hidden','false');
-});
-closeRulesBtn.addEventListener('click', () => {
-  rulesModal.classList.remove('active');
-  rulesModal.setAttribute('aria-hidden','true');
-  if (!document.getElementById('landing') || document.getElementById('landing').style.display === 'none') document.body.style.overflow = 'auto';
-});
-closeAppBtn.addEventListener('click', () => {
-  applicationModal.classList.remove('active');
-  applicationModal.setAttribute('aria-hidden','true');
-  if (!document.getElementById('landing') || document.getElementById('landing').style.display === 'none') document.body.style.overflow = 'auto';
-});
-window.addEventListener('click', (e) => {
-  if (e.target === rulesModal) { rulesModal.classList.remove('active'); rulesModal.setAttribute('aria-hidden','true'); }
-  if (e.target === applicationModal) { applicationModal.classList.remove('active'); applicationModal.setAttribute('aria-hidden','true'); }
-});
-
-/* Clan war form submit -> POST to webhook (keeps your existing behavior) */
-clanwarForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const submitBtn = clanwarForm.querySelector('button[type="submit"]');
-  const originalText = submitBtn.innerText;
-  submitBtn.innerText = "Submitting...";
-  submitBtn.disabled = true;
-
-  const inputs = Array.from(clanwarForm.querySelectorAll('input'));
-  const data = {};
-  inputs.forEach(i => data[i.name] = i.value);
-
-  try {
-    const webhookURL = "https://discord.com/api/webhooks/1437169737321943081/-cCSQGQ4GL6MS-1tb5Bke89AZ_dasIT4D0S3I-fgvny2Cxj50b1f2Nua6CDptZr6VCxq"; // replace if needed
-    const payload = {
-      content: null,
-      embeds: [{
-        title: "New Clan War Application",
-        color: 0x9146FF,
-        fields: Object.keys(data).map(k => ({ name: k, value: data[k] || 'N/A', inline: false }))
-      }]
-    };
-    const res = await fetch(webhookURL, {
-      method: "POST",
-      headers: { "Content-Type":"application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error('Failed to send application');
-    applicationModal.classList.remove('active');
-    applicationModal.setAttribute('aria-hidden','true');
-    showNotification("Your application has been submitted. We'll contact you on Discord.", false);
-  } catch (err) {
-    console.error(err);
-    showNotification("Failed to submit application.", true);
-  } finally {
-    submitBtn.innerText = originalText;
-    submitBtn.disabled = false;
-    clanwarForm.reset();
-    if (!document.getElementById('landing') || document.getElementById('landing').style.display === 'none') document.body.style.overflow = 'auto';
-  }
-});
-
-/* Close modals with Escape key */
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.modal.active').forEach(m => { m.classList.remove('active'); m.setAttribute('aria-hidden','true'); });
-    if (!document.getElementById('landing') || document.getElementById('landing').style.display === 'none') document.body.style.overflow = 'auto';
-  }
-});
 </script>
 </body>
 </html>
