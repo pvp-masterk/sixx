@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ===== BASE STYLES ===== */
+
 *{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:'Inter',sans-serif;
@@ -43,7 +43,7 @@ body{
   background:radial-gradient(circle at 50% 50%, rgba(80,0,120,0.2), transparent 70%);
 }
 
-/* ===== TITLE ===== */
+
 .page-header{
   text-align:center;
   padding:80px 20px 40px;
@@ -66,7 +66,7 @@ body{
   font-size:1.1rem;
 }
 
-/* ===== SPECIAL WORD COLORS ===== */
+
 .green-word {
   color: #00ff99;
   font-weight: 700;
@@ -80,7 +80,7 @@ body{
   text-shadow: 0 0 15px rgba(200,100,255,0.4);
 }
 
-/* ===== ACHIEVEMENT GRID ===== */
+
 .achievement-grid{
   position:relative;
   z-index:10;
@@ -138,7 +138,7 @@ body{
   line-height:1.4;
 }
 
-/* ===== MODAL ANIMATIONS ===== */
+
 @keyframes modalBackdropIn {
   0% { opacity: 0; backdrop-filter: blur(0px); }
   100% { opacity: 1; backdrop-filter: blur(12px); }
@@ -182,7 +182,7 @@ body{
 }
 
 
-/* ===== MODAL ===== */
+
 .modal {
   position: fixed;
   inset: 0;
@@ -278,7 +278,7 @@ body{
   overflow: hidden;
 }
 
-/* Soft reflection highlight */
+
 .close-btn::before {
   content: "";
   position: absolute;
@@ -296,7 +296,7 @@ body{
   pointer-events: none;
 }
 
-/* Hover animation – brightens like iOS press effect */
+
 .close-btn:hover {
   background: rgba(255, 255, 255, 0.25);
   transform: scale(1.05);
@@ -305,7 +305,7 @@ body{
     inset 0 0 10px rgba(255, 255, 255, 0.15);
 }
 
-/* Active (click) effect */
+
 .close-btn:active {
   transform: scale(0.98);
   background: rgba(255, 255, 255, 0.2);
@@ -319,12 +319,12 @@ body{
   transform:translateY(-2px);
 }
 
-/* ===== ANIMATED GRID BACK ===== */
+
 @keyframes pulseGlow{
   0%,100%{box-shadow:0 0 25px rgba(150,0,255,.3);}
   50%{box-shadow:0 0 40px rgba(150,0,255,.6);}
 }
-  /* ======================= CUSTOM /SIX FONT ======================= */
+ 
 @font-face {
   font-family: 'Diecide Remain';
   src: url('fonts/DeicideRemain.otf') format('opentype');
@@ -397,7 +397,7 @@ body{
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
-/* gold-white gradient for TLCraft */
+
 .tlcraft-word {
   font-family: 'Diecide Remain', cursive;
   background: linear-gradient(90deg, #ffd700, #fff6cc, #ffffff);
@@ -418,7 +418,7 @@ body{
   100% { background-position: 0% 50%; }
 }
 
-/* green-white gradient for galaxxxyy_ */
+
 .galaxy-word {
   font-family: 'Diecide Remain', cursive;
   background: linear-gradient(90deg, #00ff99, #ccffdd, #ffffff);
@@ -454,10 +454,10 @@ body{
 </header>
 
 <section class="achievement-grid" id="achievementGrid">
-  <!-- Achievements will be injected here -->
+ 
 </section>
 
-<!-- Modal -->
+
 <div class="modal" id="achievementModal">
   <div class="modal-content">
     <img id="modalImg" src="" alt="achievement">
@@ -469,7 +469,7 @@ body{
 </div>
 
 <script>
-  // Auto-detect /six and style it
+ 
     function styleSixText(root = document.body) {
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
       const nodes = [];
@@ -479,7 +479,7 @@ body{
         if (node.nodeValue) {
           const text = node.nodeValue;
 
-          // Match both /six and SAIS (case-insensitive)
+         
           if (/(\/six|sais)/i.test(text)) {
             const span = document.createElement('span');
             span.innerHTML = text.replace(/(\/six|sais)/gi, match => {
@@ -494,7 +494,7 @@ body{
     window.addEventListener('load', () => {
       styleSixText();
     });
-/* ===== ACHIEVEMENT DATA ===== */
+
 const achievements = [
   {
     title: 'The <span class="green-word">Richest</span> in <span class="gradient-word">SwiftSMP</span>',
@@ -504,7 +504,7 @@ const achievements = [
   }
 ];
 
-/* ===== RENDER ACHIEVEMENTS ===== */
+
 const grid = document.getElementById('achievementGrid');
 achievements.forEach((a,i)=>{
   const card = document.createElement('div');
@@ -519,10 +519,10 @@ achievements.forEach((a,i)=>{
   info.className = 'achievement-info';
 
   const titleEl = document.createElement('h3');
-  titleEl.innerHTML = a.title; // ✅ render HTML spans properly
+  titleEl.innerHTML = a.title; 
 
   const descEl = document.createElement('p');
-  descEl.innerHTML = a.desc; // ✅ same for desc if it has styled spans
+  descEl.innerHTML = a.desc; 
 
   info.appendChild(titleEl);
   info.appendChild(descEl);
@@ -535,7 +535,7 @@ achievements.forEach((a,i)=>{
 });
 
 
-/* ===== MODAL HANDLING ===== */
+
 const modal = document.getElementById('achievementModal');
 const modalImg = document.getElementById('modalImg');
 const modalTitle = document.getElementById('modalTitle');
@@ -545,28 +545,28 @@ const closeModalBtn = document.getElementById('closeModal');
 
 function openModal(a) {
   modalImg.src = a.img;
-  modalTitle.innerHTML = a.title; // allow gradient + color HTML
+  modalTitle.innerHTML = a.title;
   modalDesc.textContent = a.desc;
   modalExtra.innerHTML = a.extra;
   
-  // Reset any closing classes
+ 
   modal.classList.remove('closing');
   modal.querySelector('.modal-content').classList.remove('closing');
   
-  // Show modal with animation
+ 
   modal.classList.add('active');
 }
 
 function closeModal() {
-  // Add closing animation classes
+ 
   modal.classList.add('closing');
   modal.querySelector('.modal-content').classList.add('closing');
   
-  // Wait for animation to complete before hiding
+  
   setTimeout(() => {
     modal.classList.remove('active', 'closing');
     modal.querySelector('.modal-content').classList.remove('closing');
-  }, 300); // Match the duration of the closing animation
+  }, 300); 
 }
 
 closeModalBtn.addEventListener('click', closeModal);
@@ -575,14 +575,14 @@ modal.addEventListener('click', e => {
   if (e.target === modal) closeModal();
 });
 
-// Close modal with Escape key
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && modal.classList.contains('active')) {
     closeModal();
   }
 });
 
-/* ===== ADD ACHIEVEMENT PROGRAMMATICALLY ===== */
+
 function addAchievement(a){
   achievements.push(a);
   const card=document.createElement('div');
