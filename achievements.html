@@ -66,6 +66,61 @@ body{
   font-size:1.1rem;
 }
 
+/* Section Switcher */
+.section-switcher {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 40px;
+  position: relative;
+  z-index: 10;
+}
+
+.switch-btn {
+  background: rgba(35, 10, 55, 0.35);
+  border: 1px solid rgba(180, 120, 255, 0.3);
+  color: #c9b6ff;
+  padding: 12px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  position: relative;
+  overflow: hidden;
+}
+
+.switch-btn:first-child {
+  border-radius: 12px 0 0 12px;
+  border-right: none;
+}
+
+.switch-btn:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.switch-btn.active {
+  background: linear-gradient(90deg, #8a3fd4, #6a28d1);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(160, 100, 255, 0.4);
+  border-color: rgba(200, 140, 255, 0.5);
+}
+
+.switch-btn:hover:not(.active) {
+  background: rgba(60, 20, 90, 0.5);
+  color: #e0aaff;
+}
+
+/* Section Styles */
+.section {
+  display: none;
+  position: relative;
+  z-index: 10;
+}
+
+.section.active {
+  display: block;
+}
 
 .green-word {
   color: #00ff99;
@@ -82,8 +137,6 @@ body{
 
 
 .achievement-grid{
-  position:relative;
-  z-index:10;
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
   gap:35px;
@@ -138,6 +191,29 @@ body{
   line-height:1.4;
 }
 
+/* Victory-specific styles */
+.victory-card {
+  border: 1px solid rgba(255, 100, 100, 0.3);
+  background: linear-gradient(145deg, rgba(70, 15, 15, 0.45), rgba(40, 5, 5, 0.35));
+}
+
+.victory-card:hover {
+  border-color: rgba(255, 140, 140, 0.5);
+  box-shadow: 0 15px 40px rgba(255, 50, 50, 0.4);
+}
+
+.victory-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(90deg, #ff2b2b, #ff4545);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(255, 60, 60, 0.7);
+}
 
 @keyframes modalBackdropIn {
   0% { opacity: 0; backdrop-filter: blur(0px); }
@@ -451,12 +527,23 @@ body{
 <header class="page-header">
   <h1>/SIX Achievements</h1>
   <p>Our <span class="glorious-word">Glorious</span> Achievements.</p>
+  
+  <!-- Section Switcher -->
+  <div class="section-switcher">
+    <button class="switch-btn active" data-section="general">General Achievements</button>
+    <button class="switch-btn" data-section="victories">Victories & Battles</button>
+  </div>
 </header>
 
-<section class="achievement-grid" id="achievementGrid">
- 
+<!-- General Achievements Section -->
+<section class="section active" id="general-section">
+  <div class="achievement-grid" id="generalGrid"></div>
 </section>
 
+<!-- Victories Section -->
+<section class="section" id="victories-section">
+  <div class="achievement-grid" id="victoriesGrid"></div>
+</section>
 
 <div class="modal" id="achievementModal">
   <div class="modal-content">
@@ -495,46 +582,119 @@ body{
       styleSixText();
     });
 
+// Updated achievements with section property
 const achievements = [
   {
     title: 'The <span class="green-word">Richest</span> in <span class="gradient-word">SwiftSMP</span>',
     desc: "First /six member to be the richest on SwiftSMP's Season 9.",
     img: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
-    extra: 'Unlocked by: <span class="crimson-word">The_Killers_</span><br>Date: Nov 11, 2025'
+    extra: 'Unlocked by: <span class="crimson-word">The_Killers_</span><br>Date: Nov 11, 2025',
+    section: 'general'
+  },
+  {
+    title: 'First <span class="crimson-word">Clan War</span> Victory',
+    desc: "Led /six to victory in the first major clan war against The Eclipse.",
+    img: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
+    extra: 'Opponent: <span class="crimson-word">The Eclipse</span><br>Date: Oct 28, 2025<br>Casualties: 3',
+    section: 'victories'
+  },
+  {
+    title: '<span class="glorious-word">Glorious</span> Conquest',
+    desc: "Successfully conquered the Nether Fortress in record time.",
+    img: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
+    extra: 'Location: Nether Fortress<br>Time: 12 minutes<br>Resources Gained: 64 Blaze Rods',
+    section: 'victories'
+  },
+  {
+    title: '<span class="tlcraft-word">TLcraft</span> Alliance',
+    desc: "Formed a strategic alliance with TLcraft, strengthening our position.",
+    img: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
+    extra: 'Allied with: <span class="tlcraft-word">TLcraft</span><br>Date: Nov 5, 2025<br>Mutual Benefits: Resource Sharing',
+    section: 'general'
   }
 ];
 
+// Section switching functionality
+const switchButtons = document.querySelectorAll('.switch-btn');
+const sections = document.querySelectorAll('.section');
 
-const grid = document.getElementById('achievementGrid');
-achievements.forEach((a,i)=>{
-  const card = document.createElement('div');
-  card.className = 'achievement-card';
-
-  const img = document.createElement('img');
-  img.src = a.img;
-  img.className = 'achievement-img';
-  img.alt = a.title;
-
-  const info = document.createElement('div');
-  info.className = 'achievement-info';
-
-  const titleEl = document.createElement('h3');
-  titleEl.innerHTML = a.title; 
-
-  const descEl = document.createElement('p');
-  descEl.innerHTML = a.desc; 
-
-  info.appendChild(titleEl);
-  info.appendChild(descEl);
-
-  card.appendChild(img);
-  card.appendChild(info);
-
-  card.addEventListener('click', () => openModal(a));
-  grid.appendChild(card);
+switchButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const targetSection = button.getAttribute('data-section');
+    
+    // Update active button
+    switchButtons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+    
+    // Show target section
+    sections.forEach(section => {
+      section.classList.remove('active');
+      if (section.id === `${targetSection}-section`) {
+        section.classList.add('active');
+      }
+    });
+  });
 });
 
+// Function to render achievements to their respective sections
+function renderAchievements() {
+  const generalGrid = document.getElementById('generalGrid');
+  const victoriesGrid = document.getElementById('victoriesGrid');
+  
+  // Clear existing content
+  generalGrid.innerHTML = '';
+  victoriesGrid.innerHTML = '';
+  
+  // Sort achievements by section and render
+  achievements.forEach((a, i) => {
+    const card = document.createElement('div');
+    
+    // Add victory-specific styling for victories section
+    if (a.section === 'victories') {
+      card.className = 'achievement-card victory-card';
+      
+      // Add victory badge
+      const badge = document.createElement('div');
+      badge.className = 'victory-badge';
+      badge.textContent = 'VICTORY';
+      card.appendChild(badge);
+    } else {
+      card.className = 'achievement-card';
+    }
 
+    const img = document.createElement('img');
+    img.src = a.img;
+    img.className = 'achievement-img';
+    img.alt = a.title;
+
+    const info = document.createElement('div');
+    info.className = 'achievement-info';
+
+    const titleEl = document.createElement('h3');
+    titleEl.innerHTML = a.title; 
+
+    const descEl = document.createElement('p');
+    descEl.innerHTML = a.desc; 
+
+    info.appendChild(titleEl);
+    info.appendChild(descEl);
+
+    card.appendChild(img);
+    card.appendChild(info);
+
+    card.addEventListener('click', () => openModal(a));
+    
+    // Add to appropriate grid
+    if (a.section === 'general') {
+      generalGrid.appendChild(card);
+    } else if (a.section === 'victories') {
+      victoriesGrid.appendChild(card);
+    }
+  });
+}
+
+// Initialize the page with achievements
+renderAchievements();
 
 const modal = document.getElementById('achievementModal');
 const modalImg = document.getElementById('modalImg');
@@ -549,20 +709,20 @@ function openModal(a) {
   modalDesc.textContent = a.desc;
   modalExtra.innerHTML = a.extra;
   
- 
+  // Reset animations
   modal.classList.remove('closing');
   modal.querySelector('.modal-content').classList.remove('closing');
   
- 
+  // Show modal
   modal.classList.add('active');
 }
 
 function closeModal() {
- 
+  // Start closing animation
   modal.classList.add('closing');
   modal.querySelector('.modal-content').classList.add('closing');
   
-  
+  // Hide modal after animation completes
   setTimeout(() => {
     modal.classList.remove('active', 'closing');
     modal.querySelector('.modal-content').classList.remove('closing');
@@ -575,26 +735,16 @@ modal.addEventListener('click', e => {
   if (e.target === modal) closeModal();
 });
 
-
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && modal.classList.contains('active')) {
     closeModal();
   }
 });
 
-
-function addAchievement(a){
+// Function to add new achievements (for future use)
+function addAchievement(a) {
   achievements.push(a);
-  const card=document.createElement('div');
-  card.className='achievement-card';
-  card.innerHTML=`
-    <img src="${a.img}" class="achievement-img" alt="${a.title}">
-    <div class="achievement-info">
-      <h3>${a.title}</h3>
-      <p>${a.desc}</p>
-    </div>`;
-  card.addEventListener('click',()=>openModal(a));
-  grid.appendChild(card);
+  renderAchievements();
 }
 </script>
 </body>
