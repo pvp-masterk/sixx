@@ -141,17 +141,36 @@ body{
   height:100vh;
   backdrop-filter: blur(20px) saturate(150%);
   background:rgba(30,10,50,0.34);
-  border-right: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 0 40px rgba(120, 40, 200, 0.16);
+  border-right:1px solid rgba(255,255,255,0.06);
+  box-shadow:0 0 40px rgba(120,40,200,0.16);
   padding:28px 14px;
   display:flex;
   flex-direction:column;
   justify-content:flex-start;
   z-index:40;
-  transition: transform .35s ease, opacity .35s ease;
-  opacity:0;
-  transform: translateX(-6px);
+  transition: transform .35s ease;
+  transform: translateX(-240px); /* hidden by default */
 }
+.ios-sidebar.visible{
+  transform: translateX(0);
+}
+
+/* make the app move right when sidebar opens */
+.app{
+  transition: transform .35s ease, opacity .6s ease, box-shadow .35s ease;
+}
+.app.shifted{
+  transform: translateX(240px);
+  box-shadow: -10px 0 30px rgba(0,0,0,0.4);
+}
+
+/* mobile adjustments */
+@media (max-width:880px){
+  .ios-sidebar{ transform:translateX(-100%); }
+  .ios-sidebar.visible{ transform:translateX(0); }
+  .app.shifted{ transform:none; } /* no push on small screens */
+}
+
 .ios-sidebar.visible{ opacity:1; transform: translateX(0); }
 .sidebar-header{ font-family: 'Orbitron', sans-serif; font-size:1.6rem; font-weight:800; color:#fff; text-shadow:0 0 8px rgba(160,60,255,0.2); margin-bottom:30px; text-align:center;}
 .sidebar-links{ list-style:none; padding:0; margin:0; }
@@ -445,8 +464,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* MOBILE: sidebar toggle */
 document.getElementById('sidebarToggle').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('visible');
+  const sidebar = document.getElementById('sidebar');
+  const app = document.getElementById('app');
+  sidebar.classList.toggle('visible');
+  app.classList.toggle('shifted');
 });
+// Close sidebar when clicking outside (desktop only)
+document.addEventListener('click', (e) => {
+  const sidebar = document.getElementById('sidebar');
+  const app = document.getElementById('app');
+  const toggle = document.getElementById('sidebarToggle');
+  if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+    sidebar.classList.remove('visible');
+    app.classList.remove('shifted');
+  }
+});
+
 
 /* Highlight current nav link */
 (function highlightNav() {
