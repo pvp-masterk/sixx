@@ -3,651 +3,612 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>/six</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-/* ======================= RESET & BASE (optimized) ======================= */
+<title>/six — Home</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ======================= RESET & BASE ======================= */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   color:#e8e6f3;
   background:#050006;
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
-  line-height:1.6;
-  -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
+  line-height:1.5;
 }
 
-/* ======================= BACKGROUND (optimized) ======================= */
+/* lock scroll while landing is visible by inline style on body (set in JS) */
+
+/* ======================= BACKGROUND LAYERS (STATIC) ======================= */
 .bg-wrap{
   position:fixed;
   inset:0;
   z-index:0;
-  overflow:hidden;
   pointer-events:none;
 }
-
-/* Use lighter blur, avoid heavy transforms on large layers */
 .bg-layer{
   position:absolute;
-  inset:-12%;
-  transform:none;
-  filter:blur(18px); /* reduced from 30/60 */
-  opacity:0.88;
-  transition:opacity .6s ease;
-  /* removed will-change from large static layers to avoid GPU memory pressure */
+  inset:-18%;
+  filter:blur(28px);
+  mix-blend-mode:screen;
+  opacity:.82;
 }
 .bg-layer.one{
-  background:radial-gradient(closest-side at 10% 20%, #2d004f 0%, transparent 40%),
-             radial-gradient(closest-side at 80% 80%, #45003b 0%, transparent 35%);
+  background:radial-gradient(closest-side at 10% 20%, #2d004f 0%, transparent 35%),radial-gradient(closest-side at 80% 80%, #45003b 0%, transparent 30%);
 }
 .bg-layer.two{
-  background:linear-gradient(120deg, rgba(100,0,150,0.18), rgba(60,0,100,0.18));
-  opacity:0.65;
+  background:linear-gradient(120deg, rgba(100,0,150,0.22), rgba(60,0,100,0.22));
 }
 .bg-layer.three{
-  background:radial-gradient(circle at 50% 50%, rgba(80,0,120,0.14), transparent 75%);
-  opacity:0.45;
+  background:radial-gradient(circle at 50% 50%, rgba(80,0,120,0.15), transparent 70%);
 }
 
-/* Fog: slower and lighter */
-.fog{
-  position:absolute;
-  inset:-8%;
-  background:radial-gradient(circle at 20% 30%, rgba(100,40,180,0.06), transparent 10%),
-             radial-gradient(circle at 80% 70%, rgba(25,0,60,0.06), transparent 15%);
-  filter:blur(12px);
-  animation:drift 40s linear infinite; /* slower */
-}
-@keyframes drift{
-  0%{transform:translateY(0) rotate(0deg)}
-  50%{transform:translateY(-2%) translateX(1%) rotate(.4deg)}
-  100%{transform:translateY(0) rotate(0deg)}
-}
-
-/* ======================= CUSTOM /SIX FONT ======================= */
-@font-face{
-  font-family:'Diecide Remain';
+/* ======================= /SIX CUSTOM FONT (local fallback) ======================= */
+@font-face {
+  font-family: 'Diecide Remain';
   src: url('fonts/DeicideRemain.otf') format('opentype');
-  font-display:swap;
+  font-display: swap;
 }
 
-/* reduce text-shadow intensity; slow glow */
+/* six-text style */
 .six-text{
   font-family:'Diecide Remain', sans-serif;
-  background: linear-gradient(135deg,#c77dff,#9d4edd,#7b2cbf);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  text-shadow:0 0 10px rgba(180,80,255,0.45);
-  letter-spacing:1.2px;
+  background: linear-gradient(135deg, #c77dff, #9d4edd, #7b2cbf);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow:0 0 14px rgba(180,80,255,0.45);
+  letter-spacing:1px;
   font-weight:900;
   display:inline-block;
-  position:relative;
-  animation:textGlow 6s ease-in-out infinite alternate;
-}
-@keyframes textGlow{
-  0%{text-shadow:0 0 10px rgba(180,80,255,0.45); transform:scale(1)}
-  100%{text-shadow:0 0 18px rgba(200,100,255,0.6); transform:scale(1.01)}
 }
 
-/* ======================= LANDING ======================= */
+/* ======================= LANDING (fullscreen, no scroll) ======================= */
 .landing{
-  position:relative;
-  z-index:10;
-  min-height:100vh;
+  position:fixed;
+  inset:0;
+  z-index:50;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
   padding:40px 20px;
-  cursor:pointer;
+  background:linear-gradient(180deg, rgba(5,0,10,0.9), rgba(5,0,10,0.6));
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: opacity .6s ease, transform .6s ease;
+  will-change: opacity, transform;
+}
+.landing.hidden{
+  opacity:0;
+  transform: scale(.98);
+  pointer-events:none;
 }
 .brand-big{
-  font-size:clamp(64px,18vw,180px);
+  font-size:clamp(64px,18vw,140px);
   font-weight:900;
   letter-spacing:8px;
   line-height:0.84;
   color:transparent;
   -webkit-background-clip:text;
   background-image:linear-gradient(180deg,#e0aaff,#9d4edd 40%,#5a189a 100%);
-  text-shadow:0 10px 30px rgba(90,24,154,0.55);
-  margin-bottom:20px;
+  text-shadow:0 8px 28px rgba(90,24,154,0.55);
+  margin-bottom:18px;
   font-family:'Diecide Remain',sans-serif;
-  position:relative;
-  animation:pulse 6s ease-in-out infinite;
 }
-@keyframes pulse{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.02)}
-}
-
-/* Enter card: reduce backdrop-filter slightly */
 .enter-card{
-  margin-top:24px;
-  border-radius:20px;
-  padding:22px 28px;
-  background:linear-gradient(145deg, rgba(90,24,154,0.13), rgba(45,0,90,0.08));
-  border:1px solid rgba(180,120,255,0.16);
-  backdrop-filter: blur(5px); /* reduced */
+  margin-top:20px;
+  border-radius:16px;
+  padding:18px 22px;
+  background:linear-gradient(145deg, rgba(90,24,154,0.14), rgba(45,0,90,0.06));
+  border:1px solid rgba(180,120,255,0.12);
+  backdrop-filter: blur(4px);
+  box-shadow:0 8px 22px rgba(30,0,60,0.22);
   cursor:pointer;
-  transition: transform .28s cubic-bezier(.25,.46,.45,.94), box-shadow .28s;
-  box-shadow:0 8px 22px rgba(30,0,60,0.28);
-  max-width:700px;
+  max-width:720px;
 }
-.enter-card:hover{
-  transform:translateY(-6px) scale(1.015);
-  box-shadow:0 12px 30px rgba(90,24,154,0.35);
-  border:1px solid rgba(200,140,255,0.26);
-}
-.tagline{ color:#e2d9ff; opacity:.92; font-size:18px; line-height:1.6; }
+.tagline{ color:#e2d9ff; opacity:.94; font-size:18px; line-height:1.5; }
 
-/* ======================= APP ======================= */
+/* ======================= MAIN APP (hidden behind landing until enter) ======================= */
 .app{
   position:relative;
   z-index:20;
   max-width:1200px;
-  margin:36px auto;
-  padding:34px 24px;
-  border-radius:20px;
-  background:linear-gradient(145deg, rgba(20,5,35,0.68), rgba(10,2,20,0.78));
+  margin:48px auto;
+  padding:28px;
+  border-radius:18px;
+  background:linear-gradient(145deg, rgba(20,5,35,0.64), rgba(10,2,20,0.7));
   border:1px solid rgba(150,80,220,0.12);
-  backdrop-filter: blur(10px); /* reduced */
-  box-shadow:0 18px 48px rgba(5,0,15,0.7);
-  transform:translateY(22px);
+  backdrop-filter: blur(8px);
+  box-shadow:0 18px 48px rgba(0,0,0,0.6);
   opacity:0;
-  transition: opacity .7s ease, transform .7s cubic-bezier(.2,.9,.2,1);
+  transform: translateY(18px) scale(.995);
+  transition: opacity .6s ease, transform .6s cubic-bezier(.2,.9,.2,1);
 }
-.app.active{ transform:translateY(0); opacity:1; }
+.app.active{ opacity:1; transform: translateY(0) scale(1); }
 
-.header-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:26px; padding-bottom:18px; border-bottom:1px solid rgba(150,80,220,0.14); }
-
-.clan-title{
-  font-size:40px;
-  font-weight:800;
-  background:linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd);
-  -webkit-background-clip:text;
-  color:transparent;
-  letter-spacing:3px;
-  font-family:'Orbitron',sans-serif;
-}
-.meta{ margin-top:6px; color:#c9b6ff; font-size:16px; font-weight:500; }
-
-/* editable input: keep simple */
-.editable{
-  background:rgba(30,10,50,0.45);
-  border:1px solid rgba(150,80,220,0.22);
-  border-radius:8px;
-  padding:10px 15px;
-  color:#e2d9ff;
-  font-size:15px;
-  transition:box-shadow .25s, border-color .25s;
-}
-.editable:focus{ outline:none; border-color:rgba(200,140,255,0.5); box-shadow:0 0 0 2px rgba(150,80,220,0.12); }
-
-/* ======================= CARDS (optimized) ======================= */
-.card{
-  background:linear-gradient(145deg, rgba(40,15,70,0.36), rgba(20,5,40,0.28));
-  border:1px solid rgba(150,80,220,0.12);
-  border-radius:14px;
-  padding:20px;
-  backdrop-filter: blur(6px); /* reduced */
-  margin-bottom:20px;
-  transition: transform .25s ease, box-shadow .25s ease;
-  box-shadow:0 6px 18px rgba(10,0,25,0.32);
-}
-.card:hover{ transform:translateY(-4px); box-shadow:0 10px 22px rgba(20,0,40,0.42); border-color:rgba(180,100,255,0.2); }
-
-.section-title{
-  font-size:22px; font-weight:700; color:#d8c7ff; margin-bottom:16px; padding-bottom:8px;
-  border-bottom:1px solid rgba(150,80,220,0.12); font-family:'Orbitron',sans-serif;
-}
-
-/* small UI tweaks for performance */
-.roster-list{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
-.role-pill{ background:linear-gradient(90deg, rgba(90,24,154,0.28), rgba(60,10,120,0.16)); border:1px solid rgba(150,80,220,0.14); border-radius:40px; padding:10px 18px; transition:transform .22s, box-shadow .22s; }
-.role-pill:hover{ transform:translateY(-2px); box-shadow:0 6px 12px rgba(90,24,154,0.18); }
-
-/* ======================= MEMBER TREE (light) ======================= */
-.member-tree-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; gap:12px; flex-wrap:wrap; }
-.sort-options{ display:flex; gap:8px; }
-.sort-btn{ background:linear-gradient(90deg, rgba(90,24,154,0.46), rgba(60,10,120,0.34)); border:1px solid rgba(150,80,220,0.2); border-radius:8px; padding:8px 14px; color:#e2d9ff; font-size:13px; font-weight:600; cursor:pointer; transition: transform .18s; }
-.sort-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 12px rgba(90,24,154,0.12); }
-
-/* tree layout preserved but simpler visuals */
-.member-tree-container{ position:relative; min-height:520px; }
-.tree-structure{ padding:30px 0; display:flex; flex-direction:column; align-items:center; }
-.tree-level{ display:flex; justify-content:center; flex-wrap:wrap; gap:28px; margin-bottom:48px; width:100%; position:relative; }
-.tree-level:not(:last-child)::after{ content:''; position:absolute; bottom:-26px; left:50%; transform:translateX(-50%); width:2px; height:26px; background:linear-gradient(to bottom, rgba(180,100,255,0.5), transparent); }
-
-/* simpler node lines */
-.tree-node::before{ content:''; position:absolute; top:-26px; left:50%; transform:translateX(-50%); width:2px; height:26px; background:linear-gradient(to bottom, rgba(180,100,255,0.5), transparent); }
-.tree-node:not(:only-child)::after{ content:''; position:absolute; top:-26px; left:50%; width:calc(100% + 30px); height:2px; background:linear-gradient(to right, transparent, rgba(180,100,255,0.5), transparent); transform:translateX(-50%); }
-
-/* member card simpler */
-.member-tree-card{
-  background:linear-gradient(145deg, rgba(50,20,80,0.28), rgba(30,10,50,0.18));
-  border:1px solid rgba(150,80,220,0.12);
-  border-radius:12px;
-  padding:16px;
-  transition: transform .22s, box-shadow .22s;
-  width:220px;
-  text-align:center;
-  overflow:hidden;
-}
-.member-tree-card:hover{ transform:translateY(-4px); box-shadow:0 8px 18px rgba(20,0,40,0.26); border-color:rgba(180,100,255,0.2); }
-
-.member-avatar{ width:72px; height:72px; border-radius:50%; margin-bottom:12px; border:2px solid rgba(180,100,255,0.44); box-shadow:0 0 10px rgba(180,100,255,0.18); }
-.member-name{ font-size:18px; font-weight:700; color:#e0aaff; margin-bottom:6px; }
-.member-rank{ color:#c9b6ff; font-weight:500; font-size:14px; margin-bottom:10px; }
-
-/* Tier icons and backgrounds kept but animations slowed / reduced */
-.member-tree-card.golden::before,
-.member-tree-card.diamond::before,
-.member-tree-card.bronze::before,
-.member-tree-card.silver::before {
-  background-size: 300% 300%;
-  animation-duration: 12s; /* slower */
-  opacity: 0.92;
-}
-
-/* reduce shine durations and intensity (still present for feel) */
-@keyframes goldGradient{ from{background-position:0% 50%} to{background-position:200% 50%} }
-@keyframes diamondShine{ from{background-position:0% 50%} to{background-position:200% 50%} }
-@keyframes bronzeFlow{ from{background-position:0% 50%} to{background-position:200% 50%} }
-@keyframes silverWave{ from{background-position:0% 50%} to{background-position:200% 50%} }
-
-/* BUTTONS (optimized) */
-.discord-btn{
-  width:100%;
-  height:48px;
-  border-radius:12px;
-  border:none;
-  cursor:pointer;
+/* ======================= SIDEBAR (iOS glass) ======================= */
+.ios-sidebar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:240px;
+  height:100vh;
+  backdrop-filter: blur(20px) saturate(150%);
+  background:rgba(30,10,50,0.34);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 0 40px rgba(120, 40, 200, 0.16);
+  padding:28px 14px;
   display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-  background:linear-gradient(90deg,#7b2cbf,#5a189a);
-  color:#fff;
-  font-weight:700;
-  font-size:16px;
-  transition: transform .22s, box-shadow .22s;
-  margin-top:16px;
-  box-shadow:0 6px 14px rgba(90,24,154,0.32);
+  flex-direction:column;
+  justify-content:flex-start;
+  z-index:40;
+  transition: transform .35s ease, opacity .35s ease;
+  opacity:0;
+  transform: translateX(-6px);
 }
-.discord-btn:hover{ transform:translateY(-4px); box-shadow:0 10px 20px rgba(120,50,200,0.38); }
+.ios-sidebar.visible{ opacity:1; transform: translateX(0); }
+.sidebar-header{ font-family: 'Orbitron', sans-serif; font-size:1.6rem; font-weight:800; color:#fff; text-shadow:0 0 8px rgba(160,60,255,0.2); margin-bottom:30px; text-align:center;}
+.sidebar-links{ list-style:none; padding:0; margin:0; }
+.sidebar-links li{ margin-bottom:18px; }
+.nav-link{ display:block; color:rgba(255,255,255,0.8); text-decoration:none; padding:10px 12px; border-radius:10px; font-weight:700; transition: all .22s; }
+.nav-link:hover{ background: rgba(140,60,255,0.09); color:#fff; box-shadow:0 6px 14px rgba(120,40,200,0.08); }
+.nav-link.active{ background:linear-gradient(90deg,#7b2cbf,#5a189a); color:#fff; box-shadow:0 0 22px rgba(130,50,255,0.18); }
 
-/* FOOTER */
-footer{ text-align:center; margin:36px 0 18px; color:#bfb6e9; opacity:0.9; font-size:13px; padding-top:18px; border-top:1px solid rgba(150,80,220,0.12); }
+/* mobile toggle (only shows when narrow) */
+.sidebar-toggle{ display:none; position:fixed; top:18px; left:18px; z-index:60; background: rgba(50,20,80,0.4); border-radius:10px; padding:10px; border:1px solid rgba(255,255,255,0.06); color:white; cursor:pointer; }
+@media (max-width:880px){ .ios-sidebar{ transform: translateX(-100%);} .ios-sidebar.visible{ transform: translateX(0);} .sidebar-toggle{ display:block;} .app{ margin-left:18px; margin-right:18px; } .ios-sidebar{ width:220px; } }
 
-/* DISCORD CARD / PROGRESS (lighter) */
-.discord-section{ display:flex; justify-content:center; margin-top:48px; animation:fadeIn 1.2s ease; }
-.discord-card{ background:linear-gradient(145deg, rgba(80,40,120,0.34), rgba(50,10,80,0.26)); border:1px solid rgba(180,120,255,0.16); border-radius:14px; padding:18px 24px; display:flex; align-items:center; gap:16px; box-shadow:0 6px 18px rgba(30,0,60,0.32); transition: transform .22s; }
-.discord-card:hover{ transform:translateY(-3px); box-shadow:0 10px 26px rgba(150,90,255,0.36); }
+/* ======================= APP HEADER ROW ======================= */
+.header-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid rgba(150,80,220,0.06); gap:12px; }
+.clan-title{ font-size:34px; font-weight:800; background:linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd); -webkit-background-clip:text; color:transparent; letter-spacing:3px; font-family:'Orbitron',sans-serif;}
+.meta{ margin-top:6px; color:#c9b6ff; font-size:14px; font-weight:500; }
 
-.discord-icon{ width:72px; height:72px; border-radius:10px; border:2px solid rgba(180,120,255,0.44); box-shadow:0 0 12px rgba(180,120,255,0.16); }
-.discord-name{ font-family:'Diecide Remain',sans-serif; font-size:24px; color:#c9a2ff; text-shadow:0 0 6px #a96cff; margin-bottom:4px; }
-#progress-bar{ height:100%; width:0%; background:linear-gradient(90deg,#b77bff,#8f3fff); transition: width 1s linear; border-radius:5px; }
+/* ======================= CARDS & SECTIONS ======================= */
+.card{ background:linear-gradient(145deg, rgba(40,15,70,0.34), rgba(20,5,40,0.28)); border:1px solid rgba(150,80,220,0.08); border-radius:14px; padding:18px; margin-bottom:18px; backdrop-filter: blur(6px); box-shadow:0 6px 18px rgba(10,0,25,0.28); transition: transform .18s ease, box-shadow .18s ease; }
+.card:hover{ transform: translateY(-4px); box-shadow:0 12px 26px rgba(20,0,40,0.36); }
 
-/* MODAL + GLASS (kept but cheaper blur) */
-.modal{ position:fixed; inset:0; display:none; justify-content:center; align-items:center; background:rgba(5,0,10,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index:9999; animation:fadeIn .32s ease forwards; }
-.modal-content{ position:relative; width:90%; max-width:480px; padding:30px 24px 36px; border-radius:22px; text-align:center; color:#fff; backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%); background:rgba(35,10,55,0.33); border:1px solid rgba(255,255,255,0.12); box-shadow: inset 0 0 6px rgba(255,255,255,0.04), 0 18px 42px rgba(0,0,0,0.6); overflow:hidden; animation:zoomIn .28s ease forwards; }
-.modal-content::before{ content:""; position:absolute; inset:0; background: radial-gradient(circle at 30% 10%, rgba(255,255,255,0.18), transparent 60%); mix-blend-mode: overlay; opacity:0.45; pointer-events:none; }
-.modal-content h2{ margin-bottom:14px; font-family:'Diecide Remain',sans-serif; font-size:22px; }
-.modal-content input{ width:100%; padding:10px; border-radius:8px; border:none; margin-top:6px; }
+/* gallery */
+.gallery-section{ padding:36px 0 18px; text-align:center; }
+.gallery-title{ font-family:'Orbitron',sans-serif; font-size:1.6rem; margin-bottom:18px; color:#fff; letter-spacing:1px; }
+.gallery-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+.banner-card{ position:relative; overflow:hidden; border-radius:12px; background:linear-gradient(145deg, rgba(30,0,50,0.84), rgba(0,0,20,0.88)); box-shadow:0 6px 18px rgba(120,0,180,0.12); transition: transform .16s ease; }
+.banner-card:hover{ transform: translateY(-6px); }
+.banner-img{ width:100%; height:160px; object-fit:cover; display:block; }
 
-/* Modal buttons */
-.modal-content button{ padding:10px 18px; border-radius:12px; border:none; background:rgba(255,255,255,0.08); color:#fff; font-weight:700; cursor:pointer; margin-top:12px; transition: transform .18s, background .18s; }
-.modal-content button:hover{ transform:translateY(-2px); background:rgba(255,255,255,0.12); }
+/* socials */
+.socials-section{ padding:28px 0 18px; text-align:center; }
+.socials-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; max-width:900px; margin:0 auto; }
+.social-card{ display:flex; flex-direction:column; align-items:center; gap:10px; padding:12px; text-decoration:none; color:inherit; border-radius:10px; background:linear-gradient(90deg, rgba(90,24,154,0.08), rgba(50,10,120,0.05)); border:1px solid rgba(150,80,220,0.06); }
+.social-icon{ width:64px; height:64px; object-fit:cover; border-radius:10px; border:2px solid rgba(180,120,255,0.18); }
 
-/* Notifications */
-.notification{ position:fixed; top:18px; right:18px; background:green; color:#fff; padding:10px 16px; border-radius:10px; display:none; font-weight:600; z-index:2000; }
-.notification.error{ background:red; }
+/* discord card */
+.discord-section{ display:flex; justify-content:center; margin-top:18px; }
+.discord-card{ background:linear-gradient(145deg, rgba(80,40,120,0.34), rgba(50,10,80,0.26)); border:1px solid rgba(180,120,255,0.12); border-radius:12px; padding:14px 18px; display:flex; align-items:center; gap:14px; box-shadow:0 6px 18px rgba(30,0,60,0.22); }
+.discord-icon{ width:64px; height:64px; border-radius:10px; border:2px solid rgba(180,120,255,0.28); object-fit:cover; display:block; }
+.discord-name{ font-family:'Diecide Remain',sans-serif; font-size:20px; color:#d8b9ff; margin-bottom:4px; }
+.discord-date{ color:#c9b6ff; font-size:13px; margin-bottom:4px; }
+.discord-members{ font-weight:700; }
 
-/* Gallery & banners (less intense shadows) */
-.gallery-section{ padding:72px 5%; background:rgba(10,10,15,0.82); text-align:center; backdrop-filter: blur(8px); border-top:1px solid rgba(255,255,255,0.04); box-shadow:0 -4px 30px rgba(0,0,0,0.45); }
-.gallery-title{ font-family:'Orbitron',sans-serif; font-size:2.2em; margin-bottom:30px; color:#fff; text-shadow:0 0 10px #ff00ff; letter-spacing:2px; }
-.gallery-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:22px; }
-.banner-card{ position:relative; overflow:hidden; border-radius:16px; background:linear-gradient(145deg, rgba(30,0,50,0.88), rgba(0,0,20,0.88)); box-shadow:0 0 18px rgba(150,0,255,0.28); transition: transform .22s, box-shadow .22s; }
-.banner-card:hover{ transform:scale(1.03); box-shadow:0 0 30px rgba(255,0,255,0.56); }
-.banner-img{ width:100%; height:160px; object-fit:cover; opacity:0.92; transition: opacity .22s ease; }
+/* progress */
+.progress-wrap{ width:160px; height:10px; background:rgba(255,255,255,0.06); border-radius:8px; overflow:hidden; }
+#progress-bar{ height:100%; width:0%; background:linear-gradient(90deg,#b77bff,#8f3fff); transition: width 1s linear; }
 
-/* Socials (performance friendly) */
-.socials-section{ padding:80px 5%; background:rgba(10,10,20,0.88); border-top:1px solid rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.04); backdrop-filter: blur(10px); text-align:center; }
-.socials-title{ font-family:'Orbitron',sans-serif; font-size:2em; color:#fff; text-shadow:0 0 10px #ff00ff; margin-bottom:36px; letter-spacing:1px; }
-.socials-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:22px; max-width:1000px; margin:0 auto; }
+/* buttons */
+.discord-btn{ width:100%; height:44px; border-radius:10px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(90deg,#7b2cbf,#5a189a); color:#fff; font-weight:800; font-size:14px; box-shadow:0 6px 14px rgba(90,24,154,0.26); }
+.clanwar-btn{ margin-top:12px; width:100%; padding:12px; border-radius:10px; border:none; background:linear-gradient(90deg,#8a3fd4,#6a28d1); color:#fff; font-weight:800; cursor:pointer; }
 
-/* responsiveness: minor tweaks */
-@media (max-width:768px){
-  .brand-big{ letter-spacing:4px; }
-  .member-tree-card{ width:180px; }
-  .gallery-section{ padding:48px 6%; }
+/* footer */
+footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-size:13px; padding-top:18px; border-top:1px solid rgba(150,80,220,0.06); }
+
+/* modal */
+.modal{ position:fixed; inset:0; display:none; justify-content:center; align-items:center; background:rgba(5,0,10,0.6); backdrop-filter: blur(6px); z-index:120; }
+.modal.active{ display:flex; }
+.modal-content{ position:relative; width:92%; max-width:520px; padding:20px; border-radius:16px; text-align:center; color:#fff; background:rgba(35,10,55,0.36); border:1px solid rgba(255,255,255,0.06); box-shadow:0 14px 36px rgba(0,0,0,0.7); }
+.modal-content img{ width:100%; height:auto; border-radius:10px; margin-bottom:14px; }
+.modal-content h2{ margin-bottom:8px; font-family:'Diecide Remain',sans-serif; font-size:20px; }
+
+/* banner preview modal separate style */
+.banner-preview{ max-width:90vw; max-height:80vh; object-fit:contain; border-radius:10px; }
+
+/* notification */
+.notification{ position:fixed; top:18px; right:18px; background:green; color:#fff; padding:10px 16px; border-radius:10px; display:none; font-weight:700; z-index:2000;}
+.notification.error{ background:#c94a4a; }
+
+/* small responsiveness */
+@media (max-width:900px){
+  .app{ margin:18px; padding:20px; }
+  .header-row{ flex-direction:column; align-items:flex-start; gap:12px; }
 }
 
-/* accessibility: stop heavy motion on reduced-motion */
+/* reduce motion */
 @media (prefers-reduced-motion: reduce){
   *{ animation:none !important; transition:none !important; }
-  .fog, .bg-layer{ animation:none !important; filter:blur(8px) !important; }
-  .modal, .modal-content{ transition:none !important; }
+  .bg-layer{ filter: blur(16px) !important; }
 }
 </style>
 </head>
-<body>
-  <div class="bg-wrap">
+<body style="overflow:hidden"> <!-- locked initially to prevent scrolling during landing -->
+
+  <!-- Background layers -->
+  <div class="bg-wrap" aria-hidden="true">
     <div class="bg-layer one"></div>
     <div class="bg-layer two"></div>
     <div class="bg-layer three"></div>
-    <div class="fog"></div>
   </div>
 
-  <section class="landing" id="landing">
-    <div class="landing-inner" id="landingInner" role="button" tabindex="0" onclick="enterSite()">
+  <!-- LANDING (full screen) -->
+  <section class="landing" id="landing" role="dialog" aria-modal="true">
+    <div class="landing-inner" id="landingInner" role="button" tabindex="0" aria-label="Enter site" onclick="enterSite()" onkeydown="if(event.key==='Enter' || event.key===' ') enterSite()">
       <div class="brand-big">/SIX</div>
       <div class="enter-card">
-        <div class="tagline"><span class="click-word">CLICK</span> to enter <span class="six-text">/six</span>, a clan that has only one goal, and that is to Conquer and Destroy
-Every Server they Join.</div>
+        <div class="tagline"><strong class="click-word">CLICK</strong> to enter <span class="six-text">/six</span>, a clan that has only one goal — to Conquer and Destroy every server they join.</div>
       </div>
     </div>
   </section>
 
-  <main class="app" id="app" aria-hidden="true">
+  <!-- SIDEBAR (hidden until after landing) -->
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu" onclick="document.querySelector('.ios-sidebar').classList.toggle('visible')">
+    ☰
+  </button>
+
+  <nav class="ios-sidebar" id="sidebar" aria-hidden="true">
+    <div class="sidebar-header">/six</div>
+    <ul class="sidebar-links">
+      <li><a href="index.html" class="nav-link active">Home</a></li>
+      <li><a href="achievements.html" class="nav-link">Achievements</a></li>
+      <li><a href="members.html" class="nav-link">Members</a></li>
+    </ul>
+  </nav>
+
+  <!-- MAIN APP -->
+  <main class="app" id="app" aria-hidden="true" role="main">
     <div class="header-row">
       <div>
-        <div class="clan-title">/six</div>
-        <div class="meta">What is losing? • EST. 2024</div>
+        <div class="clan-title">Home</div>
+        <div class="meta">/six — What is losing? • EST. 2024</div>
       </div>
-      <div><input class="editable" value="Last Updated: Today"></div>
+      <div><input class="editable" value="Last Updated: Today" aria-label="Last updated"></div>
     </div>
 
-    
     <!-- Member Tree Notification -->
-<div class="card">
-  <div class="member-tree-notification">
-    <div class="notification-icon">❗</div>
-    <div class="notification-content">
-      <h3>Member Tree Has Been Moved</h3>
-      <p>The member tree is moved to its own page for more efficient performance.</p>
-      <a href="/members.html" class="view-tree-btn">View Member Tree</a>
+    <div class="card">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div style="font-size:20px">❗</div>
+        <div>
+          <div style="font-weight:800;margin-bottom:6px">Member Tree Has Been Moved</div>
+          <div style="color:#c9b6ff">The member tree is now on its own page for better performance.</div>
+          <div style="margin-top:8px"><a href="/members.html" style="text-decoration:none;padding:8px 12px;border-radius:10px;background:linear-gradient(90deg,#7b2cbf,#5a189a);color:#fff;font-weight:700">View Member Tree</a></div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-    <!-- 🏴 Clan Banner Gallery -->
-    <section id="gallery" class="gallery-section">
-      <h2 class="gallery-title">/six Banner Gallery</h2>
-      <div class="gallery-grid">
-        <div class="banner-card">
-          <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1409814312582643762/quality_restoration_20250826161611300.jpg?ex=691248a5&is=6910f725&hm=c88e4edb0ff6272ee38e76e2defcc6dc9083d90cb3110814df009963d6448c15&" alt="Banner 1" class="banner-img" />
-          <span class="banner-caption">/six Discord</span>
-        </div>
-        <div class="banner-card">
-          <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1401944987473547284/lv_0_20250804230545.gif?ex=69120003&is=6910ae83&hm=df857a55f48ae991aa9a21bc3861f78ec3d58255d1c81baca5d19bbcdb2367dd&" alt="Banner 2" class="banner-img" />
-          <span class="banner-caption">SAIS</span>
-        </div>
-        <div class="banner-card">
-          <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1400024103142035487/Picsart_25-07-30_15-51-21-892.png?ex=6912434d&is=6910f1cd&hm=d4b8dd0301e620cef924f649d03fd9df71b1d1bc79e331ac82d2ae0161bfe323&" alt="Banner 3" class="banner-img" />
-          <span class="banner-caption">/six Discord 2</span>
-        </div>
-        <div class="banner-card">
-          <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1391335858023432192/quality_restoration_20250706162944658.jpg?ex=6911a2fe&is=6910517e&hm=e95e29495b0ce1097708621dd9b6c42caf52d4de16029f23ca60f11dc6ffaa25&" alt="Banner 4" class="banner-img" />
-          <span class="banner-caption">/six HIGHNOON</span>
-        </div>
+
+    <!-- Gallery -->
+    <section class="gallery-section card" aria-labelledby="galleryTitle">
+      <h2 id="galleryTitle" class="gallery-title">/six Banner Gallery</h2>
+      <div class="gallery-grid" id="galleryGrid">
+        <!-- Banner cards (keep same sources) -->
+        <div class="banner-card"><img class="banner-img" src="https://cdn.discordapp.com/attachments/1371525091833282752/1409814312582643762/quality_restoration_20250826161611300.jpg" alt="Banner 1"></div>
+        <div class="banner-card"><img class="banner-img" src="https://cdn.discordapp.com/attachments/1371525091833282752/1401944987473547284/lv_0_20250804230545.gif" alt="Banner 2"></div>
+        <div class="banner-card"><img class="banner-img" src="https://cdn.discordapp.com/attachments/1371525091833282752/1400024103142035487/Picsart_25-07-30_15-51-21-892.png" alt="Banner 3"></div>
+        <div class="banner-card"><img class="banner-img" src="https://cdn.discordapp.com/attachments/1371525091833282752/1391335858023432192/quality_restoration_20250706162944658.jpg" alt="Banner 4"></div>
       </div>
     </section>
 
-    <!-- 🌌 /SIX — Socials Section -->
-    <section id="socials" class="socials-section">
-      <h2 class="socials-title">Contacts of <span class="six-text">/six</span></h2>
+    <!-- Socials -->
+    <section class="socials-section card" aria-labelledby="socialsTitle">
+      <h2 id="socialsTitle" class="gallery-title">Contacts of <span class="six-text">/six</span></h2>
       <div class="socials-grid">
-        <a href="https://discord.gg/tu6rpKhenw" class="social-card" target="_blank">
+        <a href="https://discord.gg/tu6rpKhenw" class="social-card" target="_blank" rel="noopener noreferrer">
           <img src="https://cdn.discordapp.com/icons/1360258839429255208/3ea76fc8a0cd48df0e3ce22e89d84305.png?size=4096" alt="Discord" class="social-icon">
-          <span class="social-name">Discord</span>
+          <div style="font-weight:800">Discord</div>
         </a>
-        <a href="https://tiktok.com/@xissais" class="social-card" target="_blank">
+        <a href="https://tiktok.com/@xissais" class="social-card" target="_blank" rel="noopener noreferrer">
           <img src="assets/icons/tiktok.svg" alt="TikTok" class="social-icon">
-          <span class="social-name">TikTok</span>
+          <div style="font-weight:800">TikTok</div>
         </a>
       </div>
     </section>
 
-    <button class="clanwar-btn">Request Clan War</button>
+    <button class="clanwar-btn" id="clanwarBtn" aria-haspopup="dialog">Request Clan War</button>
 
-    <section class="discord-section">
-      <div class="discord-card">
-        <img id="discord-icon" class="discord-icon" src="" alt="Discord Icon" />
-        <div class="discord-info">
-          <div class="discord-name">/six</div>
-          <div class="discord-date">Created: <span id="discord-date">Loading...</span></div>
-          <div class="discord-members">
-            <span id="member-count">0</span> / <span id="member-goal">200</span> Members
-          </div>
-          <div class="discord-progress">
-            <div id="progress-bar"></div>
-          </div>
-        </div>
+    <!-- Discord Info -->
+    <section class="discord-section card" aria-label="Discord info">
+      <img id="discord-icon" class="discord-icon" src="" alt="Discord server icon" />
+      <div>
+        <div class="discord-name">/six</div>
+        <div class="discord-date">Created: <span id="discord-date">Loading...</span></div>
+        <div class="discord-members"><span id="member-count">0</span> / <span id="member-goal">200</span> Members</div>
+        <div style="margin-top:8px;width:160px" class="progress-wrap"><div id="progress-bar"></div></div>
+      </div>
+      <div style="margin-left:auto;min-width:120px;text-align:right">
+        <button class="discord-btn" onclick="window.open('https://discord.gg/tu6rpKhenw','_blank')">Join Our Discord</button>
       </div>
     </section>
-
-    <button class="discord-btn">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09c-.01-.02-.04-.03-.07-.03c-1.5.26-2.93.71-4.27 1.33c-.01 0-.02.01-.03.02c-2.72 4.07-3.47 8.03-3.1 11.95c0 .02.01.04.03.05c1.8 1.32 3.53 2.12 5.24 2.65c.03.01.06 0 .07-.02c.4-.55.76-1.13 1.07-1.74c.02-.04 0-.08-.04-.09c-.57-.22-1.11-.48-1.64-.78c-.04-.02-.04-.08-.01-.11c.11-.08.22-.17.33-.25c.02-.02.05-.02.07-.01c3.44 1.57 7.15 1.57 10.55 0c.02-.01.05-.01.07.01c.11.09.22.18.33.25c.04.03.04.09-.01.11c-.52.31-1.07.56-1.64.78c-.04.01-.05.06-.04.09c.32.61.68 1.19 1.07 1.74c.03.01.06.02.09.01c1.72-.53 3.45-1.33 5.25-2.65c.02-.01.03-.03.03-.05c.44-4.53-.73-8.46-3.1-11.95c-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12c0 1.17-.83 2.12-1.89 2.12z"/>
-      </svg>
-      Join Our Discord
-    </button>
 
     <footer>© 2025 <span class="six-text">/six</span> Clan - All rights reserved.</footer>
   </main>
 
+  <!-- Banner Preview Modal -->
+  <div class="modal" id="bannerModal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <img id="bannerPreview" class="banner-preview" alt="Banner preview">
+      <div style="margin-top:12px;display:flex;gap:10px;justify-content:center">
+        <button class="discord-btn" id="closeBannerBtn" style="width:auto;padding:8px 12px">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Rules Modal -->
-  <div class="modal" id="rules-modal">
-    <div class="modal-content">
+  <div class="modal" id="rulesModal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
       <h2>Clan War Rules</h2>
-      <p><!-- Placeholder for rules -->Rules go here.</p>
-      <button id="understood-btn">Understood</button>
+      <p style="color:#c9b6ff">Please follow the clan war rules. (Edit these in the HTML to customize.)</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:8px">
+        <button id="understoodBtn" class="discord-btn" style="width:auto;padding:8px 12px">Understood</button>
+        <button id="closeRulesBtn" class="discord-btn" style="width:auto;padding:8px 12px;background:#666">Close</button>
+      </div>
     </div>
   </div>
 
   <!-- Application Modal -->
-  <div class="modal" id="application-modal">
-    <div class="modal-content">
+  <div class="modal" id="applicationModal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
       <h2>Clan War Application</h2>
-      <form id="clanwar-form">
-        <label>* Clan Name:
-          <input type="text" name="clan_name" required placeholder="Enter your clan name">
-        </label>
-        <!-- Add more questions here easily -->
-        <button type="submit">Submit</button>
+      <form id="clanwarForm">
+        <div style="text-align:left">
+          <label style="display:block;margin-bottom:8px">* Clan Name:
+            <input type="text" name="clan_name" required placeholder="Enter your clan name" style="width:100%;margin-top:6px;padding:8px;border-radius:8px;border:none">
+          </label>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+          <button type="submit" class="discord-btn" style="width:auto;padding:8px 12px">Submit</button>
+          <button type="button" id="closeAppBtn" class="discord-btn" style="width:auto;padding:8px 12px;background:#666">Cancel</button>
+        </div>
       </form>
     </div>
   </div>
 
   <!-- Notifications -->
-  <div id="notification" class="notification"></div>
+  <div id="notification" class="notification" role="status" aria-live="polite"></div>
 
-  <script>
-    
+<script>
+/* ======================= Behavior & Interactions ======================= */
 
-    // Auto-detect /six and style it
-    function styleSixText(root = document.body) {
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-      const nodes = [];
-      while (walker.nextNode()) nodes.push(walker.currentNode);
+/* Utility: show notification */
+function showNotification(message, isError = false) {
+  const n = document.getElementById('notification');
+  n.textContent = message;
+  n.className = isError ? 'notification error' : 'notification';
+  n.style.display = 'block';
+  setTimeout(() => { n.style.display = 'none'; }, 4500);
+}
 
-      nodes.forEach(node => {
-        if (node.nodeValue) {
-          const text = node.nodeValue;
-
-          // Match both /six and SAIS (case-insensitive)
-          if (/(\/six|sais)/i.test(text)) {
-            const span = document.createElement('span');
-            span.innerHTML = text.replace(/(\/six|sais)/gi, match => {
-              return `<span class="six-text">${match}</span>`;
-            });
-            node.parentNode.replaceChild(span, node);
-          }
-        }
-      });
-    }
-
-    window.addEventListener('load', () => {
-      styleSixText();
-    });
-
-    function enterSite(){
-      document.getElementById('landing').style.display='none';
-      const app=document.getElementById('app');
-      app.classList.add('active');
-      app.setAttribute('aria-hidden','false');
-      
-      // Re-apply styling to any dynamically added content
-      setTimeout(() => {
-        styleSixText(app);
-      }, 100);
-    }
-
-    // Add some interactive effects
-    document.addEventListener('DOMContentLoaded', function() {
-      // Add parallax effect to background
-      document.addEventListener('mousemove', function(e) {
-        const x = e.clientX / window.innerWidth;
-        const y = e.clientY / window.innerHeight;
-        
-        document.querySelector('.bg-layer.one').style.transform = `translate(${x * 20}px, ${y * 20}px) scale(1.1)`;
-        document.querySelector('.bg-layer.two').style.transform = `translate(${x * -15}px, ${y * -15}px) scale(1.1)`;
-        document.querySelector('.bg-layer.three').style.transform = `translate(${x * 10}px, ${y * 10}px) scale(1.1)`;
-      });
-    });
-
-    // Discord stats
-    async function loadDiscordStats() {
-      const invite = "tu6rpKhenw"; // Replace with your real invite code
-      const goal = 1000; // Set your member goal
-
-      try {
-        const res = await fetch(`https://discord.com/api/v9/invites/${invite}?with_counts=true`);
-        const data = await res.json();
-
-        const guild = data.guild;
-        const memberCount = data.approximate_member_count;
-
-        document.getElementById("discord-icon").src = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
-        document.getElementById("discord-date").innerText = new Date(parseInt(guild.id) / 4194304 + 1420070400000).toDateString();
-        document.getElementById("member-count").innerText = memberCount;
-        document.getElementById("member-goal").innerText = goal;
-
-        const progress = Math.min((memberCount / goal) * 100, 100);
-        document.getElementById("progress-bar").style.width = progress + "%";
-      } catch (err) {
-        console.error("Failed to load Discord stats:", err);
+/* Style instances of /six and SAIS */
+function styleSixText(root = document.body) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(node => {
+    if (node.nodeValue) {
+      const text = node.nodeValue;
+      if (/(\/six|sais)/i.test(text)) {
+        const span = document.createElement('span');
+        span.innerHTML = text.replace(/(\/six|sais)/gi, match => `<span class="six-text">${match}</span>`);
+        node.parentNode.replaceChild(span, node);
       }
     }
+  });
+}
+window.addEventListener('load', () => styleSixText());
 
-    loadDiscordStats();
+/* ENTER SITE: fade+scale transition, reveal sidebar & app and unlock scrolling */
+function enterSite() {
+  const landing = document.getElementById('landing');
+  const app = document.getElementById('app');
+  const sidebar = document.getElementById('sidebar');
 
-    // Clan war functionality
-    const clanwarBtn = document.querySelector('.clanwar-btn');
-    const rulesModal = document.getElementById('rules-modal');
-    const applicationModal = document.getElementById('application-modal');
-    const understoodBtn = document.getElementById('understood-btn');
-    const form = document.getElementById('clanwar-form');
-    const notification = document.getElementById('notification');
+  // animate landing out
+  landing.classList.add('hidden');
 
-    // 1. Open Rules Modal
-    clanwarBtn.addEventListener('click', () => {
-      rulesModal.style.display = 'flex';
-    });
+  // after transition, hide landing and show app
+  setTimeout(() => {
+    landing.style.display = 'none';
+    // show sidebar and app
+    sidebar.classList.add('visible');
+    app.classList.add('active');
+    app.setAttribute('aria-hidden', 'false');
+    sidebar.setAttribute('aria-hidden', 'false');
 
-    // 2. Understood -> Open Application Modal
-    understoodBtn.addEventListener('click', () => {
-      rulesModal.style.display = 'none';
-      applicationModal.style.display = 'flex';
-    });
+    // unlock scroll
+    document.body.style.overflow = 'auto';
 
-    // 3. Submit Form
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    // re-run /six styling within app
+    styleSixText(app);
+  }, 480);
+}
 
-      // Check if all required inputs are filled
-      const inputs = form.querySelectorAll('input[required]');
-      for (let input of inputs) {
-        if (!input.value.trim()) return; // required
-      }
+/* Ensure landing is focusable keyboard-wise; prevent scroll while visible */
+document.addEventListener('DOMContentLoaded', () => {
+  // Ensure landing hides scroll (body style set inline at top)
+  // Add keyboard accessibility: pressing Enter or Space triggers enterSite
+  const landingInner = document.getElementById('landingInner');
+  landingInner.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') enterSite();
+  });
+});
 
-      // Show loading buffer
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerText;
-      submitBtn.innerText = "Submitting...";
-      submitBtn.disabled = true;
+/* MOBILE: sidebar toggle */
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('visible');
+});
 
-      // Collect form data
-      const data = {};
-      inputs.forEach(input => data[input.name] = input.value);
+/* Highlight current nav link */
+(function highlightNav() {
+  const current = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(link => {
+    if (link.getAttribute('href') === current || (current === '' && link.getAttribute('href') === 'index.html')) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+})();
 
-      try {
-        // Send to Discord Webhook
-        const webhookURL = "https://discord.com/api/webhooks/1437169737321943081/-cCSQGQ4GL6MS-1tb5Bke89AZ_dasIT4D0S3I-fgvny2Cxj50b1f2Nua6CDptZr6VCxq"; // replace
-        const payload = {
-          content: null,
-          embeds: [{
-            title: "New Clan War Application",
-            color: 0x9146FF,
-            fields: Object.keys(data).map(key => ({
-              name: key,
-              value: data[key],
-              inline: false
-            }))
-          }]
-        };
+/* ======================= Discord Stats (kept, with try/catch) ======================= */
+async function loadDiscordStats() {
+  const invite = "tu6rpKhenw"; // invite code
+  const goal = 1000; // goal for progress bar
 
-        const res = await fetch(webhookURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
+  try {
+    const res = await fetch(`https://discord.com/api/v9/invites/${invite}?with_counts=true`);
+    if (!res.ok) throw new Error('Invite fetch failed');
+    const data = await res.json();
+    const guild = data.guild;
+    const memberCount = data.approximate_member_count || 0;
 
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
-        // Success
-        applicationModal.style.display = 'none';
-        showNotification("Your application for the clanwar has been submitted, you will be contacted through discord shortly.", false);
-      } catch (err) {
-        showNotification(`Failed to submit: ${err.message}`, true);
-      } finally {
-        submitBtn.innerText = originalText;
-        submitBtn.disabled = false;
-        form.reset();
-      }
-    });
-
-    // 4. Show Notification
-    function showNotification(message, isError) {
-      notification.innerText = message;
-      notification.className = isError ? 'notification error' : 'notification';
-      notification.style.display = 'block';
-      setTimeout(() => notification.style.display = 'none', 5000);
+    if (guild && guild.id && guild.icon) {
+      document.getElementById("discord-icon").src = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
+    } else {
+      document.getElementById("discord-icon").src = '';
     }
 
-    // Optional: Close modal by clicking outside
-    window.addEventListener('click', e => {
-      if (e.target === rulesModal) rulesModal.style.display = 'none';
-      if (e.target === applicationModal) applicationModal.style.display = 'none';
-    });
+    // Derived creation date from snowflake id (best-effort)
+    if (guild && guild.id) {
+      const created = new Date(Number(guild.id) / 4194304 + 1420070400000);
+      document.getElementById("discord-date").innerText = created.toDateString();
+    } else {
+      document.getElementById("discord-date").innerText = 'Unknown';
+    }
 
-    // Banner gallery modal
-    document.querySelectorAll('.banner-img').forEach(img => {
-      img.addEventListener('click', () => {
-        const modal = document.createElement('div');
-        modal.classList.add('banner-modal');
-        modal.innerHTML = `
-          <div class="modal-bg"></div>
-          <img src="${img.src}" class="modal-img" alt="Banner">
-        `;
-        document.body.appendChild(modal);
-        modal.addEventListener('click', () => modal.remove());
-      });
+    document.getElementById("member-count").innerText = memberCount;
+    document.getElementById("member-goal").innerText = goal;
+    const progress = Math.min((memberCount / goal) * 100, 100);
+    document.getElementById("progress-bar").style.width = progress + "%";
+  } catch (err) {
+    console.warn("Failed to load Discord stats:", err);
+    // keep placeholders
+  }
+}
+loadDiscordStats();
+
+/* ======================= Banner Modal Preview ======================= */
+const bannerModal = document.getElementById('bannerModal');
+const bannerPreview = document.getElementById('bannerPreview');
+const closeBannerBtn = document.getElementById('closeBannerBtn');
+
+document.querySelectorAll('.banner-img').forEach(img => {
+  img.addEventListener('click', () => {
+    bannerPreview.src = img.src;
+    bannerModal.classList.add('active');
+    bannerModal.setAttribute('aria-hidden', 'false');
+    // lock background scroll while modal open
+    document.body.style.overflow = 'hidden';
+  });
+});
+
+closeBannerBtn.addEventListener('click', closeBannerModal);
+bannerModal.addEventListener('click', (e) => { if (e.target === bannerModal) closeBannerModal(); });
+
+function closeBannerModal(){
+  bannerModal.classList.remove('active');
+  bannerModal.setAttribute('aria-hidden', 'true');
+  bannerPreview.src = '';
+  // restore scroll only if landing is removed
+  if (!document.getElementById('landing') || document.getElementById('landing').style.display === 'none') {
+    document.body.style.overflow = 'auto';
+  }
+}
+
+/* ======================= Rules & Application Modals (Clan War) ======================= */
+const clanwarBtn = document.getElementById('clanwarBtn');
+const rulesModal = document.getElementById('rulesModal');
+const applicationModal = document.getElementById('applicationModal');
+const understoodBtn = document.getElementById('understoodBtn');
+const closeRulesBtn = document.getElementById('closeRulesBtn');
+const closeAppBtn = document.getElementById('closeAppBtn');
+const clanwarForm = document.getElementById('clanwarForm');
+
+clanwarBtn.addEventListener('click', () => {
+  rulesModal.classList.add('active');
+  rulesModal.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+});
+understoodBtn.addEventListener('click', () => {
+  rulesModal.classList.remove('active');
+  rulesModal.setAttribute('aria-hidden','true');
+  applicationModal.classList.add('active');
+  applicationModal.setAttribute('aria-hidden','false');
+});
+closeRulesBtn.addEventListener('click', () => {
+  rulesModal.classList.remove('active');
+  rulesModal.setAttribute('aria-hidden','true');
+  if (!document.getElementById('landing') || document.getElementById('landing').style.display === 'none') document.body.style.overflow = 'auto';
+});
+closeAppBtn.addEventListener('click', () => {
+  applicationModal.classList.remove('active');
+  applicationModal.setAttribute('aria-hidden','true');
+  if (!document.getElementById('landing') || document.getElementById('landing').style.display === 'none') document.body.style.overflow = 'auto';
+});
+window.addEventListener('click', (e) => {
+  if (e.target === rulesModal) { rulesModal.classList.remove('active'); rulesModal.setAttribute('aria-hidden','true'); }
+  if (e.target === applicationModal) { applicationModal.classList.remove('active'); applicationModal.setAttribute('aria-hidden','true'); }
+});
+
+/* Clan war form submit -> POST to webhook (keeps your existing behavior) */
+clanwarForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const submitBtn = clanwarForm.querySelector('button[type="submit"]');
+  const originalText = submitBtn.innerText;
+  submitBtn.innerText = "Submitting...";
+  submitBtn.disabled = true;
+
+  const inputs = Array.from(clanwarForm.querySelectorAll('input'));
+  const data = {};
+  inputs.forEach(i => data[i.name] = i.value);
+
+  try {
+    const webhookURL = "https://discord.com/api/webhooks/1437169737321943081/-cCSQGQ4GL6MS-1tb5Bke89AZ_dasIT4D0S3I-fgvny2Cxj50b1f2Nua6CDptZr6VCxq"; // replace if needed
+    const payload = {
+      content: null,
+      embeds: [{
+        title: "New Clan War Application",
+        color: 0x9146FF,
+        fields: Object.keys(data).map(k => ({ name: k, value: data[k] || 'N/A', inline: false }))
+      }]
+    };
+    const res = await fetch(webhookURL, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
     });
-  </script>
+    if (!res.ok) throw new Error('Failed to send application');
+    applicationModal.classList.remove('active');
+    applicationModal.setAttribute('aria-hidden','true');
+    showNotification("Your application has been submitted. We'll contact you on Discord.", false);
+  } catch (err) {
+    console.error(err);
+    showNotification("Failed to submit application.", true);
+  } finally {
+    submitBtn.innerText = originalText;
+    submitBtn.disabled = false;
+    clanwarForm.reset();
+    if (!document.getElementById('landing') || document.getElementById('landing').style.display === 'none') document.body.style.overflow = 'auto';
+  }
+});
+
+/* Close modals with Escape key */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal.active').forEach(m => { m.classList.remove('active'); m.setAttribute('aria-hidden','true'); });
+    if (!document.getElementById('landing') || document.getElementById('landing').style.display === 'none') document.body.style.overflow = 'auto';
+  }
+});
+</script>
 </body>
 </html>
