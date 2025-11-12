@@ -556,62 +556,7 @@ body{
 </div>
 
 <script>
- let lastClickedCard = null;
-
-function openModal(a, card) {
-  lastClickedCard = card;
-  modalImg.src = a.img;
-  modalTitle.innerHTML = a.title;
-  modalDesc.textContent = a.desc;
-  modalExtra.innerHTML = a.extra;
-
-  // Set initial animation
-  modal.classList.add('active');
-  const modalContent = modal.querySelector('.modal-content');
-  modalContent.style.transform = 'scale(0.85) translateY(60px)';
-  modalContent.style.opacity = '0';
-  requestAnimationFrame(() => {
-    modalContent.style.transition = 'all 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
-    modalContent.style.transform = 'scale(1) translateY(0)';
-    modalContent.style.opacity = '1';
-  });
-}
-
-function closeModalAnimation() {
-  if (!lastClickedCard) {
-    modal.classList.remove('active');
-    return;
-  }
-
-  const cardRect = lastClickedCard.getBoundingClientRect();
-  const modalContent = modal.querySelector('.modal-content');
-  const modalRect = modalContent.getBoundingClientRect();
-
-  // Calculate difference between modal center and card position
-  const deltaX = cardRect.left + cardRect.width / 2 - (modalRect.left + modalRect.width / 2);
-  const deltaY = cardRect.top + cardRect.height / 2 - (modalRect.top + modalRect.height / 2);
-  const scaleX = cardRect.width / modalRect.width;
-  const scaleY = cardRect.height / modalRect.height;
-
-  modalContent.style.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease';
-  modalContent.style.transformOrigin = 'center center';
-  modalContent.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`;
-  modalContent.style.opacity = '0.2';
-  modalContent.style.filter = 'blur(6px)';
-
-  setTimeout(() => {
-    modal.classList.remove('active');
-    modalContent.style.transition = '';
-    modalContent.style.transform = '';
-    modalContent.style.opacity = '';
-    modalContent.style.filter = '';
-  }, 450);
-}
-
-closeModalBtn.addEventListener('click', closeModalAnimation);
-modal.addEventListener('click', e => {
-  if (e.target === modal) closeModalAnimation();
-});
+ 
 
     function styleSixText(root = document.body) {
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -745,37 +690,72 @@ const modalDesc = document.getElementById('modalDesc');
 const modalExtra = document.getElementById('modalExtra');
 const closeModalBtn = document.getElementById('closeModal');
 
-function openModal(a) {
+
+
+let lastClickedCard = null;
+
+function openModal(a, card) {
+  lastClickedCard = card;
   modalImg.src = a.img;
   modalTitle.innerHTML = a.title;
   modalDesc.textContent = a.desc;
   modalExtra.innerHTML = a.extra;
-  
-  // Reset animations
-  modal.classList.remove('closing');
-  modal.querySelector('.modal-content').classList.remove('closing');
-  
-  // Show modal
+
+  // Initial modal state for animation
+  const modalContent = modal.querySelector('.modal-content');
   modal.classList.add('active');
-}
-
-function closeModal() {
-  // Start closing animation
-  modal.classList.add('closing');
-  modal.querySelector('.modal-content').classList.add('closing');
+  modalContent.style.transform = 'scale(0.85) translateY(60px)';
+  modalContent.style.opacity = '0';
+  modalContent.style.filter = 'blur(4px)';
   
-  // Hide modal after animation completes
-  setTimeout(() => {
-    modal.classList.remove('active', 'closing');
-    modal.querySelector('.modal-content').classList.remove('closing');
-  }, 300); 
+  requestAnimationFrame(() => {
+    modalContent.style.transition = 'all 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
+    modalContent.style.transform = 'scale(1) translateY(0)';
+    modalContent.style.opacity = '1';
+    modalContent.style.filter = 'blur(0)';
+  });
 }
 
-closeModalBtn.addEventListener('click', closeModal);
+function closeModalAnimation() {
+  if (!lastClickedCard) {
+    modal.classList.remove('active');
+    return;
+  }
 
+  const cardRect = lastClickedCard.getBoundingClientRect();
+  const modalContent = modal.querySelector('.modal-content');
+  const modalRect = modalContent.getBoundingClientRect();
+
+  const deltaX = cardRect.left + cardRect.width / 2 - (modalRect.left + modalRect.width / 2);
+  const deltaY = cardRect.top + cardRect.height / 2 - (modalRect.top + modalRect.height / 2);
+  const scaleX = cardRect.width / modalRect.width;
+  const scaleY = cardRect.height / modalRect.height;
+
+  modalContent.style.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease';
+  modalContent.style.transformOrigin = 'center center';
+  modalContent.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`;
+  modalContent.style.opacity = '0.15';
+  modalContent.style.filter = 'blur(6px)';
+
+  setTimeout(() => {
+    modal.classList.remove('active');
+    modalContent.style.transition = '';
+    modalContent.style.transform = '';
+    modalContent.style.opacity = '';
+    modalContent.style.filter = '';
+  }, 450);
+}
+
+closeModalBtn.addEventListener('click', closeModalAnimation);
 modal.addEventListener('click', e => {
-  if (e.target === modal) closeModal();
+  if (e.target === modal) closeModalAnimation();
 });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && modal.classList.contains('active')) {
+    closeModalAnimation();
+  }
+});
+
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && modal.classList.contains('active')) {
