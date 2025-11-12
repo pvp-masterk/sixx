@@ -137,38 +137,45 @@ body{
   opacity:0.9;
   line-height:1.4;
 }
-  @keyframes modalClose {
+
+/* ===== MODAL ANIMATIONS ===== */
+@keyframes modalBackdropIn {
   0% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    filter: blur(0);
-  }
-  40% {
-    transform: scale(0.95) translateY(5px);
-    opacity: 0.9;
-    filter: blur(1px);
+    opacity: 0;
   }
   100% {
-    opacity: 0;
-    transform: scale(0.7) translateY(60px);
-    filter: blur(4px);
+    opacity: 1;
   }
 }
 
-@keyframes modalOpen {
+@keyframes modalBackdropOut {
   0% {
-    opacity: 0;
-    transform: scale(0.7) translateY(60px);
-    filter: blur(4px);
-  }
-  60% {
-    transform: scale(1.03) translateY(-2px);
     opacity: 1;
-    filter: blur(0.5px);
   }
   100% {
+    opacity: 0;
+  }
+}
+
+@keyframes modalContentIn {
+  0% {
+    opacity: 0;
+    transform: scale(1.05) translateY(20px);
+  }
+  100% {
+    opacity: 1;
     transform: scale(1) translateY(0);
-    filter: blur(0);
+  }
+}
+
+@keyframes modalContentOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
   }
 }
 
@@ -183,9 +190,17 @@ body{
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 9999;
-  animation: fadeIn 0.35s ease forwards;
+  animation: modalBackdropIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
-.modal.active{display:flex;}
+
+.modal.closing {
+  animation: modalBackdropOut 0.3s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+}
+
+.modal.active {
+  display: flex;
+}
+
 .modal-content {
   position: relative;
   width: 90%;
@@ -203,7 +218,11 @@ body{
     0 20px 60px rgba(0, 0, 0, 0.7),
     0 0 40px rgba(160, 100, 255, 0.25);
   overflow: hidden;
-  animation: zoomIn 0.35s ease forwards;
+  animation: modalContentIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.modal-content.closing {
+  animation: modalContentOut 0.3s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
 }
 
 .modal-content::before {
@@ -219,13 +238,7 @@ body{
   opacity: 0.5;
   pointer-events: none;
 }
-@keyframes zoomIn{
-  from{transform:scale(.8);opacity:0;}
-  to{transform:scale(1);opacity:1;}
-}
-  .modal-content.closing {
-  animation: modalClose 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
+
 .modal-content img{
   width:100%;
   height:200px;
@@ -520,23 +533,50 @@ achievements.forEach((a,i)=>{
 
 
 /* ===== MODAL HANDLING ===== */
-const modal=document.getElementById('achievementModal');
-const modalImg=document.getElementById('modalImg');
-const modalTitle=document.getElementById('modalTitle');
-const modalDesc=document.getElementById('modalDesc');
-const modalExtra=document.getElementById('modalExtra');
-const closeModalBtn=document.getElementById('closeModal');
+const modal = document.getElementById('achievementModal');
+const modalImg = document.getElementById('modalImg');
+const modalTitle = document.getElementById('modalTitle');
+const modalDesc = document.getElementById('modalDesc');
+const modalExtra = document.getElementById('modalExtra');
+const closeModalBtn = document.getElementById('closeModal');
 
-function openModal(a){
-  modalImg.src=a.img;
-  modalTitle.innerHTML=a.title; // allow gradient + color HTML
-  modalDesc.textContent=a.desc;
+function openModal(a) {
+  modalImg.src = a.img;
+  modalTitle.innerHTML = a.title; // allow gradient + color HTML
+  modalDesc.textContent = a.desc;
   modalExtra.innerHTML = a.extra;
+  
+  // Reset any closing classes
+  modal.classList.remove('closing');
+  modal.querySelector('.modal-content').classList.remove('closing');
+  
+  // Show modal with animation
   modal.classList.add('active');
 }
-closeModalBtn.addEventListener('click',()=>modal.classList.remove('active'));
-modal.addEventListener('click',e=>{
-  if(e.target===modal) modal.classList.remove('active');
+
+function closeModal() {
+  // Add closing animation classes
+  modal.classList.add('closing');
+  modal.querySelector('.modal-content').classList.add('closing');
+  
+  // Wait for animation to complete before hiding
+  setTimeout(() => {
+    modal.classList.remove('active', 'closing');
+    modal.querySelector('.modal-content').classList.remove('closing');
+  }, 300); // Match the duration of the closing animation
+}
+
+closeModalBtn.addEventListener('click', closeModal);
+
+modal.addEventListener('click', e => {
+  if (e.target === modal) closeModal();
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && modal.classList.contains('active')) {
+    closeModal();
+  }
 });
 
 /* ===== ADD ACHIEVEMENT PROGRAMMATICALLY ===== */
@@ -553,20 +593,6 @@ function addAchievement(a){
   card.addEventListener('click',()=>openModal(a));
   grid.appendChild(card);
 }
-
-const closeBtn = document.querySelector('.close-btn');
-
-closeBtn.addEventListener('click', () => {
-  const modalContent = document.querySelector('.modal-content');
-  modalContent.classList.add('closing'); // trigger the animation
-
-  // Wait for animation to end, then hide modal
-  setTimeout(() => {
-    modal.classList.remove('active');
-    modalContent.classList.remove('closing');
-  }, 450); // matches animation duration
-});
-
 </script>
 </body>
 </html>
