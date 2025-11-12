@@ -203,8 +203,10 @@ body{
   background: rgba(70, 30, 120, 0.6);
   transform: scale(1.05);
 }
+.sidebar-toggle.shifted {
+  transform: translateX(240px);
+}
 
-@media (max-width:880px){ .ios-sidebar{ transform: translateX(-100%);} .ios-sidebar.visible{ transform: translateX(0);} .sidebar-toggle{ display:block;} .app{ margin-left:18px; margin-right:18px; } .ios-sidebar{ width:220px; } }
 
 /* ======================= APP HEADER ROW ======================= */
 .header-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid rgba(150,80,220,0.06); gap:12px; }
@@ -485,13 +487,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/* MOBILE: sidebar toggle */
-document.getElementById('sidebarToggle').addEventListener('click', () => {
-  const sidebar = document.getElementById('sidebar');
-  const app = document.getElementById('app');
-  sidebar.classList.toggle('visible');
-  app.classList.toggle('shifted');
+const sidebar = document.getElementById('sidebar');
+const app = document.getElementById('app');
+const toggle = document.getElementById('sidebarToggle');
+
+toggle.addEventListener('click', () => {
+  const isVisible = sidebar.classList.toggle('visible');
+  app.classList.toggle('shifted', isVisible);
+  toggle.classList.toggle('shifted', isVisible);
 });
+
 // Close sidebar when clicking outside (desktop only)
 document.addEventListener('click', (e) => {
   const sidebar = document.getElementById('sidebar');
