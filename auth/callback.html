@@ -1,12 +1,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const supabase = supabase.createClient(
+  const sb = supabase.createClient(
     "https://tstsijdifhgmpaszqknr.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
   );
 
   async function handleCallback() {
-    const { data, error } = await supabase.auth.getSession();
+    const { data, error } = await sb.auth.getSession();
 
     if (error) {
       console.error(error);
@@ -22,7 +22,7 @@
       const avatar = user.user_metadata.avatar_url;
 
       // Store in profiles table
-      await supabase.from("profiles").upsert({
+      await sb.from("profiles").upsert({
         id: user.id,
         discord_id: discord_id,
         username: username,
