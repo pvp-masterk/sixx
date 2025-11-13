@@ -790,7 +790,7 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
   async function login() {
     await sb.auth.signInWithOAuth({
       provider: "discord",
-      options: { redirectTo: window.location.origin + "/auth/callback" }
+      options: { redirectTo: window.location.origin + "/auth/callback.html" }
     });
   }
 </script>
