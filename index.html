@@ -383,6 +383,78 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
   from { transform: translateY(0px) translateX(0px); }
   to   { transform: translateY(22px) translateX(-18px); }
 }
+/* ======================= CLAN ROSTER ======================= */
+.roster-section{
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.roster-title{
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  background: linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd);
+  -webkit-background-clip: text;
+  color: transparent;
+  letter-spacing: 2px;
+}
+
+.roster-group{
+  margin-bottom: 26px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(150,80,220,0.12);
+}
+
+.roster-rank{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.rank-icon{
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(150,60,255,0.5));
+}
+
+.rank-name{
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  font-weight: 800;
+  background: linear-gradient(90deg,#b47bff,#7b2cbf);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 10px rgba(130,50,255,0.45);
+}
+
+.roster-list{
+  list-style: none;
+  margin-left: 12px;
+  padding-left: 0;
+}
+
+.roster-list li{
+  margin-bottom: 6px;
+  font-size: 15.5px;
+  color: #e8defe;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, rgba(40,15,70,0.25), rgba(20,5,40,0.22));
+  border: 1px solid rgba(150,80,220,0.08);
+  display: inline-block;
+  margin-right: 6px;
+  backdrop-filter: blur(4px);
+  transition: 0.2s ease;
+}
+
+.roster-list li:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(100,0,200,0.28);
+}
 
 </style>
 </head>
@@ -488,6 +560,68 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
         </div>
       </div>
     </div>
+  </div>
+</section>
+<!-- CLAN ROSTER -->
+<section class="roster-section card" aria-labelledby="rosterTitle">
+  <h2 id="rosterTitle" class="roster-title">Clan Roster</h2>
+
+  <div class="roster-group">
+    <div class="roster-rank">
+      <img src="assets/icons/six_bangel.png" class="rank-icon" alt="Founder Icon">
+      <div class="rank-name">FOUNDER</div>
+    </div>
+    <ul class="roster-list">
+      <li>@xla41r</li>
+    </ul>
+  </div>
+
+  <div class="roster-group">
+    <div class="roster-rank">
+      <img src="assets/icons/six_bbape.png" class="rank-icon" alt="Beyond Icon">
+      <div class="rank-name">BEYOND</div>
+    </div>
+    <ul class="roster-list">
+      <li>&lt;@1191309436267024505&gt;</li>
+      <li>&lt;@1000994289263841370&gt;</li>
+      <li>@xzasza</li>
+      <li>&lt;@1303721296160493632&gt;</li>
+    </ul>
+  </div>
+
+  <div class="roster-group">
+    <div class="roster-rank">
+      <img src="assets/icons/six_bcap.png" class="rank-icon" alt="General Icon">
+      <div class="rank-name">HENERAL</div>
+    </div>
+    <ul class="roster-list">
+      <li>&lt;@1091049298017390733&gt;</li>
+      <li>@proglz</li>
+    </ul>
+  </div>
+
+  <div class="roster-group">
+    <div class="roster-rank">
+      <img src="assets/icons/six_bstar.png" class="rank-icon" alt="Star Icon">
+      <div class="rank-name">STAR</div>
+    </div>
+    <ul class="roster-list">
+      <li>&lt;@1191309436267024505&gt;</li>
+      <li>&lt;@1000994289263841370&gt;</li>
+      <li>&lt;@767003117094174723&gt;</li>
+      <li>&lt;@1257003235034533941&gt;</li>
+      <li>@kyzaxks</li>
+      <li>@big2ck</li>
+      <li>&lt;@1337342167269773435&gt;</li>
+      <li>@fr_rui</li>
+      <li>@proglz</li>
+      <li>&lt;@1276538939171274867&gt;</li>
+      <li>@nefushi</li>
+      <li>@xzasza</li>
+      <li>&lt;@1157572111972450324&gt;</li>
+      <li>@solcery_</li>
+      <li>@vancars.</li>
+    </ul>
   </div>
 </section>
 
