@@ -283,6 +283,107 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
   *{ animation:none !important; transition:none !important; }
   .bg-layer{ filter: blur(16px) !important; }
 }
+  /* ======================= WHO ARE WE SECTION ======================= */
+.who-section{
+  position: relative;
+  overflow: hidden;
+  padding: 28px;
+}
+
+.who-title{
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd);
+  -webkit-background-clip: text;
+  color: transparent;
+  font-weight: 800;
+}
+
+.who-wrap{
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.who-left{
+  flex: 1;
+  min-width: 260px;
+}
+
+.who-text{
+  color: #d8caff;
+  margin-bottom: 14px;
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+.who-highlight{
+  margin-top: 18px;
+  font-size: 17px;
+  font-weight: 700;
+  background: linear-gradient(90deg,#b47bff,#7b2cbf);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 12px rgba(140,60,255,0.45);
+}
+
+/* RIGHT CARD */
+.who-right{
+  flex: 0.6;
+  min-width: 240px;
+  display: flex;
+  justify-content: center;
+}
+
+.who-card{
+  width: 100%;
+  padding: 18px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(40,15,70,0.32), rgba(22,5,40,0.26));
+  border: 1px solid rgba(160,90,240,0.10);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 20px rgba(10,0,25,0.25);
+}
+
+.w-bullet{
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e8defe;
+  font-size: 15px;
+}
+
+.w-dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#c77dff,#7b2cbf);
+  box-shadow: 0 0 12px rgba(150,70,255,0.6);
+}
+
+/* Floating holographic orb */
+.who-orb{
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(160,80,255,0.55), rgba(80,0,150,0.0));
+  filter: blur(40px);
+  border-radius: 50%;
+  animation: orbFloat 6s ease-in-out infinite alternate;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+@keyframes orbFloat{
+  from { transform: translateY(0px) translateX(0px); }
+  to   { transform: translateY(22px) translateX(-18px); }
+}
+
 </style>
 </head>
 <body style="overflow:hidden"> <!-- locked initially to prevent scrolling during landing -->
@@ -339,6 +440,56 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
         </div>
       </div>
     </div>
+<!-- WHO ARE WE SECTION -->
+<section class="who-section card" aria-labelledby="whoTitle">
+  <div class="who-orb"></div>
+  <h2 id="whoTitle" class="who-title">
+    Who We Are <span class="six-text">/six</span>
+  </h2>
+
+  <div class="who-wrap">
+    <div class="who-left">
+      <p class="who-text">
+        <span class="six-text">/six</span>, also known as SAIS is a clan founded on 
+          April 11, 2025 by its Founder 3ryll
+        <span class="six-text">/six</span> has its own goal:  
+        <strong>Control and dominate every server we join and make the history.</strong>
+      </p>
+
+      <p class="who-text">
+        We mainly specialize in:  
+        Crystal • Sword • NethPot • UHC • SMP  
+        Our each member is respected and treated equally
+        We don't recruit players, we recruit <strong>weapons</strong>.
+      </p>
+
+      <p class="who-highlight">
+        Our identity is simple:  
+        <strong>Dominate. Conquer.</strong>
+      </p>
+    </div>
+
+    <div class="who-right">
+      <div class="who-card">
+        <div class="w-bullet">
+          <span class="w-dot"></span> Founded: <strong>2025</strong>
+        </div>
+        <div class="w-bullet">
+          <span class="w-dot"></span> Members United Under <span class="six-text">SAIS</span>
+        </div>
+        <div class="w-bullet">
+          <span class="w-dot"></span> Currently on 2 servers.
+        </div>
+        <div class="w-bullet">
+          <span class="w-dot"></span> High-Tier Pvpers
+        </div>
+        <div class="w-bullet">
+          <span class="w-dot"></span> Built to dominate every server we join.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
     <!-- Gallery -->
     <section class="gallery-section card" aria-labelledby="galleryTitle">
