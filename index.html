@@ -779,7 +779,7 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
 
 <!-- 2. Initialize Supabase -->
 <script>
-  const supabase = supabase.createClient(
+  const sb = supabase.createClient(
     "https://tstsijdifhgmpaszkknr.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
   );
@@ -788,7 +788,7 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
 <!-- 3. Use it -->
 <script>
   async function login() {
-    await supabase.auth.signInWithOAuth({
+    await sb.auth.signInWithOAuth({
       provider: "discord",
       options: { redirectTo: window.location.origin + "/auth/callback" }
     });
