@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,13 +40,13 @@ body {
 .profile-card {
   position: relative;
   z-index: 10;
-  width: 320px;
+  width: 380px;
   background: linear-gradient(145deg, rgba(40,15,70,0.34), rgba(20,5,40,0.28));
   border: 1px solid rgba(150,80,220,0.1);
   border-radius: 18px;
   box-shadow: 0 8px 30px rgba(10,0,25,0.5);
   backdrop-filter: blur(10px);
-  padding: 32px 24px;
+  padding: 32px 28px;
   text-align: center;
 }
 
@@ -76,6 +75,104 @@ body {
   opacity: 0.85;
 }
 
+/* Info sections */
+.info-section {
+  margin-top: 24px;
+  text-align: left;
+  border-top: 1px solid rgba(150,80,220,0.15);
+  padding-top: 18px;
+}
+
+.section-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #d0b4ff;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.info-label {
+  color: #b8a6ff;
+  opacity: 0.8;
+}
+
+.info-value {
+  color: #e0d5ff;
+  font-weight: 500;
+}
+
+/* Badges */
+.badges-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(100, 60, 180, 0.2);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border: 1px solid rgba(150, 100, 220, 0.2);
+}
+
+.badge-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+.badge-discord {
+  background: rgba(88, 101, 242, 0.2);
+  border-color: rgba(88, 101, 242, 0.3);
+}
+
+.badge-google {
+  background: rgba(219, 68, 55, 0.2);
+  border-color: rgba(219, 68, 55, 0.3);
+}
+
+/* Stats */
+.stats-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.stat-item {
+  text-align: center;
+  flex: 1;
+}
+
+.stat-value {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #e0aaff;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #b8a6ff;
+  margin-top: 4px;
+}
+
 /* Logout */
 .logout-btn {
   margin-top: 24px;
@@ -94,6 +191,12 @@ body {
   transform: translateY(-2px);
   background: linear-gradient(90deg,#8b3fd4,#6a28d1);
 }
+
+/* Loading state */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -105,14 +208,52 @@ body {
     <img id="avatar" class="profile-avatar" src="" alt="User Avatar">
     <div id="name" class="profile-name">Loading...</div>
     <div id="user-id" class="profile-id"></div>
+    
+    <!-- Stats Section -->
+    <div class="stats-container">
+      <div class="stat-item">
+        <div class="stat-value" id="likes-count">0</div>
+        <div class="stat-label">Likes</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="followers-count">0</div>
+        <div class="stat-label">Followers</div>
+      </div>
+    </div>
+    
+    <!-- Account Info Section -->
+    <div class="info-section">
+      <div class="section-title">Account Information</div>
+      <div class="info-item">
+        <span class="info-label">Discord ID</span>
+        <span class="info-value" id="discord-id">Not connected</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Account Created</span>
+        <span class="info-value" id="account-created">Loading...</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Last Login</span>
+        <span class="info-value" id="last-login">Loading...</span>
+      </div>
+    </div>
+    
+    <!-- Badges Section -->
+    <div class="info-section">
+      <div class="section-title">Badges</div>
+      <div class="badges-container" id="badges-container">
+        <!-- Badges will be dynamically added here -->
+      </div>
+    </div>
+    
     <button id="logout" class="logout-btn">Logout</button>
   </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const sb = supabase.createClient(
-    "https://tstsijdifhgmpaszqknr.supabase.co", // ✅ your correct project
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4" // ⚠️ paste your anon/public key from that same project
+    "https://tstsijdifhgmpaszqknr.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
   );
 
   async function loadProfile() {
@@ -126,6 +267,75 @@ body {
     document.getElementById("avatar").src = user.user_metadata.avatar_url || "";
     document.getElementById("name").textContent = user.user_metadata.full_name || "Unknown User";
     document.getElementById("user-id").textContent = user.id || "No ID found";
+    
+    // Set Discord ID if available
+    const discordId = user.user_metadata.provider_id || user.user_metadata.sub;
+    document.getElementById("discord-id").textContent = discordId ? discordId.slice(0, 10) + "..." : "Not connected";
+    
+    // Set account creation date
+    const createdAt = new Date(user.created_at);
+    document.getElementById("account-created").textContent = createdAt.toLocaleDateString();
+    
+    // Set last login date
+    const lastSignIn = new Date(user.last_sign_in_at);
+    document.getElementById("last-login").textContent = lastSignIn.toLocaleDateString();
+    
+    // Set random stats (in a real app, these would come from your database)
+    
+    document.getElementById("likes-count").textContent = Math.floor(Math.random() * 500);
+    document.getElementById("followers-count").textContent = Math.floor(Math.random() * 1000);
+    
+    // Add badges based on login method
+    const badgesContainer = document.getElementById("badges-container");
+    badgesContainer.innerHTML = "";
+    
+    // Determine login provider and add appropriate badge
+    const loginProvider = user.app_metadata?.provider || "email";
+    
+    if (loginProvider.includes("discord")) {
+      addBadge(badgesContainer, "discord", "Discord Login");
+    } else if (loginProvider.includes("google")) {
+      addBadge(badgesContainer, "google", "Google Login");
+    } else {
+      addBadge(badgesContainer, "email", "Email Login");
+    }
+    
+    // Add some additional badges for demonstration
+    addBadge(badgesContainer, "verified", "Verified User");
+    addBadge(badgesContainer, "early", "Early Adopter");
+  }
+
+  function addBadge(container, type, text) {
+    const badge = document.createElement("div");
+    badge.className = `badge badge-${type}`;
+    
+    const icon = document.createElement("div");
+    icon.className = "badge-icon";
+    
+    // Set appropriate icon based on badge type
+    switch(type) {
+      case "discord":
+        icon.textContent = "D";
+        break;
+      case "google":
+        icon.textContent = "G";
+        break;
+      case "verified":
+        icon.textContent = "✓";
+        break;
+      case "early":
+        icon.textContent = "★";
+        break;
+      default:
+        icon.textContent = "•";
+    }
+    
+    const badgeText = document.createElement("span");
+    badgeText.textContent = text;
+    
+    badge.appendChild(icon);
+    badge.appendChild(badgeText);
+    container.appendChild(badge);
   }
 
   async function logout() {
