@@ -522,7 +522,7 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
 
 .glass-btn {
   width: 100%;
-  padding: 12px;
+  padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.18);
   background: rgba(255,255,255,0.08);
@@ -532,13 +532,25 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
   font-weight: 700;
   margin-bottom: 14px;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+
+  gap: 10px;
+  white-space: nowrap;      
+  line-height: 1;           
+  flex-shrink: 0;            
   transition: all .25s ease;
 }
+
+.glass-btn img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;            
+}
+
 
 .glass-btn:hover {
   transform: translateY(-3px);
