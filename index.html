@@ -321,23 +321,39 @@ body{
 }
 
 .ds-btn {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  font-family:'Inter',sans-serif;
-  font-weight: 800;
-  cursor: pointer;
-  background: #7b2cbf;
-  color: white;
-  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
 }
 
-.ds-btn:hover {
-  background: #9d4edd;
-  transform: translateY(-2px);
-  box-shadow: 0 0 18px rgba(180,120,255,0.4);
+/* animated hover gradient */
+.ds-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.25) 0%,
+    rgba(0,0,0,0.25) 50%,
+    rgba(255,255,255,0.25) 100%
+  );
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity .25s ease, transform 0.5s ease;
+  z-index: -1;
 }
+
+/* hover activates animation */
+.ds-btn:hover::before {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* keep text above gradient */
+.ds-btn:hover {
+  color: #fff;
+}
+
 
 
 /* gallery */
