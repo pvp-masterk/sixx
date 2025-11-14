@@ -632,230 +632,177 @@ header.scrolled {
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
   );
 
-  // Badge definitions from drags.html
+  /* -------------------------------------------------------------------------- */
+  /*                               BADGE DEFINITIONS                             */
+  /* -------------------------------------------------------------------------- */
+
   const badgeMap = {
-    vsi: {
-      name: "VSI",
-      icon: "https://cdn3.emoji.gg/emojis/2139-level-5.png",
-      description: "VSI Rank - Basic membership level",
-      rarity: "Uncommon",
-      glow: false
-    },
-    vsn: {
-      name: "VSN",
-      icon: "https://cdn3.emoji.gg/emojis/7463-level-20.png",
-      description: "VSN Rank - Intermediate membership level",
-      rarity: "Uncommon",
-      glow: false
-    },
-    vsg: {
-      name: "VSG",
-      icon: "https://cdn3.emoji.gg/emojis/3731-level-40.png",
-      description: "VSG Rank - Advanced membership level", 
-      rarity: "Rare",
-      glow: true
-    },
-    vsultra: {
-      name: "VS Ultra",
-      icon: "https://cdn3.emoji.gg/emojis/6336-level-30.png",
-      description: "VS Ultra Rank - Elite membership level",
-      rarity: "Epic",
-      glow: true
-    },
-    vsplus: {
-      name: "VS+",
-      icon: "https://cdn3.emoji.gg/emojis/9034-member.png",
-      description: "VS+ Rank - Premium membership level",
-      rarity: "Epic",
-      glow: true
-    },
-    vsplusplus: {
-      name: "VS++",
-      icon: "https://cdn3.emoji.gg/emojis/5717-level-10.png",
-      description: "VS++ Rank - VIP membership level",
-      rarity: "Epic",
-      glow: true
-    },
-    vs: {
-      name: "VS",
-      icon: "https://cdn3.emoji.gg/emojis/4185-staff-team.png",
-      description: "VS Rank - Highest membership level",
-      rarity: "Legendary",
-      glow: true
-    },
-    early: {
-      name: "Early User",
-      icon: "https://cdn3.emoji.gg/emojis/7549-member.png",
-      description: "Joined in the first week of /six",
-      rarity: "Rare",
-      glow: false
-    },
-    staff: {
-      name: "Staff",
-      icon: "https://cdn3.emoji.gg/emojis/1415-moderator.png",
-      description: "Official /six Staff Member",
-      rarity: "Epic",
-      glow: true
-    },
-    verified: {
-      name: "Verified",
-      icon: "https://cdn3.emoji.gg/emojis/74424-partner.png",
-      description: "Verified /six User",
-      rarity: "Uncommon",
-      glow: false
-    },
-    dev: {
-      name: "Developer",
-      icon: "https://cdn3.emoji.gg/emojis/1166-partner.png",
-      description: "/six Platform Developer",
-      rarity: "Epic",
-      glow: true
-    },
-    owner: {
-      name: "Founder & Owner",
-      icon: "https://cdn3.emoji.gg/emojis/8259-owner.png",
-      description: "The original founder of /six",
-      rarity: "Legendary",
-      glow: true
-    }
+    vsi: { name: "VSI", icon: "https://cdn3.emoji.gg/emojis/2139-level-5.png", description: "VSI Rank - Basic membership level", rarity: "Uncommon", glow: false },
+    vsn: { name: "VSN", icon: "https://cdn3.emoji.gg/emojis/7463-level-20.png", description: "VSN Rank - Intermediate membership level", rarity: "Uncommon", glow: false },
+    vsg: { name: "VSG", icon: "https://cdn3.emoji.gg/emojis/3731-level-40.png", description: "VSG Rank - Advanced membership level", rarity: "Rare", glow: true },
+    vsultra: { name: "VS Ultra", icon: "https://cdn3.emoji.gg/emojis/6336-level-30.png", description: "VS Ultra Rank - Elite membership level", rarity: "Epic", glow: true },
+    vsplus: { name: "VS+", icon: "https://cdn3.emoji.gg/emojis/9034-member.png", description: "VS+ Rank - Premium membership level", rarity: "Epic", glow: true },
+    vsplusplus: { name: "VS++", icon: "https://cdn3.emoji.gg/emojis/5717-level-10.png", description: "VS++ Rank - VIP membership level", rarity: "Epic", glow: true },
+    vs: { name: "VS", icon: "https://cdn3.emoji.gg/emojis/4185-staff-team.png", description: "VS Rank - Highest membership level", rarity: "Legendary", glow: true },
+    early: { name: "Early User", icon: "https://cdn3.emoji.gg/emojis/7549-member.png", description: "Joined in the first week of /six", rarity: "Rare", glow: false },
+    staff: { name: "Staff", icon: "https://cdn3.emoji.gg/emojis/1415-moderator.png", description: "Official /six Staff Member", rarity: "Epic", glow: true },
+    verified: { name: "Verified", icon: "https://cdn3.emoji.gg/emojis/74424-partner.png", description: "Verified /six User", rarity: "Uncommon", glow: false },
+    dev: { name: "Developer", icon: "https://cdn3.emoji.gg/emojis/1166-partner.png", description: "/six Platform Developer", rarity: "Epic", glow: true },
+    owner: { name: "Founder & Owner", icon: "https://cdn3.emoji.gg/emojis/8259-owner.png", description: "The original founder of /six", rarity: "Legendary", glow: true },
+
+    /* AUTO DISCORD BADGES */
+    partner: { name: "Discord Partner", icon: "https://cdn3.emoji.gg/emojis/partner.png", description: "Official Discord Partner", rarity: "Legendary", glow: true },
+    hypesquad_events: { name: "HypeSquad Events", icon: "https://cdn3.emoji.gg/emojis/hypesquad.png", description: "Hypesquad Event Member", rarity: "Epic", glow: true },
+    hypesquad_bravery: { name: "HypeSquad Bravery", icon: "https://cdn3.emoji.gg/emojis/bravery.png", description: "House of Bravery", rarity: "Rare", glow: false },
+    hypesquad_brilliance: { name: "HypeSquad Brilliance", icon: "https://cdn3.emoji.gg/emojis/brilliance.png", description: "House of Brilliance", rarity: "Rare", glow: false },
+    hypesquad_balance: { name: "HypeSquad Balance", icon: "https://cdn3.emoji.gg/emojis/balance.png", description: "House of Balance", rarity: "Rare", glow: false },
+    bughunter_level_1: { name: "Bug Hunter", icon: "https://cdn3.emoji.gg/emojis/bughunter.png", description: "Discord Bug Hunter", rarity: "Epic", glow: true },
+    bughunter_level_2: { name: "Bug Hunter Level 2", icon: "https://cdn3.emoji.gg/emojis/bug2.png", description: "Discord Bug Buster", rarity: "Legendary", glow: true },
+    staff_badge: { name: "Discord Staff", icon: "https://cdn3.emoji.gg/emojis/staff.png", description: "Discord Staff Member", rarity: "Legendary", glow: true },
+    active_developer: { name: "Active Developer", icon: "https://cdn3.emoji.gg/emojis/activedev.png", description: "Active Discord Developer", rarity: "Epic", glow: true },
+    early_supporter: { name: "Early Supporter", icon: "https://cdn3.emoji.gg/emojis/early.png", description: "Early Discord Supporter", rarity: "Epic", glow: true }
   };
 
-  // Manual badge assignments (update this as needed)
-  const manualBadges = {
-    "5a062d5d-f7f3-4401-902a-003e81e4eda9": [ // Example Owner
-      { key: "owner", order: 1 },
-      { key: "dev", order: 2 },
-      { key: "verified", order: 3 }
-    ],
-    "1359405784915509292": [ // Example User 1
-      { key: "vsplusplus", order: 1 },
-      { key: "early", order: 2 },
-      { key: "verified", order: 3 }
-    ],
-    "1359405784915509232": [ // Example User 2
-      { key: "staff", order: 1 },
-      { key: "vsplus", order: 2 }
-    ],
-    "1359405784915509233": [ // Example User 3
-      { key: "vsultra", order: 1 },
-      { key: "vsg", order: 2 },
-      { key: "vsn", order: 3 },
-      { key: "vsi", order: 4 }
-    ],
-    "1359405784915509234": [ // Example User 4
-      { key: "vsi", order: 1 },
-      { key: "verified", order: 2 }
-    ]
+  /* -------------------------------------------------------------------------- */
+  /*                           AUTO DISCORD BADGE SYSTEM                         */
+  /* -------------------------------------------------------------------------- */
+
+  const discordFlagBadges = {
+    [1 << 0]: "staff_badge",
+    [1 << 1]: "partner",
+    [1 << 2]: "hypesquad_events",
+    [1 << 3]: "bughunter_level_1",
+    [1 << 6]: "hypesquad_bravery",
+    [1 << 7]: "hypesquad_brilliance",
+    [1 << 8]: "hypesquad_balance",
+    [1 << 9]: "early_supporter",
+    [1 << 14]: "bughunter_level_2",
+    [1 << 17]: "active_developer"
   };
 
-  // Enhanced badge display function from drags.html
-  function displayUserBadges(userId) {
-    const badgeBox = document.getElementById("badgeBox");
-    const badgeContainer = document.getElementById("badges-container");
-    
-    if (!badgeBox || !badgeContainer) return;
+  async function getDiscordFlags(user) {
+    if (!user.user_metadata.provider_token) return null;
 
-    // Clear existing badges
-    badgeContainer.innerHTML = "";
-    
-    // Get badges for this user
-    const userBadges = manualBadges[userId] || [];
-    
-    // Hide badge box if user has no badges
-    if (userBadges.length === 0) {
-      badgeBox.style.display = "none";
-      return;
+    const res = await fetch("https://discord.com/api/v10/users/@me", {
+      headers: { Authorization: `Bearer ${user.user_metadata.provider_token}` }
+    });
+
+    if (!res.ok) return null;
+    return await res.json();
+  }
+
+  function convertDiscordFlags(flags) {
+    const badgeKeys = [];
+    for (const [flag, badgeKey] of Object.entries(discordFlagBadges)) {
+      if (flags & Number(flag)) badgeKeys.push(badgeKey);
     }
-    
-    // Show badge box
-    badgeBox.style.display = "flex";
-    
-    // Sort badges by their order value
-    userBadges.sort((a, b) => a.order - b.order).forEach(badgeData => {
-      const badge = badgeMap[badgeData.key];
-      if (!badge) return; // Skip if badge definition not found
-      
-      // Create badge wrapper
+    return badgeKeys;
+  }
+
+  function displayAutoBadges(badgeKeys) {
+    const container = document.getElementById("badges-container");
+    container.innerHTML = "";
+
+    if (badgeKeys.length === 0) return;
+
+    badgeKeys.forEach(key => {
+      const badge = badgeMap[key];
+      if (!badge) return;
+
       const wrapper = document.createElement("div");
       wrapper.className = "badge-wrapper";
-      
-      // Create badge image
+
       const img = document.createElement("img");
       img.src = badge.icon;
       img.alt = badge.name;
       img.className = "badge-icon";
-      
-      // Add special effects based on badge properties
-      if (badge.glow) {
-        img.classList.add("glow");
-      }
-      
-      // Special effects for legendary badges
-      if (badge.rarity === "Legendary") {
-        img.classList.add("rainbow");
-      }
-      
-      // Create tooltip
+
+      if (badge.glow) img.classList.add("glow");
+      if (badge.rarity === "Legendary") img.classList.add("rainbow");
+
       const tooltip = document.createElement("div");
       tooltip.className = "badge-tooltip";
-      tooltip.innerHTML = `
-        <strong>${badge.name}</strong>
-        <span>${badge.description}</span>
-        <span style="margin-top: 5px; color: ${getRarityColor(badge.rarity)}">
-          ${badge.rarity} Badge
-        </span>
-      `;
-      
-      // Add elements to DOM
+      tooltip.innerHTML = `<strong>${badge.name}</strong><span>${badge.description}</span><span>${badge.rarity} Badge</span>`;
+
       wrapper.appendChild(img);
       wrapper.appendChild(tooltip);
-      badgeContainer.appendChild(wrapper);
+      container.appendChild(wrapper);
     });
   }
 
-  // Helper function to get color based on rarity
-  function getRarityColor(rarity) {
-    switch(rarity) {
-      case "Legendary": return "#ff8c00"; // Orange
-      case "Epic": return "#a335ee";     // Purple
-      case "Rare": return "#0070dd";     // Blue
-      case "Uncommon": return "#1eff00"; // Green
-      default: return "#ffffff";         // White
-    }
+  /* -------------------------------------------------------------------------- */
+  /*                          MANUAL BADGE SYSTEM (KEPT)                         */
+  /* -------------------------------------------------------------------------- */
+
+  const manualBadges = {
+    "5a062d5d-f7f3-4401-902a-003e81e4eda9": [
+      { key: "owner", order: 1 },
+      { key: "dev", order: 2 },
+      { key: "verified", order: 3 }
+    ]
+  };
+
+  function displayUserBadges(userId) {
+    const container = document.getElementById("badges-container");
+
+    const userBadges = manualBadges[userId] || [];
+    if (userBadges.length === 0) return;
+
+    userBadges.sort((a, b) => a.order - b.order).forEach(b => {
+      const badge = badgeMap[b.key];
+      if (!badge) return;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "badge-wrapper";
+
+      const img = document.createElement("img");
+      img.src = badge.icon;
+      img.alt = badge.name;
+      img.className = "badge-icon";
+
+      if (badge.glow) img.classList.add("glow");
+      if (badge.rarity === "Legendary") img.classList.add("rainbow");
+
+      const tooltip = document.createElement("div");
+      tooltip.className = "badge-tooltip";
+      tooltip.innerHTML = `<strong>${badge.name}</strong><span>${badge.description}</span><span>${badge.rarity} Badge</span>`;
+
+      wrapper.appendChild(img);
+      wrapper.appendChild(tooltip);
+      container.appendChild(wrapper);
+    });
   }
+
+  /* -------------------------------------------------------------------------- */
+  /*                               PROFILE LOADER                                */
+  /* -------------------------------------------------------------------------- */
 
   async function loadProfile() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) {
-      window.location.href = "/";
-      return;
-    }
+    if (!session) return (window.location.href = "/");
 
     const user = session.user;
+
     document.getElementById("avatar").src = user.user_metadata.avatar_url || "";
     document.getElementById("name").textContent = user.user_metadata.full_name || "Unknown User";
-    document.getElementById("user-id").textContent = user.id || "No ID found";
-    
-    // Set Discord ID if available
-    const discordId = user.user_metadata.provider_id || user.user_metadata.sub;
-    document.getElementById("discord-id").textContent = discordId ? discordId.slice(0, 10) + "..." : "Not connected";
-    
-    // Set account creation date
-    const createdAt = new Date(user.created_at);
-    document.getElementById("account-created").textContent = createdAt.toLocaleDateString();
-    
-    // Set last login date
-    const lastSignIn = new Date(user.last_sign_in_at);
-    document.getElementById("last-login").textContent = lastSignIn.toLocaleDateString();
-    
-    // Set random stats (in a real app, these would come from your database)
-    document.getElementById("likes-count").textContent = Math.floor(Math.random() * 500);
-    document.getElementById("followers-count").textContent = Math.floor(Math.random() * 1000);
-    
-    // Display badges based on user ID
+    document.getElementById("user-id").textContent = user.id;
+
+    const discordId = user.user_metadata.provider_id;
+    document.getElementById("discord-id").textContent = discordId || "Not connected";
+
+    document.getElementById("account-created").textContent = new Date(user.created_at).toLocaleDateString();
+    document.getElementById("last-login").textContent = new Date(user.last_sign_in_at).toLocaleDateString();
+
+    // Auto Discord badges
+    const discordData = await getDiscordFlags(user);
+    if (discordData && discordData.flags !== undefined) {
+      const autoKeys = convertDiscordFlags(discordData.flags);
+      displayAutoBadges(autoKeys);
+    }
+
+    // Manual /six badges
     displayUserBadges(user.id);
-    
-    // Hide loading buffer
+
     document.getElementById("loading-buffer").style.display = "none";
   }
 
@@ -864,22 +811,9 @@ header.scrolled {
     window.location.href = "/";
   }
 
-  // Add scroll effect for header
-  window.addEventListener('scroll', () => {
-    const header = document.getElementById('header');
-    if (window.scrollY > 50) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
-    }
-  });
-
   document.getElementById("logout").addEventListener("click", logout);
-  
-  // Initialize profile when page loads
-  document.addEventListener("DOMContentLoaded", () => {
-    loadProfile();
-  });
+  document.addEventListener("DOMContentLoaded", loadProfile);
 </script>
+
 </body>
 </html>
