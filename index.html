@@ -320,6 +320,7 @@ body{
   box-shadow: 0 0 12px rgba(180,120,255,0.5);
 }
 
+/* Base button — keep your original */
 .ds-btn {
   width: 100%;
   padding: 10px;
@@ -328,48 +329,51 @@ body{
   font-family:'Inter',sans-serif;
   font-weight: 800;
   cursor: pointer;
-  background: #7b2cbf; /* original color */
+  background: #7b2cbf;
   color: white;
-  transition: 0.3s;
+  transition: 0.25s;
   position: relative;
   overflow: hidden;
   z-index: 1;
 }
 
+/* Hover state (your original) */
 .ds-btn:hover {
-  background: #9d4edd; /* original hover color */
+  background: #9d4edd;
   transform: translateY(-2px);
   box-shadow: 0 0 18px rgba(180,120,255,0.4);
 }
 
-/* ANIMATED LOOPING GRADIENT OVERLAY */
+/* ---- DISCORD-STYLE SHIMMER ---- */
 .ds-btn::before {
   content: "";
   position: absolute;
   inset: 0;
+  
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,0.35) 0%,
-    rgba(0,0,0,0.20) 50%,
-    rgba(255,255,255,0.35) 100%
+    rgba(255,255,255,0.45) 0%,
+    rgba(200,200,200,0.15) 50%,
+    rgba(255,255,255,0.45) 100%
   );
+
+  /* Start fully off-screen left */
+  transform: translateX(-120%);
+  transition: transform .85s cubic-bezier(.22, .61, .36, 1); /* smooth AF */
+  
   opacity: 0;
-  transform: translateX(-150%);
   z-index: -1;
-  transition: opacity .25s ease;
 }
 
-/* Activate looping animation */
+/* On hover — sweep left → right ONCE */
 .ds-btn:hover::before {
   opacity: 1;
-  animation: dsGradientLoop 1.6s linear infinite;
+  transform: translateX(120%);
 }
 
-/* Keyframes for infinite left ↔ right motion */
-@keyframes dsGradientLoop {
-  0%   { transform: translateX(-150%); }
-  50%  { transform: translateX(150%); }
-  100% { transform: translateX(-150%); }
+/* On mouse leave — NO RESET (Discord behavior) */
+.ds-btn:not(:hover)::before {
+  transition: none; /* freezes position instantly when unhovered */
 }
 
 
