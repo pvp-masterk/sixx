@@ -514,6 +514,60 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
   color: #f0f0f0;
   -webkit-text-stroke: 0.3px rgba(255,255,255,0.45);
 }
+/* LOGIN MODAL GLOW */
+.login-modal {
+  padding: 40px 32px;
+  max-width: 420px;
+}
+
+.glass-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all .25s ease;
+}
+
+.glass-btn:hover {
+  transform: translateY(-3px);
+  background: rgba(255,255,255,0.16);
+}
+
+.glass-btn:active {
+  transform: scale(0.97);
+}
+
+.login-google {
+  border-color: rgba(219,68,55,0.45);
+  box-shadow: 0 0 15px rgba(219,68,55,0.35);
+}
+
+.login-discord {
+  border-color: rgba(88,101,242,0.45);
+  box-shadow: 0 0 15px rgba(88,101,242,0.35);
+}
+
+.login-close {
+  background: rgba(255,255,255,0.1);
+}
+
+.login-icon {
+  width: 20px;
+  height: 20px;
+  filter: brightness(1000%);
+}
 
 </style>
 </head>
@@ -862,6 +916,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter' || e.key === ' ') enterSite();
   });
 });
+// Show login modal after landing click
+setTimeout(() => {
+  document.getElementById("loginModal").classList.add("active");
+}, 400);
 
 // -------------------------
 // Sidebar toggle & push JS
@@ -1004,55 +1062,48 @@ function closeBannerModal(){
 }
 
 </script>
-  <!-- LOGIN POPUP -->
-<div class="modal" id="loginPopup">
-  <div class="modal-content" style="padding:30px;">
-    <h2 style="margin-bottom:20px">Login</h2>
+ <!-- LOGIN MODAL -->
+<div class="modal" id="loginModal">
+  <div class="modal-content login-modal">
+    <h2 style="margin-bottom:18px">Login to /six</h2>
 
-    <button id="login-google" class="discord-btn" style="margin-bottom:12px;background:#db4437;">
-      Login with Google
+    <button id="googleLoginBtn" class="glass-btn login-google">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/google.svg" class="login-icon" />
+      Continue with Google
     </button>
 
-    <button id="login-discord2" class="discord-btn" style="background:#5865F2;">
-      Login with Discord
+    <button id="discordLoginBtn" class="glass-btn login-discord">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg" class="login-icon" />
+      Continue with Discord
     </button>
 
-    <button id="closeLogin" class="discord-btn" style="margin-top:16px;background:#444;">
-      Close
-    </button>
+    <button id="closeLoginBtn" class="glass-btn login-close">Close</button>
   </div>
 </div>
 
+
 <script>
-  // open popup
-  document.getElementById("login-discord").onclick = () => {
-    document.getElementById("loginPopup").classList.add("active");
-  };
+ // Open / Close login modal
+document.getElementById("closeLoginBtn").onclick = () => {
+  document.getElementById("loginModal").classList.remove("active");
+};
 
-  // close popup
-  document.getElementById("closeLogin").onclick = () => {
-    document.getElementById("loginPopup").classList.remove("active");
-  };
+// GOOGLE LOGIN
+document.getElementById("googleLoginBtn").onclick = async () => {
+  await sb.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.origin + "/profile.html" }
+  });
+};
 
-  // LOGIN WITH GOOGLE
-  document.getElementById("login-google").onclick = async () => {
-    await sb.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin + "/profile.html"
-      }
-    });
-  };
+// DISCORD LOGIN
+document.getElementById("discordLoginBtn").onclick = async () => {
+  await sb.auth.signInWithOAuth({
+    provider: "discord",
+    options: { redirectTo: window.location.origin + "/profile.html" }
+  });
+};
 
-  // LOGIN WITH DISCORD
-  document.getElementById("login-discord2").onclick = async () => {
-    await sb.auth.signInWithOAuth({
-      provider: "discord",
-      options: {
-        redirectTo: window.location.origin + "/profile.html"
-      }
-    });
-  };
 </script>
 
 </body>
