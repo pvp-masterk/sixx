@@ -321,38 +321,50 @@ body{
 }
 
 .ds-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-family:'Inter',sans-serif;
+  font-weight: 800;
+  cursor: pointer;
+  background: #7b2cbf; /* original color */
+  color: white;
+  transition: 0.3s;
   position: relative;
   overflow: hidden;
   z-index: 1;
 }
 
-/* animated hover gradient */
+.ds-btn:hover {
+  background: #9d4edd; /* original hover color */
+  transform: translateY(-2px);
+  box-shadow: 0 0 18px rgba(180,120,255,0.4);
+}
+
+/* ANIMATED GRADIENT OVERLAY */
 .ds-btn::before {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,0.25) 0%,
-    rgba(0,0,0,0.25) 50%,
-    rgba(255,255,255,0.25) 100%
+    rgba(255,255,255,0.35) 0%,
+    rgba(0,0,0,0.2) 50%,
+    rgba(255,255,255,0.35) 100%
   );
   opacity: 0;
-  transform: translateX(-100%);
-  transition: opacity .25s ease, transform 0.5s ease;
-  z-index: -1;
+  transform: translateX(-120%);
+  transition: transform .55s ease, opacity .25s ease;
+  z-index: -1; /* BELOW text but ABOVE purple background */
 }
 
-/* hover activates animation */
+/* Hover animation activation */
 .ds-btn:hover::before {
   opacity: 1;
   transform: translateX(0);
 }
 
-/* keep text above gradient */
-.ds-btn:hover {
-  color: #fff;
-}
 
 
 
