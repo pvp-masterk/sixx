@@ -734,74 +734,80 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
   color: #f0f0f0;
   -webkit-text-stroke: 0.3px rgba(255,255,255,0.45);
 }
-/* LOGIN MODAL GLOW */
-.login-modal {
-  padding: 40px 32px;
-  max-width: 420px;
+/* ENHANCED LOGIN POPUP */
+#loginModal .modal-content {
+  background: rgba(25, 10, 40, 0.45);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 35px 30px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+
+  animation: loginPop .55s cubic-bezier(.2,1,.3,1);
 }
 
+/* entrance animation */
+@keyframes loginPop {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#loginModal h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #e9d8ff;
+  text-shadow: 0 0 18px rgba(140,60,255,0.5);
+  font-weight: 800;
+}
+
+/* ENHANCED BUTTONS */
 .glass-btn {
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 14px;
+  border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.18);
   background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   color: #fff;
-  font-weight: 700;
-  margin-bottom: 14px;
-  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 16px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-
   gap: 10px;
-  white-space: nowrap;      
-  line-height: 0;           
-  flex-shrink: 0;            
-  transition: all .25s ease;
+
+  transition: .28s ease;
+}
+
+.glass-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  background: rgba(255,255,255,0.16);
+  box-shadow: 0 0 20px rgba(180,120,255,0.35);
 }
 
 .glass-btn img {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
-  flex-shrink: 0;   
-  display: block;
 }
 
-
-.glass-btn:hover {
-  transform: translateY(-3px);
-  background: rgba(255,255,255,0.16);
+#closeLoginBtn {
+  opacity: 0.6;
 }
 
-.glass-btn:active {
-  transform: scale(0.97);
+#closeLoginBtn:hover {
+  opacity: 1;
 }
 
-.login-google {
-  border-color: rgba(219,68,55,0.45);
-  box-shadow: 0 0 15px rgba(219,68,55,0.35);
-}
-
-.login-discord {
-  border-color: rgba(88,101,242,0.45);
-  box-shadow: 0 0 15px rgba(88,101,242,0.35);
-}
-
-.login-close {
-  background: rgba(255,255,255,0.1);
-}
-
-.login-icon {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-  display: block;
-}
 
 /* ======================= DRAGS-STYLE ANIMATIONS ======================= */
 @keyframes fadeInUp {
@@ -1635,10 +1641,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter' || e.key === ' ') enterSite();
   });
 });
-// Show login modal after landing click
+
+
 setTimeout(() => {
   document.getElementById("loginModal").classList.add("active");
-}, 400);
+}, 300);
 
 // -------------------------
 // Sidebar toggle & push JS
