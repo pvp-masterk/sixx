@@ -342,7 +342,7 @@ body{
   box-shadow: 0 0 18px rgba(180,120,255,0.4);
 }
 
-/* ANIMATED GRADIENT OVERLAY */
+/* ANIMATED LOOPING GRADIENT OVERLAY */
 .ds-btn::before {
   content: "";
   position: absolute;
@@ -350,20 +350,28 @@ body{
   background: linear-gradient(
     90deg,
     rgba(255,255,255,0.35) 0%,
-    rgba(0,0,0,0.2) 50%,
+    rgba(0,0,0,0.20) 50%,
     rgba(255,255,255,0.35) 100%
   );
   opacity: 0;
-  transform: translateX(-120%);
-  transition: transform .55s ease, opacity .25s ease;
-  z-index: -1; /* BELOW text but ABOVE purple background */
+  transform: translateX(-150%);
+  z-index: -1;
+  transition: opacity .25s ease;
 }
 
-/* Hover animation activation */
+/* Activate looping animation */
 .ds-btn:hover::before {
   opacity: 1;
-  transform: translateX(0);
+  animation: dsGradientLoop 1.6s linear infinite;
 }
+
+/* Keyframes for infinite left ↔ right motion */
+@keyframes dsGradientLoop {
+  0%   { transform: translateX(-150%); }
+  50%  { transform: translateX(150%); }
+  100% { transform: translateX(-150%); }
+}
+
 
 
 
