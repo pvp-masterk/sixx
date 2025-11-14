@@ -247,13 +247,97 @@ body{
   opacity: 0;
   transition: all 0.3s ease;
 }
+.card {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform .35s;
+}
+
 .card:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+  border-color: rgba(180, 120, 255, 0.65) !important;
+  box-shadow: 0 0 18px rgba(180, 120, 255, 0.55);
+  transform: translateY(-8px) scale(1.01);
 }
-.card:hover::before {
-  opacity: 1;
+.discord-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px;
+  gap: 25px;
 }
+
+.ds-left {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.ds-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 14px;
+  border: 2px solid rgba(180, 120, 255, 0.25);
+}
+
+.ds-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #d8b9ff;
+}
+
+.ds-created {
+  font-size: 14px;
+  color: #c9b6ff;
+}
+
+.ds-right {
+  flex: 0.8;
+}
+
+.ds-count {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.ds-total {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.ds-bar {
+  width: 100%;
+  height: 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+#ds-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #b77bff, #7b2cbf);
+  transition: width 1s ease;
+  box-shadow: 0 0 12px rgba(180,120,255,0.5);
+}
+
+.ds-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 800;
+  cursor: pointer;
+  background: #7b2cbf;
+  color: white;
+  transition: 0.3s;
+}
+
+.ds-btn:hover {
+  background: #9d4edd;
+  transform: translateY(-2px);
+  box-shadow: 0 0 18px rgba(180,120,255,0.4);
+}
+
 
 /* gallery */
 .gallery-section{ padding:36px 0 18px; text-align:center; }
@@ -1384,19 +1468,31 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
 
    
 
-    <!-- Discord Info -->
-    <section class="discord-section card" aria-label="Discord info">
-      <img id="discord-icon" class="discord-icon" src="" alt="Discord server icon" />
-      <div>
-        <div class="discord-name">/six</div>
-        <div class="discord-date">Created: <span id="discord-date">Loading...</span></div>
-        <div class="discord-members"><span id="member-count">0</span> / <span id="member-goal">200</span> Members</div>
-        <div style="margin-top:8px;width:160px" class="progress-wrap"><div id="progress-bar"></div></div>
-      </div>
-      <div style="margin-left:auto;min-width:120px;text-align:right">
-        <button class="discord-btn" onclick="window.open('https://discord.gg/tu6rpKhenw','_blank')">Join Our Discord</button>
-      </div>
-    </section>
+    <section class="discord-stats card">
+  <div class="ds-left">
+    <img id="ds-icon" class="ds-icon" src="" alt="Discord icon">
+    <div>
+      <div class="ds-name">/six Discord</div>
+      <div class="ds-created">Created: <span id="ds-date">Loading...</span></div>
+    </div>
+  </div>
+
+  <div class="ds-right">
+    <div class="ds-count">
+      <span id="ds-members">0</span>
+      <span class="ds-total">/ 200</span>
+    </div>
+
+    <div class="ds-bar">
+      <div id="ds-bar-fill"></div>
+    </div>
+
+    <button class="ds-btn" onclick="window.open('https://discord.gg/tu6rpKhenw','_blank')">
+      Join Discord
+    </button>
+  </div>
+</section>
+
 
     <footer>© 2025 <span class="six-text">/six</span> Clan - All rights reserved.</footer>
   </main>
@@ -1611,42 +1707,40 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-/* ======================= Discord Stats (kept, with try/catch) ======================= */
 async function loadDiscordStats() {
-  const invite = "tu6rpKhenw"; // invite code
-  const goal = 1000; // goal for progress bar
+  const invite = "tu6rpKhenw";
 
   try {
-    const res = await fetch(`https://discord.com/api/v9/invites/${invite}?with_counts=true`);
-    if (!res.ok) throw new Error('Invite fetch failed');
+    const res = await fetch(
+      `https://discord.com/api/v9/invites/${invite}?with_counts=true`
+    );
+
     const data = await res.json();
+
     const guild = data.guild;
-    const memberCount = data.approximate_member_count || 0;
+    const members = data.approximate_member_count || 0;
+    const goal = 200;
 
-    if (guild && guild.id && guild.icon) {
-      document.getElementById("discord-icon").src = `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
-    } else {
-      document.getElementById("discord-icon").src = '';
-    }
+    // icon
+    document.getElementById("ds-icon").src =
+      `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
 
-    // Derived creation date from snowflake id (best-effort)
-    if (guild && guild.id) {
-      const created = new Date(Number(guild.id) / 4194304 + 1420070400000);
-      document.getElementById("discord-date").innerText = created.toDateString();
-    } else {
-      document.getElementById("discord-date").innerText = 'Unknown';
-    }
+    // creation date
+    const created = new Date(Number(guild.id) / 4194304 + 1420070400000);
+    document.getElementById("ds-date").innerText = created.toDateString();
 
-    document.getElementById("member-count").innerText = memberCount;
-    document.getElementById("member-goal").innerText = goal;
-    const progress = Math.min((memberCount / goal) * 100, 100);
-    document.getElementById("progress-bar").style.width = progress + "%";
+    // numbers
+    document.getElementById("ds-members").innerText = members;
+    const progress = Math.min((members / goal) * 100, 100);
+    document.getElementById("ds-bar-fill").style.width = progress + "%";
+
   } catch (err) {
-    console.warn("Failed to load Discord stats:", err);
-    // keep placeholders
+    console.warn("Discord stats failed:", err);
   }
 }
+
 loadDiscordStats();
+
 
 /* ======================= Banner Modal Preview ======================= */
 const bannerModal = document.getElementById('bannerModal');
