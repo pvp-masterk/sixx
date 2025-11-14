@@ -743,8 +743,10 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
   box-shadow: 0 12px 40px rgba(0,0,0,0.55);
   backdrop-filter: blur(18px) saturate(160%);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
-
   animation: loginPop .55s cubic-bezier(.2,1,.3,1);
+  max-width: 380px; /* Add max-width to prevent oversized modal */
+  width: 90%; /* Responsive width */
+  margin: 0 auto; /* Center the modal */
 }
 
 /* entrance animation */
@@ -765,49 +767,22 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
   color: #e9d8ff;
   text-shadow: 0 0 18px rgba(140,60,255,0.5);
   font-weight: 800;
+  text-align: center;
 }
 
-/* ENHANCED BUTTONS */
+/* Remove or modify the generic glass-btn styles that conflict */
 .glass-btn {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  color: #fff;
-  font-weight: 600;
+  /* Remove width: 100% and padding that conflict with specific button styles */
   margin-bottom: 16px;
-
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-
   transition: .28s ease;
+  border-radius: 14px; /* Keep your glass style radius */
 }
 
-.glass-btn:hover {
-  transform: translateY(-3px) scale(1.02);
-  background: rgba(255,255,255,0.16);
-  box-shadow: 0 0 20px rgba(180,120,255,0.35);
-}
-
-.glass-btn img {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-}
-
-#closeLoginBtn {
-  opacity: 0.6;
-}
-
-#closeLoginBtn:hover {
-  opacity: 1;
-}
-  /* GOOGLE BUTTON — enhanced official style */
+/* GOOGLE BUTTON — enhanced official style */
 .login-google {
   background: #ffffff !important;
   border: 1px solid #dadce0 !important;
@@ -818,7 +793,10 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
   border-radius: 4px !important;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
   transition: all 0.2s ease-in-out !important;
-  padding: 10px 16px !important;
+  padding: 12px 20px !important; /* Slightly increased padding */
+  width: 100% !important; /* Controlled width */
+  max-width: 300px !important; /* Prevent excessive width */
+  margin: 0 auto 16px auto !important; /* Center and space buttons */
   
   display: flex !important;
   align-items: center !important;
@@ -864,7 +842,10 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
   border-radius: 3px !important;
   box-shadow: 0 2px 6px rgba(88,101,242,0.2) !important;
   transition: all 0.2s ease-in-out !important;
-  padding: 10px 16px !important;
+  padding: 12px 20px !important; /* Slightly increased padding */
+  width: 100% !important; /* Controlled width */
+  max-width: 300px !important; /* Prevent excessive width */
+  margin: 0 auto 16px auto !important; /* Center and space buttons */
   
   display: flex !important;
   align-items: center !important;
@@ -911,6 +892,27 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
 
 .login-discord:focus:not(:focus-visible) {
   outline: none !important;
+}
+
+/* Close button styles */
+#closeLoginBtn {
+  opacity: 0.6;
+  width: auto !important; /* Don't force full width */
+  padding: 10px 20px !important;
+  max-width: 150px !important;
+  margin: 10px auto 0 auto !important;
+}
+
+#closeLoginBtn:hover {
+  opacity: 1;
+}
+
+/* Button container for better layout */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 
