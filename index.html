@@ -1004,5 +1004,56 @@ function closeBannerModal(){
 }
 
 </script>
+  <!-- LOGIN POPUP -->
+<div class="modal" id="loginPopup">
+  <div class="modal-content" style="padding:30px;">
+    <h2 style="margin-bottom:20px">Login</h2>
+
+    <button id="login-google" class="discord-btn" style="margin-bottom:12px;background:#db4437;">
+      Login with Google
+    </button>
+
+    <button id="login-discord2" class="discord-btn" style="background:#5865F2;">
+      Login with Discord
+    </button>
+
+    <button id="closeLogin" class="discord-btn" style="margin-top:16px;background:#444;">
+      Close
+    </button>
+  </div>
+</div>
+
+<script>
+  // open popup
+  document.getElementById("login-discord").onclick = () => {
+    document.getElementById("loginPopup").classList.add("active");
+  };
+
+  // close popup
+  document.getElementById("closeLogin").onclick = () => {
+    document.getElementById("loginPopup").classList.remove("active");
+  };
+
+  // LOGIN WITH GOOGLE
+  document.getElementById("login-google").onclick = async () => {
+    await sb.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/profile.html"
+      }
+    });
+  };
+
+  // LOGIN WITH DISCORD
+  document.getElementById("login-discord2").onclick = async () => {
+    await sb.auth.signInWithOAuth({
+      provider: "discord",
+      options: {
+        redirectTo: window.location.origin + "/profile.html"
+      }
+    });
+  };
+</script>
+
 </body>
 </html>
