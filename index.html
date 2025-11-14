@@ -222,26 +222,88 @@ body{
 .meta{ margin-top:6px; color:#c9b6ff; font-size:14px; font-weight:500; }
 
 /* ======================= CARDS & SECTIONS ======================= */
-.card{ background:linear-gradient(145deg, rgba(40,15,70,0.34), rgba(20,5,40,0.28)); border:1px solid rgba(150,80,220,0.08); border-radius:14px; padding:18px; margin-bottom:18px; backdrop-filter: blur(6px); box-shadow:0 6px 18px rgba(10,0,25,0.28); transition: transform .18s ease, box-shadow .18s ease; }
-.card:hover{ transform: translateY(-4px); box-shadow:0 12px 26px rgba(20,0,40,0.36); }
+.card{ 
+  background: linear-gradient(145deg, rgba(40,15,70,0.8), rgba(20,5,40,0.7)); 
+  border: 1px solid rgba(150,80,220,0.15); 
+  border-radius: 15px; 
+  padding: 25px; 
+  margin-bottom: 25px; 
+  backdrop-filter: blur(10px); 
+  box-shadow: 0 10px 25px rgba(10,0,25,0.3); 
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(88, 101, 242, 0.1) 0%, rgba(87, 242, 135, 0.05) 100%);
+  z-index: -1;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+.card:hover::before {
+  opacity: 1;
+}
 
 /* gallery */
 .gallery-section{ padding:36px 0 18px; text-align:center; }
 .gallery-title{ font-family:'Inter',sans-serif; font-size:1.6rem; margin-bottom:18px; color:#fff; letter-spacing:1px; }
 .gallery-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
-.banner-card{ position:relative; overflow:hidden; border-radius:12px; background:linear-gradient(145deg, rgba(30,0,50,0.84), rgba(0,0,20,0.88)); box-shadow:0 6px 18px rgba(120,0,180,0.12); transition: transform .16s ease; }
+.banner-card{ 
+  position:relative; 
+  overflow:hidden; 
+  border-radius:12px; 
+  background:linear-gradient(145deg, rgba(30,0,50,0.84), rgba(0,0,20,0.88)); 
+  box-shadow:0 6px 18px rgba(120,0,180,0.12); 
+  transition: transform .16s ease; 
+}
 .banner-card:hover{ transform: translateY(-6px); }
 .banner-img{ width:100%; height:160px; object-fit:cover; display:block; }
 
 /* socials */
 .socials-section{ padding:28px 0 18px; text-align:center; }
 .socials-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; max-width:900px; margin:0 auto; }
-.social-card{ display:flex; flex-direction:column; align-items:center; gap:10px; padding:12px; text-decoration:none; color:inherit; border-radius:10px; background:linear-gradient(90deg, rgba(90,24,154,0.08), rgba(50,10,120,0.05)); border:1px solid rgba(150,80,220,0.06); }
+.social-card{ 
+  display:flex; 
+  flex-direction:column; 
+  align-items:center; 
+  gap:10px; 
+  padding:12px; 
+  text-decoration:none; 
+  color:inherit; 
+  border-radius:10px; 
+  background:linear-gradient(90deg, rgba(90,24,154,0.08), rgba(50,10,120,0.05)); 
+  border:1px solid rgba(150,80,220,0.06); 
+  transition: all 0.3s ease;
+}
+.social-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(90,24,154,0.2);
+}
 .social-icon{ width:64px; height:64px; object-fit:cover; border-radius:10px; border:2px solid rgba(180,120,255,0.18); }
 
 /* discord card */
 .discord-section{ display:flex; justify-content:center; margin-top:18px; }
-.discord-card{ background:linear-gradient(145deg, rgba(80,40,120,0.34), rgba(50,10,80,0.26)); border:1px solid rgba(180,120,255,0.12); border-radius:12px; padding:14px 18px; display:flex; align-items:center; gap:14px; box-shadow:0 6px 18px rgba(30,0,60,0.22); }
+.discord-card{ 
+  background:linear-gradient(145deg, rgba(80,40,120,0.34), rgba(50,10,80,0.26)); 
+  border:1px solid rgba(180,120,255,0.12); 
+  border-radius:12px; 
+  padding:14px 18px; 
+  display:flex; 
+  align-items:center; 
+  gap:14px; 
+  box-shadow:0 6px 18px rgba(30,0,60,0.22); 
+}
 .discord-icon{ width:64px; height:64px; border-radius:10px; border:2px solid rgba(180,120,255,0.28); object-fit:cover; display:block; }
 .discord-name{ font-family:'Diecide Remain',sans-serif; font-size:20px; color:#d8b9ff; margin-bottom:4px; }
 .discord-date{ color:#c9b6ff; font-size:13px; margin-bottom:4px; }
@@ -252,24 +314,90 @@ body{
 #progress-bar{ height:100%; width:0%; background:linear-gradient(90deg,#b77bff,#8f3fff); transition: width 1s linear; }
 
 /* buttons */
-.discord-btn{ width:100%; height:44px; border-radius:10px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(90deg,#7b2cbf,#5a189a); color:#fff; font-weight:800; font-size:14px; box-shadow:0 6px 14px rgba(90,24,154,0.26); }
-.clanwar-btn{ margin-top:12px; width:100%; padding:12px; border-radius:10px; border:none; background:linear-gradient(90deg,#8a3fd4,#6a28d1); color:#fff; font-weight:800; cursor:pointer; }
+.discord-btn{ 
+  width:100%; 
+  height:44px; 
+  border-radius:10px; 
+  border:none; 
+  cursor:pointer; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center; 
+  gap:10px; 
+  background:linear-gradient(90deg,#7b2cbf,#5a189a); 
+  color:#fff; 
+  font-weight:800; 
+  font-size:14px; 
+  box-shadow:0 6px 14px rgba(90,24,154,0.26); 
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.discord-btn:hover {
+  background:linear-gradient(90deg,#8a3fd4,#6a28d1);
+  transform: translateY(-3px);
+  box-shadow:0 10px 25px rgba(90,24,154,0.4);
+}
+.clanwar-btn{ 
+  margin-top:12px; 
+  width:100%; 
+  padding:12px; 
+  border-radius:10px; 
+  border:none; 
+  background:linear-gradient(90deg,#8a3fd4,#6a28d1); 
+  color:#fff; 
+  font-weight:800; 
+  cursor:pointer; 
+  transition: all 0.3s ease;
+}
+.clanwar-btn:hover {
+  transform: translateY(-3px);
+  box-shadow:0 10px 25px rgba(90,24,154,0.4);
+}
 
 /* footer */
 footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-size:13px; padding-top:18px; border-top:1px solid rgba(150,80,220,0.06); }
 
 /* modal */
-.modal{ position:fixed; inset:0; display:none; justify-content:center; align-items:center; background:rgba(5,0,10,0.6); backdrop-filter: blur(6px); z-index:120; }
+.modal{ 
+  position:fixed; 
+  inset:0; 
+  display:none; 
+  justify-content:center; 
+  align-items:center; 
+  background:rgba(5,0,10,0.6); 
+  backdrop-filter: blur(6px); 
+  z-index:120; 
+}
 .modal.active{ display:flex; }
-.modal-content{ position:relative; width:92%; max-width:520px; padding:20px; border-radius:16px; text-align:center; color:#fff; background:rgba(35,10,55,0.36); border:1px solid rgba(255,255,255,0.06); box-shadow:0 14px 36px rgba(0,0,0,0.7); }
-.modal-content img{ width:100%; height:auto; border-radius:10px; margin-bottom:14px; }
-.modal-content h2{ margin-bottom:8px; font-family:'Diecide Remain',sans-serif; font-size:20px; }
+.modal-content{ 
+  position:relative; 
+  width:92%; 
+  max-width:520px; 
+  padding:20px; 
+  border-radius:16px; 
+  text-align:center; 
+  color:#fff; 
+  background:rgba(35,10,55,0.36); 
+  border:1px solid rgba(255,255,255,0.06); 
+  box-shadow:0 14px 36px rgba(0,0,0,0.7); 
+}
 
 /* banner preview modal separate style */
 .banner-preview{ max-width:90vw; max-height:80vh; object-fit:contain; border-radius:10px; }
 
 /* notification */
-.notification{ position:fixed; top:18px; right:18px; background:green; color:#fff; padding:10px 16px; border-radius:10px; display:none; font-weight:700; z-index:2000;}
+.notification{ 
+  position:fixed; 
+  top:18px; 
+  right:18px; 
+  background:green; 
+  color:#fff; 
+  padding:10px 16px; 
+  border-radius:10px; 
+  display:none; 
+  font-weight:700; 
+  z-index:2000;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
 .notification.error{ background:#c94a4a; }
 
 /* small responsiveness */
@@ -583,7 +711,478 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
   display: block;
 }
 
+/* ======================= DRAGS-STYLE ANIMATIONS ======================= */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
+/* Animate elements on scroll */
+.feature-card, .stat-item, .command-tier, .section-title {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.feature-card.animate, .stat-item.animate, .command-tier.animate, .section-title.animate {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Floating animation for hero elements */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Particle animation */
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* ======================= DRAGS-STYLE CARDS ======================= */
+.card {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(88, 101, 242, 0.1) 0%, rgba(87, 242, 135, 0.05) 100%);
+  z-index: -1;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* ======================= DRAGS-STYLE BUTTONS ======================= */
+.cta-button {
+  background: linear-gradient(90deg, #7b2cbf, #5a189a);
+  color: white;
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(90,24,154,0.3);
+}
+
+.cta-button:hover {
+  background: linear-gradient(90deg, #8a3fd4, #6a28d1);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(90,24,154,0.4);
+}
+
+.cta-button.outline {
+  background: transparent;
+  border: 2px solid #7b2cbf;
+  color: #7b2cbf;
+  box-shadow: none;
+}
+
+.cta-button.outline:hover {
+  background: rgba(123, 44, 191, 0.1);
+  color: #e0aaff;
+}
+
+.cta-button i {
+  transition: transform 0.3s ease;
+}
+
+.cta-button:hover i {
+  transform: translateX(3px);
+}
+
+/* ======================= DRAGS-STYLE SCROLLBAR ======================= */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050006;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #7b2cbf;
+  border-radius: 6px;
+  border: 3px solid #050006;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9d4edd;
+}
+
+/* ======================= DRAGS-STYLE FLOATING BUTTONS ======================= */
+.floating-buttons {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 999;
+}
+
+.floating-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #7b2cbf;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.floating-btn:hover {
+  background: #9d4edd;
+  transform: translateY(-5px) scale(1.1);
+  box-shadow: 0 8px 25px rgba(123, 44, 191, 0.6);
+}
+
+.floating-btn.secondary {
+  background: #57F287;
+  box-shadow: 0 5px 15px rgba(87, 242, 135, 0.4);
+}
+
+.floating-btn.secondary:hover {
+  background: #4ad97c;
+  box-shadow: 0 8px 25px rgba(87, 242, 135, 0.6);
+}
+
+/* ======================= DRAGS-STYLE TOAST ======================= */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(35,10,55,0.9);
+  color: #fff;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  border-left: 4px solid #7b2cbf;
+}
+
+.toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast i {
+  font-size: 20px;
+}
+
+/* ======================= DRAGS-STYLE BACK TO TOP ======================= */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #7b2cbf;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 999;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  background: #9d4edd;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(123, 44, 191, 0.6);
+}
+
+/* ======================= DRAGS-STYLE PARTICLES ======================= */
+.particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  background: rgba(123, 44, 191, 0.1);
+  border-radius: 50%;
+  animation: float-particle 15s infinite linear;
+}
+
+/* ======================= DRAGS-STYLE LOADER ======================= */
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #050006;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-logo {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.loader-logo img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.loader-bar {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loader-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #7b2cbf, #5a189a);
+  animation: loading 2s ease-in-out forwards;
+}
+
+.loader-tips {
+  margin-top: 30px;
+  max-width: 400px;
+  text-align: center;
+  opacity: 0.8;
+  font-size: 14px;
+  color: #c9b6ff;
+  min-height: 60px;
+}
+
+.loader-tips .tip {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 0 20px;
+}
+
+.loader-tips .tip.active {
+  display: block;
+  animation: fadeInOut 5s ease infinite;
+}
+
+@keyframes loading {
+  0% { width: 0; }
+  100% { width: 100%; }
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; transform: translateY(10px); }
+  20%, 80% { opacity: 1; transform: translateY(0); }
+}
+
+/* ======================= DRAGS-STYLE STAFF LINKS ======================= */
+.staff-link {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  text-decoration: none;
+  color: inherit;
+  padding: 15px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.staff-link:hover {
+  transform: translateX(10px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  background: rgba(123, 44, 191, 0.1);
+}
+
+/* ======================= DRAGS-STYLE RESPONSIVE ======================= */
+@media (max-width: 1200px) {
+  .hero-image {
+    width: 400px;
+    height: 400px;
+  }
+}
+
+@media (max-width: 992px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    padding-top: 100px;
+  }
+  
+  .hero-content {
+    max-width: 100%;
+    margin-bottom: 50px;
+  }
+  
+  .hero-buttons {
+    justify-content: center;
+  }
+  
+  .hero-image {
+    position: relative;
+    right: auto;
+    margin-top: 50px;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 15px 5%;
+  }
+  
+  .hero, .features, .community, .team, footer {
+    padding: 80px 5%;
+  }
+  
+  .hero-content h1 {
+    font-size: 36px;
+  }
+  
+  .hero-image {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .nav-links {
+    display: none;
+  }
+  
+  .stats {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .floating-buttons {
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .floating-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-buttons {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .cta-button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .cookie-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .cookie-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .hero-content h1 {
+    font-size: 32px;
+  }
+  
+  .hero-content p {
+    font-size: 16px;
+  }
+}
 
 </style>
 </head>
