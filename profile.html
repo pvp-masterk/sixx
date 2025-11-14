@@ -1,3 +1,5 @@
+<!-- Paste your updated HTML/JS here. I will modify it based on your request. -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -781,27 +783,39 @@ header.scrolled {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) return (window.location.href = "/");
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewId = urlParams.get("id");
     const user = session.user;
+    const targetId = viewId || user.id;
 
-    document.getElementById("avatar").src = user.user_metadata.avatar_url || "";
-    document.getElementById("name").textContent = user.user_metadata.full_name || "Unknown User";
-    document.getElementById("user-id").textContent = user.id;
+    const isOwnProfile = targetId === user.id;
+    document.getElementById("edit-profile").style.display = isOwnProfile ? "block" : "none";
 
-    const discordId = user.user_metadata.provider_id;
-    document.getElementById("discord-id").textContent = discordId || "Not connected";
-
-    document.getElementById("account-created").textContent = new Date(user.created_at).toLocaleDateString();
-    document.getElementById("last-login").textContent = new Date(user.last_sign_in_at).toLocaleDateString();
-
-    // Auto Discord badges
-    const discordData = await getDiscordFlags(user);
-    if (discordData && discordData.flags !== undefined) {
-      const autoKeys = convertDiscordFlags(discordData.flags);
-      displayAutoBadges(autoKeys);
+    let profileUser = user;
+    if (viewId) {
+      const result = await sb.auth.admin.getUserById(targetId);
+      profileUser = result.data.user;
     }
 
-    // Manual /six badges
-    displayUserBadges(user.id);
+    document.getElementById("avatar").src = profileUser.user_metadata.avatar_url || "";
+    document.getElementById("name").textContent = profileUser.user_metadata.full_name || "Unknown User";
+    document.getElementById("user-id").textContent = profileUser.id;
+
+    const discordId = profileUser.user_metadata.provider_id;
+    document.getElementById("discord-id").textContent = discordId || "Not connected";
+
+    document.getElementById("account-created").textContent = new Date(profileUser.created_at).toLocaleDateString();
+    document.getElementById("last-login").textContent = new Date(profileUser.last_sign_in_at).toLocaleDateString();
+
+    if (!viewId) {
+      const discordData = await getDiscordFlags(profileUser);
+      if (discordData && discordData.flags !== undefined) {
+        const autoKeys = convertDiscordFlags(discordData.flags);
+        displayAutoBadges(autoKeys);
+      }
+    }
+
+    displayUserBadges(profileUser.id);
 
     document.getElementById("loading-buffer").style.display = "none";
   }
