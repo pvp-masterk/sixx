@@ -1894,49 +1894,6 @@ function closeBannerModal(){
 }
 
 </script>
- <!-- LOGIN MODAL -->
-<div class="modal" id="loginModal">
-  <div class="modal-content login-modal">
-    <h2 style="margin-bottom:18px">Login to /six</h2>
-
-    <button id="googleLoginBtn" class="login-google">
-      <img src="https://th.bing.com/th/id/R.1e01fe36388e7453ab926c23b190827c?rik=pQoqct3ys2U8zg&pid=ImgRaw&r=0" class="login-icon" />
-      Continue with Google
-    </button>
-
-    <button id="discordLoginBtn" class="login-discord">
-      <img src="https://static.vecteezy.com/system/resources/previews/018/930/604/original/discord-logo-discord-icon-transparent-free-png.png" class="login-icon" />
-      Continue with Discord
-    </button>
-
-    <button id="closeLoginBtn" class="glass-btn login-close">Close</button>
-  </div>
-</div>
-
-
-<script>
- // Open / Close login modal
-document.getElementById("closeLoginBtn").onclick = () => {
-  document.getElementById("loginModal").classList.remove("active");
-};
-
-// GOOGLE LOGIN
-document.getElementById("googleLoginBtn").onclick = async () => {
-  await sb.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: window.location.origin + "/profile.html" }
-  });
-};
-
-// DISCORD LOGIN
-document.getElementById("discordLoginBtn").onclick = async () => {
-  await sb.auth.signInWithOAuth({
-    provider: "discord",
-    options: { redirectTo: window.location.origin + "/profile.html" }
-  });
-};
-
-</script>
 
 </body>
 </html>
