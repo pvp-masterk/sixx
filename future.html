@@ -11,7 +11,6 @@
 :root{
   --bg:#05030a;
   --accent:#8b5cf6;
-  --accent-soft:rgba(139,92,246,.2);
   --text:#eae6ff;
   --muted:#9f9bb3;
 }
@@ -25,7 +24,7 @@ body{
   overflow-x:hidden;
 }
 
-/* ================= GRID + DATA NODES ================= */
+/* Grid */
 .neural-grid{
   position:fixed;
   inset:0;
@@ -34,27 +33,26 @@ body{
     linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
   background-size:60px 60px;
   pointer-events:none;
-  z-index:0;
 }
 
+/* Animated Data Nodes */
 .data-nodes::before{
   content:'';
   position:fixed;
   inset:0;
   background:
-    radial-gradient(circle at 20% 30%,rgba(139,92,246,.18),transparent 40%),
+    radial-gradient(circle at 20% 30%,rgba(139,92,246,.2),transparent 40%),
     radial-gradient(circle at 80% 70%,rgba(139,92,246,.15),transparent 45%);
-  animation: drift 22s linear infinite;
-  pointer-events:none;
+  animation: drift 20s linear infinite;
 }
 
 @keyframes drift{
   0%{transform:translate(0,0)}
-  50%{transform:translate(-25px,18px)}
+  50%{transform:translate(-20px,15px)}
   100%{transform:translate(0,0)}
 }
 
-/* ================= HEADER ================= */
+/* Header */
 .hud-top{
   position:fixed;
   top:0;
@@ -68,11 +66,10 @@ body{
   z-index:10;
 }
 
-/* ================= LAYOUT ================= */
+/* Layout */
 .hud{
+  padding:120px 10vw 100px;
   position:relative;
-  z-index:1;
-  padding:120px 10vw 120px;
 }
 
 .hero h1{
@@ -82,25 +79,17 @@ body{
 }
 
 .hero span{color:var(--accent)}
-.hero p{
-  margin-top:14px;
-  max-width:420px;
-  color:var(--muted);
-}
+.hero p{margin-top:14px;color:var(--muted)}
 
-/* ================= SECTIONS ================= */
-.hud-section{
-  margin-top:90px;
-}
-
+.hud-section{margin-top:90px}
 .hud-section h2{
-  font-size:13px;
+  font-size:14px;
   letter-spacing:3px;
   color:var(--muted);
-  margin-bottom:26px;
+  margin-bottom:24px;
 }
 
-/* ================= CARDS ================= */
+/* Cards */
 .hud-cards{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
@@ -132,48 +121,26 @@ body{
 
 .hud-card p{
   margin-top:6px;
-  font-size:14px;
   color:var(--muted);
+  font-size:14px;
 }
 
-/* ================= CONTEXT EXPANSION (iOS STYLE) ================= */
+/* CONTEXT MODAL (iOS-style expansion) */
 .hud-card.expanded{
   position:fixed;
   inset:80px 8vw;
   background:#080510;
   z-index:50;
-  padding:40px;
-  border-left:4px solid var(--accent);
   transform:none !important;
-  animation: expand .45s cubic-bezier(.2,.9,.2,1);
+  padding:40px;
+  animation: expand .5s cubic-bezier(.2,.9,.2,1);
 }
 
 @keyframes expand{
-  from{transform:scale(.96);opacity:.6}
+  from{transform:scale(.95);opacity:.6}
   to{transform:scale(1);opacity:1}
 }
 
-.expanded .details{
-  margin-top:30px;
-  color:var(--muted);
-  line-height:1.6;
-}
-
-.close-btn{
-  margin-top:26px;
-  background:none;
-  border:1px solid var(--accent);
-  color:var(--accent);
-  padding:10px 22px;
-  font-weight:700;
-  letter-spacing:2px;
-  cursor:pointer;
-}
-
-/* ================= REDUCED MOTION ================= */
-@media (prefers-reduced-motion: reduce){
-  *{animation:none!important;transition:none!important}
-}
 </style>
 </head>
 <body>
@@ -182,8 +149,8 @@ body{
 <div class="data-nodes"></div>
 
 <header class="hud-top">
-  <span>/six — COMMAND INTERFACE</span>
-  <span>STATUS: ACTIVE</span>
+  <span>/six — COMMAND</span>
+  <span>MODE: ACTIVE</span>
 </header>
 
 <main class="hud">
@@ -191,26 +158,24 @@ body{
   <!-- HERO -->
   <section class="hero">
     <h1>THE UI<br><span>OF THE FUTURE</span></h1>
-    <p>Not a redesign. A control system.</p>
+    <p>Command. Observe. Dominate.</p>
   </section>
 
   <!-- PROFILES -->
   <section class="hud-section">
     <h2>OPERATORS</h2>
     <div class="hud-cards">
-
-      <div class="hud-card" data-type="profile">
+      <div class="hud-card profile" data-expand="profile">
         <span class="label">IGN</span>
         <h3>PSX</h3>
         <p>Crystal PvP Specialist</p>
       </div>
 
-      <div class="hud-card" data-type="profile">
+      <div class="hud-card profile" data-expand="profile">
         <span class="label">IGN</span>
         <h3>VEX</h3>
         <p>Anchor / Tactical Lead</p>
       </div>
-
     </div>
   </section>
 
@@ -218,62 +183,54 @@ body{
   <section class="hud-section">
     <h2>WAR DASHBOARD</h2>
     <div class="hud-cards">
-
-      <div class="hud-card" data-type="war">
-        <span class="label">ENGAGEMENT</span>
+      <div class="hud-card war" data-expand="war">
+        <span class="label">STATUS</span>
         <h3>/six vs VOID</h3>
         <p>DOMINANT — 4 : 1</p>
       </div>
-
     </div>
   </section>
+
 
 </main>
 
 <script>
 (() => {
-  let active = null;
+  let activeCard = null;
 
   document.querySelectorAll(".hud-card").forEach(card => {
     card.addEventListener("click", () => {
-      if(active) return;
+      if(activeCard) return;
 
-      active = card;
+      activeCard = card;
       card.classList.add("expanded");
 
-      const type = card.dataset.type;
-
-      const details = document.createElement("div");
-      details.className = "details";
-
-      details.innerHTML = type === "profile"
-        ? `
-          <p>Neural sync complete.</p>
-          <p>Combat efficiency: EXTREME</p>
-          <p>Primary role: Frontline pressure</p>
+      card.innerHTML += `
+        <div style="margin-top:30px;color:#9f9bb3">
+          <p>Neural data synced.</p>
+          <p>Combat efficiency: HIGH</p>
           <p>Latency: 0.0ms</p>
-        `
-        : `
-          <p>War state: CONTROLLED</p>
-          <p>Enemy morale: COLLAPSED</p>
-          <p>Duration: 42 minutes</p>
-          <p>MVPs: PSX, VEX</p>
-        `;
+          <br>
+          <button id="closeHud"
+            style="
+              background:none;
+              border:1px solid var(--accent);
+              color:var(--accent);
+              padding:10px 20px;
+              cursor:pointer;">
+            CLOSE INTERFACE
+          </button>
+        </div>
+      `;
 
-      const close = document.createElement("button");
-      close.className = "close-btn";
-      close.textContent = "CLOSE INTERFACE";
-
-      close.onclick = () => {
+      document.getElementById("closeHud").onclick = () => {
         card.classList.remove("expanded");
-        location.reload(); // reset cleanly
+        location.reload(); // reset state cleanly
       };
-
-      card.appendChild(details);
-      card.appendChild(close);
     });
   });
 })();
+
 </script>
 
 </body>
