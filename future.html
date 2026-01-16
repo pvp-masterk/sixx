@@ -408,7 +408,7 @@ document.addEventListener('mousemove', (e) => {
   document.body.style.setProperty('--mouse-y', mouseY + 'px');
   
   // Instant dot movement
-  cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+  cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
 });
 
 // Smooth circle movement
