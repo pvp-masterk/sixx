@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>/six — The UI of the Future</title>
+<title>/six — Interface</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Fonts: Inter for Headers, JetBrains Mono for Data -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -14,35 +12,27 @@
 :root{
   --bg: #030205;
   --accent: #7c3aed;
-  --accent-glow: rgba(124, 58, 237, 0.4);
   --text: #eae6ff;
   --muted: #8882a0;
-  --glass: rgba(10, 10, 15, 0.6);
+  --glass: rgba(20, 20, 25, 0.7);
   --border: rgba(255, 255, 255, 0.08);
-  --font-main: 'Inter', sans-serif;
-  --font-data: 'JetBrains Mono', monospace;
+  --easing: cubic-bezier(0.19, 1, 0.22, 1); /* Apple-style ease */
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
 
 body{
-  font-family: var(--font-main);
+  font-family: 'Inter', sans-serif;
   background: var(--bg);
   color: var(--text);
-  overflow-x: hidden;
-  min-height: 100vh;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
+
+body.locked { overflow: hidden; } /* Lock scroll when modal is open */
 
 /* --- BACKGROUND FX --- */
-.bg-layer {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Grid */
 .neural-grid {
+  position: fixed; inset: 0; z-index: -1;
   background:
     linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
@@ -50,130 +40,48 @@ body{
   mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
 }
 
-/* Ambient Glows */
-.data-nodes::before, .data-nodes::after {
-  content:'';
-  position:absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.4;
-  animation: drift 15s ease-in-out infinite alternate;
-}
-.data-nodes::before {
-  width: 400px; height: 400px;
-  background: var(--accent);
-  top: -100px; left: -100px;
-}
-.data-nodes::after {
-  width: 600px; height: 600px;
-  background: #2d1b69;
-  bottom: -100px; right: -200px;
-  animation-delay: -5s;
+.data-nodes {
+  position: fixed; inset: 0; z-index: -1;
+  background: radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.15), transparent 40%);
 }
 
-@keyframes drift {
-  0% { transform: translate(0,0); }
-  100% { transform: translate(50px, 30px); }
-}
-
-/* Scanlines & Grain */
-.noise-overlay {
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-  opacity: 0.4;
-  mix-blend-mode: overlay;
-}
-.scanlines {
-  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
-  background-size: 100% 4px;
-  z-index: 2;
-}
-
-/* --- UI COMPONENTS --- */
-
-/* Header */
-.hud-top{
-  position: fixed;
-  top: 0;
-  width: 100%;
-  padding: 20px 30px;
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--font-data);
-  font-size: 11px;
-  letter-spacing: 1px;
-  color: var(--muted);
-  z-index: 100;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  background: rgba(5,3,10,0.8);
+/* --- LAYOUT --- */
+.hud-top {
+  position: fixed; top: 0; width: 100%; padding: 20px 30px;
+  display: flex; justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--muted); z-index: 100;
   backdrop-filter: blur(5px);
-}
-.status-dot {
-  display: inline-block;
-  width: 6px; height: 6px;
-  background: #0f0;
-  border-radius: 50%;
-  margin-left: 8px;
-  box-shadow: 0 0 8px #0f0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-/* Layout */
 .hud {
-  position: relative;
-  z-index: 10;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 140px 24px 100px;
+  max-width: 1200px; margin: 0 auto; padding: 140px 24px 100px;
+  transition: opacity 0.4s ease, transform 0.4s var(--easing);
 }
 
-/* Hero */
-.hero { margin-bottom: 80px; }
+/* When modal is open, push the background back slightly (iOS style) */
+body.locked .hud {
+  transform: scale(0.95);
+  opacity: 0.5;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
 .hero h1 {
-  font-size: clamp(3.5rem, 8vw, 6rem);
-  font-weight: 900;
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-  text-shadow: 0 0 40px rgba(139,92,246,0.3);
-  position: relative;
+  font-size: clamp(3rem, 7vw, 5rem);
+  font-weight: 900; line-height: 0.95; margin-bottom: 20px;
 }
 .hero span { color: var(--accent); }
-.hero p {
-  margin-top: 20px;
-  color: var(--muted);
-  font-family: var(--font-data);
-  font-size: 14px;
-  max-width: 400px;
-  line-height: 1.6;
-}
 
-/* Glitch Effect on Hover */
-.glitch-wrapper:hover {
-  animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
-  color: var(--accent);
-}
-@keyframes glitch-anim {
-  0% { transform: translate(0) }
-  20% { transform: translate(-2px, 2px) }
-  40% { transform: translate(-2px, -2px) }
-  60% { transform: translate(2px, 2px) }
-  80% { transform: translate(2px, -2px) }
-  100% { transform: translate(0) }
-}
-
-/* Sections */
 .hud-section { margin-top: 60px; }
 .section-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 32px;
-  font-family: var(--font-data);
-  font-size: 12px;
-  color: var(--muted);
-  letter-spacing: 2px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--muted); letter-spacing: 2px; margin-bottom: 24px;
+  border-bottom: 1px solid var(--border); padding-bottom: 10px;
 }
-.line { flex: 1; height: 1px; background: var(--border); }
 
-/* Cards */
+/* --- CARDS --- */
 .hud-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -181,256 +89,264 @@ body{
 }
 
 .hud-card {
-  position: relative;
   background: var(--glass);
   border: 1px solid var(--border);
   padding: 30px;
+  border-radius: 16px; /* Smooth corners */
   cursor: pointer;
-  transition: all 0.3s ease;
+  position: relative;
   overflow: hidden;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.2s ease, opacity 0.2s;
 }
 
-/* Cyber Corners */
-.hud-card::before, .hud-card::after {
-  content: ''; position: absolute;
-  width: 10px; height: 10px;
-  transition: 0.3s;
-}
-.hud-card::before { top: 0; left: 0; border-top: 2px solid var(--muted); border-left: 2px solid var(--muted); }
-.hud-card::after { bottom: 0; right: 0; border-bottom: 2px solid var(--muted); border-right: 2px solid var(--muted); }
+.hud-card:active { transform: scale(0.98); }
 
-.hud-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--accent);
-  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
-}
-.hud-card:hover::before, .hud-card:hover::after {
-  border-color: var(--accent);
-  width: 100%; height: 100%; /* Expand borders */
-  opacity: 0.1;
-}
+/* Hide original card when clone is active */
+.hud-card.is-hidden { opacity: 0; pointer-events: none; }
 
 .label {
-  font-family: var(--font-data);
-  font-size: 10px;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-  display: block;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--accent); margin-bottom: 8px; display: block;
 }
-
-.hud-card h3 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+.hud-card h3 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
 .hud-card p { color: var(--muted); font-size: 14px; }
 
-/* MODAL / EXPANDED STATE */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(8px);
-  z-index: 999;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal-overlay.active { opacity: 1; pointer-events: auto; }
-
-.modal-content {
-  background: #0a0a12;
-  border: 1px solid var(--accent);
-  width: 90%;
-  max-width: 600px;
-  padding: 40px;
-  position: relative;
-  transform: scale(0.9) translateY(20px);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 0 100px rgba(124, 58, 237, 0.15);
-}
-.modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
-
-/* Decoration in Modal */
-.modal-grid {
-  position: absolute; inset: 0; pointer-events: none;
-  background:
-    linear-gradient(rgba(124, 58, 237, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(124, 58, 237, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
+/* The hidden content inside every card */
+.card-content-expanded {
+  display: none; /* Hidden by default */
+  margin-top: 30px;
+  border-top: 1px dashed var(--border);
+  padding-top: 20px;
+  animation: fadeIn 0.4s 0.2s backwards;
 }
 
 .stat-row {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px dashed var(--border);
-  padding: 12px 0;
-  font-family: var(--font-data);
-  font-size: 13px;
-  color: var(--muted);
+  display: flex; justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  color: var(--muted); margin-bottom: 12px;
 }
-.stat-row span:last-child { color: var(--text); }
+.stat-row b { color: var(--text); }
 
-.btn-close {
-  margin-top: 30px;
-  width: 100%;
-  padding: 16px;
-  background: rgba(124, 58, 237, 0.1);
+/* --- THE CLONE (ANIMATING MODAL) --- */
+.card-clone {
+  position: fixed;
+  top: 0; left: 0;
+  background: #0f0f13; /* Solid dark bg for the clone */
   border: 1px solid var(--accent);
-  color: var(--accent);
-  font-family: var(--font-data);
-  font-weight: bold;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: 0.2s;
-}
-.btn-close:hover {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 0 20px var(--accent-glow);
+  border-radius: 16px;
+  z-index: 999;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  transform-origin: top left;
+  will-change: transform, width, height, top, left, border-radius;
+  /* The Magic Transition */
+  transition: all 0.5s var(--easing); 
 }
 
-/* Hidden elements to populate modal */
-.hidden-details { display: none; }
+/* State: EXPANDED (Centered on screen) */
+.card-clone.expanded {
+  border-radius: 24px;
+  box-shadow: 0 0 0 100vmax rgba(0,0,0,0.6); /* Backdrop dimming */
+  z-index: 1000;
+}
+
+/* Close Button (Only visible in clone) */
+.close-btn {
+  position: absolute; top: 20px; right: 20px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: none; color: #fff;
+  cursor: pointer;
+  display: grid; place-items: center;
+  opacity: 0;
+  transition: 0.3s;
+}
+.card-clone.expanded .close-btn { opacity: 1; transition-delay: 0.3s; }
+.card-clone.expanded .card-content-expanded { display: block; }
+
+@keyframes fadeIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
 
 </style>
 </head>
 <body>
 
-<!-- Ambient Layers -->
-<div class="bg-layer neural-grid"></div>
-<div class="bg-layer data-nodes"></div>
-<div class="bg-layer noise-overlay"></div>
-<div class="bg-layer scanlines"></div>
+<div class="neural-grid"></div>
+<div class="data-nodes"></div>
 
 <header class="hud-top">
   <span>/six SYSTEM</span>
-  <span>ONLINE <span class="status-dot"></span></span>
+  <span>MODE: INTERACTIVE</span>
 </header>
 
-<main class="hud">
+<main class="hud" id="mainContent">
 
-  <!-- HERO -->
   <section class="hero">
-    <h1 class="glitch-wrapper">THE UI<br><span>OF THE FUTURE</span></h1>
-    <p>> Initializing visual interface...<br>> Targeting optimal user experience.</p>
+    <h1>THE UI<br><span>OF THE FUTURE</span></h1>
+    <p>Fluid Dynamics. Zero Latency.</p>
   </section>
 
   <!-- OPERATORS -->
   <section class="hud-section">
-    <div class="section-header">
-      <h2>OPERATORS</h2> <div class="line"></div> <span>01</span>
-    </div>
-    
+    <div class="section-header">OPERATORS // 01</div>
     <div class="hud-cards">
+      
       <!-- CARD 1 -->
-      <div class="hud-card" onclick="openModal('PSX', 'Crystal PvP Specialist', 'Combat Efficiency: 98%<br>Latency: 4ms<br>Rank: Grandmaster')">
-        <span class="label">LEADER</span>
-        <h3>PSX</h3>
-        <p>Crystal PvP Specialist</p>
+      <div class="hud-card" onclick="expandCard(this)">
+        <div class="card-inner">
+          <span class="label">LEADER</span>
+          <h3>PSX</h3>
+          <p>Crystal PvP Specialist</p>
+          
+          <!-- Hidden Details -->
+          <div class="card-content-expanded">
+            <div class="stat-row"><span>Combat Efficiency</span><b>98.4%</b></div>
+            <div class="stat-row"><span>Latency</span><b>4ms</b></div>
+            <div class="stat-row"><span>Preferred Weapon</span><b>Netherite Blade</b></div>
+            <div class="stat-row"><span>Status</span><b style="color:#4ade80">ONLINE</b></div>
+            <br>
+            <p>Operator PSX serves as the primary engagement specialist. Advanced tracking algorithms enabled.</p>
+          </div>
+        </div>
       </div>
 
       <!-- CARD 2 -->
-      <div class="hud-card" onclick="openModal('VEX', 'Anchor / Tactician', 'Shield Uptime: 92%<br>Callouts: Precision<br>Status: Deployed')">
-        <span class="label">OFFICER</span>
-        <h3>VEX</h3>
-        <p>Anchor / Tactical Lead</p>
+      <div class="hud-card" onclick="expandCard(this)">
+        <div class="card-inner">
+          <span class="label">TACTICIAN</span>
+          <h3>VEX</h3>
+          <p>Anchor / Logistics</p>
+           
+          <div class="card-content-expanded">
+            <div class="stat-row"><span>Shield Uptime</span><b>92%</b></div>
+            <div class="stat-row"><span>Resupply Rate</span><b>High</b></div>
+            <div class="stat-row"><span>Status</span><b style="color:orange">AWAY</b></div>
+            <br>
+            <p>VEX manages resource distribution and defensive positioning. Vital for sustained engagements.</p>
+          </div>
+        </div>
       </div>
-      
-       <!-- CARD 3 -->
-       <div class="hud-card" onclick="openModal('KAI', 'Roamer / DPS', 'K/D Ratio: 3.4<br>Movement: Hyper<br>Status: Training')">
-        <span class="label">MEMBER</span>
-        <h3>KAI</h3>
-        <p>Roamer / DPS</p>
-      </div>
+
     </div>
   </section>
-
+  
   <!-- WARS -->
   <section class="hud-section">
-    <div class="section-header">
-      <h2>CONFLICTS</h2> <div class="line"></div> <span>02</span>
-    </div>
+    <div class="section-header">CONFLICTS // 02</div>
     <div class="hud-cards">
-      <div class="hud-card" onclick="openModal('/six vs VOID', 'Dominant Victory', 'Score: 4 - 1<br>Duration: 45m<br>MVP: PSX')">
-        <span class="label">ACTIVE WAR</span>
-        <h3 style="color:#fff">/six vs VOID</h3>
-        <p style="color:#4ade80">WINNING — 4 : 1</p>
-      </div>
-      <div class="hud-card" onclick="openModal('/six vs NEXUS', 'Pending Match', 'Date: 24/10<br>Predicted Win Rate: 78%')">
-        <span class="label">UPCOMING</span>
-        <h3>/six vs NEXUS</h3>
-        <p>PREPARING</p>
+      <div class="hud-card" onclick="expandCard(this)">
+        <div class="card-inner">
+          <span class="label">ACTIVE WAR</span>
+          <h3 style="color:#fff">/six vs VOID</h3>
+          <p style="color:#4ade80">WINNING — 4 : 1</p>
+          
+          <div class="card-content-expanded">
+            <div class="stat-row"><span>Duration</span><b>45m 20s</b></div>
+            <div class="stat-row"><span>Kills</span><b>124</b></div>
+            <div class="stat-row"><span>Deaths</span><b>32</b></div>
+            <br>
+            <div style="height:4px; background:#333; border-radius:2px; overflow:hidden">
+              <div style="width:80%; height:100%; background:var(--accent)"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:10px; color:#888;">
+              <span>/six</span>
+              <span>VOID</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
 </main>
 
-<!-- MODAL OVERLAY -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal-content">
-    <div class="modal-grid"></div>
-    <span class="label" id="mLabel">DETAILS</span>
-    <h3 id="mTitle">TITLE</h3>
-    <p id="mSubtitle" style="margin-bottom: 20px; color:var(--muted)">Subtitle</p>
-    
-    <div id="mStats">
-      <!-- JS injects stats here -->
-    </div>
-
-    <button class="btn-close" onclick="closeModal()">Termimate Session</button>
-  </div>
-</div>
-
 <script>
-const modal = document.getElementById('modalOverlay');
-const mTitle = document.getElementById('mTitle');
-const mSubtitle = document.getElementById('mSubtitle');
-const mStats = document.getElementById('mStats');
+let activeClone = null;
+let originalCard = null;
 
-function openModal(title, subtitle, statsHtml) {
-  // Populate Data
-  mTitle.innerText = title;
-  mSubtitle.innerText = subtitle;
+function expandCard(card) {
+  if (activeClone) return; // Prevent double clicks
+
+  originalCard = card;
   
-  // Convert basic BR tags to styled rows
-  const lines = statsHtml.split('<br>');
-  let html = '';
-  lines.forEach(line => {
-    const parts = line.split(':');
-    if(parts.length > 1) {
-      html += `
-        <div class="stat-row">
-          <span>${parts[0]}</span>
-          <span>${parts[1]}</span>
-        </div>`;
-    } else {
-       html += `<div class="stat-row"><span>Info</span><span>${line}</span></div>`;
-    }
+  // 1. Get coordinates of the clicked card
+  const rect = card.getBoundingClientRect();
+
+  // 2. Create the Clone
+  const clone = card.cloneNode(true);
+  clone.classList.remove('hud-card'); // Remove base class to avoid grid conflicts
+  clone.classList.add('card-clone');
+  
+  // Add Close Button to Clone
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'close-btn';
+  closeBtn.innerHTML = '&times;';
+  closeBtn.onclick = (e) => { e.stopPropagation(); closeCard(); };
+  clone.appendChild(closeBtn);
+
+  // 3. Position Clone exactly over original
+  clone.style.top = rect.top + 'px';
+  clone.style.left = rect.left + 'px';
+  clone.style.width = rect.width + 'px';
+  clone.style.height = rect.height + 'px';
+
+  document.body.appendChild(clone);
+
+  // 4. Hide original
+  requestAnimationFrame(() => {
+    card.classList.add('is-hidden');
+    document.body.classList.add('locked'); // Lock scroll
+
+    // 5. Expand Clone (Next Frame to allow CSS transition)
+    requestAnimationFrame(() => {
+      clone.classList.add('expanded');
+      
+      // Calculate centered position
+      const isMobile = window.innerWidth < 768;
+      const targetWidth = isMobile ? window.innerWidth * 0.9 : 600;
+      const targetHeight = isMobile ? window.innerHeight * 0.8 : 500;
+      const targetTop = (window.innerHeight - targetHeight) / 2;
+      const targetLeft = (window.innerWidth - targetWidth) / 2;
+
+      clone.style.width = targetWidth + 'px';
+      clone.style.height = targetHeight + 'px';
+      clone.style.top = targetTop + 'px';
+      clone.style.left = targetLeft + 'px';
+    });
   });
+
+  activeClone = clone;
+}
+
+function closeCard() {
+  if (!activeClone || !originalCard) return;
+
+  // 1. Get original coordinates again (in case user scrolled or resized)
+  const rect = originalCard.getBoundingClientRect();
+
+  // 2. Animate Clone back to original position
+  activeClone.classList.remove('expanded');
+  activeClone.style.width = rect.width + 'px';
+  activeClone.style.height = rect.height + 'px';
+  activeClone.style.top = rect.top + 'px';
+  activeClone.style.left = rect.left + 'px';
   
-  mStats.innerHTML = html;
+  document.body.classList.remove('locked');
 
-  // Show Modal
-  modal.classList.add('active');
+  // 3. Wait for transition to finish, then cleanup
+  activeClone.addEventListener('transitionend', function() {
+    if (this.parentNode) {
+      this.parentNode.removeChild(this);
+    }
+    originalCard.classList.remove('is-hidden');
+    activeClone = null;
+    originalCard = null;
+  }, { once: true });
 }
 
-function closeModal() {
-  modal.classList.remove('active');
-}
-
-// Close on background click
-modal.addEventListener('click', (e) => {
-  if (e.target === modal) closeModal();
-});
-
-// Escape key support
+// Close on Escape key
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape' && activeClone) closeCard();
 });
 </script>
 
