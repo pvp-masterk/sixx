@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>/six — OS</title>
+<title>/six — System 7.0</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,463 +10,363 @@
 
 <style>
 :root {
-  --bg: #050508;
-  --surface: rgba(255, 255, 255, 0.03);
-  --surface-highlight: rgba(255, 255, 255, 0.08);
-  --border: rgba(255, 255, 255, 0.06);
-  --primary: #6d28d9;
-  --primary-glow: #8b5cf6;
-  --accent: #00f0ff;
-  --text-main: #ffffff;
-  --text-muted: #8a8a9b;
+  --bg: #030304;
+  --surface: rgba(20, 20, 25, 0.4);
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #00f3ff; /* Cyber Cyan */
+  --accent-glow: rgba(0, 243, 255, 0.4);
+  --primary: #7000ff; /* Deep Purple */
+  --text: #ffffff;
+  --text-muted: #7a7a85;
   
-  --ease-elastic: cubic-bezier(0.19, 1, 0.22, 1);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Physics Constants */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-back: cubic-bezier(0.6, -0.28, 0.735, 0.045);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; cursor: none; /* Hide default cursor */ }
+* { box-sizing: border-box; margin: 0; padding: 0; cursor: none; }
 
 body {
   font-family: 'Inter', sans-serif;
   background-color: var(--bg);
-  color: var(--text-main);
-  overflow-x: hidden;
-  height: 100vh;
-  width: 100vw;
+  color: var(--text);
+  overflow: hidden; /* App-like feel */
+  height: 100vh; width: 100vw;
 }
 
-/* --- AMBIENT BACKGROUND --- */
-.ambient-layer {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+/* --- AMBIENCE --- */
+.scanline {
+  position: fixed; inset: 0; pointer-events: none; z-index: 9000;
+  background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3) 51%);
+  background-size: 100% 4px;
+  opacity: 0.6;
 }
-.noise {
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.07'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
+.vignette {
+  position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  background: radial-gradient(circle at center, transparent 0%, #000 120%);
 }
-.grid-lines {
-  background: 
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 80px 80px;
-  mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
-}
-.glow-orb {
-  width: 60vw; height: 60vw;
-  background: radial-gradient(circle, rgba(109, 40, 217, 0.15), transparent 70%);
-  position: absolute; top: -20%; left: -10%;
-  animation: breathe 10s ease-in-out infinite alternate;
-}
-
-@keyframes breathe { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.1); opacity: 0.8; } }
-
-/* --- CUSTOM CURSOR --- */
-.cursor-dot, .cursor-circle {
-  position: fixed; top: 0; left: 0;
-  pointer-events: none; z-index: 9999;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-.cursor-dot { width: 4px; height: 4px; background: var(--accent); }
-.cursor-circle {
-  width: 40px; height: 40px;
-  border: 1px solid rgba(255,255,255,0.2);
-  transition: width 0.2s, height 0.2s, background 0.2s;
-}
-.cursor-circle.hovered {
-  width: 60px; height: 60px;
-  background: rgba(255,255,255,0.05);
-  border-color: var(--accent);
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform: perspective(1000px) rotateX(10deg) scale(1.5);
+  transform-origin: top center;
+  opacity: 0.5;
 }
 
-/* --- MAIN CONTAINER --- */
-#app-container {
-  padding: 80px 5vw 120px;
-  transition: transform 0.6s var(--ease-elastic), opacity 0.6s;
-  transform-origin: center 20vh;
+/* --- CURSOR --- */
+#cursor {
+  position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none;
+  mix-blend-mode: difference;
 }
-body.has-modal #app-container {
-  transform: scale(0.92) translateY(-20px);
-  opacity: 0.4;
-  filter: blur(4px) grayscale(50%);
+.c-dot { width: 6px; height: 6px; background: white; border-radius: 50%; position: absolute; transform: translate(-50%, -50%); }
+.c-ring { 
+  width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.5); 
+  border-radius: 50%; position: absolute; transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, border-color 0.2s;
+}
+body:hover .c-ring.active { width: 60px; height: 60px; border-color: var(--accent); background: rgba(255,255,255,0.05); }
+
+/* --- LAYOUT --- */
+#app-root {
+  height: 100%; overflow-y: auto; padding: 100px 5vw;
+  transition: transform 0.6s var(--ease-out-expo), filter 0.6s;
+}
+body.modal-open #app-root {
+  transform: scale(0.92) translateY(-30px);
+  filter: blur(8px) brightness(0.6);
   pointer-events: none;
 }
 
-/* --- HERO --- */
-.hero { margin-bottom: 100px; position: relative; }
-.hero-tag {
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--accent); font-size: 12px; letter-spacing: 2px;
-  margin-bottom: 16px; display: block;
-  opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
-}
+.hero { margin-bottom: 80px; position: relative; z-index: 2; }
 .hero h1 {
-  font-size: clamp(3rem, 8vw, 7rem);
-  font-weight: 300; line-height: 0.9;
-  letter-spacing: -0.05em;
-  background: linear-gradient(to right, #fff, #888);
+  font-size: clamp(3rem, 7vw, 6rem); font-weight: 900;
+  text-transform: uppercase; line-height: 0.9; letter-spacing: -2px;
+  background: linear-gradient(180deg, #fff, #666);
   -webkit-background-clip: text; color: transparent;
-  opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
 }
-.hero p {
-  margin-top: 24px; max-width: 500px;
-  color: var(--text-muted); line-height: 1.6;
-  opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
-}
-
-/* --- GRID SYSTEM --- */
-.bento-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
-}
+.hero p { font-family: 'JetBrains Mono'; color: var(--accent); margin-top: 20px; letter-spacing: 1px; }
 
 /* --- CARDS --- */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+
 .card {
-  position: relative;
+  height: 340px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 32px;
-  height: 320px;
-  display: flex; flex-direction: column; justify-content: space-between;
-  transition: border-color 0.3s, transform 0.3s;
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 20px;
+  position: relative;
+  transition: 0.3s;
   overflow: hidden;
 }
-
-/* Card Hover Light Effect */
-.card::before {
-  content: ""; position: absolute; inset: 0;
-  background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
-  opacity: 0; transition: opacity 0.5s; pointer-events: none;
+.card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255,255,255,0.2);
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
 }
-.card:hover::before { opacity: 1; }
-.card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-4px); }
-
-/* Card Content */
-.card-header { display: flex; justify-content: space-between; align-items: flex-start; }
-.icon-box {
-  width: 48px; height: 48px; border-radius: 12px;
-  background: rgba(255,255,255,0.05);
-  display: grid; place-items: center; font-size: 20px;
-  border: 1px solid var(--border);
-}
-.status-badge {
-  font-family: 'JetBrains Mono'; font-size: 10px;
-  padding: 6px 10px; border-radius: 100px;
-  background: rgba(0, 240, 255, 0.1); color: var(--accent);
-  border: 1px solid rgba(0, 240, 255, 0.2);
-}
-
-.card h3 { font-size: 28px; font-weight: 500; margin-bottom: 8px; }
-.card-sub { color: var(--text-muted); font-size: 14px; }
-
-/* Hidden content for expanded state */
-.card-details { display: none; } 
-
-/* --- THE CLONE (MODAL) --- */
-.card-clone {
-  position: fixed; z-index: 1000;
-  background: #0a0a0f;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 24px;
-  transform-origin: top left;
-  will-change: transform, width, height, opacity;
-  overflow: hidden;
-  box-shadow: 0 40px 80px -20px rgba(0,0,0,0.8);
-  /* The core animation transition */
-  transition: all 0.6s var(--ease-elastic);
-}
-
-.card-clone.expanded {
-  border-radius: 32px;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 1px var(--primary-glow), 0 50px 100px rgba(0,0,0,1);
-}
-
-/* Modal Internal Layout */
-.clone-inner {
-  padding: 40px; height: 100%; display: flex; flex-direction: column;
-  opacity: 0; transition: opacity 0.3s 0.2s; /* Fade in content after expand */
-}
-.card-clone.expanded .clone-inner { opacity: 1; }
-
-.modal-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px;
-  height: 100%;
-}
-
-.stat-block {
-  padding: 20px; background: rgba(255,255,255,0.03); border-radius: 16px;
-  border: 1px solid var(--border);
-}
-.stat-label { font-family:'JetBrains Mono'; font-size:11px; color:var(--text-muted); display:block; margin-bottom:8px; }
-.stat-value { font-size: 24px; font-weight: 500; }
-
-.visualizer {
-  height: 100px; width: 100%; display: flex; align-items: flex-end; gap: 4px; margin-top: 20px;
-}
-.bar { flex: 1; background: var(--primary); opacity: 0.5; animation: equalizer 1s infinite ease-in-out; }
-@keyframes equalizer { 0%,100%{height: 20%} 50%{height: 80%} }
-
-/* Close Button */
-.btn-close {
-  position: absolute; top: 30px; right: 30px;
-  width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(255,255,255,0.1); border: none; color: #fff;
-  display: grid; place-items: center;
+/* Holographic corner accents */
+.card::after {
+  content:''; position: absolute; top: 0; right: 0;
+  width: 30px; height: 30px;
+  border-top: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
   opacity: 0; transition: 0.3s;
-  pointer-events: none;
 }
-.card-clone.expanded .btn-close { opacity: 1; pointer-events: auto; }
-.btn-close:hover { background: var(--primary); transform: rotate(90deg); }
+.card:hover::after { opacity: 1; }
 
+.card-title { font-size: 32px; font-weight: 300; margin-top: auto; }
+.card-meta { font-family: 'JetBrains Mono'; color: var(--text-muted); font-size: 12px; }
 
-/* --- COMMAND DOCK (Bottom Nav) --- */
-.dock-wrapper {
-  position: fixed; bottom: 30px; left: 0; width: 100%;
-  display: flex; justify-content: center; z-index: 500;
-  pointer-events: none; /* Let clicks pass through around it */
-}
-.dock {
-  pointer-events: auto;
-  background: rgba(15, 15, 20, 0.6);
-  backdrop-filter: blur(20px);
-  padding: 10px; border-radius: 24px;
+.hidden-content { display: none; } /* Stored data for modal */
+
+/* --- THE FLIP MODAL --- */
+.clone-wrapper {
+  position: fixed; z-index: 1000;
+  background: #08080a;
+  border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.1);
-  display: flex; gap: 10px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  transition: transform 0.4s var(--ease-elastic);
-}
-body.has-modal .dock { transform: translateY(150%); } /* Hide dock when modal open */
-
-.dock-item {
-  width: 50px; height: 50px; border-radius: 16px;
-  background: rgba(255,255,255,0.05);
-  border: none; color: var(--text-muted);
-  font-size: 20px; transition: 0.3s;
-  position: relative; overflow: hidden;
-}
-.dock-item:hover {
-  background: rgba(255,255,255,0.15); color: #fff; transform: translateY(-10px) scale(1.1);
-}
-.dock-item.active { background: var(--primary); color: #fff; }
-.dock-item.active::after {
-  content:''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
-  width: 4px; height: 4px; background: #fff; border-radius: 50%;
+  box-shadow: 0 50px 100px rgba(0,0,0,0.9);
+  transform-origin: top left;
+  overflow: hidden;
+  will-change: transform, width, height, top, left;
+  transition: all 0.6s var(--ease-out-expo); /* The Open Animation */
 }
 
-@keyframes fadeUp { from{opacity:0; transform:translateY(20px)} to{opacity:1; transform:translateY(0)} }
+/* Modal Inner Content */
+.modal-inner {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.3s 0.2s, transform 0.3s 0.2s;
+  padding: 60px 40px; height: 100%;
+  background: radial-gradient(circle at top right, rgba(112, 0, 255, 0.1), transparent 50%);
+}
+.clone-wrapper.expanded .modal-inner { opacity: 1; transform: translateY(0); }
 
-/* Responsive adjustments for modal */
-@media (max-width: 768px) {
-  .modal-grid { grid-template-columns: 1fr; }
-  .hero h1 { font-size: 3.5rem; }
+/* The CLOSING State overrides */
+.clone-wrapper.is-closing {
+  transition: all 0.5s var(--ease-in-back); /* Snappier close */
+  border-color: transparent;
+}
+.clone-wrapper.is-closing .modal-inner {
+  opacity: 0; transition: 0.1s; /* Content vanishes instantly */
+}
+
+/* --- NEW BUTTONS --- */
+
+/* 1. ORBITAL CLOSE BUTTON */
+.btn-orbital {
+  position: absolute; top: 30px; right: 30px;
+  width: 50px; height: 50px;
+  background: transparent; border: none;
+  display: grid; place-items: center;
+  z-index: 10;
+  opacity: 0; transform: scale(0.5) rotate(-90deg);
+  transition: opacity 0.4s 0.3s, transform 0.4s 0.3s;
+}
+.clone-wrapper.expanded .btn-orbital { opacity: 1; transform: scale(1) rotate(0); }
+/* The fade out logic */
+.clone-wrapper.is-closing .btn-orbital { 
+  opacity: 0; transform: scale(0.5); transition: 0.2s; 
+}
+
+.orb-ring {
+  position: absolute; inset: 0; border: 1px dashed var(--accent); border-radius: 50%;
+  animation: spin 10s linear infinite;
+}
+.orb-center { font-size: 20px; color: #fff; }
+.btn-orbital:hover .orb-ring { border-style: solid; box-shadow: 0 0 15px var(--accent-glow); animation-duration: 2s; }
+
+/* 2. CYBER DOCK BUTTONS */
+.dock-container {
+  position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 12px; z-index: 500;
+  transition: 0.4s var(--ease-out-expo);
+}
+body.modal-open .dock-container { transform: translate(-50%, 150%); }
+
+.cyber-btn {
+  position: relative;
+  width: 60px; height: 60px;
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(10px);
+  border: none;
+  color: var(--text-muted);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  transition: 0.3s;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Scanline effect inside button */
+.cyber-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent, var(--accent), transparent);
+  height: 20%; top: -20%; opacity: 0.3;
+  transition: 0.5s;
+}
+.cyber-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.cyber-btn:hover::before { top: 120%; } /* Scan down on hover */
+
+.cyber-btn::after { /* Corner Tick */
+  content:''; position: absolute; bottom: 2px; right: 2px;
+  width: 4px; height: 4px; background: var(--accent); opacity: 0;
+}
+.cyber-btn.active { color: var(--accent); border: 1px solid rgba(0, 243, 255, 0.3); }
+.cyber-btn.active::after { opacity: 1; }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* --- MODAL CONTENT STYLES --- */
+.m-label { font-family: 'JetBrains Mono'; color: var(--accent); font-size: 14px; margin-bottom: 10px; display:block;}
+.m-title { font-size: 60px; font-weight: 900; line-height: 0.9; margin-bottom: 40px; text-transform: uppercase; }
+.data-row { 
+  display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding: 20px 0;
+  font-family: 'JetBrains Mono'; font-size: 14px;
 }
 
 </style>
 </head>
 <body>
 
-<!-- Ambient Layers -->
-<div class="ambient-layer noise"></div>
-<div class="ambient-layer grid-lines"></div>
-<div class="ambient-layer glow-orb"></div>
+<div class="vignette"></div>
+<div class="scanline"></div>
+<div class="bg-grid"></div>
 
-<!-- Cursor -->
-<div class="cursor-dot" id="cDot"></div>
-<div class="cursor-circle" id="cCircle"></div>
+<!-- Custom Cursor -->
+<div id="cursor"><div class="c-dot"></div><div class="c-ring"></div></div>
 
-<!-- Main App Content -->
-<div id="app-container">
-  
+<div id="app-root">
   <section class="hero">
-    <span class="hero-tag">SYSTEM // 6.0</span>
-    <h1>INTERFACE<br>EVOLVED</h1>
-    <p>A spatial interface designed for the next generation of neural operators. Zero latency. Infinite scale.</p>
+    <p>> SYSTEM READY</p>
+    <h1>The Next<br>Generation</h1>
   </section>
 
-  <section class="bento-grid">
+  <div class="grid">
     
-    <!-- CARD 1: OPERATOR -->
-    <div class="card hover-trigger" onclick="openCard(this)">
-      <div class="card-header">
-        <div class="icon-box">◈</div>
-        <span class="status-badge">ACTIVE</span>
-      </div>
-      <div style="margin-top:auto">
-        <h3>PSX-01</h3>
-        <span class="card-sub">Crystal PvP Unit</span>
+    <!-- CARD 1 -->
+    <div class="card hover-target" onclick="expand(this)">
+      <div class="card-meta">01 // OPERATOR</div>
+      <div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end;">
+        <h3 class="card-title">PSX</h3>
       </div>
       
-      <!-- Hidden Data for Modal -->
-      <div class="card-details">
-        <div class="stat-label">OPERATOR PROFILE</div>
-        <h2 style="font-size:40px; margin-bottom:10px">PSX-01</h2>
-        <p style="color:var(--text-muted); margin-bottom:30px">Elite tactical unit specialized in close-quarters crystal combat and rapid deployment.</p>
-        
-        <div class="modal-grid">
-          <div>
-             <div class="stat-block">
-               <span class="stat-label">EFFICIENCY</span>
-               <span class="stat-value" style="color:#00f0ff">98.4%</span>
-             </div>
-             <br>
-             <div class="stat-block">
-               <span class="stat-label">LATENCY</span>
-               <span class="stat-value">2ms</span>
-             </div>
-          </div>
-          <div>
-            <div class="stat-label">NEURAL SYNC</div>
-            <div class="visualizer">
-              <div class="bar" style="animation-delay:0s"></div>
-              <div class="bar" style="animation-delay:0.2s"></div>
-              <div class="bar" style="animation-delay:0.4s"></div>
-              <div class="bar" style="animation-delay:0.1s"></div>
-              <div class="bar" style="animation-delay:0.5s"></div>
-            </div>
-          </div>
-        </div>
+      <!-- Hidden Data -->
+      <div class="hidden-content">
+        <span class="m-label">UNIT ANALYSIS</span>
+        <h1 class="m-title">PSX<br>OPERATOR</h1>
+        <div class="data-row"><span>STATUS</span><span style="color:#0f0">ONLINE</span></div>
+        <div class="data-row"><span>KINETIC ENERGY</span><span>98%</span></div>
+        <div class="data-row"><span>NEURAL LINK</span><span>STABLE</span></div>
+        <br><br>
+        <p style="color:var(--text-muted); line-height:1.6">The PSX unit utilizes advanced crystal tracking algorithms to predict enemy movement 400ms into the future.</p>
       </div>
     </div>
 
-    <!-- CARD 2: TACTICS -->
-    <div class="card hover-trigger" onclick="openCard(this)">
-      <div class="card-header">
-        <div class="icon-box">⟡</div>
-        <span class="status-badge">STABLE</span>
+    <!-- CARD 2 -->
+    <div class="card hover-target" onclick="expand(this)">
+      <div class="card-meta">02 // PROTOCOL</div>
+      <div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end;">
+        <h3 class="card-title">VEX</h3>
       </div>
-      <div style="margin-top:auto">
-        <h3>VEX-09</h3>
-        <span class="card-sub">Anchor / Logistics</span>
-      </div>
-       <div class="card-details">
-        <div class="stat-label">OPERATOR PROFILE</div>
-        <h2 style="font-size:40px; margin-bottom:10px">VEX-09</h2>
-        <p style="color:var(--text-muted); margin-bottom:30px">Heavy defense specialist. Provides shield coverage and resource management.</p>
-        <div class="modal-grid">
-             <div class="stat-block" style="border-color:var(--primary)">
-               <span class="stat-label">SHIELD UPTIME</span>
-               <span class="stat-value">99.9%</span>
-             </div>
-        </div>
+       <div class="hidden-content">
+        <span class="m-label">DEFENSE PROTOCOL</span>
+        <h1 class="m-title">VEX<br>SYSTEM</h1>
+        <div class="data-row"><span>SHIELD INTEGRITY</span><span>100%</span></div>
+        <div class="data-row"><span>ANCHOR POINT</span><span>LOCKED</span></div>
       </div>
     </div>
 
-    <!-- CARD 3: WAR -->
-    <div class="card hover-trigger" onclick="openCard(this)">
-      <div class="card-header">
-        <div class="icon-box">⚔</div>
-        <span class="status-badge" style="background:rgba(255,50,50,0.1); color:#ff4444; border-color:rgba(255,50,50,0.3)">COMBAT</span>
+    <!-- CARD 3 -->
+    <div class="card hover-target" onclick="expand(this)">
+       <div class="card-meta">03 // EVENT</div>
+      <div style="height: 100%; display: flex; flex-direction: column; justify-content: flex-end;">
+        <h3 class="card-title">WAR</h3>
       </div>
-      <div style="margin-top:auto">
-        <h3>/six vs VOID</h3>
-        <span class="card-sub">Dominance: High</span>
-      </div>
-      <div class="card-details">
-         <div class="stat-label">CONFLICT ANALYSIS</div>
-         <h2 style="font-size:40px; margin-bottom:10px">/six vs VOID</h2>
-         <div class="modal-grid">
-           <div class="stat-block">
-             <span class="stat-label">SCORE</span>
-             <span class="stat-value">4 - 1</span>
-           </div>
-           <div class="stat-block">
-             <span class="stat-label">WIN PROBABILITY</span>
-             <span class="stat-value" style="color:#00f0ff">92%</span>
-           </div>
-         </div>
+      <div class="hidden-content">
+        <span class="m-label">ACTIVE CONFLICT</span>
+        <h1 class="m-title">DOMINATION</h1>
+        <div class="data-row"><span>/SIX</span><span>4</span></div>
+        <div class="data-row"><span>VOID</span><span>1</span></div>
+        <div class="data-row" style="color:var(--accent)">VICTORY IMMINENT</div>
       </div>
     </div>
 
-  </section>
-</div>
-
-<!-- Bottom Command Dock -->
-<div class="dock-wrapper">
-  <div class="dock">
-    <button class="dock-item active hover-trigger">⌬</button>
-    <button class="dock-item hover-trigger">⊞</button>
-    <button class="dock-item hover-trigger">⚙</button>
   </div>
 </div>
 
+<!-- DOCK -->
+<div class="dock-container">
+  <button class="cyber-btn active hover-target"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button>
+  <button class="cyber-btn hover-target"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
+  <button class="cyber-btn hover-target"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/></svg></button>
+</div>
+
 <script>
-/* --- CUSTOM CURSOR LOGIC --- */
-const cursorDot = document.getElementById('cDot');
-const cursorCircle = document.getElementById('cCircle');
+/* --- CURSOR LOGIC --- */
+const cursor = document.getElementById('cursor');
+const ring = cursor.querySelector('.c-ring');
+let mouseX = -100, mouseY = -100;
 
-let mouseX = 0, mouseY = 0;
-let cursorX = 0, cursorY = 0;
-
-document.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-  
-  // Update mouse position CSS vars for card hover effect
-  document.body.style.setProperty('--mouse-x', mouseX + 'px');
-  document.body.style.setProperty('--mouse-y', mouseY + 'px');
-  
-  // Instant dot movement
-  cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+document.addEventListener('mousemove', e => { 
+  mouseX = e.clientX; mouseY = e.clientY; 
+  cursor.querySelector('.c-dot').style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
 });
 
-// Smooth circle movement
-function animateCursor() {
-  const dt = 0.15; // Smooth factor
-  cursorX += (mouseX - cursorX) * dt;
-  cursorY += (mouseY - cursorY) * dt;
-  cursorCircle.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`;
-  requestAnimationFrame(animateCursor);
+// Physics-based ring lag
+let ringX = 0, ringY = 0;
+function loop() {
+  ringX += (mouseX - ringX) * 0.15;
+  ringY += (mouseY - ringY) * 0.15;
+  ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+  requestAnimationFrame(loop);
 }
-animateCursor();
+loop();
 
-// Hover states for cursor
-document.querySelectorAll('.hover-trigger').forEach(el => {
-  el.addEventListener('mouseenter', () => cursorCircle.classList.add('hovered'));
-  el.addEventListener('mouseleave', () => cursorCircle.classList.remove('hovered'));
+// Hover Interactions
+document.querySelectorAll('.hover-target').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.classList.add('active'));
+  el.addEventListener('mouseleave', () => ring.classList.remove('active'));
 });
 
-
-/* --- FLIP ANIMATION LOGIC (SPATIAL MODAL) --- */
+/* --- FLIP ANIMATION 2.0 --- */
 let activeClone = null;
 let originalCard = null;
 
-function openCard(cardElement) {
-  if (activeClone) return; // Busy
-  
-  originalCard = cardElement;
-  const rect = cardElement.getBoundingClientRect();
-  
+function expand(card) {
+  if(activeClone) return;
+  originalCard = card;
+  const rect = card.getBoundingClientRect();
+
   // 1. Create Clone
   const clone = document.createElement('div');
-  clone.classList.add('card-clone');
-  
-  // 2. Set Initial Geometry (Match Original)
+  clone.className = 'clone-wrapper';
   clone.style.top = rect.top + 'px';
   clone.style.left = rect.left + 'px';
   clone.style.width = rect.width + 'px';
   clone.style.height = rect.height + 'px';
   
-  // 3. Inject Content
-  // We grab the hidden details from the card and put them in the clone
-  const details = cardElement.querySelector('.card-details').innerHTML;
-  
+  // 2. Inject Content (Orbital Button + Data)
+  const content = card.querySelector('.hidden-content').innerHTML;
   clone.innerHTML = `
-    <button class="btn-close hover-trigger" onclick="closeModal()">✕</button>
-    <div class="clone-inner">
-      ${details}
+    <button class="btn-orbital hover-target" onclick="collapse()">
+      <div class="orb-ring"></div>
+      <div class="orb-center">✕</div>
+    </button>
+    <div class="modal-inner">
+      ${content}
     </div>
   `;
-  
+
   document.body.appendChild(clone);
-  
-  // 4. Hide Original & trigger App Scale effect
+
+  // 3. FLIP Execution
   requestAnimationFrame(() => {
-    originalCard.style.opacity = '0'; // Hide original
-    document.body.classList.add('has-modal'); // Scale background
-    
-    // 5. Expand Clone
+    // Hide original & Dim App
+    card.style.opacity = 0;
+    document.body.classList.add('modal-open');
+
+    // Calculate Expanded State
     requestAnimationFrame(() => {
       clone.classList.add('expanded');
       
@@ -474,50 +374,50 @@ function openCard(cardElement) {
       const w = isMobile ? window.innerWidth * 0.9 : 800;
       const h = isMobile ? window.innerHeight * 0.8 : 600;
       
-      const targetX = (window.innerWidth - w) / 2;
-      const targetY = (window.innerHeight - h) / 2;
-      
       clone.style.width = w + 'px';
       clone.style.height = h + 'px';
-      clone.style.top = targetY + 'px';
-      clone.style.left = targetX + 'px';
+      clone.style.top = (window.innerHeight - h)/2 + 'px';
+      clone.style.left = (window.innerWidth - w)/2 + 'px';
+      
+      // Re-bind hover for the new button
+      const newBtn = clone.querySelector('.btn-orbital');
+      newBtn.addEventListener('mouseenter', () => ring.classList.add('active'));
+      newBtn.addEventListener('mouseleave', () => ring.classList.remove('active'));
     });
   });
   
   activeClone = clone;
 }
 
-function closeModal() {
-  if (!activeClone) return;
-  
-  const rect = originalCard.getBoundingClientRect(); // Get original pos again
-  
-  // 1. Revert App Scale
-  document.body.classList.remove('has-modal');
-  
-  // 2. Shrink Clone
+function collapse() {
+  if(!activeClone) return;
+  const rect = originalCard.getBoundingClientRect();
+
+  // 1. Trigger Close State (Fades out button & content immediately)
+  activeClone.classList.add('is-closing');
   activeClone.classList.remove('expanded');
-  activeClone.style.width = rect.width + 'px';
-  activeClone.style.height = rect.height + 'px';
-  activeClone.style.top = rect.top + 'px';
-  activeClone.style.left = rect.left + 'px';
-  activeClone.style.opacity = '0'; // Fade out slightly at end
-  
-  // 3. Cleanup after animation
+
+  // 2. Wait a split second, then shrink box (Cinematic separation)
+  setTimeout(() => {
+    document.body.classList.remove('modal-open');
+    
+    activeClone.style.width = rect.width + 'px';
+    activeClone.style.height = rect.height + 'px';
+    activeClone.style.top = rect.top + 'px';
+    activeClone.style.left = rect.left + 'px';
+  }, 50); 
+
+  // 3. Cleanup
   setTimeout(() => {
     if(activeClone) activeClone.remove();
-    if(originalCard) originalCard.style.opacity = '1';
+    if(originalCard) originalCard.style.opacity = 1;
     activeClone = null;
     originalCard = null;
-  }, 600); // Match CSS transition time
+  }, 600); // Matches CSS transition time
 }
 
-// Close on Escape
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
-});
+document.addEventListener('keydown', e => { if(e.key === 'Escape') collapse(); });
 
 </script>
-
 </body>
 </html>
