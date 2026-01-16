@@ -416,7 +416,7 @@ function animateCursor() {
   const dt = 0.15; // Smooth factor
   cursorX += (mouseX - cursorX) * dt;
   cursorY += (mouseY - cursorY) * dt;
-  cursorCircle.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
+  cursorCircle.style.transform = `translate(${cursorX}px, ${cursorY}px) translate(-50%, -50%)`;
   requestAnimationFrame(animateCursor);
 }
 animateCursor();
