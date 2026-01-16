@@ -1389,6 +1389,117 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
     font-size: 16px;
   }
 }
+/* ======================= SIX SIGNATURE OATH ======================= */
+
+.six-oath{
+  position: relative;
+  text-align: center;
+  padding: 46px 32px;
+  overflow: hidden;
+}
+
+/* Ambient glow */
+.oath-glow{
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(160,80,255,0.45), transparent 60%);
+  filter: blur(60px);
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.oath-title{
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg,#e0aaff,#9d4edd,#5a189a);
+  -webkit-background-clip: text;
+  color: transparent;
+  z-index: 1;
+  position: relative;
+}
+
+.oath-sub{
+  color: #c9b6ff;
+  font-size: 15px;
+  margin-bottom: 30px;
+  opacity: 0.85;
+}
+
+.oath-lines{
+  max-width: 720px;
+  margin: 0 auto 28px auto;
+}
+
+.oath-line{
+  opacity: 0;
+  transform: translateY(16px);
+  font-size: 17px;
+  margin: 10px 0;
+  color: #e8defe;
+  transition: all .6s cubic-bezier(.2,.9,.2,1);
+}
+
+.oath-line strong{
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(180,120,255,0.55);
+}
+
+.oath-final{
+  margin-top: 22px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  background: linear-gradient(90deg,#c77dff,#7b2cbf);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 14px rgba(140,60,255,0.6);
+}
+
+/* Revealed state */
+.oath-line.reveal{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Button */
+.oath-btn{
+  margin-top: 18px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg,#7b2cbf,#5a189a);
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(90,24,154,0.45);
+  transition: all .3s ease;
+}
+
+.oath-btn:hover{
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 14px 40px rgba(120,60,255,0.6);
+}
+
+/* Status text */
+.oath-status{
+  margin-top: 18px;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #57F287;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all .4s ease;
+}
+
+.oath-status.active{
+  opacity: 1;
+  transform: translateY(0);
+}
 
 </style>
 </head>
@@ -1588,7 +1699,43 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
       </div>
     </section>
 
-   
+   <!-- ======================= SIX SIGNATURE MOMENT ======================= -->
+<section class="six-oath card" id="sixOath" aria-labelledby="oathTitle">
+  <div class="oath-glow"></div>
+
+  <h2 id="oathTitle" class="oath-title">
+    The <span class="six-text">/six</span> Oath
+  </h2>
+
+  <p class="oath-sub">
+    This is not a clan. This is a contract.
+  </p>
+
+  <div class="oath-lines">
+    <p class="oath-line">We do not join servers.</p>
+    <p class="oath-line">We <strong>take</strong> them.</p>
+
+    <p class="oath-line">We do not recruit players.</p>
+    <p class="oath-line">We forge <strong>weapons</strong>.</p>
+
+    <p class="oath-line">Every fight is calculated.</p>
+    <p class="oath-line">Every loss is remembered.</p>
+
+    <p class="oath-line oath-final">
+      If you stand with <span class="six-text">/six</span>,  
+      you stand until the server falls.
+    </p>
+  </div>
+
+  <button class="oath-btn" id="oathAccept">
+    I Accept the Oath
+  </button>
+
+  <div class="oath-status" id="oathStatus">
+    Initiation Complete.
+  </div>
+</section>
+
 
     <section class="discord-stats card">
   <div class="ds-left">
@@ -1614,7 +1761,6 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
     </button>
   </div>
 </section>
-
 
     <footer>© 2025 <span class="six-text">/six</span> Clan - All rights reserved.</footer>
   </main>
@@ -1892,6 +2038,43 @@ function closeBannerModal(){
     document.body.style.overflow = 'auto';
   }
 }
+
+/* ======================= SIX OATH INTERACTION ======================= */
+
+const oathSection = document.getElementById("sixOath");
+const oathLines = document.querySelectorAll(".oath-line");
+const oathBtn = document.getElementById("oathAccept");
+const oathStatus = document.getElementById("oathStatus");
+
+/* Reveal lines on scroll */
+const oathObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      oathLines.forEach((line, i) => {
+        setTimeout(() => line.classList.add("reveal"), i * 220);
+      });
+      oathObserver.disconnect();
+    }
+  });
+},{ threshold: 0.35 });
+
+oathObserver.observe(oathSection);
+
+/* Accept oath */
+oathBtn.addEventListener("click", () => {
+  oathBtn.disabled = true;
+  oathBtn.textContent = "Oath Accepted";
+  oathStatus.classList.add("active");
+
+  oathSection.style.boxShadow =
+    "0 0 45px rgba(160,80,255,0.65)";
+
+  setTimeout(() => {
+    oathSection.style.boxShadow =
+      "0 10px 30px rgba(90,24,154,0.35)";
+  }, 1200);
+});
+
 
 </script>
 
