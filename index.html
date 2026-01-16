@@ -1389,117 +1389,114 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
     font-size: 16px;
   }
 }
-/* ======================= SIX SIGNATURE OATH ======================= */
+/* ======================= PERFORMANCE SAFE OATH ======================= */
 
 .six-oath{
   position: relative;
+  padding: 44px 30px;
   text-align: center;
-  padding: 46px 32px;
-  overflow: hidden;
+
+  /* isolate repaint area */
+  contain: layout paint;
 }
 
-/* Ambient glow */
+/* glow simplified (static, not animated) */
 .oath-glow{
   position: absolute;
-  inset: -40%;
+  inset: -25%;
   background:
-    radial-gradient(circle at 50% 40%, rgba(160,80,255,0.45), transparent 60%);
-  filter: blur(60px);
-  opacity: 0.8;
+    radial-gradient(circle at center,
+      rgba(140,60,255,0.35),
+      transparent 60%);
+  filter: blur(40px);
+  opacity: 0.6;
   pointer-events: none;
-  z-index: 0;
 }
 
+/* text */
 .oath-title{
-  font-size: 2.2rem;
+  font-size: 2.1rem;
   font-weight: 900;
   letter-spacing: 3px;
-  margin-bottom: 10px;
   background: linear-gradient(90deg,#e0aaff,#9d4edd,#5a189a);
   -webkit-background-clip: text;
   color: transparent;
-  z-index: 1;
-  position: relative;
 }
 
 .oath-sub{
+  font-size: 14.5px;
   color: #c9b6ff;
-  font-size: 15px;
-  margin-bottom: 30px;
   opacity: 0.85;
+  margin-bottom: 28px;
 }
 
-.oath-lines{
-  max-width: 720px;
-  margin: 0 auto 28px auto;
-}
-
+/* lines */
 .oath-line{
   opacity: 0;
-  transform: translateY(16px);
-  font-size: 17px;
-  margin: 10px 0;
-  color: #e8defe;
-  transition: all .6s cubic-bezier(.2,.9,.2,1);
+  transform: translate3d(0,16px,0);
+  will-change: transform, opacity;
+  transition:
+    transform .55s cubic-bezier(.2,.9,.2,1),
+    opacity .55s ease;
 }
 
-.oath-line strong{
-  color: #ffffff;
-  text-shadow: 0 0 12px rgba(180,120,255,0.55);
+.oath-line.reveal{
+  opacity: 1;
+  transform: translate3d(0,0,0);
 }
 
 .oath-final{
-  margin-top: 22px;
-  font-size: 18px;
+  margin-top: 20px;
   font-weight: 700;
-  letter-spacing: .5px;
   background: linear-gradient(90deg,#c77dff,#7b2cbf);
   -webkit-background-clip: text;
   color: transparent;
-  text-shadow: 0 0 14px rgba(140,60,255,0.6);
 }
 
-/* Revealed state */
-.oath-line.reveal{
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Button */
+/* button */
 .oath-btn{
   margin-top: 18px;
-  padding: 12px 26px;
+  padding: 11px 26px;
   border-radius: 999px;
+  font-weight: 800;
   border: none;
   cursor: pointer;
-  font-weight: 800;
-  letter-spacing: 1px;
   background: linear-gradient(90deg,#7b2cbf,#5a189a);
-  color: #fff;
-  box-shadow: 0 10px 30px rgba(90,24,154,0.45);
-  transition: all .3s ease;
+  color: white;
+
+  /* only transform animates */
+  transition: transform .25s ease;
 }
 
 .oath-btn:hover{
-  transform: translateY(-3px) scale(1.04);
-  box-shadow: 0 14px 40px rgba(120,60,255,0.6);
+  transform: translate3d(0,-3px,0);
 }
 
-/* Status text */
+/* status */
 .oath-status{
-  margin-top: 18px;
-  font-size: 14px;
-  letter-spacing: 1px;
+  margin-top: 16px;
+  font-size: 13px;
   color: #57F287;
   opacity: 0;
-  transform: translateY(10px);
-  transition: all .4s ease;
+  transform: translate3d(0,10px,0);
+  transition: opacity .35s ease, transform .35s ease;
 }
 
 .oath-status.active{
   opacity: 1;
-  transform: translateY(0);
+  transform: translate3d(0,0,0);
 }
+
+/* reduced motion support */
+@media (prefers-reduced-motion: reduce){
+  .oath-line,
+  .oath-btn,
+  .oath-status{
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
 
 </style>
 </head>
@@ -1699,17 +1696,14 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
       </div>
     </section>
 
-   <!-- ======================= SIX SIGNATURE MOMENT ======================= -->
-<section class="six-oath card" id="sixOath" aria-labelledby="oathTitle">
+  <section class="six-oath card" id="sixOath" data-animated="false">
   <div class="oath-glow"></div>
 
-  <h2 id="oathTitle" class="oath-title">
+  <h2 class="oath-title">
     The <span class="six-text">/six</span> Oath
   </h2>
 
-  <p class="oath-sub">
-    This is not a clan. This is a contract.
-  </p>
+  <p class="oath-sub">This is not a clan. This is a contract.</p>
 
   <div class="oath-lines">
     <p class="oath-line">We do not join servers.</p>
@@ -1727,14 +1721,10 @@ footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-
     </p>
   </div>
 
-  <button class="oath-btn" id="oathAccept">
-    I Accept the Oath
-  </button>
-
-  <div class="oath-status" id="oathStatus">
-    Initiation Complete.
-  </div>
+  <button class="oath-btn" id="oathAccept">I Accept the Oath</button>
+  <div class="oath-status" id="oathStatus">Initiation Complete.</div>
 </section>
+
 
 
     <section class="discord-stats card">
@@ -2039,43 +2029,47 @@ function closeBannerModal(){
   }
 }
 
-/* ======================= SIX OATH INTERACTION ======================= */
+</script>
+<script>
+(() => {
+  const oath = document.getElementById("sixOath");
+  const lines = oath.querySelectorAll(".oath-line");
+  const btn = document.getElementById("oathAccept");
+  const status = document.getElementById("oathStatus");
 
-const oathSection = document.getElementById("sixOath");
-const oathLines = document.querySelectorAll(".oath-line");
-const oathBtn = document.getElementById("oathAccept");
-const oathStatus = document.getElementById("oathStatus");
+  /* Prevent re-running */
+  if (!oath || oath.dataset.animated === "true") return;
 
-/* Reveal lines on scroll */
-const oathObserver = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if(entry.isIntersecting){
-      oathLines.forEach((line, i) => {
-        setTimeout(() => line.classList.add("reveal"), i * 220);
-      });
-      oathObserver.disconnect();
-    }
+  const observer = new IntersectionObserver(entries => {
+    if (!entries[0].isIntersecting) return;
+
+    oath.dataset.animated = "true";
+
+    lines.forEach((line, i) => {
+      setTimeout(() => line.classList.add("reveal"), i * 180);
+    });
+
+    observer.disconnect();
+  }, {
+    threshold: 0.4
   });
-},{ threshold: 0.35 });
 
-oathObserver.observe(oathSection);
+  observer.observe(oath);
 
-/* Accept oath */
-oathBtn.addEventListener("click", () => {
-  oathBtn.disabled = true;
-  oathBtn.textContent = "Oath Accepted";
-  oathStatus.classList.add("active");
+  btn.addEventListener("click", () => {
+    if (btn.disabled) return;
 
-  oathSection.style.boxShadow =
-    "0 0 45px rgba(160,80,255,0.65)";
+    btn.disabled = true;
+    btn.textContent = "Oath Accepted";
+    status.classList.add("active");
 
-  setTimeout(() => {
-    oathSection.style.boxShadow =
-      "0 10px 30px rgba(90,24,154,0.35)";
-  }, 1200);
-});
-
-
+    /* minimal visual feedback, no repaint storm */
+    oath.style.transform = "translate3d(0,-2px,0)";
+    requestAnimationFrame(() => {
+      oath.style.transform = "translate3d(0,0,0)";
+    });
+  });
+})();
 </script>
 
 </body>
