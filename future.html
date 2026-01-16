@@ -5,232 +5,433 @@
 <title>/six — The UI of the Future</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<!-- Fonts: Inter for Headers, JetBrains Mono for Data -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
-  --bg:#05030a;
-  --accent:#8b5cf6;
-  --text:#eae6ff;
-  --muted:#9f9bb3;
+  --bg: #030205;
+  --accent: #7c3aed;
+  --accent-glow: rgba(124, 58, 237, 0.4);
+  --text: #eae6ff;
+  --muted: #8882a0;
+  --glass: rgba(10, 10, 15, 0.6);
+  --border: rgba(255, 255, 255, 0.08);
+  --font-main: 'Inter', sans-serif;
+  --font-data: 'JetBrains Mono', monospace;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
 
 body{
-  font-family:Inter,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  overflow-x:hidden;
+  font-family: var(--font-main);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* --- BACKGROUND FX --- */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* Grid */
-.neural-grid{
-  position:fixed;
-  inset:0;
+.neural-grid {
   background:
-    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-  background-size:60px 60px;
-  pointer-events:none;
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
 }
 
-/* Animated Data Nodes */
-.data-nodes::before{
+/* Ambient Glows */
+.data-nodes::before, .data-nodes::after {
   content:'';
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at 20% 30%,rgba(139,92,246,.2),transparent 40%),
-    radial-gradient(circle at 80% 70%,rgba(139,92,246,.15),transparent 45%);
-  animation: drift 20s linear infinite;
+  position:absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: drift 15s ease-in-out infinite alternate;
+}
+.data-nodes::before {
+  width: 400px; height: 400px;
+  background: var(--accent);
+  top: -100px; left: -100px;
+}
+.data-nodes::after {
+  width: 600px; height: 600px;
+  background: #2d1b69;
+  bottom: -100px; right: -200px;
+  animation-delay: -5s;
 }
 
-@keyframes drift{
-  0%{transform:translate(0,0)}
-  50%{transform:translate(-20px,15px)}
-  100%{transform:translate(0,0)}
+@keyframes drift {
+  0% { transform: translate(0,0); }
+  100% { transform: translate(50px, 30px); }
 }
+
+/* Scanlines & Grain */
+.noise-overlay {
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+}
+.scanlines {
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+  background-size: 100% 4px;
+  z-index: 2;
+}
+
+/* --- UI COMPONENTS --- */
 
 /* Header */
 .hud-top{
-  position:fixed;
-  top:0;
-  width:100%;
-  padding:14px 24px;
-  display:flex;
-  justify-content:space-between;
-  font-size:12px;
-  letter-spacing:2px;
-  color:var(--muted);
-  z-index:10;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  z-index: 100;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: rgba(5,3,10,0.8);
+  backdrop-filter: blur(5px);
+}
+.status-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: #0f0;
+  border-radius: 50%;
+  margin-left: 8px;
+  box-shadow: 0 0 8px #0f0;
 }
 
 /* Layout */
-.hud{
-  padding:120px 10vw 100px;
-  position:relative;
+.hud {
+  position: relative;
+  z-index: 10;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 140px 24px 100px;
 }
 
-.hero h1{
-  font-size:clamp(3rem,6vw,5rem);
-  font-weight:900;
-  line-height:1;
+/* Hero */
+.hero { margin-bottom: 80px; }
+.hero h1 {
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-shadow: 0 0 40px rgba(139,92,246,0.3);
+  position: relative;
+}
+.hero span { color: var(--accent); }
+.hero p {
+  margin-top: 20px;
+  color: var(--muted);
+  font-family: var(--font-data);
+  font-size: 14px;
+  max-width: 400px;
+  line-height: 1.6;
 }
 
-.hero span{color:var(--accent)}
-.hero p{margin-top:14px;color:var(--muted)}
-
-.hud-section{margin-top:90px}
-.hud-section h2{
-  font-size:14px;
-  letter-spacing:3px;
-  color:var(--muted);
-  margin-bottom:24px;
+/* Glitch Effect on Hover */
+.glitch-wrapper:hover {
+  animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+  color: var(--accent);
 }
+@keyframes glitch-anim {
+  0% { transform: translate(0) }
+  20% { transform: translate(-2px, 2px) }
+  40% { transform: translate(-2px, -2px) }
+  60% { transform: translate(2px, 2px) }
+  80% { transform: translate(2px, -2px) }
+  100% { transform: translate(0) }
+}
+
+/* Sections */
+.hud-section { margin-top: 60px; }
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  font-family: var(--font-data);
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 2px;
+}
+.line { flex: 1; height: 1px; background: var(--border); }
 
 /* Cards */
-.hud-cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:32px;
+.hud-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
 }
 
-.hud-card{
-  position:relative;
-  padding:22px;
-  cursor:pointer;
-  border-left:2px solid var(--accent);
-  transition:transform .4s cubic-bezier(.2,.9,.2,1);
+.hud-card {
+  position: relative;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  padding: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.hud-card:hover{
-  transform:translateY(-6px);
+/* Cyber Corners */
+.hud-card::before, .hud-card::after {
+  content: ''; position: absolute;
+  width: 10px; height: 10px;
+  transition: 0.3s;
+}
+.hud-card::before { top: 0; left: 0; border-top: 2px solid var(--muted); border-left: 2px solid var(--muted); }
+.hud-card::after { bottom: 0; right: 0; border-bottom: 2px solid var(--muted); border-right: 2px solid var(--muted); }
+
+.hud-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent);
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+}
+.hud-card:hover::before, .hud-card:hover::after {
+  border-color: var(--accent);
+  width: 100%; height: 100%; /* Expand borders */
+  opacity: 0.1;
 }
 
-.label{
-  font-size:11px;
-  letter-spacing:2px;
-  color:var(--muted);
+.label {
+  font-family: var(--font-data);
+  font-size: 10px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: block;
 }
 
-.hud-card h3{
-  margin-top:6px;
-  font-size:24px;
+.hud-card h3 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+.hud-card p { color: var(--muted); font-size: 14px; }
+
+/* MODAL / EXPANDED STATE */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+.modal-content {
+  background: #0a0a12;
+  border: 1px solid var(--accent);
+  width: 90%;
+  max-width: 600px;
+  padding: 40px;
+  position: relative;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 100px rgba(124, 58, 237, 0.15);
+}
+.modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+
+/* Decoration in Modal */
+.modal-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(rgba(124, 58, 237, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-.hud-card p{
-  margin-top:6px;
-  color:var(--muted);
-  font-size:14px;
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--border);
+  padding: 12px 0;
+  font-family: var(--font-data);
+  font-size: 13px;
+  color: var(--muted);
+}
+.stat-row span:last-child { color: var(--text); }
+
+.btn-close {
+  margin-top: 30px;
+  width: 100%;
+  padding: 16px;
+  background: rgba(124, 58, 237, 0.1);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-data);
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: 0.2s;
+}
+.btn-close:hover {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 20px var(--accent-glow);
 }
 
-/* CONTEXT MODAL (iOS-style expansion) */
-.hud-card.expanded{
-  position:fixed;
-  inset:80px 8vw;
-  background:#080510;
-  z-index:50;
-  transform:none !important;
-  padding:40px;
-  animation: expand .5s cubic-bezier(.2,.9,.2,1);
-}
-
-@keyframes expand{
-  from{transform:scale(.95);opacity:.6}
-  to{transform:scale(1);opacity:1}
-}
+/* Hidden elements to populate modal */
+.hidden-details { display: none; }
 
 </style>
 </head>
 <body>
 
-<div class="neural-grid"></div>
-<div class="data-nodes"></div>
+<!-- Ambient Layers -->
+<div class="bg-layer neural-grid"></div>
+<div class="bg-layer data-nodes"></div>
+<div class="bg-layer noise-overlay"></div>
+<div class="bg-layer scanlines"></div>
 
 <header class="hud-top">
-  <span>/six — COMMAND</span>
-  <span>MODE: ACTIVE</span>
+  <span>/six SYSTEM</span>
+  <span>ONLINE <span class="status-dot"></span></span>
 </header>
 
 <main class="hud">
 
   <!-- HERO -->
   <section class="hero">
-    <h1>THE UI<br><span>OF THE FUTURE</span></h1>
-    <p>Command. Observe. Dominate.</p>
+    <h1 class="glitch-wrapper">THE UI<br><span>OF THE FUTURE</span></h1>
+    <p>> Initializing visual interface...<br>> Targeting optimal user experience.</p>
   </section>
 
-  <!-- PROFILES -->
+  <!-- OPERATORS -->
   <section class="hud-section">
-    <h2>OPERATORS</h2>
+    <div class="section-header">
+      <h2>OPERATORS</h2> <div class="line"></div> <span>01</span>
+    </div>
+    
     <div class="hud-cards">
-      <div class="hud-card profile" data-expand="profile">
-        <span class="label">IGN</span>
+      <!-- CARD 1 -->
+      <div class="hud-card" onclick="openModal('PSX', 'Crystal PvP Specialist', 'Combat Efficiency: 98%<br>Latency: 4ms<br>Rank: Grandmaster')">
+        <span class="label">LEADER</span>
         <h3>PSX</h3>
         <p>Crystal PvP Specialist</p>
       </div>
 
-      <div class="hud-card profile" data-expand="profile">
-        <span class="label">IGN</span>
+      <!-- CARD 2 -->
+      <div class="hud-card" onclick="openModal('VEX', 'Anchor / Tactician', 'Shield Uptime: 92%<br>Callouts: Precision<br>Status: Deployed')">
+        <span class="label">OFFICER</span>
         <h3>VEX</h3>
         <p>Anchor / Tactical Lead</p>
+      </div>
+      
+       <!-- CARD 3 -->
+       <div class="hud-card" onclick="openModal('KAI', 'Roamer / DPS', 'K/D Ratio: 3.4<br>Movement: Hyper<br>Status: Training')">
+        <span class="label">MEMBER</span>
+        <h3>KAI</h3>
+        <p>Roamer / DPS</p>
       </div>
     </div>
   </section>
 
   <!-- WARS -->
   <section class="hud-section">
-    <h2>WAR DASHBOARD</h2>
+    <div class="section-header">
+      <h2>CONFLICTS</h2> <div class="line"></div> <span>02</span>
+    </div>
     <div class="hud-cards">
-      <div class="hud-card war" data-expand="war">
-        <span class="label">STATUS</span>
-        <h3>/six vs VOID</h3>
-        <p>DOMINANT — 4 : 1</p>
+      <div class="hud-card" onclick="openModal('/six vs VOID', 'Dominant Victory', 'Score: 4 - 1<br>Duration: 45m<br>MVP: PSX')">
+        <span class="label">ACTIVE WAR</span>
+        <h3 style="color:#fff">/six vs VOID</h3>
+        <p style="color:#4ade80">WINNING — 4 : 1</p>
+      </div>
+      <div class="hud-card" onclick="openModal('/six vs NEXUS', 'Pending Match', 'Date: 24/10<br>Predicted Win Rate: 78%')">
+        <span class="label">UPCOMING</span>
+        <h3>/six vs NEXUS</h3>
+        <p>PREPARING</p>
       </div>
     </div>
   </section>
 
-
 </main>
 
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-content">
+    <div class="modal-grid"></div>
+    <span class="label" id="mLabel">DETAILS</span>
+    <h3 id="mTitle">TITLE</h3>
+    <p id="mSubtitle" style="margin-bottom: 20px; color:var(--muted)">Subtitle</p>
+    
+    <div id="mStats">
+      <!-- JS injects stats here -->
+    </div>
+
+    <button class="btn-close" onclick="closeModal()">Termimate Session</button>
+  </div>
+</div>
+
 <script>
-(() => {
-  let activeCard = null;
+const modal = document.getElementById('modalOverlay');
+const mTitle = document.getElementById('mTitle');
+const mSubtitle = document.getElementById('mSubtitle');
+const mStats = document.getElementById('mStats');
 
-  document.querySelectorAll(".hud-card").forEach(card => {
-    card.addEventListener("click", () => {
-      if(activeCard) return;
-
-      activeCard = card;
-      card.classList.add("expanded");
-
-      card.innerHTML += `
-        <div style="margin-top:30px;color:#9f9bb3">
-          <p>Neural data synced.</p>
-          <p>Combat efficiency: HIGH</p>
-          <p>Latency: 0.0ms</p>
-          <br>
-          <button id="closeHud"
-            style="
-              background:none;
-              border:1px solid var(--accent);
-              color:var(--accent);
-              padding:10px 20px;
-              cursor:pointer;">
-            CLOSE INTERFACE
-          </button>
-        </div>
-      `;
-
-      document.getElementById("closeHud").onclick = () => {
-        card.classList.remove("expanded");
-        location.reload(); // reset state cleanly
-      };
-    });
+function openModal(title, subtitle, statsHtml) {
+  // Populate Data
+  mTitle.innerText = title;
+  mSubtitle.innerText = subtitle;
+  
+  // Convert basic BR tags to styled rows
+  const lines = statsHtml.split('<br>');
+  let html = '';
+  lines.forEach(line => {
+    const parts = line.split(':');
+    if(parts.length > 1) {
+      html += `
+        <div class="stat-row">
+          <span>${parts[0]}</span>
+          <span>${parts[1]}</span>
+        </div>`;
+    } else {
+       html += `<div class="stat-row"><span>Info</span><span>${line}</span></div>`;
+    }
   });
-})();
+  
+  mStats.innerHTML = html;
 
+  // Show Modal
+  modal.classList.add('active');
+}
+
+function closeModal() {
+  modal.classList.remove('active');
+}
+
+// Close on background click
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) closeModal();
+});
+
+// Escape key support
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
 </script>
 
 </body>
