@@ -2,613 +2,611 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 <title>/six Achievements</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
 <style>
+  /* --- 0. CORE VARIABLES & RESET --- */
+  :root {
+    --primary: #9d4edd;
+    --accent: #e0aaff;
+    --bg-deep: #030005;
+    --glass: rgba(20, 10, 30, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --ease-ios: cubic-bezier(0.19, 1, 0.22, 1); /* Apple's Spring-like curve */
+    --card-radius: 20px;
+    --modal-radius: 24px;
+    --transition-speed: 0.6s;
+  }
 
-/* --- 1. Global Reset & Variables --- */
-:root {
-  --primary: #9d4edd;
-  --accent: #e0aaff;
-  --dark-bg: #050008;
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --card-radius: 24px;
-  --ease-apple: cubic-bezier(0.25, 1, 0.5, 1); /* Soft Spring */
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
+  
+  body {
+    background-color: var(--bg-deep);
+    color: #f0f0f5;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
 
-*{box-sizing:border-box;margin:0;padding:0; -webkit-tap-highlight-color: transparent;}
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(157, 78, 221, 0.3); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(157, 78, 221, 0.6); }
 
-body {
-  font-family: 'Inter', sans-serif;
-  color: #e8e6f3;
-  background-color: var(--dark-bg);
-  overflow-x: hidden;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
+  /* --- 1. AMBIENT BACKGROUND --- */
+  .bg-universe {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: twinkle 4s infinite ease-in-out;
+  }
+  .nebula {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    animation: float 20s infinite alternate ease-in-out;
+  }
+  @keyframes float { 0% { transform: translate(0,0); } 100% { transform: translate(-30px, 30px); } }
+  @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 0.6; transform: scale(1.2); } }
 
-/* --- 2. Cinematic Noise Overlay --- */
-.noise-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  opacity: 0.04;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
+  /* --- 2. NOISE TEXTURE --- */
+  .noise {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
 
-/* --- 3. Ambient Background --- */
-.bg-wrap { position:fixed; inset:0; z-index:0; pointer-events:none; }
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.6;
-  animation: breathe 10s infinite alternate ease-in-out;
-}
-.orb.one { width: 400px; height: 400px; background: #4a0a75; top: -10%; left: -10%; }
-.orb.two { width: 300px; height: 300px; background: #240046; bottom: 10%; right: -5%; animation-delay: -5s; }
-.orb.three { width: 200px; height: 200px; background: #7b2cbf; top: 40%; left: 40%; opacity: 0.3; filter: blur(100px); }
+  /* --- 3. UI LAYOUT --- */
+  .layout-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    transition: filter 0.4s ease;
+  }
+  /* When modal is open, blur the background */
+  body.modal-open .layout-container, 
+  body.modal-open .page-header {
+    filter: blur(10px) brightness(0.7);
+    pointer-events: none;
+  }
 
-@keyframes breathe { 0%{transform:scale(1);} 100%{transform:scale(1.2);} }
+  /* Header */
+  .page-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    background: rgba(3, 0, 5, 0.7);
+    transition: all 0.4s ease;
+  }
 
-/* --- 4. Sticky Glass Header --- */
-.page-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  padding: 20px 20px 30px;
-  text-align: center;
-  background: rgba(5, 0, 8, 0.75);
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  transition: padding 0.3s ease;
-}
+  .header-title {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #fff 20%, #b87aff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 5px;
+    text-shadow: 0 10px 30px rgba(157, 78, 221, 0.3);
+  }
+  .header-subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 20px; }
 
-.header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-}
+  /* Controls */
+  .controls { display: flex; gap: 15px; align-items: center; justify-content: center; width: 100%; }
+  .search-box {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    padding: 10px 20px;
+    border-radius: 50px;
+    color: white;
+    width: 200px;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  .search-box:focus { width: 280px; background: rgba(255,255,255,0.1); border-color: var(--primary); }
 
-.page-header h1 {
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  font-weight: 800;
-  background: linear-gradient(135deg, #fff 30%, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 5px;
-  letter-spacing: -1px;
-}
-.page-header p { color: #c0b0d0; font-size: 0.95rem; margin-bottom: 20px; }
+  /* --- 4. THE GRID & CARDS --- */
+  .grid-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 40px 10px 100px;
+  }
 
-/* --- 5. Controls (Search & Switch) --- */
-.controls-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-}
+  .card-container {
+    position: relative;
+    height: 400px;
+    border-radius: var(--card-radius);
+    cursor: pointer;
+    /* 3D Tilt Setup */
+    perspective: 1000px;
+    transition: opacity 0.3s;
+  }
+  
+  /* The actual visible card */
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    background: var(--glass);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--glass-border);
+    /* For Tilt */
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+    will-change: transform;
+  }
 
-.search-input {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--glass-border);
-  padding: 10px 20px;
-  border-radius: 30px;
-  color: #fff;
-  width: 100%;
-  max-width: 300px;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-  text-align: center;
-}
-.search-input:focus {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--accent);
-  outline: none;
-  box-shadow: 0 0 25px rgba(157, 78, 221, 0.2);
-}
+  /* Spotlight Effect Overlay */
+  .card-inner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  .card-container:hover .card-inner::after { opacity: 1; }
+  .card-container:hover .card-inner {
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(157, 78, 221, 0.4);
+  }
 
-.section-switcher {
-  display: inline-flex;
-  background: rgba(255,255,255,0.05);
-  padding: 4px;
-  border-radius: 30px;
-  position: relative;
-}
-.switch-btn {
-  background: transparent;
-  border: none;
-  color: #aaa;
-  padding: 8px 24px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 25px;
-  position: relative;
-  z-index: 2;
-  transition: color 0.3s;
-}
-.switch-btn.active { color: #fff; }
+  /* Card Content */
+  .card-img-wrap {
+    height: 65%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease-ios);
+  }
+  .card-container:hover .card-img { transform: scale(1.08); }
 
-/* The sliding bubble background for tabs */
-.switch-bg {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  height: calc(100% - 8px);
-  background: #3c096c;
-  border-radius: 25px;
-  transition: all 0.4s var(--ease-apple);
-  z-index: 1;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
+  .card-content {
+    padding: 20px;
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.8));
+    height: 35%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .card-title { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+  .card-date { font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
 
-/* --- 6. The Grid --- */
-.section { display: none; padding: 40px 20px 100px; max-width: 1400px; margin: 0 auto; position: relative; z-index: 10; }
-.section.active { display: block; }
-.achievement-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 40px;
-  perspective: 2000px; /* Essential for 3D */
-}
+  /* Victory Badge */
+  .victory-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #ff2b2b, #850000);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    z-index: 5;
+    box-shadow: 0 4px 15px rgba(255,0,0,0.4);
+  }
 
-/* --- 7. Apple-Style Flip Cards --- */
-.card-scene {
-  background-color: transparent;
-  height: 400px; /* Fixed height for consistent flip */
-  cursor: pointer;
-  opacity: 0;
-  animation: fadeSlideUp 0.8s var(--ease-apple) forwards;
-}
+  /* --- 5. THE APP STORE ANIMATION (MODAL) --- */
+  /* This element floats on top and transforms to mimic the card, then expands */
+  .app-modal-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    pointer-events: none; /* Let clicks pass through until active */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(40px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
+  /* The Expanding Card */
+  .app-card {
+    position: absolute; /* Positioned via JS */
+    background: #11051b;
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    box-shadow: 0 0 0 0 rgba(0,0,0,0);
+    transform-origin: top left;
+    will-change: transform, width, height, border-radius;
+    /* The Magic Transition */
+    transition: 
+      transform var(--transition-speed) var(--ease-ios),
+      width var(--transition-speed) var(--ease-ios),
+      height var(--transition-speed) var(--ease-ios),
+      border-radius var(--transition-speed) var(--ease-ios);
+  }
 
-.card-object {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.8s var(--ease-apple); /* The flip speed */
-  transform-style: preserve-3d;
-  border-radius: var(--card-radius);
-  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
-}
+  .app-card.fullscreen {
+    /* These styles are applied when open. JS calculates the transform to get here. */
+    box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+    pointer-events: auto;
+    z-index: 1000;
+  }
 
-/* The Flip State */
-.card-scene.flipped .card-object {
-  transform: rotateY(180deg);
-}
+  /* Internal Layout of Expanded Card */
+  .app-hero-image {
+    width: 100%;
+    height: 400px; /* Initial Height matches card roughly */
+    object-fit: cover;
+    transition: height var(--transition-speed) var(--ease-ios);
+  }
+  .app-card.fullscreen .app-hero-image {
+    height: 50vh; /* Expands to half screen on open */
+  }
 
-/* Common Face Styles */
-.face {
-  position: absolute;
-  inset: 0;
-  -webkit-backface-visibility: hidden; /* Safari */
-  backface-visibility: hidden;
-  border-radius: var(--card-radius);
-  overflow: hidden;
-  background: rgba(20, 10, 30, 0.6);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  display: flex;
-  flex-direction: column;
-}
+  /* Scrollable Content inside Expanded Card */
+  .app-body {
+    opacity: 0;
+    transform: translateY(20px);
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    transition: opacity 0.4s 0.2s, transform 0.4s 0.2s; /* Delay for content fade in */
+    color: #d0c0e0;
+    line-height: 1.6;
+  }
+  .app-card.fullscreen .app-body {
+    opacity: 1;
+    transform: translateY(0);
+    overflow-y: auto; /* Allow scrolling inside */
+    max-height: 50vh;
+  }
 
-/* Front Face */
-.face.front {
-  z-index: 2;
-}
+  /* Close Button */
+  .close-app-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+  .app-card.fullscreen .close-app-btn {
+    opacity: 1;
+    transform: scale(1);
+    transition-delay: 0.3s;
+  }
+  .close-app-btn:hover { background: rgba(255,255,255,0.2); }
 
-/* Dynamic Sheen Effect on Hover (Front) */
-.face.front::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.1), transparent 50%);
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
-}
-.card-scene:hover .face.front::after { opacity: 1; }
+  /* --- 6. VERSION LABEL --- */
+  .version-label {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.4);
+    pointer-events: none;
+    z-index: 900;
+    letter-spacing: 1px;
+  }
 
-.card-image {
-  width: 100%;
-  height: 65%;
-  object-fit: cover;
-  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-  transition: transform 0.8s var(--ease-apple);
-}
-.card-scene:hover .card-image { transform: scale(1.05); }
+  /* Typography Utilities */
+  .glorious { color: #ffd700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+  .crimson { color: #ff4d4d; font-weight: 700; }
+  .six-font { font-family: 'Cinzel Decorative', cursive; }
 
-.card-content-front {
-  padding: 0 25px 25px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  flex-grow: 1;
-  transform: translateZ(20px); /* Parallax depth */
-}
-
-.card-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 8px;
-  line-height: 1.2;
-}
-.tap-hint {
-  font-size: 0.75rem;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-.tap-hint svg { width: 14px; height: 14px; opacity: 0.7; }
-
-/* Back Face */
-.face.back {
-  transform: rotateY(180deg);
-  background: linear-gradient(145deg, #1a0b2e, #0f0518);
-  padding: 30px;
-  justify-content: center;
-  align-items: center;
-  box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
-}
-
-.back-content {
-  text-align: left;
-  width: 100%;
-}
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding: 12px 0;
-  font-size: 0.9rem;
-}
-.stat-label { color: #888; }
-.stat-value { color: #e0aaff; font-weight: 600; text-align: right;}
-.back-desc {
-  margin-top: 20px;
-  color: #ccc;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-.close-hint {
-  margin-top: auto;
-  padding-top: 20px;
-  width: 100%;
-  text-align: center;
-  color: #555;
-  font-size: 0.8rem;
-}
-
-/* Victory Styles */
-.victory-glow {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: linear-gradient(135deg, #ff4d4d, #b30000);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: white;
-  box-shadow: 0 0 15px rgba(255, 50, 50, 0.5);
-  z-index: 10;
-  transform: translateZ(30px);
-}
-.card-scene.victory .face { border-color: rgba(255, 100, 100, 0.3); }
-
-/* --- 8. Typography Effects --- */
-.six-text {
-  font-family: 'Cinzel Decorative', cursive;
-  background: linear-gradient(to right, #d8b4fe, #fff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-}
-.highlight { color: #00ff99; text-shadow: 0 0 10px rgba(0,255,153,0.4); }
-.crimson { color: #ff5555; font-weight: 700; }
-
-/* --- 9. Sidebar (Mobile & Desktop) --- */
-.ios-sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 260px;
-  height: 100vh;
-  background: rgba(10, 5, 16, 0.9);
-  backdrop-filter: blur(30px);
-  border-right: 1px solid rgba(255,255,255,0.08);
-  padding: 40px 25px;
-  z-index: 999;
-  transform: translateX(-100%);
-  transition: transform 0.5s var(--ease-apple);
-}
-.ios-sidebar.open { transform: translateX(0); }
-
-/* Desktop: Always show sidebar, adjust layout */
-@media(min-width: 900px) {
-  .ios-sidebar { transform: translateX(0); }
-  .page-header, .section { padding-left: 280px; } /* Offset content */
-  .sidebar-toggle { display: none; }
-}
-
-.sidebar-brand { font-size: 2rem; font-weight: 800; margin-bottom: 50px; text-align: center; letter-spacing: 2px;}
-.nav-item {
-  display: flex;
-  align-items: center;
-  padding: 14px 18px;
-  color: rgba(255,255,255,0.6);
-  text-decoration: none;
-  border-radius: 14px;
-  margin-bottom: 8px;
-  transition: 0.3s;
-  font-weight: 500;
-}
-.nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
-.nav-item.active {
-  background: linear-gradient(90deg, #621c9c, #4a127a);
-  color: #fff;
-  box-shadow: 0 4px 20px rgba(98, 28, 156, 0.3);
-}
-
-.sidebar-toggle {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 1001;
-  background: rgba(30,10,40,0.6);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: white;
-  padding: 10px;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  cursor: pointer;
-}
+  @media (max-width: 768px) {
+    .app-card.fullscreen .app-hero-image { height: 40vh; }
+    .app-card.fullscreen .app-body { max-height: 60vh; padding: 25px; }
+  }
 
 </style>
 </head>
 <body>
 
-<!-- Noise & Background -->
-<div class="noise-overlay"></div>
-<div class="bg-wrap">
-  <div class="orb one"></div>
-  <div class="orb two"></div>
-  <div class="orb three"></div>
+<!-- Ambient Layers -->
+<div class="noise"></div>
+<div class="bg-universe" id="universe"></div>
+
+<!-- Version Label -->
+<div class="version-label">V.2.4.0 // STABLE</div>
+
+<!-- Layout -->
+<div class="layout-container">
+  
+  <header class="page-header">
+    <div class="header-title">/six <span style="font-size:1.5rem; font-weight:300; opacity:0.7;">Archive</span></div>
+    <div class="header-subtitle">Witness the <span class="glorious">Glorious</span> Timeline</div>
+    
+    <div class="controls">
+      <input type="text" class="search-box" id="searchInput" placeholder="Search Database...">
+    </div>
+  </header>
+
+  <main class="grid-section" id="grid">
+    <!-- Cards Injected via JS -->
+  </main>
 </div>
 
-<!-- Mobile Toggle -->
-<button class="sidebar-toggle" onclick="toggleSidebar()">
-  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-  </svg>
-</button>
-
-<!-- Sidebar -->
-<nav class="ios-sidebar" id="sidebar">
-  <div class="sidebar-brand"><span class="six-text">/six</span></div>
-  <a href="index.html" class="nav-item">Home</a>
-  <a href="achievements.html" class="nav-item active">Achievements</a>
-  <a href="members.html" class="nav-item">Members</a>
-</nav>
-
-<header class="page-header">
-  <div class="header-content">
-    <h1>Glorious Achievements</h1>
-    <p>A history of dominance.</p>
-    
-    <div class="controls-wrapper">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search history...">
-      
-      <div class="section-switcher">
-        <div class="switch-bg"></div>
-        <button class="switch-btn active" data-target="general">General</button>
-        <button class="switch-btn" data-target="victories">Victories</button>
-      </div>
+<!-- The Magic Animation Layer -->
+<div class="app-modal-layer">
+  <!-- The single expanding element that morphs -->
+  <div class="app-card" id="appCard">
+    <div class="close-app-btn" onclick="closeApp()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </div>
+    <img src="" class="app-hero-image" id="appHeroImg">
+    <div class="app-body">
+      <h1 id="appTitle" style="font-size: 2.5rem; margin-bottom: 10px; color: white;"></h1>
+      <div id="appMeta" style="margin-bottom: 25px; opacity: 0.7; font-family: 'Orbitron'; font-size: 0.8rem;"></div>
+      <div id="appDesc" style="font-size: 1.1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;"></div>
     </div>
   </div>
-</header>
-
-<main>
-  <section id="general" class="section active">
-    <div class="achievement-grid" id="generalGrid"></div>
-  </section>
-  
-  <section id="victories" class="section">
-    <div class="achievement-grid" id="victoriesGrid"></div>
-  </section>
-</main>
+</div>
 
 <script>
-/* --- Data Source --- */
-const achievements = [
-  {
-    title: 'Richest in SwiftSMP',
-    desc: "First /six member to achieve dominance on Season 9.",
-    img: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
-    date: 'Nov 11, 2025',
-    player: 'The_Killers_',
-    stats: 'Net Worth: $500M+',
-    type: 'general'
-  },
-  {
-    title: 'CPX VS /SIX',
-    desc: "A flawless victory against the CPX coalition.",
-    img: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
-    date: 'Nov 09, 2025',
-    player: 'Team Effort',
-    stats: 'Score: 2-0 | Casualties: 0',
-    type: 'victories'
-  }
-];
+  /* --- DATA --- */
+  const achievements = [
+    {
+      id: 1,
+      title: "Richest in SwiftSMP",
+      date: "Nov 11, 2025",
+      type: "general",
+      image: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
+      desc: "The economic domination of Season 9 began here. Through strategic market manipulation and grinding, <span class='crimson'>The_Killers_</span> became the wealthiest player on the server, surpassing the combined wealth of the next three factions.",
+      meta: "UNLOCKED BY: THE_KILLERS_ // NET WORTH: $540M"
+    },
+    {
+      id: 2,
+      title: "CPX VS /SIX",
+      date: "Nov 09, 2025",
+      type: "victory",
+      image: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
+      desc: "A decisive battle in the Nether. The CPX coalition attempted an ambush but was met with perfect coordination. Lineup: Mo0a, Wpun, Steral1n, Eucl1d_. Result: Complete wipe of enemy forces.",
+      meta: "SCORE: 2-0 // CASUALTIES: 0"
+    },
+    {
+      id: 3, 
+      title: "The First Dragon",
+      date: "Oct 20, 2025",
+      type: "general",
+      image: "https://wallpapers.com/images/hd/minecraft-ender-dragon-4k-720w0y9a8u7e8t7e.jpg",
+      desc: "Speedrunning the ender dragon on reset day to secure the dragon egg for the faction vault. A display of pure efficiency.",
+      meta: "TIME: 1H 45M // LOOT: DRAGON EGG"
+    }
+  ];
 
-/* --- Rendering Engine --- */
-const generalGrid = document.getElementById('generalGrid');
-const victoriesGrid = document.getElementById('victoriesGrid');
-
-function renderCards(filterText = "") {
-  generalGrid.innerHTML = '';
-  victoriesGrid.innerHTML = '';
-
-  achievements.forEach((item, index) => {
-    // Filter
-    if (!item.title.toLowerCase().includes(filterText) && !item.desc.toLowerCase().includes(filterText)) return;
-
-    // Card Structure
-    const scene = document.createElement('div');
-    scene.className = `card-scene ${item.type === 'victories' ? 'victory' : ''}`;
-    scene.style.animationDelay = `${index * 0.1}s`;
-    
-    // Victory Badge logic
-    let badgeHTML = item.type === 'victories' ? `<div class="victory-glow">VICTORY</div>` : '';
-
-    // HTML Construction
-    scene.innerHTML = `
-      ${badgeHTML}
-      <div class="card-object">
-        <!-- Front -->
-        <div class="face front">
-          <img src="${item.img}" class="card-image" alt="${item.title}">
-          <div class="card-content-front">
-            <h3 class="card-title">${formatTitle(item.title)}</h3>
-            <div class="tap-hint">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-              Tap to Flip
-            </div>
-          </div>
-        </div>
-        
-        <!-- Back -->
-        <div class="face back">
-          <div class="back-content">
-            <h3 style="color:#fff; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:10px;">Details</h3>
-            
-            <div class="stat-row">
-              <span class="stat-label">Date</span>
-              <span class="stat-value">${item.date}</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Unlocked By</span>
-              <span class="stat-value highlight">${item.player}</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Stats</span>
-              <span class="stat-value">${item.stats}</span>
-            </div>
-            
-            <p class="back-desc">${item.desc}</p>
-            <div class="close-hint">Click to close</div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Event Listeners
-    scene.addEventListener('click', () => scene.classList.toggle('flipped'));
-    scene.addEventListener('mousemove', handleMouseMove);
-
-    // Append
-    if (item.type === 'general') generalGrid.appendChild(scene);
-    else victoriesGrid.appendChild(scene);
-  });
-}
-
-/* --- Dynamic Lighting Effect --- */
-function handleMouseMove(e) {
-  const card = e.currentTarget;
-  const rect = card.getBoundingClientRect();
-  const x = ((e.clientX - rect.left) / rect.width) * 100;
-  const y = ((e.clientY - rect.top) / rect.height) * 100;
+  /* --- RENDER ENGINE --- */
+  const grid = document.getElementById('grid');
   
-  card.style.setProperty('--mouse-x', `${x}%`);
-  card.style.setProperty('--mouse-y', `${y}%`);
-}
+  function render(filter = "") {
+    grid.innerHTML = '';
+    achievements.forEach(item => {
+      if (!item.title.toLowerCase().includes(filter.toLowerCase())) return;
 
-/* --- Utilities --- */
-function formatTitle(title) {
-  return title.replace(/SwiftSMP/g, '<span style="color:#e0aaff">SwiftSMP</span>')
-              .replace(/CPX/g, '<span class="crimson">CPX</span>');
-}
+      const cardWrap = document.createElement('div');
+      cardWrap.className = 'card-container';
+      cardWrap.dataset.id = item.id;
+      
+      // Victory Badge Logic
+      const badge = item.type === 'victory' ? `<div class="victory-badge">VICTORY</div>` : '';
 
-/* --- Switcher Logic --- */
-const switchBtns = document.querySelectorAll('.switch-btn');
-const switchBg = document.querySelector('.switch-bg');
-const sections = document.querySelectorAll('.section');
+      cardWrap.innerHTML = `
+        <div class="card-inner">
+          ${badge}
+          <div class="card-img-wrap">
+            <img src="${item.image}" class="card-img" alt="${item.title}">
+          </div>
+          <div class="card-content">
+            <div class="card-title">${item.title}</div>
+            <div class="card-date">${item.date}</div>
+          </div>
+        </div>
+      `;
 
-switchBtns.forEach((btn, index) => {
-  btn.addEventListener('click', () => {
-    // 1. Move background bubble
-    const width = btn.offsetWidth;
-    const left = btn.offsetLeft;
-    switchBg.style.width = `${width}px`;
-    switchBg.style.transform = `translateX(${left}px)`;
+      // 3D Tilt Event
+      cardWrap.addEventListener('mousemove', handleTilt);
+      cardWrap.addEventListener('mouseleave', resetTilt);
+      
+      // Click to Open App
+      cardWrap.addEventListener('click', (e) => openApp(item, cardWrap));
 
-    // 2. Active Class
-    switchBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    // 3. Show Section
-    const target = btn.dataset.target;
-    sections.forEach(sec => {
-      sec.classList.remove('active');
-      if(sec.id === target) {
-        sec.classList.add('active');
-        // Re-trigger animations
-        const cards = sec.querySelectorAll('.card-scene');
-        cards.forEach(c => {
-          c.style.animation = 'none';
-          c.offsetHeight; /* trigger reflow */
-          c.style.animation = `fadeSlideUp 0.8s var(--ease-apple) forwards ${Math.random() * 0.2}s`;
-        });
-      }
+      grid.appendChild(cardWrap);
     });
-  });
-});
-
-// Init Switcher Position
-window.addEventListener('load', () => {
-  const activeBtn = document.querySelector('.switch-btn.active');
-  switchBg.style.width = `${activeBtn.offsetWidth}px`;
-  switchBg.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
-  renderCards();
-});
-
-/* --- Search Logic --- */
-document.getElementById('searchInput').addEventListener('input', (e) => {
-  renderCards(e.target.value.toLowerCase());
-});
-
-/* --- Mobile Sidebar --- */
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-}
-
-/* --- Text Formatter for /six --- */
-const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-let node;
-while (node = walker.nextNode()) {
-  if (node.nodeValue.match(/\/six/i) && node.parentElement.tagName !== 'SCRIPT' && node.parentElement.tagName !== 'STYLE') {
-    const span = document.createElement('span');
-    span.innerHTML = node.nodeValue.replace(/\/six/gi, '<span class="six-text">/six</span>');
-    node.parentNode.replaceChild(span, node);
   }
-}
+
+  /* --- 3D TILT PHYSICS --- */
+  function handleTilt(e) {
+    const card = e.currentTarget.querySelector('.card-inner');
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Set CSS var for spotlight
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+
+    // Calculate rotation
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -10; // -10deg max
+    const rotateY = ((x - centerX) / centerX) * 10;
+
+    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+  }
+
+  function resetTilt(e) {
+    const card = e.currentTarget.querySelector('.card-inner');
+    card.style.transform = `rotateX(0) rotateY(0) scale3d(1,1,1)`;
+  }
+
+  /* --- THE IOS APP OPEN ANIMATION LOGIC --- */
+  let activeCardRect = null;
+  let activeItem = null;
+  const appCard = document.getElementById('appCard');
+  const appHeroImg = document.getElementById('appHeroImg');
+  const appTitle = document.getElementById('appTitle');
+  const appMeta = document.getElementById('appMeta');
+  const appDesc = document.getElementById('appDesc');
+  const body = document.body;
+
+  function openApp(item, cardElement) {
+    if (body.classList.contains('modal-open')) return;
+    
+    activeItem = item;
+    
+    // 1. Get position of the clicked card
+    activeCardRect = cardElement.getBoundingClientRect();
+
+    // 2. Populate App Card with data (while invisible/small)
+    appHeroImg.src = item.image;
+    appTitle.innerHTML = item.title;
+    appMeta.innerHTML = item.meta;
+    appDesc.innerHTML = item.desc;
+
+    // 3. Position App Card exactly over the clicked card
+    // We use Fixed positioning, so we match the rect coordinates
+    appCard.style.transition = 'none'; // Disable transition for instant placement
+    appCard.style.top = `${activeCardRect.top}px`;
+    appCard.style.left = `${activeCardRect.left}px`;
+    appCard.style.width = `${activeCardRect.width}px`;
+    appCard.style.height = `${activeCardRect.height}px`;
+    appCard.style.borderRadius = '20px'; // Match card radius
+    
+    // 4. Force a browser reflow (so it recognizes the start position)
+    appCard.offsetHeight;
+
+    // 5. Enable transitions and animate to Full Screen
+    appCard.style.transition = ''; // Re-enable CSS transitions
+    body.classList.add('modal-open');
+    cardElement.style.opacity = '0'; // Hide original card
+
+    // Calculate center position styles
+    const isMobile = window.innerWidth < 768;
+    const expandedWidth = isMobile ? window.innerWidth : 800; // Max width 800px on desktop
+    const expandedHeight = isMobile ? window.innerHeight : 600; // Max height on desktop
+    
+    const topPos = isMobile ? 0 : (window.innerHeight - expandedHeight) / 2;
+    const leftPos = (window.innerWidth - expandedWidth) / 2;
+
+    requestAnimationFrame(() => {
+        appCard.classList.add('fullscreen');
+        
+        // Apply new coordinates
+        appCard.style.top = `${topPos}px`;
+        appCard.style.left = `${leftPos}px`;
+        appCard.style.width = `${expandedWidth}px`;
+        appCard.style.height = `${expandedHeight}px`;
+        appCard.style.borderRadius = isMobile ? '0px' : '24px';
+    });
+  }
+
+  function closeApp() {
+    if (!activeCardRect) return;
+
+    // 1. Remove fullscreen class (internal content fades out)
+    appCard.classList.remove('fullscreen');
+
+    // 2. Animate back to original coordinates
+    appCard.style.top = `${activeCardRect.top}px`;
+    appCard.style.left = `${activeCardRect.left}px`;
+    appCard.style.width = `${activeCardRect.width}px`;
+    appCard.style.height = `${activeCardRect.height}px`;
+    appCard.style.borderRadius = '20px';
+
+    // 3. Cleanup after animation ends
+    setTimeout(() => {
+        body.classList.remove('modal-open');
+        
+        // Find the original card and show it again
+        const originalCard = document.querySelector(`.card-container[data-id="${activeItem.id}"]`);
+        if(originalCard) originalCard.style.opacity = '1';
+        
+        // Reset App Card internal state slightly for next open
+        appCard.scrollTop = 0;
+    }, 600); // Matches CSS transition speed
+  }
+
+  /* --- INITIALIZATION --- */
+  // Create Stars
+  const universe = document.getElementById('universe');
+  for(let i=0; i<50; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = `${Math.random()*100}%`;
+    star.style.top = `${Math.random()*100}%`;
+    star.style.width = `${Math.random()*3}px`;
+    star.style.height = star.style.width;
+    star.style.animationDelay = `${Math.random()*4}s`;
+    universe.appendChild(star);
+  }
+  // Add Nebulas
+  ['#4a0a75', '#240046'].forEach((col, i) => {
+    const neb = document.createElement('div');
+    neb.className = 'nebula';
+    neb.style.background = col;
+    neb.style.width = `${300 + Math.random()*200}px`;
+    neb.style.height = neb.style.width;
+    neb.style.left = `${Math.random()*80}%`;
+    neb.style.top = `${Math.random()*80}%`;
+    neb.style.animationDuration = `${15 + i*5}s`;
+    universe.appendChild(neb);
+  });
+
+  // Search Logic
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    render(e.target.value);
+  });
+
+  // Start
+  render();
+
+  // Escape Key to Close
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && body.classList.contains('modal-open')) closeApp();
+  });
+
 </script>
 </body>
 </html>
