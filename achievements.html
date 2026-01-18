@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 
+/* --- Reset & Base --- */
 *{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:'Inter',sans-serif;
@@ -20,6 +21,23 @@ body{
   min-height:100vh;
   -webkit-font-smoothing:antialiased;
 }
+
+/* --- Custom Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #050006; 
+}
+::-webkit-scrollbar-thumb {
+  background: #4a1a6e; 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7b2cbf; 
+}
+
+/* --- Animated Background --- */
 .bg-wrap{
   position:fixed;
   inset:0;
@@ -29,24 +47,35 @@ body{
 .bg-layer{
   position:absolute;
   inset:-20%;
-  filter:blur(60px);
+  filter:blur(80px);
   mix-blend-mode:screen;
-  opacity:.8;
+  opacity:.7;
+  transition: transform 0.5s ease;
 }
+
+/* Ambient Floating Animation */
+@keyframes floatOne { 0%{transform: translate(0,0)} 100%{transform: translate(-50px, 40px)} }
+@keyframes floatTwo { 0%{transform: translate(0,0)} 100%{transform: translate(40px, -30px)} }
+@keyframes floatThree { 0%{transform: scale(1)} 100%{transform: scale(1.2)} }
+
 .bg-layer.one{
   background:radial-gradient(closest-side at 10% 20%, #2d004f 0%, transparent 35%),radial-gradient(closest-side at 80% 80%, #45003b 0%, transparent 30%);
+  animation: floatOne 25s infinite alternate ease-in-out;
 }
 .bg-layer.two{
-  background:linear-gradient(120deg, rgba(100,0,150,0.25), rgba(60,0,100,0.25));
+  background:linear-gradient(120deg, rgba(100,0,150,0.2), rgba(60,0,100,0.2));
+  animation: floatTwo 30s infinite alternate ease-in-out;
 }
 .bg-layer.three{
-  background:radial-gradient(circle at 50% 50%, rgba(80,0,120,0.2), transparent 70%);
+  background:radial-gradient(circle at 50% 50%, rgba(80,0,120,0.15), transparent 70%);
+  animation: floatThree 20s infinite alternate ease-in-out;
 }
 
 
+/* --- Header & Layout --- */
 .page-header{
   text-align:center;
-  padding:80px 20px 40px;
+  padding:80px 20px 20px;
   position:relative;
   z-index:10;
 }
@@ -56,7 +85,7 @@ body{
   background:linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd);
   -webkit-background-clip:text;
   color:transparent;
-  text-shadow:0 0 25px rgba(150,80,255,.5);
+  text-shadow:0 0 35px rgba(150,80,255,.4);
   letter-spacing:3px;
   margin-bottom:10px;
 }
@@ -66,11 +95,44 @@ body{
   font-size:1.1rem;
 }
 
-/* Section Switcher */
+/* --- Search Bar --- */
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 10;
+}
+.search-input {
+  background: rgba(20, 5, 35, 0.6);
+  border: 1px solid rgba(180, 120, 255, 0.25);
+  padding: 12px 20px;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 50px;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  outline: none;
+  text-align: center;
+}
+.search-input:focus {
+  border-color: #9d4edd;
+  box-shadow: 0 0 20px rgba(157, 78, 221, 0.3);
+  background: rgba(30, 10, 50, 0.8);
+}
+.search-input::placeholder {
+  color: rgba(201, 182, 255, 0.5);
+}
+
+/* --- Section Switcher --- */
 .section-switcher {
   display: flex;
   justify-content: center;
-  margin: 20px 0 40px;
+  margin: 30px 0 40px;
   position: relative;
   z-index: 10;
 }
@@ -89,15 +151,8 @@ body{
   position: relative;
   overflow: hidden;
 }
-
-.switch-btn:first-child {
-  border-radius: 12px 0 0 12px;
-  border-right: none;
-}
-
-.switch-btn:last-child {
-  border-radius: 0 12px 12px 0;
-}
+.switch-btn:first-child { border-radius: 12px 0 0 12px; border-right: none; }
+.switch-btn:last-child { border-radius: 0 12px 12px 0; }
 
 .switch-btn.active {
   background: linear-gradient(90deg, #8a3fd4, #6a28d1);
@@ -105,535 +160,342 @@ body{
   box-shadow: 0 0 20px rgba(160, 100, 255, 0.4);
   border-color: rgba(200, 140, 255, 0.5);
 }
-
 .switch-btn:hover:not(.active) {
   background: rgba(60, 20, 90, 0.5);
   color: #e0aaff;
 }
 
-/* Section Styles */
-.section {
-  display: none;
-  position: relative;
-  z-index: 10;
-}
+/* --- Section Container --- */
+.section { display: none; position: relative; z-index: 10; min-height: 50vh;}
+.section.active { display: block; }
 
-.section.active {
-  display: block;
-}
-
-.green-word {
-  color: #00ff99;
-  font-weight: 700;
-  text-shadow: 0 0 10px rgba(0,255,100,0.6);
-}
-
+/* --- Special Text Effects --- */
+.green-word { color: #00ff99; font-weight: 700; text-shadow: 0 0 10px rgba(0,255,100,0.6); }
 .gradient-word {
   background: linear-gradient(90deg, #ff4fd8, #9d4edd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 15px rgba(200,100,255,0.4);
+  font-weight: 700;
+}
+.glorious-word {
+  background: linear-gradient(90deg, #FFD700, #FFA500, #FFFACD);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+.crimson-word {
+  background: linear-gradient(90deg, #ff2b2b, #ff4545);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+  text-shadow: 0 0 15px rgba(255, 50, 50, 0.5);
 }
 
-
+/* --- Achievements Grid --- */
 .achievement-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:35px;
-  padding:60px 5% 100px;
-  justify-items:center;
+  grid-template-columns:repeat(auto-fit,minmax(280px,320px));
+  gap:40px;
+  padding:40px 5% 100px;
+  justify-content:center;
+  perspective: 1000px; /* For 3D Tilt */
 }
+
+/* --- Card Styles --- */
 .achievement-card{
-  background:linear-gradient(145deg,rgba(40,15,70,.45),rgba(20,5,40,.35));
+  background:linear-gradient(145deg,rgba(40,15,70,.5),rgba(20,5,40,.4));
   border:1px solid rgba(180,120,255,.2);
   border-radius:18px;
   overflow:hidden;
   backdrop-filter:blur(15px);
   cursor:pointer;
-  box-shadow:0 10px 25px rgba(20,0,40,.5);
-  transition:transform .3s,box-shadow .3s,border-color .3s;
+  box-shadow:0 10px 25px rgba(10,0,20,.6);
+  transition: transform 0.1s ease-out, box-shadow 0.3s, border-color 0.3s;
   position:relative;
+  /* 3D Tilt Props */
+  transform-style: preserve-3d;
+  will-change: transform;
 }
+
+/* Entrance Animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.achievement-card {
+  animation: fadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  opacity: 0; /* Hidden initially */
+}
+
 .achievement-card:hover{
-  transform:translateY(-8px) scale(1.02);
-  box-shadow:0 15px 40px rgba(150,0,255,.4);
-  border-color:rgba(200,140,255,.4);
+  box-shadow:0 20px 50px rgba(150,0,255,.3);
+  border-color:rgba(200,140,255,.5);
 }
+
 .achievement-card::before{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(120deg,rgba(255,255,255,.08),transparent);
+  background:linear-gradient(120deg,rgba(255,255,255,.15),transparent 60%);
   opacity:0;
   transition:opacity .4s;
+  z-index: 2;
+  pointer-events: none;
 }
-.achievement-card:hover::before{opacity:.6;}
+.achievement-card:hover::before{opacity:.7;}
+
+.achievement-img-wrapper {
+  overflow: hidden;
+  height: 180px;
+  width: 100%;
+  border-bottom: 1px solid rgba(200,150,255,.1);
+}
+
 .achievement-img{
   width:100%;
-  height:180px;
+  height:100%;
   object-fit:cover;
-  border-bottom:1px solid rgba(200,150,255,.1);
+  transition: transform 0.5s ease;
 }
+.achievement-card:hover .achievement-img {
+  transform: scale(1.1);
+}
+
 .achievement-info{
-  padding:20px;
+  padding:25px;
   text-align:center;
+  position: relative;
+  z-index: 2;
+  transform: translateZ(20px); /* Lifts text off card in 3D */
 }
 .achievement-info h3{
   font-family:'Inter',sans-serif;
-  font-size:1.4rem;
+  font-size:1.3rem;
   color:#e0aaff;
   margin-bottom:10px;
+  line-height: 1.3;
 }
 .achievement-info p{
   color:#c9b6ff;
-  font-size:0.95rem;
-  opacity:0.9;
-  line-height:1.4;
+  font-size:0.9rem;
+  opacity:0.8;
+  line-height:1.5;
 }
 
-/* Victory-specific styles */
+/* --- Victory Specific --- */
 .victory-card {
-  border: 1px solid rgba(255, 100, 100, 0.3);
-  background: linear-gradient(145deg, rgba(70, 15, 15, 0.45), rgba(40, 5, 5, 0.35));
+  border: 1px solid rgba(255, 80, 80, 0.4);
+  background: linear-gradient(145deg, rgba(60, 10, 10, 0.6), rgba(30, 5, 5, 0.5));
 }
-
 .victory-card:hover {
-  border-color: rgba(255, 140, 140, 0.5);
-  box-shadow: 0 15px 40px rgba(255, 50, 50, 0.4);
+  border-color: #ff4545;
+  box-shadow: 0 0 40px rgba(255, 50, 50, 0.3);
 }
-
 .victory-badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: linear-gradient(90deg, #ff2b2b, #ff4545);
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #ff2b2b, #a80000);
   color: white;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  box-shadow: 0 0 10px rgba(255, 60, 60, 0.7);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  box-shadow: 0 0 15px rgba(255, 60, 60, 0.6);
+  z-index: 5;
+  transform: translateZ(30px);
 }
 
-@keyframes modalBackdropIn {
-  0% { opacity: 0; backdrop-filter: blur(0px); }
-  100% { opacity: 1; backdrop-filter: blur(12px); }
-}
-
-@keyframes modalBackdropOut {
-  0% { opacity: 1; backdrop-filter: blur(12px); }
-  100% { opacity: 0; backdrop-filter: blur(0px); }
-}
-
-@keyframes modalContentIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.85) translateY(60px) perspective(1000px) rotateX(8deg);
-    filter: blur(6px);
-  }
-  60% {
-    transform: scale(1.03) translateY(-6px) perspective(1000px) rotateX(0deg);
-    opacity: 1;
-    filter: blur(0);
-  }
-  100% {
-    transform: scale(1) translateY(0) perspective(1000px) rotateX(0deg);
-  }
-}
-
-@keyframes modalContentOut {
-  0% {
-    opacity: 1;
-    transform: scale(1) translateY(0) perspective(1000px) rotateX(0deg);
-  }
-  40% {
-    transform: scale(0.95) translateY(5px) perspective(1000px) rotateX(3deg);
-    opacity: 0.9;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.75) translateY(60px) perspective(1000px) rotateX(10deg);
-    filter: blur(6px);
-  }
-}
-
-
-
+/* --- Modal --- */
 .modal {
   position: fixed;
   inset: 0;
   display: none;
   justify-content: center;
   align-items: center;
-  background: rgba(5, 0, 10, 0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(5, 0, 10, 0.7);
+  backdrop-filter: blur(8px);
   z-index: 9999;
-  animation: modalBackdropIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
-
-.modal.closing {
-  animation: modalBackdropOut 0.3s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
-}
-
 .modal.active {
   display: flex;
+  opacity: 1;
 }
 
 .modal-content {
   position: relative;
   width: 90%;
-  max-width: 480px;
-  padding: 40px 30px 50px;
-  border-radius: 28px;
+  max-width: 500px;
+  padding: 40px;
+  border-radius: 24px;
   text-align: center;
   color: #fff;
-  backdrop-filter: blur(35px) saturate(180%);
-  -webkit-backdrop-filter: blur(35px) saturate(180%);
-  background: rgba(35, 10, 55, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow:
-    inset 0 0 15px rgba(255, 255, 255, 0.08),
-    0 20px 60px rgba(0, 0, 0, 0.7),
-    0 0 40px rgba(160, 100, 255, 0.25);
-  overflow: hidden;
-  animation: modalContentIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  background: rgba(25, 10, 45, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 80px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.1);
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
-.modal-content.closing {
-  animation: modalContentOut 0.3s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
-}
-
-.modal-content::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at 30% 10%,
-    rgba(255, 255, 255, 0.25),
-    transparent 60%
-  );
-  mix-blend-mode: overlay;
-  opacity: 0.5;
-  pointer-events: none;
+.modal.active .modal-content {
+  transform: scale(1);
 }
 
 .modal-content img{
   width:100%;
-  height:200px;
+  height:220px;
   object-fit:cover;
-  border-radius:12px;
-  margin-bottom:20px;
+  border-radius:16px;
+  margin-bottom:25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 .modal-content h2{
-  font-family:'Inter',sans-serif;
   color:#e0aaff;
-  margin-bottom:10px;
+  margin-bottom:15px;
+  font-size: 1.8rem;
 }
 .modal-content p{
   color:#c9b6ff;
-  margin-bottom:15px;
-  line-height:1.5;
+  margin-bottom:20px;
+  line-height:1.6;
 }
+
 .close-btn {
-  position: relative;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  font-weight: 700;
-  padding: 10px 22px;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 10px 28px;
+  border-radius: 50px;
   cursor: pointer;
-  font-size: 15px;
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
-  transition: all 0.3s ease;
-  box-shadow:
-    inset 0 0 8px rgba(255, 255, 255, 0.1),
-    0 0 20px rgba(160, 100, 255, 0.25);
-  overflow: hidden;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.close-btn:hover{
+  background: #8a3fd4;
+  box-shadow: 0 0 20px rgba(138, 63, 212, 0.6);
+  border-color: transparent;
+  transform: translateY(-2px);
 }
 
-
-.close-btn::before {
-  content: "";
-  position: absolute;
+/* --- Sidebar --- */
+.ios-sidebar {
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  background: radial-gradient(
-    circle at top left,
-    rgba(255, 255, 255, 0.3),
-    transparent 60%
-  );
-  opacity: 0.4;
+  width: 250px;
+  height: 100vh;
+  background: rgba(15, 5, 25, 0.85);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ios-sidebar.open { transform: translateX(0); }
+
+/* Desktop Sidebar always visible if screen big enough */
+@media(min-width: 900px) {
+  .ios-sidebar { transform: translateX(0); }
+  .page-header, .section-switcher, .section, .search-container { padding-left: 250px; }
+  .sidebar-toggle { display: none; }
+}
+
+.sidebar-header {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 50px;
+  letter-spacing: -1px;
+}
+.sidebar-links { list-style: none; }
+.sidebar-links li { margin-bottom: 15px; }
+.nav-link {
+  display: block;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 12px 15px;
+  border-radius: 12px;
+  transition: 0.3s;
+}
+.nav-link:hover {
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+}
+.nav-link.active {
+  background: linear-gradient(90deg, #7b2cbf, #5a189a);
+  color: #fff;
+  box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4);
+}
+
+.sidebar-toggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  background: rgba(20,5,30,0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+}
+
+/* --- Overlay when sidebar open on mobile --- */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 0.3s;
 }
+.sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
-
-.close-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(1.05);
-  box-shadow:
-    0 0 25px rgba(160, 100, 255, 0.4),
-    inset 0 0 10px rgba(255, 255, 255, 0.15);
-}
-
-
-.close-btn:active {
-  transform: scale(0.98);
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow:
-    inset 0 0 15px rgba(255, 255, 255, 0.2),
-    0 0 10px rgba(140, 90, 255, 0.3);
-}
-
-.close-btn:hover{
-  background:linear-gradient(90deg,#8a3fd4,#6a28d1);
-  transform:translateY(-2px);
-}
-
-
-@keyframes pulseGlow{
-  0%,100%{box-shadow:0 0 25px rgba(150,0,255,.3);}
-  50%{box-shadow:0 0 40px rgba(150,0,255,.6);}
-}
- 
+/* Font injection for specific text if local font missing */
 @font-face {
   font-family: 'Diecide Remain';
   src: url('fonts/DeicideRemain.otf') format('opentype');
   font-display: swap;
 }
-
-.six-text{
-  font-family: 'Diecide Remain', sans-serif;
-  background: linear-gradient(135deg, #c77dff, #9d4edd, #7b2cbf);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 0 0 20px rgba(180, 80, 255, 0.6), 
-               0 0 40px rgba(140, 40, 220, 0.4);
-  letter-spacing: 1.5px;
-  font-weight: 900;
-  display: inline-block;
-  position: relative;
-  animation: textGlow 3s ease-in-out infinite alternate;
-}
-
-@keyframes textGlow {
-  0% {
-    text-shadow: 0 0 20px rgba(180, 80, 255, 0.6), 
-                 0 0 40px rgba(140, 40, 220, 0.4);
-    transform: scale(1);
-  }
-  100% {
-    text-shadow: 0 0 25px rgba(200, 100, 255, 0.8), 
-                 0 0 50px rgba(160, 60, 240, 0.6),
-                 0 0 60px rgba(120, 20, 200, 0.4);
-    transform: scale(1.02);
-  }
-}
-.glorious-word {
-  font-family: 'Diecide Remain', cursive;
-  background: linear-gradient(90deg, #FFD700, #FFA500, #FFFACD);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  position: relative;
-  font-weight: 900;
-  letter-spacing: 2px;
-  text-shadow:
-    0 0 10px rgba(255, 215, 0, 0.7),
-    0 0 20px rgba(255, 215, 0, 0.4);
-  animation: shine 3s linear infinite;
-}
-
-@keyframes shine {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-.crimson-word {
-  font-family: 'Diecide Remain', cursive;
-  background: linear-gradient(90deg, #ff2b2b, #ff4545, #ff7676);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  position: relative;
-  font-weight: 900;
-  letter-spacing: 2px;
-  text-shadow:
-    0 0 10px rgba(255, 60, 60, 0.7),
-    0 0 20px rgba(255, 40, 40, 0.4);
-  animation: crimsonShine 3s linear infinite;
-}
-
-@keyframes crimsonShine {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.tlcraft-word {
-  font-family: 'Diecide Remain', cursive;
-  background: linear-gradient(90deg, #ffd700, #fff6cc, #ffffff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  position: relative;
-  font-weight: 900;
-  letter-spacing: 2px;
-  text-shadow:
-    0 0 10px rgba(255, 215, 0, 0.7),
-    0 0 20px rgba(255, 255, 200, 0.5);
-  animation: tlShine 3s linear infinite;
-}
-
-@keyframes tlShine {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.modal-content {
-  will-change: transform, opacity, filter;
-  transform-origin: center;
-}
-
-.galaxy-word {
-  font-family: 'Diecide Remain', cursive;
-  background: linear-gradient(90deg, #00ff99, #ccffdd, #ffffff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  position: relative;
-  font-weight: 900;
-  letter-spacing: 2px;
-  text-shadow:
-    0 0 10px rgba(0, 255, 100, 0.7),
-    0 0 20px rgba(200, 255, 200, 0.5);
-  animation: galaxyShine 3s linear infinite;
-}
-
-@keyframes galaxyShine {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-/* === iOS Glass Sidebar === */
-.ios-sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 240px;
-  height: 100vh;
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
-  background: rgba(30, 10, 50, 0.35);
-  border-right: 1px solid rgba(255,255,255,0.2);
-  box-shadow: 0 0 40px rgba(120, 40, 200, 0.25);
-  padding: 30px 15px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  z-index: 999;
-  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-.sidebar-header {
-  font-family: 'Inter', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #fff;
-  text-shadow: 0 0 10px rgba(180, 0, 255, 0.5);
-  margin-bottom: 40px;
-  text-align: center;
-}
-
-.sidebar-links {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.sidebar-links li {
-  margin-bottom: 20px;
-}
-
-.nav-link {
-  display: block;
-  font-family: 'Inter', sans-serif;
-  color: rgba(255,255,255,0.7);
-  text-decoration: none;
-  font-size: 1.05rem;
-  padding: 10px 15px;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-}
-
-.nav-link:hover {
-  color: #fff;
-  background: rgba(150, 50, 255, 0.15);
-  box-shadow: 0 0 15px rgba(160, 60, 255, 0.3);
-}
-
-/* Active Page Glow */
-.nav-link.active {
-  color: #fff;
-  background: linear-gradient(90deg, #7b2cbf, #5a189a);
-  box-shadow: 0 0 25px rgba(130, 50, 255, 0.5);
-}
-
-/* === Mobile Behavior === */
-.sidebar-toggle {
-  display: none;
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 1000;
-  background: rgba(50, 20, 80, 0.4);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 12px;
-  padding: 10px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.sidebar-toggle:hover {
-  background: rgba(80, 30, 130, 0.5);
-}
-
-@media (max-width: 800px) {
-  .ios-sidebar {
-    transform: translateX(-100%);
-  }
-  .ios-sidebar.active {
-    transform: translateX(0);
-  }
-  .sidebar-toggle {
-    display: block;
-  }
+.six-text {
+  font-family: 'Diecide Remain', 'Cinzel Decorative', cursive; /* Fallback */
+  color: #d8b4fe;
+  text-shadow: 0 0 10px #a855f7;
 }
 
 </style>
 </head>
 <body>
-  <!-- Sidebar Navigation -->
-<nav class="ios-sidebar">
+
+<!-- Mobile Overlay -->
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- Navigation -->
+<nav class="ios-sidebar" id="sidebar">
   <div class="sidebar-header">
-    <span class="sidebar-title">/six</span>
+    <span class="six-text">/six</span>
   </div>
   <ul class="sidebar-links">
     <li><a href="index.html" class="nav-link">Home</a></li>
-    <li><a href="achievements.html" class="nav-link">Achievements</a></li>
+    <li><a href="achievements.html" class="nav-link active">Achievements</a></li>
     <li><a href="members.html" class="nav-link">Members</a></li>
   </ul>
 </nav>
 
-<!-- Sidebar Toggle (for mobile) -->
 <button class="sidebar-toggle" onclick="toggleSidebar()">
-  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
   </svg>
 </button>
 
@@ -645,262 +507,218 @@ body{
 
 <header class="page-header">
   <h1>/SIX Achievements</h1>
-  <p>Our <span class="glorious-word">Glorious</span> Achievements.</p>
+  <p>Witness our <span class="glorious-word">Glorious</span> History.</p>
   
-  <!-- Section Switcher -->
+  <div class="search-container">
+    <input type="text" id="searchInput" class="search-input" placeholder="Search achievements...">
+  </div>
+
   <div class="section-switcher">
     <button class="switch-btn active" data-section="general">General</button>
     <button class="switch-btn" data-section="victories">Victories</button>
   </div>
 </header>
 
-<!-- General Achievements Section -->
-<section class="section active" id="general-section">
-  <div class="achievement-grid" id="generalGrid"></div>
-</section>
+<main>
+  <!-- General Section -->
+  <section class="section active" id="general-section">
+    <div class="achievement-grid" id="generalGrid"></div>
+  </section>
 
-<!-- Victories Section -->
-<section class="section" id="victories-section">
-  <div class="achievement-grid" id="victoriesGrid"></div>
-</section>
+  <!-- Victories Section -->
+  <section class="section" id="victories-section">
+    <div class="achievement-grid" id="victoriesGrid"></div>
+  </section>
+</main>
 
+<!-- Modal -->
 <div class="modal" id="achievementModal">
   <div class="modal-content">
     <img id="modalImg" src="" alt="achievement">
     <h2 id="modalTitle"></h2>
     <p id="modalDesc"></p>
-    <p id="modalExtra"></p>
+    <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
+      <p id="modalExtra" style="font-size:0.9rem; opacity:0.8;"></p>
+    </div>
     <button class="close-btn" id="closeModal">Close</button>
   </div>
 </div>
 
 <script>
- 
-
-    function styleSixText(root = document.body) {
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-      const nodes = [];
-      while (walker.nextNode()) nodes.push(walker.currentNode);
-
-      nodes.forEach(node => {
-        if (node.nodeValue) {
-          const text = node.nodeValue;
-
-         
-          if (/(\/six|sais)/i.test(text)) {
-            const span = document.createElement('span');
-            span.innerHTML = text.replace(/(\/six|sais)/gi, match => {
-              return `<span class="six-text">${match}</span>`;
-            });
-            node.parentNode.replaceChild(span, node);
-          }
-        }
-      });
-    }
-
-    window.addEventListener('load', () => {
-      styleSixText();
-    });
-
-// Updated achievements with section property
+// --- Data ---
 const achievements = [
   {
     title: 'The <span class="green-word">Richest</span> in <span class="gradient-word">SwiftSMP</span>',
     desc: "First /six member to be the richest on SwiftSMP's Season 9.",
     img: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
     extra: 'Unlocked by: <span class="crimson-word">The_Killers_</span><br>Date: Nov 11, 2025',
-    section: 'general'
+    section: 'general',
+    rawTitle: "The Richest in SwiftSMP" // Plain text for searching
   },
   {
     title: 'CPX VS /SIX',
     desc: "NethPot: 2 - 0, Lineup(s): Mo0a , Wpun , Steral1n , Eucl1d_",
     img: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
     extra: 'Opponent: CPX<br>Date: November 9, 2025<br>Casualties: None',
-    section: 'victories'
+    section: 'victories',
+    rawTitle: "CPX VS /SIX"
   }
 ];
 
-// Section switching functionality
+// --- Core Logic ---
+const generalGrid = document.getElementById('generalGrid');
+const victoriesGrid = document.getElementById('victoriesGrid');
+let currentFilter = '';
+
+function renderAchievements() {
+  // Clear grids
+  generalGrid.innerHTML = '';
+  victoriesGrid.innerHTML = '';
+  
+  achievements.forEach((a, index) => {
+    // Filter logic
+    const matchesSearch = a.rawTitle.toLowerCase().includes(currentFilter) || 
+                          a.desc.toLowerCase().includes(currentFilter);
+    
+    if (!matchesSearch) return;
+
+    // Create Card
+    const card = document.createElement('div');
+    card.className = a.section === 'victories' ? 'achievement-card victory-card' : 'achievement-card';
+    
+    // Stagger animation
+    card.style.animationDelay = `${index * 0.1}s`;
+
+    // 3D Tilt Logic
+    card.addEventListener('mousemove', handleTilt);
+    card.addEventListener('mouseleave', resetTilt);
+    card.addEventListener('click', () => openModal(a));
+
+    if (a.section === 'victories') {
+      const badge = document.createElement('div');
+      badge.className = 'victory-badge';
+      badge.textContent = 'VICTORY';
+      card.appendChild(badge);
+    }
+
+    const imgWrapper = document.createElement('div');
+    imgWrapper.className = 'achievement-img-wrapper';
+    
+    const img = document.createElement('img');
+    img.src = a.img;
+    img.className = 'achievement-img';
+    imgWrapper.appendChild(img);
+
+    const info = document.createElement('div');
+    info.className = 'achievement-info';
+    info.innerHTML = `<h3>${a.title}</h3><p>${a.desc}</p>`;
+
+    card.appendChild(imgWrapper);
+    card.appendChild(info);
+
+    // Append to correct grid
+    if (a.section === 'general') generalGrid.appendChild(card);
+    else victoriesGrid.appendChild(card);
+  });
+
+  // Handle empty state
+  if(generalGrid.children.length === 0 && document.getElementById('general-section').classList.contains('active')) {
+    generalGrid.innerHTML = '<p style="color:#aaa; grid-column:1/-1; text-align:center;">No achievements found.</p>';
+  }
+}
+
+// --- 3D Tilt Effect ---
+function handleTilt(e) {
+  const card = e.currentTarget;
+  const rect = card.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+  
+  const rotateX = ((y - centerY) / centerY) * -8; // Max -8deg rotation
+  const rotateY = ((x - centerX) / centerX) * 8; 
+
+  card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+}
+
+function resetTilt(e) {
+  e.currentTarget.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+}
+
+// --- Search ---
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  currentFilter = e.target.value.toLowerCase();
+  renderAchievements();
+});
+
+// --- Tabs ---
 const switchButtons = document.querySelectorAll('.switch-btn');
 const sections = document.querySelectorAll('.section');
 
 switchButtons.forEach(button => {
   button.addEventListener('click', () => {
-    const targetSection = button.getAttribute('data-section');
-    
-    // Update active button
-    switchButtons.forEach(btn => btn.classList.remove('active'));
+    switchButtons.forEach(b => b.classList.remove('active'));
     button.classList.add('active');
     
-    // Show target section
-    sections.forEach(section => {
-      section.classList.remove('active');
-      if (section.id === `${targetSection}-section`) {
-        section.classList.add('active');
-      }
+    const target = button.getAttribute('data-section');
+    sections.forEach(s => {
+      s.classList.remove('active');
+      if(s.id === `${target}-section`) s.classList.add('active');
     });
+    
+    // Re-render to restart animations logic if needed, or simply let CSS handle display
+    renderAchievements(); 
   });
 });
 
-// Function to render achievements to their respective sections
-function renderAchievements() {
-  const generalGrid = document.getElementById('generalGrid');
-  const victoriesGrid = document.getElementById('victoriesGrid');
-  
-  // Clear existing content
-  generalGrid.innerHTML = '';
-  victoriesGrid.innerHTML = '';
-  
-  // Sort achievements by section and render
-  achievements.forEach((a, i) => {
-    const card = document.createElement('div');
-    
-    // Add victory-specific styling for victories section
-    if (a.section === 'victories') {
-      card.className = 'achievement-card victory-card';
-      
-      // Add victory badge
-      const badge = document.createElement('div');
-      badge.className = 'victory-badge';
-      badge.textContent = 'VICTORY';
-      card.appendChild(badge);
-    } else {
-      card.className = 'achievement-card';
-    }
-
-    const img = document.createElement('img');
-    img.src = a.img;
-    img.className = 'achievement-img';
-    img.alt = a.title;
-
-    const info = document.createElement('div');
-    info.className = 'achievement-info';
-
-    const titleEl = document.createElement('h3');
-    titleEl.innerHTML = a.title; 
-
-    const descEl = document.createElement('p');
-    descEl.innerHTML = a.desc; 
-
-    info.appendChild(titleEl);
-    info.appendChild(descEl);
-
-    card.appendChild(img);
-    card.appendChild(info);
-
-    card.addEventListener('click', () => openModal(a, card));
-    
-    // Add to appropriate grid
-    if (a.section === 'general') {
-      generalGrid.appendChild(card);
-    } else if (a.section === 'victories') {
-      victoriesGrid.appendChild(card);
-    }
-  });
-}
-
-// Initialize the page with achievements
-renderAchievements();
-
+// --- Modal ---
 const modal = document.getElementById('achievementModal');
-const modalImg = document.getElementById('modalImg');
-const modalTitle = document.getElementById('modalTitle');
-const modalDesc = document.getElementById('modalDesc');
-const modalExtra = document.getElementById('modalExtra');
 const closeModalBtn = document.getElementById('closeModal');
 
-
-
-let lastClickedCard = null;
-
-function openModal(a, card) {
-  lastClickedCard = card;
-  modalImg.src = a.img;
-  modalTitle.innerHTML = a.title;
-  modalDesc.textContent = a.desc;
-  modalExtra.innerHTML = a.extra;
-
-  // Initial modal state for animation
-  const modalContent = modal.querySelector('.modal-content');
-  modal.classList.add('active');
-  modalContent.style.transform = 'scale(0.85) translateY(60px)';
-  modalContent.style.opacity = '0';
-  modalContent.style.filter = 'blur(4px)';
+function openModal(data) {
+  document.getElementById('modalImg').src = data.img;
+  document.getElementById('modalTitle').innerHTML = data.title;
+  document.getElementById('modalDesc').textContent = data.desc;
+  document.getElementById('modalExtra').innerHTML = data.extra;
   
-  requestAnimationFrame(() => {
-    modalContent.style.transition = 'all 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
-    modalContent.style.transform = 'scale(1) translateY(0)';
-    modalContent.style.opacity = '1';
-    modalContent.style.filter = 'blur(0)';
+  modal.classList.add('active');
+}
+
+function closeModal() {
+  modal.classList.remove('active');
+}
+
+closeModalBtn.addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
+
+// --- Mobile Sidebar ---
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.querySelector('.sidebar-overlay').classList.toggle('active');
+}
+
+// --- Init ---
+renderAchievements();
+
+// Style "six" text dynamically
+function styleSixText() {
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+
+  nodes.forEach(node => {
+    if (node.nodeValue && /(\/six|sais)/i.test(node.nodeValue) && node.parentElement.tagName !== 'SCRIPT') {
+      const span = document.createElement('span');
+      span.innerHTML = node.nodeValue.replace(/(\/six|sais)/gi, '<span class="six-text">$1</span>');
+      node.parentNode.replaceChild(span, node);
+    }
   });
 }
+window.addEventListener('load', styleSixText);
 
-function closeModalAnimation() {
-  if (!lastClickedCard) {
-    modal.classList.remove('active');
-    return;
-  }
-
-  const cardRect = lastClickedCard.getBoundingClientRect();
-  const modalContent = modal.querySelector('.modal-content');
-  const modalRect = modalContent.getBoundingClientRect();
-
-  const deltaX = cardRect.left + cardRect.width / 2 - (modalRect.left + modalRect.width / 2);
-  const deltaY = cardRect.top + cardRect.height / 2 - (modalRect.top + modalRect.height / 2);
-  const scaleX = cardRect.width / modalRect.width;
-  const scaleY = cardRect.height / modalRect.height;
-
-  modalContent.style.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease';
-  modalContent.style.transformOrigin = 'center center';
-  modalContent.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`;
-  modalContent.style.opacity = '0.15';
-  modalContent.style.filter = 'blur(6px)';
-
-  setTimeout(() => {
-    modal.classList.remove('active');
-    modalContent.style.transition = '';
-    modalContent.style.transform = '';
-    modalContent.style.opacity = '';
-    modalContent.style.filter = '';
-  }, 450);
-}
-
-closeModalBtn.addEventListener('click', closeModalAnimation);
-modal.addEventListener('click', e => {
-  if (e.target === modal) closeModalAnimation();
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && modal.classList.contains('active')) {
-    closeModalAnimation();
-  }
-});
-
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && modal.classList.contains('active')) {
-    closeModal();
-  }
-});
-
-// Function to add new achievements (for future use)
-function addAchievement(a) {
-  achievements.push(a);
-  renderAchievements();
-}
 </script>
-  <script>
-function toggleSidebar() {
-  document.querySelector('.ios-sidebar').classList.toggle('active');
-}
-
-// Highlight active page
-const current = window.location.pathname.split('/').pop();
-document.querySelectorAll('.nav-link').forEach(link => {
-  if (link.getAttribute('href') === current) {
-    link.classList.add('active');
-  }
-});
-</script>
-
 </body>
 </html>
