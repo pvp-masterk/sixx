@@ -2,438 +2,369 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
 <title>/six Achievements</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 
-/* --- Reset & Base --- */
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:'Inter',sans-serif;
-  color:#e8e6f3;
-  background:#050006;
-  overflow-x:hidden;
-  min-height:100vh;
-  -webkit-font-smoothing:antialiased;
+/* --- 1. Global Reset & Variables --- */
+:root {
+  --primary: #9d4edd;
+  --accent: #e0aaff;
+  --dark-bg: #050008;
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --card-radius: 24px;
+  --ease-apple: cubic-bezier(0.25, 1, 0.5, 1); /* Soft Spring */
 }
 
-/* --- Custom Scrollbar --- */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #050006; 
-}
-::-webkit-scrollbar-thumb {
-  background: #4a1a6e; 
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #7b2cbf; 
-}
+*{box-sizing:border-box;margin:0;padding:0; -webkit-tap-highlight-color: transparent;}
 
-/* --- Animated Background --- */
-.bg-wrap{
-  position:fixed;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-}
-.bg-layer{
-  position:absolute;
-  inset:-20%;
-  filter:blur(80px);
-  mix-blend-mode:screen;
-  opacity:.7;
-  transition: transform 0.5s ease;
-}
-
-/* Ambient Floating Animation */
-@keyframes floatOne { 0%{transform: translate(0,0)} 100%{transform: translate(-50px, 40px)} }
-@keyframes floatTwo { 0%{transform: translate(0,0)} 100%{transform: translate(40px, -30px)} }
-@keyframes floatThree { 0%{transform: scale(1)} 100%{transform: scale(1.2)} }
-
-.bg-layer.one{
-  background:radial-gradient(closest-side at 10% 20%, #2d004f 0%, transparent 35%),radial-gradient(closest-side at 80% 80%, #45003b 0%, transparent 30%);
-  animation: floatOne 25s infinite alternate ease-in-out;
-}
-.bg-layer.two{
-  background:linear-gradient(120deg, rgba(100,0,150,0.2), rgba(60,0,100,0.2));
-  animation: floatTwo 30s infinite alternate ease-in-out;
-}
-.bg-layer.three{
-  background:radial-gradient(circle at 50% 50%, rgba(80,0,120,0.15), transparent 70%);
-  animation: floatThree 20s infinite alternate ease-in-out;
-}
-
-
-/* --- Header & Layout --- */
-.page-header{
-  text-align:center;
-  padding:80px 20px 20px;
-  position:relative;
-  z-index:10;
-}
-.page-header h1{
-  font-family:'Inter',sans-serif;
-  font-size:clamp(2.5rem,6vw,4.5rem);
-  background:linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd);
-  -webkit-background-clip:text;
-  color:transparent;
-  text-shadow:0 0 35px rgba(150,80,255,.4);
-  letter-spacing:3px;
-  margin-bottom:10px;
-}
-.page-header p{
-  color:#c9b6ff;
-  opacity:0.85;
-  font-size:1.1rem;
-}
-
-/* --- Search Bar --- */
-.search-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 25px;
-  margin-bottom: 10px;
-  position: relative;
-  z-index: 10;
-}
-.search-input {
-  background: rgba(20, 5, 35, 0.6);
-  border: 1px solid rgba(180, 120, 255, 0.25);
-  padding: 12px 20px;
-  width: 100%;
-  max-width: 400px;
-  border-radius: 50px;
-  color: #fff;
+body {
   font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  backdrop-filter: blur(10px);
+  color: #e8e6f3;
+  background-color: var(--dark-bg);
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- 2. Cinematic Noise Overlay --- */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* --- 3. Ambient Background --- */
+.bg-wrap { position:fixed; inset:0; z-index:0; pointer-events:none; }
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.6;
+  animation: breathe 10s infinite alternate ease-in-out;
+}
+.orb.one { width: 400px; height: 400px; background: #4a0a75; top: -10%; left: -10%; }
+.orb.two { width: 300px; height: 300px; background: #240046; bottom: 10%; right: -5%; animation-delay: -5s; }
+.orb.three { width: 200px; height: 200px; background: #7b2cbf; top: 40%; left: 40%; opacity: 0.3; filter: blur(100px); }
+
+@keyframes breathe { 0%{transform:scale(1);} 100%{transform:scale(1.2);} }
+
+/* --- 4. Sticky Glass Header --- */
+.page-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 20px 20px 30px;
+  text-align: center;
+  background: rgba(5, 0, 8, 0.75);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: padding 0.3s ease;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header h1 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff 30%, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 5px;
+  letter-spacing: -1px;
+}
+.page-header p { color: #c0b0d0; font-size: 0.95rem; margin-bottom: 20px; }
+
+/* --- 5. Controls (Search & Switch) --- */
+.controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.search-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  padding: 10px 20px;
+  border-radius: 30px;
+  color: #fff;
+  width: 100%;
+  max-width: 300px;
+  font-size: 0.9rem;
   transition: all 0.3s ease;
-  outline: none;
   text-align: center;
 }
 .search-input:focus {
-  border-color: #9d4edd;
-  box-shadow: 0 0 20px rgba(157, 78, 221, 0.3);
-  background: rgba(30, 10, 50, 0.8);
-}
-.search-input::placeholder {
-  color: rgba(201, 182, 255, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 25px rgba(157, 78, 221, 0.2);
 }
 
-/* --- Section Switcher --- */
 .section-switcher {
-  display: flex;
-  justify-content: center;
-  margin: 30px 0 40px;
+  display: inline-flex;
+  background: rgba(255,255,255,0.05);
+  padding: 4px;
+  border-radius: 30px;
   position: relative;
-  z-index: 10;
 }
-
 .switch-btn {
-  background: rgba(35, 10, 55, 0.35);
-  border: 1px solid rgba(180, 120, 255, 0.3);
-  color: #c9b6ff;
-  padding: 12px 30px;
-  font-size: 1rem;
+  background: transparent;
+  border: none;
+  color: #aaa;
+  padding: 8px 24px;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  border-radius: 25px;
   position: relative;
-  overflow: hidden;
-}
-.switch-btn:first-child { border-radius: 12px 0 0 12px; border-right: none; }
-.switch-btn:last-child { border-radius: 0 12px 12px 0; }
-
-.switch-btn.active {
-  background: linear-gradient(90deg, #8a3fd4, #6a28d1);
-  color: #fff;
-  box-shadow: 0 0 20px rgba(160, 100, 255, 0.4);
-  border-color: rgba(200, 140, 255, 0.5);
-}
-.switch-btn:hover:not(.active) {
-  background: rgba(60, 20, 90, 0.5);
-  color: #e0aaff;
-}
-
-/* --- Section Container --- */
-.section { display: none; position: relative; z-index: 10; min-height: 50vh;}
-.section.active { display: block; }
-
-/* --- Special Text Effects --- */
-.green-word { color: #00ff99; font-weight: 700; text-shadow: 0 0 10px rgba(0,255,100,0.6); }
-.gradient-word {
-  background: linear-gradient(90deg, #ff4fd8, #9d4edd);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 15px rgba(200,100,255,0.4);
-  font-weight: 700;
-}
-.glorious-word {
-  background: linear-gradient(90deg, #FFD700, #FFA500, #FFFACD);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 900;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-.crimson-word {
-  background: linear-gradient(90deg, #ff2b2b, #ff4545);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 900;
-  text-shadow: 0 0 15px rgba(255, 50, 50, 0.5);
-}
-
-/* --- Achievements Grid --- */
-.achievement-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,320px));
-  gap:40px;
-  padding:40px 5% 100px;
-  justify-content:center;
-  perspective: 1000px; /* For 3D Tilt */
-}
-
-/* --- Card Styles --- */
-.achievement-card{
-  background:linear-gradient(145deg,rgba(40,15,70,.5),rgba(20,5,40,.4));
-  border:1px solid rgba(180,120,255,.2);
-  border-radius:18px;
-  overflow:hidden;
-  backdrop-filter:blur(15px);
-  cursor:pointer;
-  box-shadow:0 10px 25px rgba(10,0,20,.6);
-  transition: transform 0.1s ease-out, box-shadow 0.3s, border-color 0.3s;
-  position:relative;
-  /* 3D Tilt Props */
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-
-/* Entrance Animation */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.achievement-card {
-  animation: fadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  opacity: 0; /* Hidden initially */
-}
-
-.achievement-card:hover{
-  box-shadow:0 20px 50px rgba(150,0,255,.3);
-  border-color:rgba(200,140,255,.5);
-}
-
-.achievement-card::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(120deg,rgba(255,255,255,.15),transparent 60%);
-  opacity:0;
-  transition:opacity .4s;
   z-index: 2;
+  transition: color 0.3s;
+}
+.switch-btn.active { color: #fff; }
+
+/* The sliding bubble background for tabs */
+.switch-bg {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  height: calc(100% - 8px);
+  background: #3c096c;
+  border-radius: 25px;
+  transition: all 0.4s var(--ease-apple);
+  z-index: 1;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+/* --- 6. The Grid --- */
+.section { display: none; padding: 40px 20px 100px; max-width: 1400px; margin: 0 auto; position: relative; z-index: 10; }
+.section.active { display: block; }
+.achievement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 40px;
+  perspective: 2000px; /* Essential for 3D */
+}
+
+/* --- 7. Apple-Style Flip Cards --- */
+.card-scene {
+  background-color: transparent;
+  height: 400px; /* Fixed height for consistent flip */
+  cursor: pointer;
+  opacity: 0;
+  animation: fadeSlideUp 0.8s var(--ease-apple) forwards;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card-object {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s var(--ease-apple); /* The flip speed */
+  transform-style: preserve-3d;
+  border-radius: var(--card-radius);
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+}
+
+/* The Flip State */
+.card-scene.flipped .card-object {
+  transform: rotateY(180deg);
+}
+
+/* Common Face Styles */
+.face {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  background: rgba(20, 10, 30, 0.6);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Front Face */
+.face.front {
+  z-index: 2;
+}
+
+/* Dynamic Sheen Effect on Hover (Front) */
+.face.front::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.1), transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s;
   pointer-events: none;
 }
-.achievement-card:hover::before{opacity:.7;}
+.card-scene:hover .face.front::after { opacity: 1; }
 
-.achievement-img-wrapper {
-  overflow: hidden;
-  height: 180px;
+.card-image {
   width: 100%;
-  border-bottom: 1px solid rgba(200,150,255,.1);
+  height: 65%;
+  object-fit: cover;
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  transition: transform 0.8s var(--ease-apple);
+}
+.card-scene:hover .card-image { transform: scale(1.05); }
+
+.card-content-front {
+  padding: 0 25px 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex-grow: 1;
+  transform: translateZ(20px); /* Parallax depth */
 }
 
-.achievement-img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  transition: transform 0.5s ease;
+.card-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+  line-height: 1.2;
 }
-.achievement-card:hover .achievement-img {
-  transform: scale(1.1);
+.tap-hint {
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.tap-hint svg { width: 14px; height: 14px; opacity: 0.7; }
+
+/* Back Face */
+.face.back {
+  transform: rotateY(180deg);
+  background: linear-gradient(145deg, #1a0b2e, #0f0518);
+  padding: 30px;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
 }
 
-.achievement-info{
-  padding:25px;
-  text-align:center;
-  position: relative;
-  z-index: 2;
-  transform: translateZ(20px); /* Lifts text off card in 3D */
+.back-content {
+  text-align: left;
+  width: 100%;
 }
-.achievement-info h3{
-  font-family:'Inter',sans-serif;
-  font-size:1.3rem;
-  color:#e0aaff;
-  margin-bottom:10px;
-  line-height: 1.3;
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 12px 0;
+  font-size: 0.9rem;
 }
-.achievement-info p{
-  color:#c9b6ff;
-  font-size:0.9rem;
-  opacity:0.8;
-  line-height:1.5;
+.stat-label { color: #888; }
+.stat-value { color: #e0aaff; font-weight: 600; text-align: right;}
+.back-desc {
+  margin-top: 20px;
+  color: #ccc;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.close-hint {
+  margin-top: auto;
+  padding-top: 20px;
+  width: 100%;
+  text-align: center;
+  color: #555;
+  font-size: 0.8rem;
 }
 
-/* --- Victory Specific --- */
-.victory-card {
-  border: 1px solid rgba(255, 80, 80, 0.4);
-  background: linear-gradient(145deg, rgba(60, 10, 10, 0.6), rgba(30, 5, 5, 0.5));
-}
-.victory-card:hover {
-  border-color: #ff4545;
-  box-shadow: 0 0 40px rgba(255, 50, 50, 0.3);
-}
-.victory-badge {
+/* Victory Styles */
+.victory-glow {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: linear-gradient(135deg, #ff2b2b, #a80000);
-  color: white;
-  padding: 5px 12px;
+  top: 15px;
+  right: 15px;
+  background: linear-gradient(135deg, #ff4d4d, #b30000);
+  padding: 6px 14px;
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 1px;
-  box-shadow: 0 0 15px rgba(255, 60, 60, 0.6);
-  z-index: 5;
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 50, 50, 0.5);
+  z-index: 10;
   transform: translateZ(30px);
 }
+.card-scene.victory .face { border-color: rgba(255, 100, 100, 0.3); }
 
-/* --- Modal --- */
-.modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  background: rgba(5, 0, 10, 0.7);
-  backdrop-filter: blur(8px);
-  z-index: 9999;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+/* --- 8. Typography Effects --- */
+.six-text {
+  font-family: 'Cinzel Decorative', cursive;
+  background: linear-gradient(to right, #d8b4fe, #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
 }
-.modal.active {
-  display: flex;
-  opacity: 1;
-}
+.highlight { color: #00ff99; text-shadow: 0 0 10px rgba(0,255,153,0.4); }
+.crimson { color: #ff5555; font-weight: 700; }
 
-.modal-content {
-  position: relative;
-  width: 90%;
-  max-width: 500px;
-  padding: 40px;
-  border-radius: 24px;
-  text-align: center;
-  color: #fff;
-  background: rgba(25, 10, 45, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 25px 80px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.1);
-  transform: scale(0.9);
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.modal.active .modal-content {
-  transform: scale(1);
-}
-
-.modal-content img{
-  width:100%;
-  height:220px;
-  object-fit:cover;
-  border-radius:16px;
-  margin-bottom:25px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-.modal-content h2{
-  color:#e0aaff;
-  margin-bottom:15px;
-  font-size: 1.8rem;
-}
-.modal-content p{
-  color:#c9b6ff;
-  margin-bottom:20px;
-  line-height:1.6;
-}
-
-.close-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  padding: 10px 28px;
-  border-radius: 50px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s;
-}
-.close-btn:hover{
-  background: #8a3fd4;
-  box-shadow: 0 0 20px rgba(138, 63, 212, 0.6);
-  border-color: transparent;
-  transform: translateY(-2px);
-}
-
-/* --- Sidebar --- */
+/* --- 9. Sidebar (Mobile & Desktop) --- */
 .ios-sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 250px;
+  width: 260px;
   height: 100vh;
-  background: rgba(15, 5, 25, 0.85);
-  backdrop-filter: blur(20px);
+  background: rgba(10, 5, 16, 0.9);
+  backdrop-filter: blur(30px);
   border-right: 1px solid rgba(255,255,255,0.08);
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  z-index: 1000;
+  padding: 40px 25px;
+  z-index: 999;
   transform: translateX(-100%);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.5s var(--ease-apple);
 }
 .ios-sidebar.open { transform: translateX(0); }
 
-/* Desktop Sidebar always visible if screen big enough */
+/* Desktop: Always show sidebar, adjust layout */
 @media(min-width: 900px) {
   .ios-sidebar { transform: translateX(0); }
-  .page-header, .section-switcher, .section, .search-container { padding-left: 250px; }
+  .page-header, .section { padding-left: 280px; } /* Offset content */
   .sidebar-toggle { display: none; }
 }
 
-.sidebar-header {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #fff;
-  text-align: center;
-  margin-bottom: 50px;
-  letter-spacing: -1px;
-}
-.sidebar-links { list-style: none; }
-.sidebar-links li { margin-bottom: 15px; }
-.nav-link {
-  display: block;
+.sidebar-brand { font-size: 2rem; font-weight: 800; margin-bottom: 50px; text-align: center; letter-spacing: 2px;}
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 18px;
   color: rgba(255,255,255,0.6);
   text-decoration: none;
-  font-weight: 500;
-  padding: 12px 15px;
-  border-radius: 12px;
+  border-radius: 14px;
+  margin-bottom: 8px;
   transition: 0.3s;
+  font-weight: 500;
 }
-.nav-link:hover {
-  background: rgba(255,255,255,0.05);
+.nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.nav-item.active {
+  background: linear-gradient(90deg, #621c9c, #4a127a);
   color: #fff;
-}
-.nav-link.active {
-  background: linear-gradient(90deg, #7b2cbf, #5a189a);
-  color: #fff;
-  box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4);
+  box-shadow: 0 4px 20px rgba(98, 28, 156, 0.3);
 }
 
 .sidebar-toggle {
@@ -441,284 +372,243 @@ body{
   top: 20px;
   left: 20px;
   z-index: 1001;
-  background: rgba(20,5,30,0.6);
+  background: rgba(30,10,40,0.6);
   border: 1px solid rgba(255,255,255,0.2);
   color: white;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
   cursor: pointer;
-  backdrop-filter: blur(5px);
-}
-
-/* --- Overlay when sidebar open on mobile --- */
-.sidebar-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 999;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-.sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-
-/* Font injection for specific text if local font missing */
-@font-face {
-  font-family: 'Diecide Remain';
-  src: url('fonts/DeicideRemain.otf') format('opentype');
-  font-display: swap;
-}
-.six-text {
-  font-family: 'Diecide Remain', 'Cinzel Decorative', cursive; /* Fallback */
-  color: #d8b4fe;
-  text-shadow: 0 0 10px #a855f7;
 }
 
 </style>
 </head>
 <body>
 
-<!-- Mobile Overlay -->
-<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+<!-- Noise & Background -->
+<div class="noise-overlay"></div>
+<div class="bg-wrap">
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+  <div class="orb three"></div>
+</div>
 
-<!-- Navigation -->
-<nav class="ios-sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <span class="six-text">/six</span>
-  </div>
-  <ul class="sidebar-links">
-    <li><a href="index.html" class="nav-link">Home</a></li>
-    <li><a href="achievements.html" class="nav-link active">Achievements</a></li>
-    <li><a href="members.html" class="nav-link">Members</a></li>
-  </ul>
-</nav>
-
+<!-- Mobile Toggle -->
 <button class="sidebar-toggle" onclick="toggleSidebar()">
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
   </svg>
 </button>
 
-<div class="bg-wrap">
-  <div class="bg-layer one"></div>
-  <div class="bg-layer two"></div>
-  <div class="bg-layer three"></div>
-</div>
+<!-- Sidebar -->
+<nav class="ios-sidebar" id="sidebar">
+  <div class="sidebar-brand"><span class="six-text">/six</span></div>
+  <a href="index.html" class="nav-item">Home</a>
+  <a href="achievements.html" class="nav-item active">Achievements</a>
+  <a href="members.html" class="nav-item">Members</a>
+</nav>
 
 <header class="page-header">
-  <h1>/SIX Achievements</h1>
-  <p>Witness our <span class="glorious-word">Glorious</span> History.</p>
-  
-  <div class="search-container">
-    <input type="text" id="searchInput" class="search-input" placeholder="Search achievements...">
-  </div>
-
-  <div class="section-switcher">
-    <button class="switch-btn active" data-section="general">General</button>
-    <button class="switch-btn" data-section="victories">Victories</button>
+  <div class="header-content">
+    <h1>Glorious Achievements</h1>
+    <p>A history of dominance.</p>
+    
+    <div class="controls-wrapper">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search history...">
+      
+      <div class="section-switcher">
+        <div class="switch-bg"></div>
+        <button class="switch-btn active" data-target="general">General</button>
+        <button class="switch-btn" data-target="victories">Victories</button>
+      </div>
+    </div>
   </div>
 </header>
 
 <main>
-  <!-- General Section -->
-  <section class="section active" id="general-section">
+  <section id="general" class="section active">
     <div class="achievement-grid" id="generalGrid"></div>
   </section>
-
-  <!-- Victories Section -->
-  <section class="section" id="victories-section">
+  
+  <section id="victories" class="section">
     <div class="achievement-grid" id="victoriesGrid"></div>
   </section>
 </main>
 
-<!-- Modal -->
-<div class="modal" id="achievementModal">
-  <div class="modal-content">
-    <img id="modalImg" src="" alt="achievement">
-    <h2 id="modalTitle"></h2>
-    <p id="modalDesc"></p>
-    <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">
-      <p id="modalExtra" style="font-size:0.9rem; opacity:0.8;"></p>
-    </div>
-    <button class="close-btn" id="closeModal">Close</button>
-  </div>
-</div>
-
 <script>
-// --- Data ---
+/* --- Data Source --- */
 const achievements = [
   {
-    title: 'The <span class="green-word">Richest</span> in <span class="gradient-word">SwiftSMP</span>',
-    desc: "First /six member to be the richest on SwiftSMP's Season 9.",
+    title: 'Richest in SwiftSMP',
+    desc: "First /six member to achieve dominance on Season 9.",
     img: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
-    extra: 'Unlocked by: <span class="crimson-word">The_Killers_</span><br>Date: Nov 11, 2025',
-    section: 'general',
-    rawTitle: "The Richest in SwiftSMP" // Plain text for searching
+    date: 'Nov 11, 2025',
+    player: 'The_Killers_',
+    stats: 'Net Worth: $500M+',
+    type: 'general'
   },
   {
     title: 'CPX VS /SIX',
-    desc: "NethPot: 2 - 0, Lineup(s): Mo0a , Wpun , Steral1n , Eucl1d_",
+    desc: "A flawless victory against the CPX coalition.",
     img: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
-    extra: 'Opponent: CPX<br>Date: November 9, 2025<br>Casualties: None',
-    section: 'victories',
-    rawTitle: "CPX VS /SIX"
+    date: 'Nov 09, 2025',
+    player: 'Team Effort',
+    stats: 'Score: 2-0 | Casualties: 0',
+    type: 'victories'
   }
 ];
 
-// --- Core Logic ---
+/* --- Rendering Engine --- */
 const generalGrid = document.getElementById('generalGrid');
 const victoriesGrid = document.getElementById('victoriesGrid');
-let currentFilter = '';
 
-function renderAchievements() {
-  // Clear grids
+function renderCards(filterText = "") {
   generalGrid.innerHTML = '';
   victoriesGrid.innerHTML = '';
-  
-  achievements.forEach((a, index) => {
-    // Filter logic
-    const matchesSearch = a.rawTitle.toLowerCase().includes(currentFilter) || 
-                          a.desc.toLowerCase().includes(currentFilter);
+
+  achievements.forEach((item, index) => {
+    // Filter
+    if (!item.title.toLowerCase().includes(filterText) && !item.desc.toLowerCase().includes(filterText)) return;
+
+    // Card Structure
+    const scene = document.createElement('div');
+    scene.className = `card-scene ${item.type === 'victories' ? 'victory' : ''}`;
+    scene.style.animationDelay = `${index * 0.1}s`;
     
-    if (!matchesSearch) return;
+    // Victory Badge logic
+    let badgeHTML = item.type === 'victories' ? `<div class="victory-glow">VICTORY</div>` : '';
 
-    // Create Card
-    const card = document.createElement('div');
-    card.className = a.section === 'victories' ? 'achievement-card victory-card' : 'achievement-card';
-    
-    // Stagger animation
-    card.style.animationDelay = `${index * 0.1}s`;
+    // HTML Construction
+    scene.innerHTML = `
+      ${badgeHTML}
+      <div class="card-object">
+        <!-- Front -->
+        <div class="face front">
+          <img src="${item.img}" class="card-image" alt="${item.title}">
+          <div class="card-content-front">
+            <h3 class="card-title">${formatTitle(item.title)}</h3>
+            <div class="tap-hint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+              Tap to Flip
+            </div>
+          </div>
+        </div>
+        
+        <!-- Back -->
+        <div class="face back">
+          <div class="back-content">
+            <h3 style="color:#fff; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:10px;">Details</h3>
+            
+            <div class="stat-row">
+              <span class="stat-label">Date</span>
+              <span class="stat-value">${item.date}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Unlocked By</span>
+              <span class="stat-value highlight">${item.player}</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Stats</span>
+              <span class="stat-value">${item.stats}</span>
+            </div>
+            
+            <p class="back-desc">${item.desc}</p>
+            <div class="close-hint">Click to close</div>
+          </div>
+        </div>
+      </div>
+    `;
 
-    // 3D Tilt Logic
-    card.addEventListener('mousemove', handleTilt);
-    card.addEventListener('mouseleave', resetTilt);
-    card.addEventListener('click', () => openModal(a));
+    // Event Listeners
+    scene.addEventListener('click', () => scene.classList.toggle('flipped'));
+    scene.addEventListener('mousemove', handleMouseMove);
 
-    if (a.section === 'victories') {
-      const badge = document.createElement('div');
-      badge.className = 'victory-badge';
-      badge.textContent = 'VICTORY';
-      card.appendChild(badge);
-    }
-
-    const imgWrapper = document.createElement('div');
-    imgWrapper.className = 'achievement-img-wrapper';
-    
-    const img = document.createElement('img');
-    img.src = a.img;
-    img.className = 'achievement-img';
-    imgWrapper.appendChild(img);
-
-    const info = document.createElement('div');
-    info.className = 'achievement-info';
-    info.innerHTML = `<h3>${a.title}</h3><p>${a.desc}</p>`;
-
-    card.appendChild(imgWrapper);
-    card.appendChild(info);
-
-    // Append to correct grid
-    if (a.section === 'general') generalGrid.appendChild(card);
-    else victoriesGrid.appendChild(card);
+    // Append
+    if (item.type === 'general') generalGrid.appendChild(scene);
+    else victoriesGrid.appendChild(scene);
   });
-
-  // Handle empty state
-  if(generalGrid.children.length === 0 && document.getElementById('general-section').classList.contains('active')) {
-    generalGrid.innerHTML = '<p style="color:#aaa; grid-column:1/-1; text-align:center;">No achievements found.</p>';
-  }
 }
 
-// --- 3D Tilt Effect ---
-function handleTilt(e) {
+/* --- Dynamic Lighting Effect --- */
+function handleMouseMove(e) {
   const card = e.currentTarget;
   const rect = card.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const x = ((e.clientX - rect.left) / rect.width) * 100;
+  const y = ((e.clientY - rect.top) / rect.height) * 100;
   
-  const centerX = rect.width / 2;
-  const centerY = rect.height / 2;
-  
-  const rotateX = ((y - centerY) / centerY) * -8; // Max -8deg rotation
-  const rotateY = ((x - centerX) / centerX) * 8; 
-
-  card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+  card.style.setProperty('--mouse-x', `${x}%`);
+  card.style.setProperty('--mouse-y', `${y}%`);
 }
 
-function resetTilt(e) {
-  e.currentTarget.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+/* --- Utilities --- */
+function formatTitle(title) {
+  return title.replace(/SwiftSMP/g, '<span style="color:#e0aaff">SwiftSMP</span>')
+              .replace(/CPX/g, '<span class="crimson">CPX</span>');
 }
 
-// --- Search ---
-document.getElementById('searchInput').addEventListener('input', (e) => {
-  currentFilter = e.target.value.toLowerCase();
-  renderAchievements();
-});
-
-// --- Tabs ---
-const switchButtons = document.querySelectorAll('.switch-btn');
+/* --- Switcher Logic --- */
+const switchBtns = document.querySelectorAll('.switch-btn');
+const switchBg = document.querySelector('.switch-bg');
 const sections = document.querySelectorAll('.section');
 
-switchButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    switchButtons.forEach(b => b.classList.remove('active'));
-    button.classList.add('active');
-    
-    const target = button.getAttribute('data-section');
-    sections.forEach(s => {
-      s.classList.remove('active');
-      if(s.id === `${target}-section`) s.classList.add('active');
+switchBtns.forEach((btn, index) => {
+  btn.addEventListener('click', () => {
+    // 1. Move background bubble
+    const width = btn.offsetWidth;
+    const left = btn.offsetLeft;
+    switchBg.style.width = `${width}px`;
+    switchBg.style.transform = `translateX(${left}px)`;
+
+    // 2. Active Class
+    switchBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // 3. Show Section
+    const target = btn.dataset.target;
+    sections.forEach(sec => {
+      sec.classList.remove('active');
+      if(sec.id === target) {
+        sec.classList.add('active');
+        // Re-trigger animations
+        const cards = sec.querySelectorAll('.card-scene');
+        cards.forEach(c => {
+          c.style.animation = 'none';
+          c.offsetHeight; /* trigger reflow */
+          c.style.animation = `fadeSlideUp 0.8s var(--ease-apple) forwards ${Math.random() * 0.2}s`;
+        });
+      }
     });
-    
-    // Re-render to restart animations logic if needed, or simply let CSS handle display
-    renderAchievements(); 
   });
 });
 
-// --- Modal ---
-const modal = document.getElementById('achievementModal');
-const closeModalBtn = document.getElementById('closeModal');
+// Init Switcher Position
+window.addEventListener('load', () => {
+  const activeBtn = document.querySelector('.switch-btn.active');
+  switchBg.style.width = `${activeBtn.offsetWidth}px`;
+  switchBg.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+  renderCards();
+});
 
-function openModal(data) {
-  document.getElementById('modalImg').src = data.img;
-  document.getElementById('modalTitle').innerHTML = data.title;
-  document.getElementById('modalDesc').textContent = data.desc;
-  document.getElementById('modalExtra').innerHTML = data.extra;
-  
-  modal.classList.add('active');
-}
+/* --- Search Logic --- */
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  renderCards(e.target.value.toLowerCase());
+});
 
-function closeModal() {
-  modal.classList.remove('active');
-}
-
-closeModalBtn.addEventListener('click', closeModal);
-modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
-document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
-
-// --- Mobile Sidebar ---
+/* --- Mobile Sidebar --- */
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
-  document.querySelector('.sidebar-overlay').classList.toggle('active');
 }
 
-// --- Init ---
-renderAchievements();
-
-// Style "six" text dynamically
-function styleSixText() {
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  const nodes = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode);
-
-  nodes.forEach(node => {
-    if (node.nodeValue && /(\/six|sais)/i.test(node.nodeValue) && node.parentElement.tagName !== 'SCRIPT') {
-      const span = document.createElement('span');
-      span.innerHTML = node.nodeValue.replace(/(\/six|sais)/gi, '<span class="six-text">$1</span>');
-      node.parentNode.replaceChild(span, node);
-    }
-  });
+/* --- Text Formatter for /six --- */
+const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+let node;
+while (node = walker.nextNode()) {
+  if (node.nodeValue.match(/\/six/i) && node.parentElement.tagName !== 'SCRIPT' && node.parentElement.tagName !== 'STYLE') {
+    const span = document.createElement('span');
+    span.innerHTML = node.nodeValue.replace(/\/six/gi, '<span class="six-text">/six</span>');
+    node.parentNode.replaceChild(span, node);
+  }
 }
-window.addEventListener('load', styleSixText);
-
 </script>
 </body>
 </html>
