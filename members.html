@@ -1,536 +1,592 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>/six - Members</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    /* ========== RESET ========== */
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%}
-    body{font-family:'Exo 2',sans-serif;background:#050006;color:#e8e6f3;overflow-x:hidden}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>/six | OPERATIVES</title>
 
-    /* ========== APP LAYOUT ========== */
-    .app{max-width:1200px;margin:40px auto;padding:28px;border-radius:18px;background:linear-gradient(145deg, rgba(20,5,35,0.7), rgba(10,2,20,0.8));border:1px solid rgba(150,80,220,0.15);backdrop-filter:blur(12px);position:relative;z-index:1}
-    .header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-    .clan-title{font-size:36px;font-weight:800;background:linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd);-webkit-background-clip:text;color:transparent}
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
-    /* ========== MEMBER TREE ========== */
-    .member-tree-container{position:relative;padding:30px 10px}
-    .tree-structure{display:flex;flex-direction:column;align-items:center;gap:40px;position:relative}
-    .tree-level{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2}
+<style>
+/* ======================= VOID CORE ======================= */
+:root {
+  --void-bg: #030005;
+  --primary: #9d4edd;
+  --primary-dim: rgba(157, 78, 221, 0.1);
+  --accent: #e0aaff;
+  --glitch: #0ff;
+  --danger: #ff2a2a;
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-code: 'Space Mono', monospace;
+  --ease-tech: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 
-    /* ========== TREE WITH CHAINS ========== */
-    .tree-connections{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
-    .chain{position:absolute;background:linear-gradient(90deg, rgba(157, 77, 221, 0.4), rgba(192, 132, 252, 0.4), rgba(157, 77, 221, 0.4));border-radius:2px;transform-origin:0 50%}
-    .chain-link{position:absolute;width:12px;height:12px;border-radius:50%;background:rgba(157, 77, 221, 0.7);border:1px solid rgba(224, 170, 255, 0.5);box-shadow:0 0 8px rgba(157, 77, 221, 0.5)}
+* { box-sizing: border-box; cursor: none; }
+html, body {
+  margin: 0; padding: 0; min-height: 100%;
+  background-color: var(--void-bg);
+  color: #e8e6f3;
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
 
-    /* ========== FLIP CARD BASE ========== */
-    .member-node{perspective:1200px;width:220px;position:relative;z-index:2}
-    .flip-card{width:220px;height:320px;position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.9,.3,1);cursor:pointer;border-radius:14px}
-    .flip-card.is-flipped{transform:rotateY(180deg)}
-    .flip-face{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:18px;border:1px solid rgba(150,80,220,0.12);box-shadow:0 8px 25px rgba(10,0,25,0.45)}
-    .flip-face.front{z-index:2}
-    .flip-face.back{transform:rotateY(180deg);background:linear-gradient(145deg, rgba(10,5,20,0.9), rgba(25,10,45,0.85));gap:8px}
+/* ======================= BACKGROUND STAGE ======================= */
+.void-stage {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(circle at 50% 0%, #1a002e, #030005 80%);
+}
+.grid-floor {
+  position: absolute; inset: -50%;
+  background-image: 
+    linear-gradient(var(--primary-dim) 1px, transparent 1px),
+    linear-gradient(90deg, var(--primary-dim) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform: perspective(500px) rotateX(60deg);
+  animation: gridMove 20s linear infinite;
+  mask-image: radial-gradient(circle, black 30%, transparent 70%);
+}
+@keyframes gridMove {
+  0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+  100% { transform: perspective(500px) rotateX(60deg) translateY(60px); }
+}
 
-    /* ========== THEMES (apply via JS: theme = 'purple' | 'black') ========== */
-    .theme-purple .flip-face.front{background:linear-gradient(145deg, rgba(50,20,80,0.35), rgba(30,10,50,0.2));}
-    .theme-purple .member-name,.theme-purple .member-rank{color:#e0aaff}
+/* ======================= CURSOR ======================= */
+.cursor-dot {
+  width: 6px; height: 6px; background: white; position: fixed;
+  border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+}
+.cursor-circle { 
+  width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.4); position: fixed;
+  border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background-color 0.2s;
+}
+body.hovering .cursor-circle { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-color: var(--primary); }
 
-    .theme-black .flip-face.front{background:linear-gradient(145deg, rgba(12,12,12,0.95), rgba(22,22,22,0.95));border:1px solid rgba(255,255,255,0.04)}
-    .theme-black .member-name,.theme-black .member-rank{color:#ddd}
+/* ======================= HUD LAYOUT ======================= */
+.hud-header {
+  position: fixed; top: 0; left: 0; right: 0;
+  padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;
+  z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px); background: rgba(3,0,5,0.9);
+}
+.hud-brand { font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; letter-spacing: 2px; text-decoration: none; color: white; }
+.hud-brand span { color: var(--primary); }
 
-    /* Fixed background image styling - no transparency issue */
-    .bg-img{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.22;filter:blur(1px);z-index:-1}
-    .flip-face.front{position:relative;overflow:hidden}
-    .flip-face.front .content-wrapper{position:relative;z-index:2}
+.app-container {
+  padding-top: 100px;
+  max-width: 1400px; margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  z-index: 10;
+}
 
-    /* ========== AVATAR / TEXT ========== */
-    .member-avatar{width:86px;height:86px;border-radius:50%;border:2px solid rgba(180,100,255,0.35);box-shadow:0 6px 18px rgba(100,30,140,0.2);margin-top:6px}
-    .member-name{font-size:18px;font-weight:800;margin-top:12px}
-    .member-rank{font-size:13px;color:#c9b6ff;margin-top:6px}
+/* ======================= CONTROLS TERMINAL ======================= */
+.control-deck {
+  display: flex; flex-wrap: wrap; gap: 20px;
+  justify-content: space-between; align-items: flex-end;
+  padding: 0 20px 30px;
+  border-bottom: 1px solid var(--primary-dim);
+  margin-bottom: 40px;
+}
 
-    /* ========== TIER ROW (icons aligned center with text) ========== */
-    .tier-row{display:flex;flex-direction:column;gap:6px;margin-top:10px}
-    .tier-item{display:inline-flex;align-items:center;gap:8px;font-weight:700;padding:6px 10px;border-radius:999px;font-size:13px}
-    .tier-item .tier-icon{width:18px;height:18px;background-size:contain;background-repeat:no-repeat;background-position:center;display:inline-block}
-    /* colors for tier types */
-    .tier-crystal{color:#bb86fc}
-    .tier-sword{color:#7ee3d6}
-    .tier-nethpot{color:#ff9e64}
-    .tier-smp{color:#64ffa4}
+.mode-selector {
+  display: flex; gap: 5px; background: rgba(20,10,30,0.6);
+  padding: 5px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);
+}
 
-    /* ========== BACK FACE LAYOUT ========== */
-    .back-top{width:100%;text-align:center;font-weight:800;padding-top:6px}
-    .back-avatar{width:72px;height:72px;border-radius:50%;border:2px solid rgba(255,255,255,0.06);margin:8px auto}
-    .back-name{font-weight:900;font-size:16px}
-    .socials{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-    .social-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.03);font-size:13px;transition:all 0.3s ease;text-decoration:none;color:#e8e6f3}
-    .social-btn:hover{background:rgba(255,255,255,0.1);transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.2)}
-    .social-icon{width:18px;height:18px;background-size:contain;background-repeat:no-repeat;background-position:center}
+.cyber-btn {
+  background: transparent; color: #888; border: none;
+  padding: 10px 20px; font-family: var(--font-code); font-size: 0.8rem;
+  text-transform: uppercase; cursor: none; transition: all 0.2s;
+  position: relative; overflow: hidden;
+}
+.cyber-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+.cyber-btn.active { background: var(--primary); color: #000; font-weight: 700; box-shadow: 0 0 15px var(--primary-dim); }
+.cyber-btn.active::before {
+  content: ''; position: absolute; left:0; top:0; bottom:0; width: 3px; background: #fff;
+}
 
-    /* Social button specific colors */
-    .social-btn[data-social="tiktok"]{border-left:3px solid #ff0050}
-    .social-btn[data-social="youtube"]{border-left:3px solid #ff0000}
-    .social-btn[data-social="discord"]{border-left:3px solid #5865f2}
-    .social-btn[data-social="twitch"]{border-left:3px solid #9146ff}
+.filter-btn {
+  border: 1px solid var(--primary); color: var(--primary);
+  padding: 8px 16px; font-family: var(--font-code); font-size: 0.75rem;
+  background: rgba(157,78,221,0.05); clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  transition: 0.2s;
+}
+.filter-btn:hover { background: var(--primary); color: #fff; transform: translateY(-2px); }
 
-    /* ========== CARD TYPE STYLES (keeps old special types) ========== */
-    .member-tree-card.diamond .member-name{font-weight:900}
+/* ======================= TREE & CARDS ======================= */
+.member-tree-container {
+  position: relative; padding: 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 60px;
+}
 
-    /* ========== SMALL UX ========== */
-    .controls{display:flex;gap:10px;align-items:center}
-    .sort-btn{padding:8px 12px;border-radius:8px;background:linear-gradient(90deg,rgba(90,24,154,0.5),rgba(60,10,120,0.4));border:1px solid rgba(150,80,220,0.25);color:#e2d9ff;cursor:pointer;transition:all 0.3s ease}
-    .sort-btn:hover{background:linear-gradient(90deg,rgba(110,34,174,0.6),rgba(80,20,140,0.5));transform:translateY(-2px)}
+/* Laser Beams (Replacements for chains) */
+.connections-layer {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: -1; pointer-events: none;
+}
+.laser-beam {
+  position: absolute; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  box-shadow: 0 0 8px var(--primary);
+  transform-origin: 0 50%; opacity: 0.6;
+}
 
-    /* ========== GAME MODE SELECTOR ========== */
-    .game-mode-selector{display:flex;gap:10px;margin-top:15px;flex-wrap:wrap}
-    .game-mode-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:rgba(30,10,50,0.4);border:1px solid rgba(150,80,220,0.25);color:#e2d9ff;cursor:pointer;transition:all 0.3s ease}
-    .game-mode-btn.active{background:linear-gradient(90deg,rgba(90,24,154,0.7),rgba(60,10,120,0.6));border-color:rgba(200,120,255,0.5)}
-    .game-mode-btn:hover{background:rgba(40,15,70,0.6)}
-    .game-mode-icon{width:20px;height:20px;background-size:contain;background-repeat:no-repeat;background-position:center}
+.tree-level {
+  display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;
+  width: 100%; position: relative; z-index: 5;
+}
 
-    /* ========== ANIMATIONS ========== */
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(157, 77, 221, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(157, 77, 221, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(157, 77, 221, 0); }
-    }
-    
-    .pulse { animation: pulse 2s infinite; }
+/* CARD ENGINE */
+.card-scene {
+  width: 240px; height: 340px;
+  perspective: 1200px;
+}
 
-    @media(max-width:720px){
-      .flip-card{width:180px;height:290px}
-      .member-node{width:180px}
-      .header-row{flex-direction:column;align-items:flex-start;gap:15px}
-      .controls{width:100%;justify-content:flex-start}
-    }
-  </style>
+.holo-card {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s var(--ease-tech);
+}
+.card-scene:hover .holo-card { transform: scale(1.02); }
+.holo-card.flipped { transform: rotateY(180deg); }
+
+.face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  border-radius: 4px;
+  border: 1px solid rgba(157, 78, 221, 0.3);
+  background: rgba(10, 5, 16, 0.85);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+/* --- FRONT FACE --- */
+.face.front {
+  display: flex; flex-direction: column; align-items: center; padding: 25px 15px;
+}
+.face.front::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height: 2px;
+  background: var(--primary); box-shadow: 0 0 10px var(--primary);
+}
+
+.avatar-frame {
+  width: 90px; height: 90px;
+  border: 2px solid var(--primary);
+  border-radius: 50%; padding: 4px;
+  position: relative;
+  box-shadow: 0 0 20px var(--primary-dim);
+}
+.avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; filter: grayscale(0.2); transition: 0.3s; }
+.card-scene:hover .avatar-img { filter: grayscale(0); }
+
+.mem-name {
+  margin-top: 15px; font-family: var(--font-display);
+  font-size: 1.2rem; color: #fff; text-transform: uppercase; letter-spacing: 1px;
+}
+.mem-rank {
+  font-family: var(--font-code); font-size: 0.75rem; color: var(--accent);
+  margin-bottom: 15px; opacity: 0.8;
+}
+
+.tier-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;
+  margin-top: auto;
+}
+.tier-chip {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  padding: 5px; text-align: center; border-radius: 2px;
+  font-family: var(--font-code); font-size: 0.7rem; color: #ccc;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.tier-chip.active { border-color: var(--primary); color: var(--accent); background: rgba(157,78,221,0.1); }
+.tier-icon { width: 12px; height: 12px; opacity: 0.8; }
+
+/* --- BACK FACE --- */
+.face.back {
+  transform: rotateY(180deg);
+  background: linear-gradient(135deg, #0f0518, #000);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 20px; text-align: center;
+}
+.back-data {
+  font-family: var(--font-code); font-size: 0.8rem; color: #888;
+  margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; width: 100%;
+}
+.social-grid {
+  display: flex; flex-direction: column; gap: 10px; width: 100%;
+}
+.social-link {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 8px; border: 1px solid #333; color: #fff; text-decoration: none;
+  font-family: var(--font-code); font-size: 0.8rem;
+  transition: 0.2s;
+}
+.social-link:hover { border-color: var(--primary); background: var(--primary-dim); }
+
+/* --- SPECIAL CARDS --- */
+.card-scene.diamond .face { border-color: #0ff; box-shadow: 0 0 15px rgba(0,255,255,0.1); }
+.card-scene.diamond .face.front::before { background: #0ff; box-shadow: 0 0 10px #0ff; }
+.card-scene.diamond .mem-name { text-shadow: 0 0 5px #0ff; }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .control-deck { flex-direction: column; align-items: stretch; }
+  .mode-selector { overflow-x: auto; }
+}
+</style>
 </head>
 <body>
-  <main class="app">
-    <div class="header-row">
-      <div>
-        <div class="clan-title">/six Members</div>
-        <div style="color:#c9b6ff;margin-top:6px">Click a card to flip — all customization comes from the script (members array)</div>
-        
-        <div class="game-mode-selector">
-          <div class="game-mode-btn active" data-mode="all">
-            <span class="game-mode-icon" style="background-image: url('assets/icons/all.png')"></span>
-            <span>All Modes</span>
-          </div>
-          <div class="game-mode-btn" data-mode="crystal">
-            <span class="game-mode-icon" style="background-image: url('https://media.discordapp.net/attachments/1360264592025976923/1437527360130912276/Screenshot_20251111-033709_1-removebg-preview.png?ex=6913912e&is=69123fae&hm=fa4e5b5602cbc868b72f9b7942edab2e71aa5992ebd90b48e19a2dbde3ae69c0&=&format=webp&quality=lossless')"></span>
-            <span>Crystal PvP</span>
-          </div>
-          <div class="game-mode-btn" data-mode="sword">
-            <span class="game-mode-icon" style="background-image: url('https://media.discordapp.net/attachments/1360264592025976923/1437527359413813389/Screenshot_20251111-033454_1-removebg-preview.png?ex=6913912e&is=69123fae&hm=08e46601b7387d41addf576199e5802cedd0cd04748c307ae1f7fdd5e432273e&=&format=webp&quality=lossless')"></span>
-            <span>Sword PvP</span>
-          </div>
-          <div class="game-mode-btn" data-mode="nethpot">
-            <span class="game-mode-icon" style="background-image: url('https://media.discordapp.net/attachments/1360264592025976923/1437527358562242671/Screenshot_20251111-033424_1-removebg-preview.png?ex=6913912e&is=69123fae&hm=47e33fb2f371dbf8baa5de0fd83316c466923f605e67a12b4db368f7a0150ca3&=&format=webp&quality=lossless')"></span>
-            <span>NethPot</span>
-          </div>
-          <div class="game-mode-btn" data-mode="smp">
-            <span class="game-mode-icon" style="background-image: url('https://media.discordapp.net/attachments/1360264592025976923/1437527360776962168/Screenshot_20251111-033731_1-removebg-preview.png?ex=6913912e&is=69123fae&hm=67b4de2b18eeb5cc007bcddeda25ca7d35dad40b999087f228a07ee5b7cf01b3&=&format=webp&quality=lossless')"></span>
-            <span>SMP</span>
-          </div>
-        </div>
+
+<!-- AUDIO ENGINE -->
+<audio id="sfx-hover" src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA=="></audio>
+<audio id="sfx-flip" src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA=="></audio>
+
+<!-- CURSOR -->
+<div class="cursor-dot"></div>
+<div class="cursor-circle"></div>
+
+<!-- BACKGROUND -->
+<div class="void-stage">
+  <div class="grid-floor"></div>
+</div>
+
+<!-- HEADER -->
+<nav class="hud-header">
+  <a href="index.html" class="hud-brand">/SIX<span>_DB</span></a>
+  <div style="font-family:var(--font-code); font-size:0.8rem; color:var(--primary);">
+    <span class="pulse-dot" style="display:inline-block; width:6px; height:6px; background:#57F287; border-radius:50%; margin-right:5px; box-shadow:0 0 8px #57F287;"></span>
+    LIVE ROSTER
+  </div>
+</nav>
+
+<div class="app-container">
+  
+  <!-- CONTROLS -->
+  <div class="control-deck">
+    <div>
+      <div style="font-family:var(--font-display); color:#fff; font-size:1.5rem; margin-bottom:5px;">OPERATIVES</div>
+      <div style="font-family:var(--font-code); color:#666; font-size:0.8rem;">Select combat specialization</div>
+    </div>
+    
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <div class="mode-selector">
+        <button class="cyber-btn active" data-mode="all">All Units</button>
+        <button class="cyber-btn" data-mode="crystal">Crystal</button>
+        <button class="cyber-btn" data-mode="sword">Sword</button>
+        <button class="cyber-btn" data-mode="nethpot">Pot</button>
+        <button class="cyber-btn" data-mode="smp">SMP</button>
       </div>
-      <div class="controls">
-        <button class="sort-btn" id="sortByRank">Sort by Rank</button>
-        <button class="sort-btn" id="sortByTier">Sort by Tier (HT → LT)</button>
+      
+      <div style="display:flex; gap:5px;">
+        <button class="filter-btn" id="sortByRank">RANK</button>
+        <button class="filter-btn" id="sortByTier">TIER</button>
       </div>
     </div>
+  </div>
 
-    <section class="member-tree-container" id="memberTree">
-      <div class="tree-connections" id="treeConnections"></div>
-    </section>
-  </main>
+  <!-- TREE AREA -->
+  <div class="member-tree-container" id="memberTree">
+    <div class="connections-layer" id="connectionsLayer"></div>
+    <!-- Nodes injected by JS -->
+  </div>
 
-  <script>
-    /* ========== CONFIG: AVAILABLE SOCIAL ICONS (point to your assets/icons/*) ========== */
-    const SOCIAL_ICONS = {
-      tiktok: 'assets/icons/tiktok.png',
-      youtube: 'assets/icons/youtube.png',
-      discord: 'assets/icons/discord.png',
-      twitch: 'assets/icons/twitch.png'
-    };
+</div>
 
-    /* ========== GAME MODE ICONS ========== */
-    const GAME_MODE_ICONS = {
-      crystal: 'assets/icons/crystalpvp.png',
-      sword: 'assets/icons/swordpvp.png',
-      nethpot: 'assets/icons/nethpot.png',
-      smp: 'assets/icons/smp.png'
-    };
+<script>
+/* ======================= DATA CORE ======================= */
+/* Customize your members here. The rest handles itself. */
+const members = [
+  {
+    name: 'Lair', rank: 'FOUNDER', level: 1,
+    avatar: 'https://minotar.net/avatar/Lair/128.png',
+    cardType: 'diamond', // adds cyan glitch effect
+    tiers: { crystal: 'HT1', sword: 'HT1', nethpot: 'HT2' },
+    socials: { discord: 'https://discord.gg/example', youtube: '#' }
+  },
+  {
+    name: 'Toofles', rank: 'CO-LEADER', level: 2,
+    avatar: 'https://minotar.net/avatar/Toofles/128.png',
+    cardType: 'diamond',
+    tiers: { crystal: 'HT1', nethpot: 'HT3', smp: 'Builder' },
+    socials: { discord: '#' }
+  },
+  {
+    name: 'PVP_King', rank: 'ELITE', level: 3,
+    avatar: 'https://minotar.net/avatar/MHF_Steve/128.png',
+    tiers: { crystal: 'HT1', sword: 'HT2' },
+    socials: { twitch: '#', youtube: '#' }
+  },
+  {
+    name: 'Shadow', rank: 'SOLDIER', level: 4,
+    avatar: 'https://minotar.net/avatar/MHF_Alex/128.png',
+    tiers: { sword: 'LT1', nethpot: 'LT2' },
+    socials: { tiktok: '#' }
+  },
+  {
+    name: 'BuilderX', rank: 'MEMBER', level: 4,
+    avatar: 'https://minotar.net/avatar/Notch/128.png',
+    tiers: { smp: 'Master' },
+    socials: { youtube: '#' }
+  },
+  {
+    name: 'Viper', rank: 'ELITE', level: 3,
+    avatar: 'https://minotar.net/avatar/Herobrine/128.png',
+    tiers: { crystal: 'HT2', nethpot: 'HT1' },
+    socials: { discord: '#' }
+  }
+];
 
-    /* ========== MEMBERS ARRAY: toggle everything here. This is the only place to customize cards. ========== */
-    const members = [
-      {
-        name: 'Lair', rank: 'Founder & Leader', level:1,
-        avatar: 'https://minotar.net/avatar/Lair/128.png',
-        cardType: 'diamond',
-        theme: 'purple', // 'purple' or 'black'
-        // tiers are optional. If absent or null, don't render that tier.
-        crystalTier: 'HT1', hasCrystal: true,
-        swordTier: 'HT1', hasSword: true,
-        nethpotTier: 'HT2', hasNethpot: true,
-        smpTier: null, hasSmp: false,
-        socials: ['discord','youtube'], // choose any keys from SOCIAL_ICONS
-        socialLinks: {
-          discord: 'https://discord.gg/example',
-          youtube: 'https://youtube.com/example'
-        },
-        backgroundImage: null // or 'assets/backgrounds/special.jpg' (full-cover image)
-      },
-      {
-        name: 'Toofles', rank: 'Co-Leader', level:2,
-        avatar: 'https://minotar.net/avatar/Toofles/128.png',
-        cardType: 'diamond', theme: 'purple',
-        crystalTier: 'HT1', hasCrystal: true,
-        swordTier: null, hasSword: false, // sword disabled here
-        nethpotTier: 'HT3', hasNethpot: true,
-        smpTier: 'Member', hasSmp: true,
-        socials: ['discord'],
-        socialLinks: {
-          discord: 'https://discord.gg/example'
-        },
-        backgroundImage: null
-      },
-      {
-        name: 'PVP_MASTERK', rank: 'Developer/Grinder', level:3,
-        avatar: 'https://minotar.net/avatar/PVP_MASTERK/128.png',
-        cardType: 'golden', theme: 'black', // example of a black-theme card
-        crystalTier: 'HT1', hasCrystal: true,
-        swordTier: null, hasSword: false,
-        nethpotTier: null, hasNethpot: false,
-        smpTier: 'Builder', hasSmp: true,
-        socials: ['twitch','youtube'],
-        socialLinks: {
-          twitch: 'https://twitch.tv/example',
-          youtube: 'https://youtube.com/example'
-        },
-        backgroundImage: 'https://th.bing.com/th/id/R.9859b727dd8dc0fc2ba5ac213bbe1514?rik=kg8pTlS21q2W7Q&pid=ImgRaw&r=0'
-      },
-      {
-        name: 'Nefusho', rank: 'Member', level:4,
-        avatar: 'https://minotar.net/avatar/NewRecruit/128.png',
-        cardType: 'bronze', theme: 'purple',
-        crystalTier: null, hasCrystal: false,
-        swordTier: 'LT10', hasSword: true,
-        nethpotTier: 'LT5', hasNethpot: true,
-        smpTier: null, hasSmp: false,
-        socials: [],
-        socialLinks: {},
-        backgroundImage: null
-      },
-      {
-        name: 'ShadowBlade', rank: 'PvP Specialist', level:3,
-        avatar: 'https://minotar.net/avatar/Steve/128.png',
-        cardType: 'golden', theme: 'purple',
-        crystalTier: 'HT2', hasCrystal: true,
-        swordTier: 'HT3', hasSword: true,
-        nethpotTier: 'HT1', hasNethpot: true,
-        smpTier: null, hasSmp: false,
-        socials: ['tiktok', 'discord'],
-        socialLinks: {
-          tiktok: 'https://tiktok.com/@example',
-          discord: 'https://discord.gg/example'
-        },
-        backgroundImage: null
-      },
-      {
-        name: 'BuilderPro', rank: 'SMP Architect', level:4,
-        avatar: 'https://minotar.net/avatar/Alex/128.png',
-        cardType: 'bronze', theme: 'black',
-        crystalTier: null, hasCrystal: false,
-        swordTier: null, hasSword: false,
-        nethpotTier: null, hasNethpot: false,
-        smpTier: 'Master Builder', hasSmp: true,
-        socials: ['youtube'],
-        socialLinks: {
-          youtube: 'https://youtube.com/example'
-        },
-        backgroundImage: null
+/* Icons configuration (Using generic shapes or images) */
+const ICONS = {
+  crystal: 'assets/icons/crystalpvp.png', // Ensure these paths exist or use placeholder
+  sword: 'assets/icons/swordpvp.png',
+  nethpot: 'assets/icons/nethpot.png',
+  smp: 'assets/icons/smp.png',
+  discord: 'assets/icons/discord.png',
+  youtube: 'assets/icons/youtube.png',
+  twitch: 'assets/icons/twitch.png',
+  tiktok: 'assets/icons/tiktok.png'
+};
+
+/* Tier Sorting Order */
+const tierOrder = ['HT1','HT2','HT3','HT4','HT5','LT1','LT2','LT3','LT4','LT5'];
+
+/* ======================= ENGINE ======================= */
+let currentMode = 'all';
+
+// 1. Cursor Logic
+const cursorDot = document.querySelector('.cursor-dot');
+const cursorCircle = document.querySelector('.cursor-circle');
+window.addEventListener('mousemove', (e) => {
+  cursorDot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+  cursorCircle.animate({ left: `${e.clientX}px`, top: `${e.clientY}px` }, { duration: 500, fill: "forwards" });
+});
+document.addEventListener('mouseover', (e) => {
+  if(e.target.closest('button') || e.target.closest('.card-scene')) document.body.classList.add('hovering');
+  else document.body.classList.remove('hovering');
+});
+
+// 2. Rendering System
+function renderTree(sortBy = 'rank') {
+  const container = document.getElementById('memberTree');
+  const layer = document.getElementById('connectionsLayer');
+  
+  // Clear non-layer elements
+  Array.from(container.children).forEach(c => {
+    if(c.id !== 'connectionsLayer') container.removeChild(c);
+  });
+  layer.innerHTML = ''; // Clear beams
+
+  // Filter & Sort
+  let list = members.filter(m => {
+    if(currentMode === 'all') return true;
+    return m.tiers && m.tiers[currentMode];
+  });
+
+  if(sortBy === 'tier') {
+    list.sort((a,b) => {
+      // Simple logic: check highest tier of first available mode
+      const getVal = (m) => {
+        const t = Object.values(m.tiers || {})[0];
+        return t ? tierOrder.indexOf(t) : 99;
       }
-    ];
+      return getVal(a) - getVal(b);
+    });
+  } else {
+    list.sort((a,b) => a.level - b.level); // Default rank sort
+  }
 
-    /* Tier order for sorting (High -> Low). If member has both, we'll use crystalTier for tier-sort priority; fallback to swordTier. */
-    const tierOrder = ['HT1','HT2','HT3','HT4','HT5','LT1','LT2','LT3','LT4','LT5'];
+  // Group by Level
+  const levels = {};
+  list.forEach(m => {
+    const lv = m.level || 99;
+    if(!levels[lv]) levels[lv] = [];
+    levels[lv].push(m);
+  });
 
-    // Track current game mode filter
-    let currentGameMode = 'all';
+  // Build DOM
+  const sortedLevels = Object.keys(levels).sort((a,b)=>a-b);
+  
+  sortedLevels.forEach(lvKey => {
+    const row = document.createElement('div');
+    row.className = 'tree-level';
+    row.dataset.level = lvKey;
+    
+    levels[lvKey].forEach(m => {
+      row.appendChild(createCard(m));
+    });
+    container.appendChild(row);
+  });
 
-    /* ======= RENDERING ======= */
-    function renderMemberTree(sortBy='rank'){
-      const container = document.getElementById('memberTree');
-      container.innerHTML='<div class="tree-connections" id="treeConnections"></div>';
-      const connectionsContainer = document.getElementById('treeConnections');
+  // Decrypt Names
+  setTimeout(() => decryptNames(), 100);
 
-      // optionally sort
-      const list = [...members];
+  // Draw Beams (Laser Connections)
+  setTimeout(() => drawLasers(sortedLevels), 300); // Wait for layout
+}
+
+function createCard(data) {
+  const scene = document.createElement('div');
+  scene.className = `card-scene ${data.cardType || ''}`;
+  scene.onclick = () => {
+    scene.querySelector('.holo-card').classList.toggle('flipped');
+    // document.getElementById('sfx-flip').play(); // Uncomment if audio src valid
+  };
+
+  // Generate Tier Chips
+  let tiersHTML = '';
+  if(data.tiers) {
+    Object.entries(data.tiers).forEach(([type, val]) => {
+      // Highlight if matches current filter
+      const isActive = (currentMode === 'all' || currentMode === type) ? 'active' : '';
+      tiersHTML += `
+        <div class="tier-chip ${isActive}">
+          <span style="text-transform:uppercase">${type.substr(0,4)}</span>
+          <b>${val}</b>
+        </div>
+      `;
+    });
+  }
+
+  // Generate Socials
+  let socialHTML = '';
+  if(data.socials) {
+    Object.entries(data.socials).forEach(([net, link]) => {
+      socialHTML += `<a href="${link}" target="_blank" class="social-link">${net.toUpperCase()}</a>`;
+    });
+  }
+
+  scene.innerHTML = `
+    <div class="holo-card">
+      <div class="face front">
+        <div class="avatar-frame">
+          <img src="${data.avatar}" class="avatar-img" alt="${data.name}">
+        </div>
+        <div class="mem-name" data-value="${data.name}">${generateRandomChars(data.name.length)}</div>
+        <div class="mem-rank">${data.rank}</div>
+        <div class="tier-grid">${tiersHTML}</div>
+      </div>
+      <div class="face back">
+        <div class="back-data">
+          ID: ${Math.floor(Math.random()*9000)+1000}<br>
+          STATUS: ONLINE
+        </div>
+        <div class="social-grid">${socialHTML}</div>
+      </div>
+    </div>
+  `;
+  return scene;
+}
+
+// 3. Laser Beams Logic
+function drawLasers(levels) {
+  const container = document.getElementById('memberTree');
+  const layer = document.getElementById('connectionsLayer');
+  const containerRect = container.getBoundingClientRect();
+
+  for(let i=0; i < levels.length - 1; i++) {
+    const currLvl = document.querySelector(`.tree-level[data-level="${levels[i]}"]`);
+    const nextLvl = document.querySelector(`.tree-level[data-level="${levels[i+1]}"]`);
+    if(!currLvl || !nextLvl) continue;
+
+    const currNodes = Array.from(currLvl.children);
+    const nextNodes = Array.from(nextLvl.children);
+
+    currNodes.forEach((parent, pIdx) => {
+      // Connect to subset of children to look like a tree
+      // Simple logic: Distribute children among parents
+      const ratio = nextNodes.length / currNodes.length;
+      const startIdx = Math.floor(pIdx * ratio);
+      const endIdx = Math.floor((pIdx + 1) * ratio) || 1;
       
-      // Apply game mode filter
-      const filteredList = list.filter(member => {
-        if (currentGameMode === 'all') return true;
-        if (currentGameMode === 'crystal') return member.hasCrystal;
-        if (currentGameMode === 'sword') return member.hasSword;
-        if (currentGameMode === 'nethpot') return member.hasNethpot;
-        if (currentGameMode === 'smp') return member.hasSmp;
-        return true;
-      });
-      
-      if(sortBy === 'tier'){
-        filteredList.sort((a,b)=>{
-          const aTier = a.hasCrystal && a.crystalTier ? a.crystalTier : 
-                       (a.hasSword && a.swordTier ? a.swordTier : 
-                       (a.hasNethpot && a.nethpotTier ? a.nethpotTier : null));
-          const bTier = b.hasCrystal && b.crystalTier ? b.crystalTier : 
-                       (b.hasSword && b.swordTier ? b.swordTier : 
-                       (b.hasNethpot && b.nethpotTier ? b.nethpotTier : null));
-          const ai = aTier ? tierOrder.indexOf(aTier) : tierOrder.length;
-          const bi = bTier ? tierOrder.indexOf(bTier) : tierOrder.length;
-          return ai - bi;
-        });
-      } else {
-        // default: sort by level then name
-        filteredList.sort((a,b)=> (a.level||99)-(b.level||99) || a.name.localeCompare(b.name));
-      }
+      // Ensure at least one connection if possible
+      const targets = nextNodes.slice(startIdx, Math.max(startIdx + 1, endIdx + (nextNodes.length > currNodes.length ? 1 : 0)));
 
-      // group by level
-      const levels = {};
-      filteredList.forEach(m=>{const lv = m.level||99; (levels[lv]=levels[lv]||[]).push(m)});
-
-      const tree = document.createElement('div'); tree.className='tree-structure';
-      Object.keys(levels).sort((a,b)=>a-b).forEach(lv=>{
-        const lvlDiv = document.createElement('div'); lvlDiv.className='tree-level';
-        levels[lv].forEach(member=>{ lvlDiv.appendChild(createMemberNode(member)); });
-        tree.appendChild(lvlDiv);
-      });
-
-      container.appendChild(tree);
-
-      // add click handlers for flipping
-      document.querySelectorAll('.flip-card').forEach(card=>{
-        card.addEventListener('click', ()=> card.classList.toggle('is-flipped'));
-      });
-
-      // Draw chains after DOM is rendered
-      setTimeout(() => drawChains(levels, connectionsContainer), 100);
-    }
-
-    function createMemberNode(member){
-      const node = document.createElement('div'); node.className='member-node';
-
-      const wrapper = document.createElement('div'); wrapper.className=`flip-card ${member.cardType || ''}`;
-      // apply theme wrapper (outermost so CSS theme selectors work)
-      const themeWrapper = document.createElement('div'); themeWrapper.className = `theme-${member.theme || 'purple'}`;
-
-      // FRONT
-      const front = document.createElement('div'); front.className='flip-face front';
-      const contentWrapper = document.createElement('div'); contentWrapper.className = 'content-wrapper';
-      
-      if(member.backgroundImage){ 
-        const bgdiv = document.createElement('div'); 
-        bgdiv.className='bg-img'; 
-        bgdiv.style.backgroundImage = `url(${member.backgroundImage})`; 
-        front.appendChild(bgdiv); 
-      }
-      
-      const avatar = document.createElement('img'); avatar.className='member-avatar'; avatar.src = member.avatar; avatar.alt = member.name;
-      const nameEl = document.createElement('div'); nameEl.className='member-name'; nameEl.textContent = member.name;
-      const rankEl = document.createElement('div'); rankEl.className='member-rank'; rankEl.textContent = member.rank || '';
-      
-      contentWrapper.appendChild(avatar); 
-      contentWrapper.appendChild(nameEl); 
-      contentWrapper.appendChild(rankEl);
-
-      // tiers (render only if enabled)
-      const tierRow = document.createElement('div'); tierRow.className='tier-row';
-      if(member.hasCrystal && member.crystalTier){
-        const t = document.createElement('div'); t.className='tier-item tier-crystal';
-        const icon = document.createElement('span'); icon.className='tier-icon'; icon.style.backgroundImage = "url('assets/icons/crystalpvp.png')";
-        t.appendChild(icon);
-        const txt = document.createElement('span'); txt.textContent = member.crystalTier;
-        t.appendChild(txt);
-        tierRow.appendChild(t);
-      }
-      if(member.hasSword && member.swordTier){
-        const t = document.createElement('div'); t.className='tier-item tier-sword';
-        const icon = document.createElement('span'); icon.className='tier-icon'; icon.style.backgroundImage = "url('assets/icons/swordpvp.png')";
-        t.appendChild(icon);
-        const txt = document.createElement('span'); txt.textContent = member.swordTier;
-        t.appendChild(txt);
-        tierRow.appendChild(t);
-      }
-      if(member.hasNethpot && member.nethpotTier){
-        const t = document.createElement('div'); t.className='tier-item tier-nethpot';
-        const icon = document.createElement('span'); icon.className='tier-icon'; icon.style.backgroundImage = "url('assets/icons/nethpot.png')";
-        t.appendChild(icon);
-        const txt = document.createElement('span'); txt.textContent = member.nethpotTier;
-        t.appendChild(txt);
-        tierRow.appendChild(t);
-      }
-      if(member.hasSmp && member.smpTier){
-        const t = document.createElement('div'); t.className='tier-item tier-smp';
-        const icon = document.createElement('span'); icon.className='tier-icon'; icon.style.backgroundImage = "url('assets/icons/smp.png')";
-        t.appendChild(icon);
-        const txt = document.createElement('span'); txt.textContent = member.smpTier;
-        t.appendChild(txt);
-        tierRow.appendChild(t);
-      }
-      
-      contentWrapper.appendChild(tierRow);
-      front.appendChild(contentWrapper);
-
-      // BACK
-      const back = document.createElement('div'); back.className='flip-face back';
-      // show top: first tier (prefer crystal if present) with both icons centered above
-      const backTop = document.createElement('div'); backTop.className='back-top';
-      const tierLabel = document.createElement('div'); tierLabel.style.fontSize='14px'; tierLabel.style.marginBottom='6px';
-
-      // Show combined tier text if both exist, else single
-      const combined = [];
-      if(member.hasCrystal && member.crystalTier) combined.push(`<span style="display:inline-flex;align-items:center;gap:6px"><img src="assets/icons/crystalpvp.png" style="width:16px;height:16px;vertical-align:middle"> ${member.crystalTier}</span>`);
-      if(member.hasSword && member.swordTier) combined.push(`<span style="display:inline-flex;align-items:center;gap:6px"><img src="assets/icons/swordpvp.png" style="width:16px;height:16px;vertical-align:middle"> ${member.swordTier}</span>`);
-      if(member.hasNethpot && member.nethpotTier) combined.push(`<span style="display:inline-flex;align-items:center;gap:6px"><img src="assets/icons/nethpot.png" style="width:16px;height:16px;vertical-align:middle"> ${member.nethpotTier}</span>`);
-      if(member.hasSmp && member.smpTier) combined.push(`<span style="display:inline-flex;align-items:center;gap:6px"><img src="assets/icons/smp.png" style="width:16px;height:16px;vertical-align:middle"> ${member.smpTier}</span>`);
-      tierLabel.innerHTML = combined.length ? combined.join(' &nbsp; ') : 'No PvP tiers';
-      backTop.appendChild(tierLabel);
-
-      const backAvatar = document.createElement('img'); backAvatar.className='back-avatar'; backAvatar.src = member.avatar; backAvatar.alt = member.name;
-      const backName = document.createElement('div'); backName.className='back-name'; backName.textContent = member.name;
-      const backRank = document.createElement('div'); backRank.style.opacity = 0.85; backRank.style.fontSize = '13px'; backRank.textContent = member.rank || '';
-
-      back.appendChild(backTop); back.appendChild(backAvatar); back.appendChild(backName); back.appendChild(backRank);
-
-      // socials (selectable through script: member.socials array)
-      const socialsWrap = document.createElement('div'); socialsWrap.className='socials';
-      (member.socials || []).forEach(s => {
-        const btn = document.createElement('a'); 
-        btn.className='social-btn'; 
-        btn.href=member.socialLinks[s] || '#'; 
-        btn.setAttribute('data-social', s);
-        btn.target = '_blank';
-        
-        const icon = document.createElement('span'); icon.className='social-icon';
-        icon.style.backgroundImage = `url(${SOCIAL_ICONS[s] || ''})`;
-        const label = document.createElement('span'); label.textContent = s.charAt(0).toUpperCase() + s.slice(1);
-        btn.appendChild(icon); btn.appendChild(label);
-        socialsWrap.appendChild(btn);
-      });
-      back.appendChild(socialsWrap);
-
-      // assemble
-      wrapper.appendChild(front); wrapper.appendChild(back);
-      themeWrapper.appendChild(wrapper);
-      node.appendChild(themeWrapper);
-
-      return node;
-    }
-
-    function drawChains(levels, container) {
-      const levelKeys = Object.keys(levels).sort((a, b) => a - b);
-      
-      // Draw chains between levels
-      for (let i = 0; i < levelKeys.length - 1; i++) {
-        const currentLevel = levels[levelKeys[i]];
-        const nextLevel = levels[levelKeys[i + 1]];
-        
-        // Connect each member in current level to one or two members in next level
-        currentLevel.forEach((member, memberIndex) => {
-          const memberNode = document.querySelector(`.member-node:has(.member-name:contains("${member.name}")`);
-          if (!memberNode) return;
-          
-          const memberRect = memberNode.getBoundingClientRect();
-          const containerRect = container.getBoundingClientRect();
-          
-          const startX = memberRect.left + memberRect.width / 2 - containerRect.left;
-          const startY = memberRect.top + memberRect.height - containerRect.top;
-          
-          // Connect to one or two members in next level
-          const connections = [];
-          if (nextLevel.length === 1) {
-            connections.push(0);
-          } else {
-            // Distribute connections
-            const connectionIndex = Math.floor(memberIndex * nextLevel.length / currentLevel.length);
-            connections.push(connectionIndex);
-            if (currentLevel.length < nextLevel.length && memberIndex < nextLevel.length - 1) {
-              connections.push(connectionIndex + 1);
-            }
-          }
-          
-          connections.forEach(connIndex => {
-            if (connIndex >= nextLevel.length) return;
-            
-            const nextMember = nextLevel[connIndex];
-            const nextMemberNode = document.querySelector(`.member-node:has(.member-name:contains("${nextMember.name}")`);
-            if (!nextMemberNode) return;
-            
-            const nextMemberRect = nextMemberNode.getBoundingClientRect();
-            const endX = nextMemberRect.left + nextMemberRect.width / 2 - containerRect.left;
-            const endY = nextMemberRect.top - containerRect.top;
-            
-            // Create chain
-            const chain = document.createElement('div');
-            chain.className = 'chain';
-            
-            const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
-            const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
-            
-            chain.style.width = `${length}px`;
-            chain.style.height = '4px';
-            chain.style.left = `${startX}px`;
-            chain.style.top = `${startY}px`;
-            chain.style.transform = `rotate(${angle}deg)`;
-            
-            container.appendChild(chain);
-            
-            // Add chain links
-            const linkCount = Math.floor(length / 30);
-            for (let i = 0; i < linkCount; i++) {
-              const link = document.createElement('div');
-              link.className = 'chain-link';
-              const progress = i / (linkCount - 1);
-              const linkX = startX + (endX - startX) * progress;
-              const linkY = startY + (endY - startY) * progress;
-              
-              link.style.left = `${linkX - 6}px`;
-              link.style.top = `${linkY - 6}px`;
-              
-              // Add pulsing animation to some links
-              if (i % 3 === 0) {
-                link.classList.add('pulse');
-              }
-              
-              container.appendChild(link);
-            }
-          });
-        });
-      }
-    }
-
-    // initial render
-    document.addEventListener('DOMContentLoaded', ()=>{
-      renderMemberTree();
-      
-      // Sort buttons
-      document.getElementById('sortByRank').addEventListener('click', ()=>renderMemberTree('rank'));
-      document.getElementById('sortByTier').addEventListener('click', ()=>renderMemberTree('tier'));
-      
-      // Game mode buttons
-      document.querySelectorAll('.game-mode-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          document.querySelectorAll('.game-mode-btn').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          currentGameMode = this.getAttribute('data-mode');
-          renderMemberTree();
-        });
+      targets.forEach(child => {
+        createBeam(parent, child, containerRect, layer);
       });
     });
-  </script>
+  }
+}
+
+function createBeam(el1, el2, rootRect, layer) {
+  const r1 = el1.getBoundingClientRect();
+  const r2 = el2.getBoundingClientRect();
+
+  const x1 = r1.left + r1.width/2 - rootRect.left;
+  const y1 = r1.bottom - rootRect.top;
+  const x2 = r2.left + r2.width/2 - rootRect.left;
+  const y2 = r2.top - rootRect.top;
+
+  const length = Math.hypot(x2 - x1, y2 - y1);
+  const angle = Math.atan2(y2 - y1, x2 - x1) * (180/Math.PI);
+
+  const beam = document.createElement('div');
+  beam.className = 'laser-beam';
+  beam.style.width = `${length}px`;
+  beam.style.left = `${x1}px`;
+  beam.style.top = `${y1}px`;
+  beam.style.transform = `rotate(${angle}deg)`;
+  
+  layer.appendChild(beam);
+}
+
+// 4. Decryption Effect
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890#%&";
+function generateRandomChars(len) {
+  let s = '';
+  for(let i=0; i<len; i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+
+function decryptNames() {
+  document.querySelectorAll('.mem-name').forEach(el => {
+    const target = el.dataset.value;
+    let iter = 0;
+    const interval = setInterval(() => {
+      el.innerText = target.split('').map((l, i) => {
+        if(i < iter) return l;
+        return chars[Math.floor(Math.random() * chars.length)];
+      }).join('');
+      
+      if(iter >= target.length) clearInterval(interval);
+      iter += 1/3;
+    }, 30);
+  });
+}
+
+// 5. Init & Listeners
+document.addEventListener('DOMContentLoaded', () => {
+  renderTree();
+
+  // Mode Buttons
+  document.querySelectorAll('.cyber-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.cyber-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      currentMode = e.target.dataset.mode;
+      renderTree();
+    });
+  });
+
+  // Sort Buttons
+  document.getElementById('sortByRank').onclick = () => renderTree('rank');
+  document.getElementById('sortByTier').onclick = () => renderTree('tier');
+  
+  // Resize Handler for Lasers
+  window.addEventListener('resize', () => {
+    const levels = Object.keys(members.reduce((acc,m)=>{acc[m.level||99]=1;return acc},{})).sort((a,b)=>a-b);
+    document.getElementById('connectionsLayer').innerHTML = '';
+    drawLasers(levels);
+  });
+});
+
+</script>
 </body>
 </html>
