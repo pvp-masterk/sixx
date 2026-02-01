@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>/six | ARMORY</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Teko:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+/* ======================= CORE PHYSICS ======================= */
+:root {
+  --void: #050505;
+  --glass: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.1);
+  --theme: #9d4edd; /* Dynamic Variable */
+  --font-tech: 'Rajdhani', sans-serif;
+  --font-display: 'Teko', sans-serif;
+}
+
+* { box-sizing: border-box; cursor: none; user-select: none; }
+body {
+  margin: 0; height: 100vh; overflow: hidden;
+  background: var(--void); color: #fff;
+  font-family: var(--font-tech);
+  transition: background 0.5s ease;
+}
+
+/* ======================= AMBIENT LIGHTING ======================= */
+.forge-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+              rgba(157, 78, 221, 0.15) 0%, transparent 60%);
+  transition: opacity 0.3s;
+}
+.grid-overlay {
+  position: fixed; inset: 0; z-index: 1;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+}
+
+/* ======================= CUSTOM CURSOR ======================= */
+.cursor-main {
+  width: 10px; height: 10px; background: var(--theme);
+  position: fixed; border-radius: 50%; pointer-events: none; z-index: 9999;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 15px var(--theme);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.cursor-follower {
+  width: 50px; height: 50px; border: 1px solid rgba(255,255,255,0.2);
+  position: fixed; border-radius: 50%; pointer-events: none; z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, top 0.1s, left 0.1s;
+}
+body:hover .cursor-follower { width: 40px; height: 40px; }
+body.clicking .cursor-follower { width: 30px; height: 30px; border-color: var(--theme); }
+
+/* ======================= LAYOUT ======================= */
+.armory-container {
+  position: relative; z-index: 10;
+  display: grid; grid-template-columns: 250px 1fr 300px;
+  height: 100vh; padding: 40px; gap: 40px;
+}
+
+/* --- SIDEBAR: SELECTOR --- */
+.kit-selector {
+  display: flex; flex-direction: column; justify-content: center; gap: 20px;
+}
+.kit-btn {
+  background: transparent; border: 1px solid var(--border);
+  color: #888; padding: 20px; text-align: right;
+  font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 2px;
+  transition: 0.3s; position: relative; overflow: hidden;
+  clip-path: polygon(10% 0, 100% 0, 100% 100%, 0 100%, 0 20%);
+}
+.kit-btn::before {
+  content:''; position: absolute; top:0; right:0; width: 4px; height: 100%;
+  background: var(--theme); transform: scaleY(0); transition: 0.3s;
+}
+.kit-btn:hover, .kit-btn.active {
+  background: var(--glass); color: #fff; border-color: rgba(255,255,255,0.2);
+  padding-right: 30px;
+}
+.kit-btn.active::before { transform: scaleY(1); }
+
+/* --- CENTER: CONTAINMENT FIELD --- */
+.containment-field {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  perspective: 1000px;
+}
+
+.prism-box {
+  width: 400px; height: 500px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.1s; /* Parallax handled by JS */
+}
+
+/* The Weapon Image */
+.weapon-visual {
+  width: 100%; height: 100%;
+  position: absolute; inset: 0;
+  display: flex; justify-content: center; align-items: center;
+  filter: drop-shadow(0 0 30px var(--theme));
+  animation: float 6s ease-in-out infinite;
+  z-index: 5;
+}
+.weapon-img {
+  width: 250px; image-rendering: pixelated;
+  transition: filter 0.3s;
+}
+
+/* Fabrication Effect (Glitch transition) */
+.fabricating .weapon-img {
+  animation: fabricate 0.6s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+@keyframes fabricate {
+  0% { clip-path: inset(0 100% 0 0); opacity: 0; filter: hue-rotate(90deg); }
+  50% { clip-path: inset(0 0 0 0); opacity: 0.5; filter: hue-rotate(45deg); }
+  100% { clip-path: inset(0 0 0 0); opacity: 1; filter: hue-rotate(0deg); }
+}
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+/* Holographic Rings */
+.holo-ring {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  border: 1px solid var(--theme); border-radius: 50%;
+  opacity: 0.2; pointer-events: none;
+}
+.r1 { width: 300px; height: 300px; animation: spin 10s linear infinite; border-left-color: transparent; }
+.r2 { width: 450px; height: 450px; animation: spin-rev 15s linear infinite; border-top-color: transparent; }
+@keyframes spin { 100% { transform: translate(-50%,-50%) rotate(360deg); } }
+@keyframes spin-rev { 100% { transform: translate(-50%,-50%) rotate(-360deg); } }
+
+/* --- RIGHT: STATS HUD --- */
+.stats-panel {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 20px;
+}
+.stat-header {
+  font-family: var(--font-display); font-size: 3rem; 
+  text-transform: uppercase; line-height: 1; margin-bottom: 10px;
+  text-shadow: 0 0 20px var(--theme);
+}
+.stat-sub { color: #888; margin-bottom: 40px; font-size: 0.9rem; }
+
+.stat-row { margin-bottom: 25px; }
+.stat-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
+.bar-container {
+  width: 100%; height: 6px; background: rgba(255,255,255,0.1);
+  position: relative; overflow: hidden;
+}
+.bar-fill {
+  height: 100%; width: 0%; background: var(--theme);
+  box-shadow: 0 0 10px var(--theme);
+  transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.action-btn {
+  margin-top: 40px;
+  background: var(--theme); color: #000; border: none;
+  padding: 15px; font-family: var(--font-tech); font-weight: 700; font-size: 1.1rem;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  transition: 0.2s; position: relative; overflow: hidden;
+}
+.action-btn::after {
+  content: ''; position: absolute; inset: 0; background: #fff; opacity: 0; transition: 0.1s;
+}
+.action-btn:active::after { opacity: 0.5; }
+.action-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--theme); }
+
+/* --- DAMAGE NUMBERS (JS Spawned) --- */
+.dmg-number {
+  position: absolute; font-family: var(--font-display); font-weight: 700;
+  font-size: 2rem; color: #fff; pointer-events: none;
+  text-shadow: 2px 2px 0 #000;
+  animation: pop-up 0.8s forwards;
+  z-index: 100;
+}
+.dmg-number.crit { color: #ff2a2a; font-size: 3rem; text-shadow: 0 0 10px red; }
+
+@keyframes pop-up {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  20% { transform: translate(-50%, -100%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -200%) scale(1); opacity: 0; }
+}
+
+/* Shake Effect */
+body.shaking .containment-field { animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0); } 40%, 60% { transform: translate3d(6px, 0, 0); } }
+
+/* Responsive */
+@media(max-width: 900px) {
+  .armory-container { grid-template-columns: 1fr; grid-template-rows: auto 400px auto; gap: 20px; overflow-y: auto; height: auto; }
+  .kit-selector { flex-direction: row; flex-wrap: wrap; }
+  .kit-btn { flex: 1; text-align: center; padding: 10px; }
+  .kit-btn:hover { padding-right: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div class="forge-bg"></div>
+<div class="grid-overlay"></div>
+
+<div class="cursor-main"></div>
+<div class="cursor-follower"></div>
+
+<main class="armory-container">
+  
+  <!-- LEFT: SELECTOR -->
+  <aside class="kit-selector">
+    <div style="font-size:0.8rem; color:#666; margin-bottom:10px;">// SELECT BLUEPRINT</div>
+    <button class="kit-btn active" onclick="loadKit('crystal')">CRYSTAL</button>
+    <button class="kit-btn" onclick="loadKit('sword')">SWORD</button>
+    <button class="kit-btn" onclick="loadKit('pot')">NETH-POT</button>
+    <button class="kit-btn" onclick="loadKit('smp')">SMP_GOD</button>
+  </aside>
+
+  <!-- CENTER: THE FORGE -->
+  <section class="containment-field" id="forge">
+    <div class="prism-box" id="prism">
+      <div class="holo-ring r1"></div>
+      <div class="holo-ring r2"></div>
+      
+      <div class="weapon-visual" id="weaponContainer">
+        <img src="https://minecraft.wiki/images/End_Crystal.gif" class="weapon-img" id="weaponImg" alt="Weapon">
+      </div>
+    </div>
+    <div style="margin-top:20px; font-size:0.8rem; color:var(--theme); letter-spacing:2px; opacity:0.7;">
+      /// SYSTEM: STABLE
+    </div>
+  </section>
+
+  <!-- RIGHT: STATS -->
+  <aside class="stats-panel">
+    <h1 class="stat-header" id="kitTitle">CRYSTAL META</h1>
+    <div class="stat-sub" id="kitDesc">Standard Tier-1 Fabrication. Optimized for low-ping anchor explosions.</div>
+
+    <div class="stat-row">
+      <div class="stat-label"><span>BURST DAMAGE</span><span id="stat1Val">98%</span></div>
+      <div class="bar-container"><div class="bar-fill" id="bar1" style="width:98%"></div></div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-label"><span>DURABILITY</span><span id="stat2Val">45%</span></div>
+      <div class="bar-container"><div class="bar-fill" id="bar2" style="width:45%"></div></div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-label"><span>SPEED</span><span id="stat3Val">80%</span></div>
+      <div class="bar-container"><div class="bar-fill" id="bar3" style="width:80%"></div></div>
+    </div>
+
+    <button class="action-btn" id="testBtn" onclick="testFire()">[ TEST FIRE ]</button>
+  </aside>
+
+</main>
+
+<script>
+/* ======================= DATABASE ======================= */
+const kits = {
+  crystal: {
+    title: "CRYSTAL META",
+    color: "#9d4edd",
+    desc: "Standard Tier-1 Fabrication. Optimized for anchor explosions and hitbox manipulation.",
+    img: "https://minecraft.wiki/images/End_Crystal.gif",
+    stats: [98, 45, 80]
+  },
+  sword: {
+    title: "SWORD PVP",
+    color: "#00f3ff",
+    desc: "Close quarters combat unit. Enhanced knockback resistance and crit chaining.",
+    img: "https://minecraft.wiki/images/Netherite_Sword.png",
+    stats: [60, 90, 70]
+  },
+  pot: {
+    title: "NETH POT",
+    color: "#ff2a2a",
+    desc: "Attrition warfare kit. High health pool with debuff splash capability.",
+    img: "https://minecraft.wiki/images/Splash_Potion_of_Harming.gif",
+    stats: [50, 85, 95]
+  },
+  smp: {
+    title: "SMP GOD",
+    color: "#ffd700",
+    desc: "Survival Multi-Player maxed gear. Efficiency V and Protection IV standard.",
+    img: "https://minecraft.wiki/images/Enchanted_Golden_Apple.gif",
+    stats: [75, 100, 40]
+  }
+};
+
+/* ======================= LOGIC ======================= */
+
+// 1. Mouse Tracking (Lighting & Parallax)
+document.addEventListener('mousemove', (e) => {
+  const x = e.clientX;
+  const y = e.clientY;
+  
+  // Custom Cursor
+  const cursor = document.querySelector('.cursor-main');
+  const follower = document.querySelector('.cursor-follower');
+  cursor.style.left = x + 'px'; cursor.style.top = y + 'px';
+  follower.style.left = x + 'px'; follower.style.top = y + 'px';
+  
+  // Ambient Light
+  document.body.style.setProperty('--mouse-x', (x / window.innerWidth * 100) + '%');
+  document.body.style.setProperty('--mouse-y', (y / window.innerHeight * 100) + '%');
+
+  // Parallax Tilt for Prism
+  const prism = document.getElementById('prism');
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const moveX = (x - w/2) / w * 30; // Max 30deg
+  const moveY = (y - h/2) / h * 30;
+  
+  prism.style.transform = `rotateY(${moveX}deg) rotateX(${-moveY}deg)`;
+});
+
+document.addEventListener('mousedown', () => document.body.classList.add('clicking'));
+document.addEventListener('mouseup', () => document.body.classList.remove('clicking'));
+
+// 2. Kit Loader
+function loadKit(key) {
+  const data = kits[key];
+  const container = document.getElementById('weaponContainer');
+  const img = document.getElementById('weaponImg');
+  
+  // Update Buttons
+  document.querySelectorAll('.kit-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  // Set Theme Color
+  document.documentElement.style.setProperty('--theme', data.color);
+
+  // Trigger Fabrication Animation
+  container.classList.remove('fabricating');
+  void container.offsetWidth; // Force reflow
+  container.classList.add('fabricating');
+
+  // Update Content with slight delay for effect
+  setTimeout(() => {
+    img.src = data.img;
+    document.getElementById('kitTitle').innerText = data.title;
+    document.getElementById('kitDesc').innerText = data.desc;
+    
+    // Animate Bars
+    document.getElementById('bar1').style.width = data.stats[0] + '%';
+    document.getElementById('stat1Val').innerText = data.stats[0] + '%';
+    
+    document.getElementById('bar2').style.width = data.stats[1] + '%';
+    document.getElementById('stat2Val').innerText = data.stats[1] + '%';
+    
+    document.getElementById('bar3').style.width = data.stats[2] + '%';
+    document.getElementById('stat3Val').innerText = data.stats[2] + '%';
+  }, 100);
+}
+
+// 3. Damage Simulation
+function testFire() {
+  const body = document.body;
+  
+  // Screen Shake
+  body.classList.remove('shaking');
+  void body.offsetWidth;
+  body.classList.add('shaking');
+
+  // Spawn Numbers
+  for(let i=0; i<3; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      const dmg = Math.floor(Math.random() * 10) + 5;
+      const isCrit = Math.random() > 0.7;
+      
+      el.className = `dmg-number ${isCrit ? 'crit' : ''}`;
+      el.innerText = isCrit ? (dmg * 2) + " CRIT!" : dmg;
+      
+      // Random position near center
+      const offsetX = (Math.random() - 0.5) * 200;
+      const offsetY = (Math.random() - 0.5) * 100;
+      
+      el.style.left = `calc(50% + ${offsetX}px)`;
+      el.style.top = `calc(50% + ${offsetY}px)`;
+      
+      document.getElementById('forge').appendChild(el);
+      
+      setTimeout(() => el.remove(), 800);
+    }, i * 150);
+  }
+}
+
+</script>
+</body>
+</html>
