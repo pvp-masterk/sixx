@@ -2,610 +2,489 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>/six Achievements</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>/six | ARCHIVES</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
 <style>
-  /* --- 0. CORE VARIABLES & RESET --- */
-  :root {
-    --primary: #9d4edd;
-    --accent: #e0aaff;
-    --bg-deep: #030005;
-    --glass: rgba(20, 10, 30, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --ease-ios: cubic-bezier(0.19, 1, 0.22, 1); /* Apple's Spring-like curve */
-    --card-radius: 20px;
-    --modal-radius: 24px;
-    --transition-speed: 0.6s;
-  }
+/* ======================= VOID CORE ======================= */
+:root {
+  --void-bg: #030005;
+  --primary: #9d4edd;
+  --primary-dim: rgba(157, 78, 221, 0.15);
+  --accent: #e0aaff;
+  --legendary: #ffd700;
+  --classified: #ff2a2a;
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-code: 'Space Mono', monospace;
+  --ease-holo: cubic-bezier(0.23, 1, 0.32, 1);
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
-  
-  body {
-    background-color: var(--bg-deep);
-    color: #f0f0f5;
-    font-family: 'Inter', sans-serif;
-    overflow-x: hidden;
-    min-height: 100vh;
-  }
+* { box-sizing: border-box; cursor: none; }
+html, body {
+  margin: 0; padding: 0; min-height: 100%;
+  background-color: var(--void-bg);
+  color: #e8e6f3;
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(157, 78, 221, 0.3); border-radius: 10px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(157, 78, 221, 0.6); }
+/* ======================= ATMOSPHERE ======================= */
+.void-stage {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(circle at 50% -20%, #1a002e, #030005 80%);
+}
 
-  /* --- 1. AMBIENT BACKGROUND --- */
-  .bg-universe {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-  }
-  .star {
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-    opacity: 0.3;
-    animation: twinkle 4s infinite ease-in-out;
-  }
-  .nebula {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.4;
-    animation: float 20s infinite alternate ease-in-out;
-  }
-  @keyframes float { 0% { transform: translate(0,0); } 100% { transform: translate(-30px, 30px); } }
-  @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 0.6; transform: scale(1.2); } }
+.grid-floor {
+  position: absolute; inset: -50%;
+  background-image: 
+    linear-gradient(var(--primary-dim) 1px, transparent 1px),
+    linear-gradient(90deg, var(--primary-dim) 1px, transparent 1px);
+  background-size: 50px 50px;
+  transform: perspective(1000px) rotateX(60deg);
+  animation: gridMove 30s linear infinite;
+  mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+  opacity: 0.5;
+}
+@keyframes gridMove {
+  0% { transform: perspective(1000px) rotateX(60deg) translateY(0); }
+  100% { transform: perspective(1000px) rotateX(60deg) translateY(50px); }
+}
 
-  /* --- 2. NOISE TEXTURE --- */
-  .noise {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-    pointer-events: none;
-  }
+.particles {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+}
 
-  /* --- 3. UI LAYOUT --- */
-  .layout-container {
-    position: relative;
-    z-index: 2;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
-    transition: filter 0.4s ease;
-  }
-  /* When modal is open, blur the background */
-  body.modal-open .layout-container, 
-  body.modal-open .page-header {
-    filter: blur(10px) brightness(0.7);
-    pointer-events: none;
-  }
+/* ======================= CURSOR ======================= */
+.cursor-dot {
+  width: 6px; height: 6px; background: white; position: fixed;
+  border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
+}
+.cursor-circle { 
+  width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.4); position: fixed;
+  border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s;
+}
+body.hovering .cursor-circle { 
+  width: 60px; height: 60px; 
+  background: rgba(157, 78, 221, 0.1); 
+  border-color: var(--primary); 
+}
 
-  /* Header */
-  .page-header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    padding: 20px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    background: rgba(3, 0, 5, 0.7);
-    transition: all 0.4s ease;
-  }
+/* ======================= HUD HEADER ======================= */
+.hud-header {
+  position: fixed; top: 0; left: 0; right: 0;
+  padding: 20px 40px; display: flex; justify-content: space-between; align-items: flex-end;
+  z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px); background: rgba(3,0,5,0.9);
+}
+.hud-title {
+  font-family: var(--font-display); font-weight: 900; font-size: 2rem;
+  letter-spacing: 2px; color: #fff; line-height: 1;
+}
+.hud-subtitle {
+  font-family: var(--font-code); color: var(--primary); font-size: 0.8rem;
+  opacity: 0.8; margin-top: 5px;
+}
 
-  .header-title {
-    font-size: 3rem;
-    font-weight: 800;
-    letter-spacing: -1px;
-    background: linear-gradient(135deg, #fff 20%, #b87aff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 5px;
-    text-shadow: 0 10px 30px rgba(157, 78, 221, 0.3);
-  }
-  .header-subtitle { color: #aaa; font-size: 0.9rem; margin-bottom: 20px; }
+/* Search Interface */
+.search-interface {
+  position: relative; width: 300px;
+}
+.search-input {
+  width: 100%; background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;
+  padding: 10px 15px; color: #fff; font-family: var(--font-code);
+  font-size: 0.9rem; transition: 0.3s;
+}
+.search-input:focus {
+  border-color: var(--primary); background: rgba(157, 78, 221, 0.05);
+  box-shadow: 0 0 15px var(--primary-dim); outline: none;
+}
+.search-deco {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--primary); font-size: 0.8rem; pointer-events: none; opacity: 0.7;
+}
 
-  /* Controls */
-  .controls { display: flex; gap: 15px; align-items: center; justify-content: center; width: 100%; }
-  .search-box {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--glass-border);
-    padding: 10px 20px;
-    border-radius: 50px;
-    color: white;
-    width: 200px;
-    transition: all 0.3s ease;
-    text-align: center;
-  }
-  .search-box:focus { width: 280px; background: rgba(255,255,255,0.1); border-color: var(--primary); }
+/* ======================= ARCHIVE GRID ======================= */
+.archive-container {
+  padding: 140px 40px 60px;
+  max-width: 1600px; margin: 0 auto;
+  position: relative; z-index: 10;
+}
 
-  /* --- 4. THE GRID & CARDS --- */
-  .grid-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
-    padding: 40px 10px 100px;
-  }
+.grid-layout {
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 40px;
+}
 
-  .card-container {
-    position: relative;
-    height: 400px;
-    border-radius: var(--card-radius);
-    cursor: pointer;
-    /* 3D Tilt Setup */
-    perspective: 1000px;
-    transition: opacity 0.3s;
-  }
-  
-  /* The actual visible card */
-  .card-inner {
-    width: 100%;
-    height: 100%;
-    background: var(--glass);
-    border-radius: var(--card-radius);
-    overflow: hidden;
-    position: relative;
-    border: 1px solid var(--glass-border);
-    /* For Tilt */
-    transform-style: preserve-3d;
-    transition: transform 0.1s ease-out, box-shadow 0.3s ease;
-    will-change: transform;
-  }
+/* --- HOLOGRAPHIC CARD --- */
+.holo-wrapper {
+  perspective: 1000px;
+  height: 420px;
+}
 
-  /* Spotlight Effect Overlay */
-  .card-inner::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
-    pointer-events: none;
-    z-index: 3;
-    opacity: 0;
-    transition: opacity 0.5s;
-  }
-  .card-container:hover .card-inner::after { opacity: 1; }
-  .card-container:hover .card-inner {
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(157, 78, 221, 0.4);
-  }
+.holo-card {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  background: rgba(15, 10, 25, 0.4);
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: transform 0.1s linear, box-shadow 0.3s;
+  overflow: hidden;
+}
 
-  /* Card Content */
-  .card-img-wrap {
-    height: 65%;
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-  }
-  .card-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s var(--ease-ios);
-  }
-  .card-container:hover .card-img { transform: scale(1.08); }
+.holo-card::before {
+  content:''; position: absolute; inset: 0;
+  background: linear-gradient(125deg, transparent 30%, rgba(255,255,255,0.05) 40%, transparent 50%);
+  background-size: 200% 200%;
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: none; z-index: 2;
+}
+.holo-wrapper:hover .holo-card::before { opacity: 1; }
+.holo-wrapper:hover .holo-card {
+  box-shadow: 0 0 30px var(--primary-dim), 0 0 0 1px var(--primary);
+}
 
-  .card-content {
-    padding: 20px;
-    position: relative;
-    z-index: 2;
-    background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.8));
-    height: 35%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .card-title { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
-  .card-date { font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+/* Scanline Image */
+.card-vis {
+  height: 60%; width: 100%; position: relative; overflow: hidden;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.card-img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(0.6) contrast(1.2);
+  transition: 0.5s;
+}
+.card-vis::after {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 1px, transparent 1px, transparent 3px);
+  pointer-events: none;
+}
+.holo-wrapper:hover .card-img { filter: grayscale(0) contrast(1.1); transform: scale(1.05); }
 
-  /* Victory Badge */
-  .victory-badge {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: linear-gradient(135deg, #ff2b2b, #850000);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 800;
-    z-index: 5;
-    box-shadow: 0 4px 15px rgba(255,0,0,0.4);
-  }
+/* Data Block */
+.card-data {
+  padding: 20px; position: relative;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}
+.data-meta {
+  display: flex; justify-content: space-between;
+  font-family: var(--font-code); font-size: 0.7rem; color: #888;
+  margin-bottom: 10px;
+}
+.data-title {
+  font-family: var(--font-display); font-size: 1.4rem; color: #fff;
+  margin-bottom: 10px; line-height: 1;
+}
+.data-desc {
+  font-size: 0.85rem; color: #aaa; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
 
-  /* --- 5. THE APP STORE ANIMATION (MODAL) --- */
-  /* This element floats on top and transforms to mimic the card, then expands */
-  .app-modal-layer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 999;
-    pointer-events: none; /* Let clicks pass through until active */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+/* Rarity Glows */
+.holo-card.legendary { border-color: var(--legendary); }
+.holo-card.legendary .card-vis::before {
+  content: 'LEGENDARY'; position: absolute; top: 10px; right: 10px;
+  background: var(--legendary); color: #000; font-family: var(--font-code);
+  font-weight: 700; font-size: 0.6rem; padding: 2px 6px; z-index: 5;
+}
 
-  /* The Expanding Card */
-  .app-card {
-    position: absolute; /* Positioned via JS */
-    background: #11051b;
-    border-radius: var(--card-radius);
-    overflow: hidden;
-    box-shadow: 0 0 0 0 rgba(0,0,0,0);
-    transform-origin: top left;
-    will-change: transform, width, height, border-radius;
-    /* The Magic Transition */
-    transition: 
-      transform var(--transition-speed) var(--ease-ios),
-      width var(--transition-speed) var(--ease-ios),
-      height var(--transition-speed) var(--ease-ios),
-      border-radius var(--transition-speed) var(--ease-ios);
-  }
+.holo-card.classified { border-color: var(--classified); }
+.holo-card.classified .card-vis::before {
+  content: 'CLASSIFIED'; position: absolute; top: 10px; right: 10px;
+  background: var(--classified); color: #000; font-family: var(--font-code);
+  font-weight: 700; font-size: 0.6rem; padding: 2px 6px; z-index: 5;
+}
 
-  .app-card.fullscreen {
-    /* These styles are applied when open. JS calculates the transform to get here. */
-    box-shadow: 0 50px 100px rgba(0,0,0,0.8);
-    pointer-events: auto;
-    z-index: 1000;
-  }
+/* ======================= PROJECTION MODAL ======================= */
+.projection-layer {
+  position: fixed; inset: 0; z-index: 900;
+  display: flex; justify-content: center; align-items: center;
+  pointer-events: none;
+}
 
-  /* Internal Layout of Expanded Card */
-  .app-hero-image {
-    width: 100%;
-    height: 400px; /* Initial Height matches card roughly */
-    object-fit: cover;
-    transition: height var(--transition-speed) var(--ease-ios);
-  }
-  .app-card.fullscreen .app-hero-image {
-    height: 50vh; /* Expands to half screen on open */
-  }
+.projector-beam {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 0; height: 2px; background: #fff;
+  transition: width 0.3s var(--ease-holo);
+  box-shadow: 0 0 20px #fff;
+  z-index: 910;
+}
 
-  /* Scrollable Content inside Expanded Card */
-  .app-body {
-    opacity: 0;
-    transform: translateY(20px);
-    padding: 40px;
-    max-width: 800px;
-    margin: 0 auto;
-    transition: opacity 0.4s 0.2s, transform 0.4s 0.2s; /* Delay for content fade in */
-    color: #d0c0e0;
-    line-height: 1.6;
-  }
-  .app-card.fullscreen .app-body {
-    opacity: 1;
-    transform: translateY(0);
-    overflow-y: auto; /* Allow scrolling inside */
-    max-height: 50vh;
-  }
+.modal-content {
+  position: relative;
+  width: 90vw; max-width: 1000px; height: 80vh;
+  background: rgba(10, 5, 15, 0.95);
+  border: 1px solid var(--primary);
+  backdrop-filter: blur(20px);
+  clip-path: inset(50% 0 50% 0); /* Start closed vertically */
+  transition: clip-path 0.5s 0.2s var(--ease-holo), opacity 0.3s;
+  opacity: 0; pointer-events: auto;
+  display: grid; grid-template-columns: 1.2fr 0.8fr;
+  box-shadow: 0 0 100px rgba(0,0,0,0.8);
+}
 
-  /* Close Button */
-  .close-app-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 36px;
-    height: 36px;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(10px);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    cursor: pointer;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.3s ease;
-    z-index: 10;
-  }
-  .app-card.fullscreen .close-app-btn {
-    opacity: 1;
-    transform: scale(1);
-    transition-delay: 0.3s;
-  }
-  .close-app-btn:hover { background: rgba(255,255,255,0.2); }
+.modal-open .projector-beam { width: 100vw; opacity: 0; transition: width 0.3s, opacity 0.1s 0.3s; }
+.modal-open .modal-content { 
+  opacity: 1; 
+  clip-path: inset(0 0 0 0);
+}
 
-  /* --- 6. VERSION LABEL --- */
-  .version-label {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.7rem;
-    color: rgba(255,255,255,0.4);
-    pointer-events: none;
-    z-index: 900;
-    letter-spacing: 1px;
-  }
+.modal-visual {
+  position: relative; overflow: hidden;
+  border-right: 1px solid rgba(255,255,255,0.1);
+}
+.modal-img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.visual-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, #000 0%, transparent 40%);
+}
 
-  /* Typography Utilities */
-  .glorious { color: #ffd700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
-  .crimson { color: #ff4d4d; font-weight: 700; }
-  .six-font { font-family: 'Cinzel Decorative', cursive; }
+.modal-info {
+  padding: 40px; display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.modal-close {
+  position: absolute; top: 20px; right: 20px;
+  background: transparent; border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  transition: 0.2s; z-index: 10;
+}
+.modal-close:hover { background: var(--primary); border-color: var(--primary); }
 
-  @media (max-width: 768px) {
-    .app-card.fullscreen .app-hero-image { height: 40vh; }
-    .app-card.fullscreen .app-body { max-height: 60vh; padding: 25px; }
-  }
+.info-header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px; }
+.info-title { font-family: var(--font-display); font-size: 2.5rem; color: #fff; margin-bottom: 10px; }
+.info-meta { font-family: var(--font-code); color: var(--primary); font-size: 0.8rem; }
+.info-body { color: #ccc; line-height: 1.8; font-size: 1rem; }
 
+@media(max-width: 900px) {
+  .modal-content { grid-template-columns: 1fr; height: 90vh; }
+  .modal-visual { height: 40%; }
+  .hud-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+  .search-interface { width: 100%; }
+}
 </style>
 </head>
 <body>
 
-<!-- Ambient Layers -->
-<div class="noise"></div>
-<div class="bg-universe" id="universe"></div>
-
-<!-- Version Label -->
-<div class="version-label">V.2.4.0 // STABLE</div>
-
-<!-- Layout -->
-<div class="layout-container">
-  
-  <header class="page-header">
-    <div class="header-title">/six <span style="font-size:1.5rem; font-weight:300; opacity:0.7;">Archive</span></div>
-    <div class="header-subtitle">Witness the <span class="glorious">Glorious</span> Timeline</div>
-    
-    <div class="controls">
-      <input type="text" class="search-box" id="searchInput" placeholder="Search Database...">
-    </div>
-  </header>
-
-  <main class="grid-section" id="grid">
-    <!-- Cards Injected via JS -->
-  </main>
+<!-- ENVIRONMENT -->
+<div class="void-stage">
+  <div class="grid-floor"></div>
 </div>
+<div class="particles"></div>
 
-<!-- The Magic Animation Layer -->
-<div class="app-modal-layer">
-  <!-- The single expanding element that morphs -->
-  <div class="app-card" id="appCard">
-    <div class="close-app-btn" onclick="closeApp()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+<!-- CURSOR -->
+<div class="cursor-dot"></div>
+<div class="cursor-circle"></div>
+
+<!-- HEADER -->
+<header class="hud-header">
+  <div>
+    <div class="hud-title">/SIX <span style="color:var(--primary)">ARCHIVES</span></div>
+    <div class="hud-subtitle">SECURE DATABANK // V.2.4.0</div>
+  </div>
+  <div class="search-interface">
+    <input type="text" class="search-input" id="searchInput" placeholder="SEARCH QUERY...">
+    <div class="search-deco">_</div>
+  </div>
+</header>
+
+<!-- MAIN GRID -->
+<main class="archive-container">
+  <div class="grid-layout" id="grid">
+    <!-- JS Injects Cards Here -->
+  </div>
+</main>
+
+<!-- PROJECTION MODAL -->
+<div class="projection-layer" id="projectionLayer">
+  <div class="projector-beam"></div>
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-visual">
+      <img src="" class="modal-img" id="mImg">
+      <div class="visual-overlay"></div>
     </div>
-    <img src="" class="app-hero-image" id="appHeroImg">
-    <div class="app-body">
-      <h1 id="appTitle" style="font-size: 2.5rem; margin-bottom: 10px; color: white;"></h1>
-      <div id="appMeta" style="margin-bottom: 25px; opacity: 0.7; font-family: 'Orbitron'; font-size: 0.8rem;"></div>
-      <div id="appDesc" style="font-size: 1.1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;"></div>
+    <div class="modal-info">
+      <div class="info-header">
+        <h1 class="info-title" id="mTitle"></h1>
+        <div class="info-meta" id="mMeta"></div>
+      </div>
+      <div class="info-body" id="mDesc"></div>
     </div>
   </div>
 </div>
 
 <script>
-  /* --- DATA --- */
-  const achievements = [
-    {
-      id: 1,
-      title: "Richest in SwiftSMP",
-      date: "Nov 11, 2025",
-      type: "general",
-      image: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
-      desc: "The economic domination of Season 9 began here. Through strategic market manipulation and grinding, <span class='crimson'>The_Killers_</span> became the wealthiest player on the server, surpassing the combined wealth of the next three factions.",
-      meta: "UNLOCKED BY: THE_KILLERS_ // NET WORTH: $540M"
-    },
-    {
-      id: 2,
-      title: "CPX VS /SIX",
-      date: "Nov 09, 2025",
-      type: "victory",
-      image: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
-      desc: "A decisive battle in the Nether. The CPX coalition attempted an ambush but was met with perfect coordination. Lineup: Mo0a, Wpun, Steral1n, Eucl1d_. Result: Complete wipe of enemy forces.",
-      meta: "SCORE: 2-0 // CASUALTIES: 0"
-    },
-    {
-      id: 3, 
-      title: "The First Dragon",
-      date: "Oct 20, 2025",
-      type: "general",
-      image: "https://wallpapers.com/images/hd/minecraft-ender-dragon-4k-720w0y9a8u7e8t7e.jpg",
-      desc: "Speedrunning the ender dragon on reset day to secure the dragon egg for the faction vault. A display of pure efficiency.",
-      meta: "TIME: 1H 45M // LOOT: DRAGON EGG"
-    }
-  ];
+/* ======================= DATABASE ======================= */
+const achievements = [
+  {
+    id: 1,
+    title: "ECONOMY DOMINATION",
+    date: "2025-11-11",
+    rarity: "legendary",
+    image: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
+    desc: "Achieved absolute market control in SwiftSMP Season 9. Through calculated trade routes and resource monopolies, The_Killers_ amassed a net worth exceeding the combined total of the top 3 rival factions. This event triggered the 'Great Inflation' of November.",
+    meta: "OPERATIVE: THE_KILLERS_ // NET WORTH: $540M"
+  },
+  {
+    id: 2,
+    title: "OPERATION: NETHER WIPE",
+    date: "2025-11-09",
+    rarity: "classified",
+    image: "https://th.bing.com/th/id/OIP.9_YLlxPpUyONWg2N9wqNSwHaHa?w=108&h=108&c=1&bgcl=d22373&r=0&o=7&cb=ucfimg1&pid=ImgRC&rm=3&ucfimg=1",
+    desc: "A tactical ambush against the CPX coalition. Despite being outnumbered 2:1, /six operatives utilized crystal PvP meta to systematically eliminate the enemy frontline. No casualties were sustained on our side.",
+    meta: "STATUS: VICTORY // K/D RATIO: INFINITE"
+  },
+  {
+    id: 3,
+    title: "THE FIRST DRAGON",
+    date: "2025-10-20",
+    rarity: "common",
+    image: "https://wallpapers.com/images/hd/minecraft-ender-dragon-4k-720w0y9a8u7e8t7e.jpg",
+    desc: "Speedrun completion of the End Dimension on reset day. The Dragon Egg was secured and moved to the Vault before other factions entered the End.",
+    meta: "TIME: 1H 45M // LOOT: DRAGON EGG"
+  },
+  {
+    id: 4,
+    title: "SERVER TAKEOVER",
+    date: "2025-08-15",
+    rarity: "legendary",
+    image: "https://wallpapers.com/images/high/cool-minecraft-background-1920-x-1080-3635s3a08q9842s3.webp",
+    desc: "Complete administrative control established over the target server. Opposition clans disbanded or merged into /six tributaries.",
+    meta: "TARGET: [REDACTED] // DURATION: 2 WEEKS"
+  }
+];
 
-  /* --- RENDER ENGINE --- */
-  const grid = document.getElementById('grid');
+/* ======================= ENGINE ======================= */
+
+// 1. Cursor Logic
+const cursorDot = document.querySelector('.cursor-dot');
+const cursorCircle = document.querySelector('.cursor-circle');
+
+window.addEventListener('mousemove', (e) => {
+  cursorDot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+  cursorCircle.animate({
+    left: `${e.clientX}px`,
+    top: `${e.clientY}px`
+  }, { duration: 400, fill: "forwards" });
+});
+
+// 2. Render Grid
+const grid = document.getElementById('grid');
+
+function render(filter = '') {
+  grid.innerHTML = '';
+  const filtered = achievements.filter(a => a.title.toLowerCase().includes(filter.toLowerCase()));
   
-  function render(filter = "") {
-    grid.innerHTML = '';
-    achievements.forEach(item => {
-      if (!item.title.toLowerCase().includes(filter.toLowerCase())) return;
-
-      const cardWrap = document.createElement('div');
-      cardWrap.className = 'card-container';
-      cardWrap.dataset.id = item.id;
-      
-      // Victory Badge Logic
-      const badge = item.type === 'victory' ? `<div class="victory-badge">VICTORY</div>` : '';
-
-      cardWrap.innerHTML = `
-        <div class="card-inner">
-          ${badge}
-          <div class="card-img-wrap">
-            <img src="${item.image}" class="card-img" alt="${item.title}">
-          </div>
-          <div class="card-content">
-            <div class="card-title">${item.title}</div>
-            <div class="card-date">${item.date}</div>
-          </div>
+  filtered.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'holo-wrapper';
+    card.innerHTML = `
+      <div class="holo-card ${item.rarity}" onclick="openModal(${item.id})">
+        <div class="card-vis">
+          <img src="${item.image}" class="card-img" alt="Evidence">
         </div>
-      `;
-
-      // 3D Tilt Event
-      cardWrap.addEventListener('mousemove', handleTilt);
-      cardWrap.addEventListener('mouseleave', resetTilt);
+        <div class="card-data">
+          <div class="data-meta">
+            <span>// ${item.date}</span>
+            <span style="color:var(--${item.rarity === 'common' ? 'accent' : item.rarity})">${item.rarity.toUpperCase()}</span>
+          </div>
+          <div class="data-title" data-val="${item.title}">${item.title}</div>
+          <div class="data-desc">${item.desc}</div>
+        </div>
+      </div>
+    `;
+    
+    // 3D Tilt Logic
+    card.addEventListener('mousemove', (e) => {
+      document.body.classList.add('hovering');
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -8;
+      const rotateY = ((x - centerX) / centerX) * 8;
       
-      // Click to Open App
-      cardWrap.addEventListener('click', (e) => openApp(item, cardWrap));
-
-      grid.appendChild(cardWrap);
+      card.querySelector('.holo-card').style.transform = 
+        `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
     });
-  }
 
-  /* --- 3D TILT PHYSICS --- */
-  function handleTilt(e) {
-    const card = e.currentTarget.querySelector('.card-inner');
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    // Set CSS var for spotlight
-    card.style.setProperty('--mouse-x', `${x}px`);
-    card.style.setProperty('--mouse-y', `${y}px`);
-
-    // Calculate rotation
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -10; // -10deg max
-    const rotateY = ((x - centerX) / centerX) * 10;
-
-    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-  }
-
-  function resetTilt(e) {
-    const card = e.currentTarget.querySelector('.card-inner');
-    card.style.transform = `rotateX(0) rotateY(0) scale3d(1,1,1)`;
-  }
-
-  /* --- THE IOS APP OPEN ANIMATION LOGIC --- */
-  let activeCardRect = null;
-  let activeItem = null;
-  const appCard = document.getElementById('appCard');
-  const appHeroImg = document.getElementById('appHeroImg');
-  const appTitle = document.getElementById('appTitle');
-  const appMeta = document.getElementById('appMeta');
-  const appDesc = document.getElementById('appDesc');
-  const body = document.body;
-
-  function openApp(item, cardElement) {
-    if (body.classList.contains('modal-open')) return;
-    
-    activeItem = item;
-    
-    // 1. Get position of the clicked card
-    activeCardRect = cardElement.getBoundingClientRect();
-
-    // 2. Populate App Card with data (while invisible/small)
-    appHeroImg.src = item.image;
-    appTitle.innerHTML = item.title;
-    appMeta.innerHTML = item.meta;
-    appDesc.innerHTML = item.desc;
-
-    // 3. Position App Card exactly over the clicked card
-    // We use Fixed positioning, so we match the rect coordinates
-    appCard.style.transition = 'none'; // Disable transition for instant placement
-    appCard.style.top = `${activeCardRect.top}px`;
-    appCard.style.left = `${activeCardRect.left}px`;
-    appCard.style.width = `${activeCardRect.width}px`;
-    appCard.style.height = `${activeCardRect.height}px`;
-    appCard.style.borderRadius = '20px'; // Match card radius
-    
-    // 4. Force a browser reflow (so it recognizes the start position)
-    appCard.offsetHeight;
-
-    // 5. Enable transitions and animate to Full Screen
-    appCard.style.transition = ''; // Re-enable CSS transitions
-    body.classList.add('modal-open');
-    cardElement.style.opacity = '0'; // Hide original card
-
-    // Calculate center position styles
-    const isMobile = window.innerWidth < 768;
-    const expandedWidth = isMobile ? window.innerWidth : 800; // Max width 800px on desktop
-    const expandedHeight = isMobile ? window.innerHeight : 600; // Max height on desktop
-    
-    const topPos = isMobile ? 0 : (window.innerHeight - expandedHeight) / 2;
-    const leftPos = (window.innerWidth - expandedWidth) / 2;
-
-    requestAnimationFrame(() => {
-        appCard.classList.add('fullscreen');
-        
-        // Apply new coordinates
-        appCard.style.top = `${topPos}px`;
-        appCard.style.left = `${leftPos}px`;
-        appCard.style.width = `${expandedWidth}px`;
-        appCard.style.height = `${expandedHeight}px`;
-        appCard.style.borderRadius = isMobile ? '0px' : '24px';
+    card.addEventListener('mouseleave', () => {
+      document.body.classList.remove('hovering');
+      card.querySelector('.holo-card').style.transform = 
+        `perspective(1000px) rotateX(0) rotateY(0) scale3d(1,1,1)`;
     });
-  }
-
-  function closeApp() {
-    if (!activeCardRect) return;
-
-    // 1. Remove fullscreen class (internal content fades out)
-    appCard.classList.remove('fullscreen');
-
-    // 2. Animate back to original coordinates
-    appCard.style.top = `${activeCardRect.top}px`;
-    appCard.style.left = `${activeCardRect.left}px`;
-    appCard.style.width = `${activeCardRect.width}px`;
-    appCard.style.height = `${activeCardRect.height}px`;
-    appCard.style.borderRadius = '20px';
-
-    // 3. Cleanup after animation ends
-    setTimeout(() => {
-        body.classList.remove('modal-open');
-        
-        // Find the original card and show it again
-        const originalCard = document.querySelector(`.card-container[data-id="${activeItem.id}"]`);
-        if(originalCard) originalCard.style.opacity = '1';
-        
-        // Reset App Card internal state slightly for next open
-        appCard.scrollTop = 0;
-    }, 600); // Matches CSS transition speed
-  }
-
-  /* --- INITIALIZATION --- */
-  // Create Stars
-  const universe = document.getElementById('universe');
-  for(let i=0; i<50; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.left = `${Math.random()*100}%`;
-    star.style.top = `${Math.random()*100}%`;
-    star.style.width = `${Math.random()*3}px`;
-    star.style.height = star.style.width;
-    star.style.animationDelay = `${Math.random()*4}s`;
-    universe.appendChild(star);
-  }
-  // Add Nebulas
-  ['#4a0a75', '#240046'].forEach((col, i) => {
-    const neb = document.createElement('div');
-    neb.className = 'nebula';
-    neb.style.background = col;
-    neb.style.width = `${300 + Math.random()*200}px`;
-    neb.style.height = neb.style.width;
-    neb.style.left = `${Math.random()*80}%`;
-    neb.style.top = `${Math.random()*80}%`;
-    neb.style.animationDuration = `${15 + i*5}s`;
-    universe.appendChild(neb);
+    
+    grid.appendChild(card);
   });
+  
+  // Trigger text decryption on titles
+  decryptTitles();
+}
 
-  // Search Logic
-  document.getElementById('searchInput').addEventListener('input', (e) => {
-    render(e.target.value);
+// 3. Text Decryption Effect
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890/[]#";
+function decryptTitles() {
+  document.querySelectorAll('.data-title').forEach(el => {
+    const original = el.dataset.val;
+    let iter = 0;
+    const interval = setInterval(() => {
+      el.innerText = original.split("").map((letter, index) => {
+        if(index < iter) return original[index];
+        return chars[Math.floor(Math.random() * 26)];
+      }).join("");
+      if(iter >= original.length) clearInterval(interval);
+      iter += 1/2;
+    }, 30);
   });
+}
 
-  // Start
-  render();
+// 4. Modal Logic
+const modalLayer = document.getElementById('projectionLayer');
+const mImg = document.getElementById('mImg');
+const mTitle = document.getElementById('mTitle');
+const mMeta = document.getElementById('mMeta');
+const mDesc = document.getElementById('mDesc');
 
-  // Escape Key to Close
-  document.addEventListener('keydown', (e) => {
-    if(e.key === 'Escape' && body.classList.contains('modal-open')) closeApp();
-  });
+function openModal(id) {
+  const item = achievements.find(a => a.id === id);
+  if(!item) return;
+  
+  mImg.src = item.image;
+  mTitle.innerText = item.title;
+  mMeta.innerText = item.meta;
+  mDesc.innerHTML = item.desc; // Allow HTML in desc
+  
+  modalLayer.classList.add('modal-open');
+}
+
+function closeModal() {
+  modalLayer.classList.remove('modal-open');
+}
+
+// Search Listener
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  render(e.target.value);
+});
+
+// ESC Key
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') closeModal();
+});
+
+// Initial Render
+render();
 
 </script>
 </body>
