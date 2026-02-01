@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>/six | OPERATIONS</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+/* ======================= THE CORE ======================= */
+:root {
+  --bg-void: #020003;
+  --neon: #9d4edd;
+  --neon-dim: rgba(157, 78, 221, 0.2);
+  --cyan: #00f3ff;
+  --alert: #ff2a2a;
+  --font-hud: 'Orbitron', sans-serif;
+  --font-term: 'Share Tech Mono', monospace;
+  --ease-tech: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+* { box-sizing: border-box; cursor: none; user-select: none; }
+body {
+  margin: 0; height: 100vh; overflow: hidden;
+  background: var(--bg-void); color: #fff;
+  font-family: var(--font-term);
+}
+
+/* ======================= CURSOR ======================= */
+.cursor-reticle {
+  width: 20px; height: 20px; border: 1px solid var(--cyan);
+  position: fixed; pointer-events: none; z-index: 9999;
+  transform: translate(-50%, -50%) rotate(45deg);
+  transition: width 0.2s, height 0.2s;
+  mix-blend-mode: exclusion;
+}
+.cursor-reticle::after {
+  content:''; position: absolute; top: 50%; left: 50%;
+  width: 4px; height: 4px; background: var(--cyan);
+  transform: translate(-50%, -50%);
+}
+body.active-hover .cursor-reticle { width: 40px; height: 40px; border-color: var(--alert); background: rgba(255,42,42,0.1); }
+
+/* ======================= CRT & NOISE OVERLAY ======================= */
+.scanlines {
+  position: fixed; inset: 0; pointer-events: none; z-index: 900;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 2px, 3px 100%;
+  opacity: 0.6;
+}
+.vignette {
+  position: fixed; inset: 0; pointer-events: none; z-index: 901;
+  background: radial-gradient(circle, transparent 60%, black 100%);
+}
+
+/* ======================= BOOT SEQUENCE ======================= */
+.boot-screen {
+  position: fixed; inset: 0; background: #000; z-index: 2000;
+  display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;
+  font-family: var(--font-term); color: var(--neon); font-size: 14px;
+}
+.boot-log { height: 100%; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+.boot-line { margin: 2px 0; }
+.boot-line span { color: #fff; }
+
+/* ======================= MAIN UI GRID ======================= */
+.ops-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr 350px;
+  grid-template-rows: 80px 1fr 200px;
+  height: 100vh; padding: 20px; gap: 20px;
+  opacity: 0; transform: scale(1.02);
+  transition: opacity 1s, transform 1s var(--ease-tech);
+}
+.ops-grid.online { opacity: 1; transform: scale(1); }
+
+/* Common Panel Style */
+.panel {
+  border: 1px solid rgba(157, 78, 221, 0.3);
+  background: rgba(10, 5, 15, 0.6);
+  backdrop-filter: blur(5px);
+  position: relative;
+  display: flex; flex-direction: column;
+}
+.panel::before { /* Corner Accents */
+  content: ''; position: absolute; top: -1px; left: -1px; width: 10px; height: 10px;
+  border-top: 2px solid var(--neon); border-left: 2px solid var(--neon);
+}
+.panel::after {
+  content: ''; position: absolute; bottom: -1px; right: -1px; width: 10px; height: 10px;
+  border-bottom: 2px solid var(--neon); border-right: 2px solid var(--neon);
+}
+.p-header {
+  padding: 10px 15px; background: rgba(157, 78, 221, 0.1);
+  border-bottom: 1px solid rgba(157, 78, 221, 0.3);
+  font-family: var(--font-hud); font-size: 0.8rem; letter-spacing: 2px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+/* ======================= 3D HOLO-GLOBE ======================= */
+.viewport-3d {
+  grid-column: 2; grid-row: 2 / 3;
+  position: relative; perspective: 1000px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.wireframe-globe {
+  width: 400px; height: 400px;
+  transform-style: preserve-3d;
+  animation: spin 20s linear infinite;
+}
+
+.ring {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  border: 1px solid var(--neon); border-radius: 50%; opacity: 0.3;
+}
+.ring:nth-child(1) { transform: rotateY(0deg); }
+.ring:nth-child(2) { transform: rotateY(30deg); }
+.ring:nth-child(3) { transform: rotateY(60deg); }
+.ring:nth-child(4) { transform: rotateY(90deg); }
+.ring:nth-child(5) { transform: rotateY(120deg); }
+.ring:nth-child(6) { transform: rotateY(150deg); }
+.equator { transform: rotateX(90deg); border-color: var(--cyan); opacity: 0.6; }
+
+.target-dot {
+  position: absolute; width: 8px; height: 8px; background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #fff, 0 0 20px var(--neon);
+  transform-style: preserve-3d;
+}
+/* Place dots in 3D space */
+.t1 { transform: rotateY(45deg) rotateX(-20deg) translateZ(200px); }
+.t2 { transform: rotateY(140deg) rotateX(10deg) translateZ(200px); }
+.t3 { transform: rotateY(260deg) rotateX(40deg) translateZ(200px); }
+
+@keyframes spin { from { transform: rotateY(0deg) rotateX(10deg); } to { transform: rotateY(360deg) rotateX(10deg); } }
+
+/* ======================= TARGET LIST ======================= */
+.target-list {
+  grid-column: 3; grid-row: 2 / 4;
+  overflow-y: auto;
+}
+.target-item {
+  padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: 0.3s; position: relative; overflow: hidden;
+}
+.target-item:hover { background: rgba(157, 78, 221, 0.1); padding-left: 20px; }
+.target-item.active { background: rgba(255, 42, 42, 0.1); border-left: 3px solid var(--alert); }
+.t-name { font-family: var(--font-hud); font-size: 1.1rem; color: #fff; }
+.t-status { font-size: 0.8rem; color: #888; margin-top: 5px; }
+.lock-btn {
+  margin-top: 10px; background: transparent; border: 1px solid var(--neon);
+  color: var(--neon); font-family: var(--font-term); padding: 5px 10px;
+  width: 100%; cursor: none; text-transform: uppercase; transition: 0.2s;
+}
+.lock-btn:hover { background: var(--neon); color: #000; box-shadow: 0 0 15px var(--neon); }
+
+/* ======================= LIVE TERMINAL ======================= */
+.terminal-panel {
+  grid-column: 1; grid-row: 2 / 4;
+}
+.terminal-log {
+  padding: 10px; font-size: 12px; color: #aaa;
+  overflow: hidden; height: 100%; display: flex; flex-direction: column; justify-content: flex-end;
+}
+.log-entry { margin-bottom: 4px; opacity: 0.7; }
+.log-entry.new { color: var(--cyan); opacity: 1; }
+.log-entry.warn { color: var(--alert); }
+
+/* ======================= RED ALERT STATE ======================= */
+body.alert-mode {
+  animation: shake 0.5s ease-in-out;
+}
+body.alert-mode .ring { border-color: var(--alert); }
+body.alert-mode .target-dot { background: var(--alert); box-shadow: 0 0 20px var(--alert); }
+body.alert-mode .panel { border-color: var(--alert); }
+body.alert-mode .p-header { background: rgba(255,42,42,0.2); color: var(--alert); }
+
+@keyframes shake {
+  0%, 100% { transform: translate(0,0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(2px, -2px); }
+  60% { transform: translate(-2px, -2px); }
+}
+
+/* ======================= HEADER & FOOTER ======================= */
+.top-bar {
+  grid-column: 1 / 4;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.logo { font-family: var(--font-hud); font-size: 2rem; letter-spacing: 5px; }
+.clock { color: var(--cyan); font-size: 1.2rem; }
+
+.btm-stats {
+  grid-column: 2; grid-row: 3;
+  display: flex; gap: 20px;
+}
+.stat-box {
+  flex: 1; border: 1px solid rgba(255,255,255,0.1);
+  padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+.stat-val { font-family: var(--font-hud); font-size: 2rem; color: #fff; }
+.stat-label { color: #666; font-size: 0.8rem; letter-spacing: 1px; }
+
+/* RESPONSIVE */
+@media (max-width: 1000px) {
+  .ops-grid { grid-template-columns: 1fr; grid-template-rows: auto; height: auto; display: flex; flex-direction: column; }
+  .viewport-3d { height: 300px; }
+  .wireframe-globe { width: 200px; height: 200px; }
+}
+</style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="cursor-reticle"></div>
+
+<!-- BOOT OVERLAY -->
+<div class="boot-screen" id="bootScreen">
+  <div class="boot-log" id="bootLog"></div>
+</div>
+
+<div class="ops-grid" id="mainGrid">
+  
+  <!-- HEADER -->
+  <div class="top-bar">
+    <div class="logo">/SIX <span style="color:var(--neon)">OPS</span></div>
+    <div class="clock" id="clock">00:00:00</div>
+  </div>
+
+  <!-- LEFT: TERMINAL -->
+  <div class="panel terminal-panel">
+    <div class="p-header">
+      <span>LIVE_FEED</span>
+      <span style="color:var(--cyan)">● REC</span>
+    </div>
+    <div class="terminal-log" id="terminalLog">
+      <!-- JS populates this -->
+    </div>
+  </div>
+
+  <!-- CENTER: 3D MAP -->
+  <div class="viewport-3d">
+    <div class="wireframe-globe" id="globe">
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+      <div class="ring equator"></div>
+      
+      <!-- Target Dots -->
+      <div class="target-dot t1"></div>
+      <div class="target-dot t2"></div>
+      <div class="target-dot t3"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM: STATS -->
+  <div class="btm-stats">
+    <div class="panel stat-box">
+      <div class="stat-val" id="cpuVal">12%</div>
+      <div class="stat-label">SYSTEM LOAD</div>
+    </div>
+    <div class="panel stat-box">
+      <div class="stat-val" style="color:var(--cyan)">SECURE</div>
+      <div class="stat-label">NETWORK</div>
+    </div>
+    <div class="panel stat-box">
+      <div class="stat-val" style="color:var(--neon)">3</div>
+      <div class="stat-label">ACTIVE WARS</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: TARGETS -->
+  <div class="panel target-list">
+    <div class="p-header">PRIORITY TARGETS</div>
+    
+    <div class="target-item">
+      <div class="t-name">SWIFTSMP_S9</div>
+      <div class="t-status">STATUS: DOMINATED</div>
+      <button class="lock-btn">VIEW INTEL</button>
+    </div>
+
+    <div class="target-item">
+      <div class="t-name">CPX_COALITION</div>
+      <div class="t-status">STATUS: FRACTURED</div>
+      <button class="lock-btn">VIEW INTEL</button>
+    </div>
+
+    <div class="target-item">
+      <div class="t-name">SERVER_NA_04</div>
+      <div class="t-status" style="color:var(--alert)">STATUS: ACTIVE CONFLICT</div>
+      <button class="lock-btn" onclick="initiateProtocol(this)">INITIATE ATTACK</button>
+    </div>
+
+    <div class="target-item">
+      <div class="t-name">VANILLA_HUB</div>
+      <div class="t-status">STATUS: SURVEILLANCE</div>
+      <button class="lock-btn">SCAN</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ======================= SYSTEMS LOGIC ======================= */
+
+// 1. Cursor Follow
+const reticle = document.querySelector('.cursor-reticle');
+document.addEventListener('mousemove', (e) => {
+  reticle.style.left = e.clientX + 'px';
+  reticle.style.top = e.clientY + 'px';
+});
+
+// Hover Effect
+document.querySelectorAll('button, .target-item').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('active-hover'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('active-hover'));
+});
+
+// 2. Boot Sequence
+const bootLog = document.getElementById('bootLog');
+const bootLines = [
+  "INITIALIZING /SIX KERNEL...",
+  "LOADING ASSETS...",
+  "BYPASSING FIREWALLS...",
+  "CONNECTING TO DARKNET...",
+  "ESTABLISHING SECURE LINK...",
+  "SYSTEM ONLINE."
+];
+
+let lineIndex = 0;
+function runBoot() {
+  if(lineIndex < bootLines.length) {
+    const div = document.createElement('div');
+    div.className = 'boot-line';
+    div.innerHTML = `> <span>${bootLines[lineIndex]}</span>`;
+    bootLog.appendChild(div);
+    lineIndex++;
+    setTimeout(runBoot, 200);
+  } else {
+    setTimeout(() => {
+      document.getElementById('bootScreen').style.opacity = '0';
+      document.getElementById('bootScreen').style.pointerEvents = 'none';
+      document.getElementById('mainGrid').classList.add('online');
+      startTerminal();
+    }, 500);
+  }
+}
+window.onload = runBoot;
+
+// 3. Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').innerText = now.toLocaleTimeString('en-US', {hour12: false});
+}
+setInterval(updateClock, 1000);
+
+// 4. Live Terminal
+const termLog = document.getElementById('terminalLog');
+const commands = [
+  "Scanning port 25565...", "Packet injected [TCP]", "Handshake successful", 
+  "Decrypting user data...", "Ping: 12ms", "Target identified", "Downloading terrain...",
+  "Proxy rotation active", "Bypassing Auth...", "Coords acquired: X:104 Z:-400"
+];
+
+function startTerminal() {
+  setInterval(() => {
+    const p = document.createElement('div');
+    const isWarn = Math.random() > 0.8;
+    p.className = `log-entry new ${isWarn ? 'warn' : ''}`;
+    p.innerText = `> ${commands[Math.floor(Math.random() * commands.length)]}`;
+    termLog.appendChild(p);
+    
+    if(termLog.children.length > 15) termLog.removeChild(termLog.firstChild);
+    termLog.scrollTop = termLog.scrollHeight;
+  }, 800);
+  
+  // Random CPU fluctuation
+  setInterval(() => {
+    document.getElementById('cpuVal').innerText = Math.floor(Math.random() * 30 + 10) + "%";
+  }, 2000);
+}
+
+// 5. Attack Protocol
+function initiateProtocol(btn) {
+  const body = document.body;
+  const globe = document.getElementById('globe');
+  
+  if(body.classList.contains('alert-mode')) {
+    // Deactivate
+    body.classList.remove('alert-mode');
+    btn.innerText = "INITIATE ATTACK";
+    globe.style.animationDuration = "20s";
+  } else {
+    // Activate
+    body.classList.add('alert-mode');
+    btn.innerText = "ABORT PROTOCOL";
+    globe.style.animationDuration = "2s"; // Spin fast
+    
+    // Add aggressive logs
+    const p = document.createElement('div');
+    p.className = 'log-entry warn';
+    p.innerText = "!!! ATTACK SEQUENCE STARTED !!!";
+    termLog.appendChild(p);
+  }
+}
+</script>
+</body>
+</html>
