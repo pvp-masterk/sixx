@@ -32,7 +32,10 @@
             overflow-x: hidden;
             line-height: 1.6;
         }
-
+    @font-face {
+           font-family: 'Diecide Remain';
+          src: url('fonts/DeicideRemain.otf') format('opentype');
+          font-display: swap;
         /* --- SCROLLBAR --- */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
@@ -40,10 +43,7 @@
 
         /* --- SPECIAL FONT HANDLING --- */
         /* This class is auto-applied to the word "SIX" via Javascript */
-       @font-face {
-  font-family: 'Diecide Remain';
-  src: url('fonts/DeicideRemain.otf') format('opentype');
-  font-display: swap;
+       
         .six-font {
             font-family:'Diecide Remain', sans-serif;
       background: linear-gradient(135deg, #c77dff, #9d4edd, #7b2cbf);
