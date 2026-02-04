@@ -472,8 +472,14 @@ footer { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.2); font
   <div id="preview-modal" class="modal-overlay" onclick="app.closePreview()">
     <img id="preview-img-el" class="preview-img" src="" alt="Preview">
   </div>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <script>
+  const supabase = supabase.createClient(
+  "https://tstsijdifhgmpaszqknr.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
+);
+
 /* ======================= DATA STORE (Centralized Configuration) ======================= */
 const DATA = {
   nav: [
@@ -533,6 +539,7 @@ const DATA = {
 const app = {
   
   init: () => {
+    app.checkAuth();
     app.renderNav();
     app.renderRoster();
     app.renderTimeline();
@@ -543,6 +550,18 @@ const app = {
 
   /* 1. DOM MANIPULATION HELPER FOR ICONS */
   icon: (path) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`,
+  
+checkAuth: async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) return;
+
+  const user = session.user;
+
+  console.log("Logged in as:", user);
+
+  app.onLogin(user);
+},
 
   /* 2. RENDER FUNCTIONS */
   renderNav: () => {
@@ -623,11 +642,17 @@ const app = {
     show ? modal.classList.add('active') : modal.classList.remove('active');
   },
 
-  login: (provider) => {
-    // Supabase or logic here
-    console.log(`Logging in with ${provider}`);
-    alert("Redirecting to secure login gateway...");
-  },
+  login: async (provider) => {
+  if (provider !== "discord") return;
+
+  await supabase.auth.signInWithOAuth({
+    provider: "discord",
+    options: {
+      redirectTo: window.location.origin
+    }
+  });
+},
+
 
   /* 4. UTILITIES */
   openPreview: (src) => {
