@@ -1,549 +1,448 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>/six | DOMINION</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIX ⛧ | Minecraft Clan</title>
+    <style>
+        /* --- FONTS & VARIABLES --- */
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Montserrat:ital,wght@1,900&display=swap');
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+        :root {
+            --primary: #5F26B4;
+            --primary-glow: #7a3ee3;
+            --dark: #050505;
+            --darker: #000000;
+            --light: #ffffff;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
 
-<style>
-/* ======================= GOD-TIER CORE ======================= */
-:root {
-  --void-bg: #030005;
-  --void-panel: rgba(10, 5, 16, 0.7);
-  --primary: #9d4edd;
-  --accent: #e0aaff;
-  --glitch: #0ff;
-  --danger: #ff2a2a;
-  --font-display: 'Orbitron', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-code: 'Space Mono', monospace;
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
 
-* { box-sizing: border-box; cursor: none; /* Custom cursor system */ }
-::selection { background: var(--primary); color: #000; }
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+        }
 
-html, body {
-  margin: 0; padding: 0; height: 100%;
-  background-color: var(--void-bg);
-  color: #e8e6f3;
-  font-family: var(--font-body);
-  overflow: hidden; /* Locked until breach */
-}
+        /* --- SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-glow); }
 
-/* ======================= SCENE: THE VOID (Background) ======================= */
-.void-stage {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: radial-gradient(circle at 50% -20%, #1a002e, #030005 60%);
-}
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(95, 38, 180, 0.3);
+        }
 
-.grid-floor {
-  position: absolute; inset: -50%;
-  background-image: 
-    linear-gradient(rgba(157, 78, 221, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(157, 78, 221, 0.1) 1px, transparent 1px);
-  background-size: 60px 60px;
-  transform: perspective(500px) rotateX(60deg) translateY(0);
-  animation: gridMove 20s linear infinite;
-  mask-image: radial-gradient(circle, black 30%, transparent 70%);
-}
+        .nav-logo img {
+            height: 40px; /* Adjust based on your chrome text image */
+            filter: drop-shadow(0 0 5px var(--primary));
+        }
 
-@keyframes gridMove {
-  0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
-  100% { transform: perspective(500px) rotateX(60deg) translateY(60px); }
-}
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
 
-/* ======================= CUSTOM CURSOR (Lag Free) ======================= */
-.cursor-dot, .cursor-circle {
-  position: fixed; top: 0; left: 0;
-  border-radius: 50%; pointer-events: none; z-index: 9999;
-  transform: translate(-50%, -50%);
-  mix-blend-mode: difference;
-}
-.cursor-dot { width: 6px; height: 6px; background: white; }
-.cursor-circle { 
-  width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.4);
-  transition: width 0.2s, height 0.2s, background-color 0.2s;
-}
-body:hover .cursor-circle { opacity: 1; }
-body.hovering .cursor-circle { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-color: var(--primary); }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--light);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            position: relative;
+        }
 
-/* ======================= SCENE: BREACH PROTOCOL (Landing) ======================= */
-.breach-gate {
-  position: fixed; inset: 0; z-index: 100;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: #000;
-  transition: opacity 1s var(--ease-out-expo), clip-path 1.5s var(--ease-out-expo);
-}
+        .nav-links a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+        }
 
-.breach-gate.open {
-  clip-path: circle(0% at 50% 50%);
-  pointer-events: none;
-}
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            background: url('hero-bg.png') no-repeat center center/cover; /* Car Image */
+            overflow: hidden;
+        }
 
-.glitch-text {
-  font-family: var(--font-display);
-  font-size: 5rem; font-weight: 900;
-  text-transform: uppercase;
-  position: relative;
-  color: #fff;
-  letter-spacing: 10px;
-}
+        /* Overlay to make text readable */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.9) 100%);
+        }
 
-.breach-btn-wrap {
-  position: relative; margin-top: 40px;
-  width: 260px; height: 60px;
-}
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
 
-.breach-trigger {
-  width: 100%; height: 100%;
-  background: transparent; border: 1px solid rgba(255,255,255,0.2);
-  color: var(--code); letter-spacing: 2px;
-  font-family: var(--font-code);
-  text-transform: uppercase;
-  position: relative; overflow: hidden;
-  transition: all 0.3s;
-}
+        /* Glitch Title Effect */
+        h1.glitch {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 8rem;
+            font-weight: 900;
+            font-style: italic;
+            color: var(--light);
+            text-transform: uppercase;
+            position: relative;
+            text-shadow: 4px 4px 0px var(--primary);
+            animation: shake 3s infinite;
+        }
 
-.breach-fill {
-  position: absolute; top: 0; left: 0; bottom: 0; width: 0%;
-  background: var(--primary);
-  transition: width 0.1s linear;
-  z-index: -1;
-}
+        .subtitle {
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            margin-bottom: 30px;
+            color: #ccc;
+        }
 
-.breach-trigger:active .breach-fill { transition: width 0.05s linear; }
+        .cta-btn {
+            padding: 15px 40px;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--light);
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-block;
+        }
 
-/* ======================= MAIN INTERFACE ======================= */
-.interface-layer {
-  position: relative; z-index: 10;
-  padding: 100px 20px 40px;
-  max-width: 1400px; margin: 0 auto;
-  opacity: 0; transform: scale(1.05);
-  transition: opacity 1s 0.5s, transform 1s 0.5s var(--ease-out-expo);
-}
-.interface-layer.active { opacity: 1; transform: scale(1); }
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: var(--primary);
+            transition: 0.4s;
+            z-index: -1;
+        }
 
-/* --- HUD Header --- */
-.hud-header {
-  position: fixed; top: 0; left: 0; right: 0;
-  padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
-  z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
-  background: rgba(3,0,5,0.8);
-}
-.hud-brand { font-family: var(--font-display); font-weight: 900; font-size: 1.5rem; letter-spacing: 4px; }
-.hud-brand span { color: var(--primary); }
-.hud-status { font-family: var(--font-code); font-size: 0.8rem; color: #57F287; display: flex; gap: 10px; align-items: center; }
-.status-dot { width: 8px; height: 8px; background: #57F287; border-radius: 50%; box-shadow: 0 0 10px #57F287; }
+        .cta-btn:hover::before {
+            left: 0;
+        }
 
-/* --- Holo-Cards --- */
-.holo-grid {
-  display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px;
-}
+        .cta-btn:hover {
+            box-shadow: 0 0 20px var(--primary);
+        }
 
-.holo-card {
-  background: rgba(20, 10, 30, 0.4);
-  border: 1px solid rgba(157, 78, 221, 0.2);
-  padding: 30px;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.1s, box-shadow 0.3s;
-  transform-style: preserve-3d;
-  perspective: 1000px;
-}
-.holo-card::before {
-  content:''; position: absolute; inset: 0;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.03), transparent);
-  transform: translateX(-100%);
-  transition: 0.5s;
-}
-.holo-card:hover::before { transform: translateX(100%); }
+        /* --- ABOUT / IDENTITY --- */
+        .section {
+            padding: 80px 10%;
+            background: var(--darker);
+            position: relative;
+        }
 
-/* Grid Spans */
-.span-12 { grid-column: span 12; }
-.span-8 { grid-column: span 8; }
-.span-4 { grid-column: span 4; }
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3rem;
+            font-style: italic;
+            margin-bottom: 50px;
+            border-left: 5px solid var(--primary);
+            padding-left: 20px;
+            text-transform: uppercase;
+        }
 
-@media (max-width: 900px) { .span-8, .span-4 { grid-column: span 12; } }
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
 
-/* --- Typography --- */
-h1, h2, h3 { margin: 0; }
-.display-text {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 1;
-  text-transform: uppercase;
-  background: linear-gradient(180deg, #fff, #a0a0a0);
-  -webkit-background-clip: text; color: transparent;
-  margin-bottom: 20px;
-}
-.display-text span { color: var(--primary); -webkit-text-fill-color: var(--primary); }
+        .about-img img {
+            width: 100%;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 15px rgba(95, 38, 180, 0.2);
+            filter: grayscale(100%);
+            transition: 0.5s;
+        }
 
-.decrypt-text { color: var(--accent); font-family: var(--font-code); font-size: 0.9rem; margin-bottom: 10px; display: block; opacity: 0.7; }
+        .about-img img:hover {
+            filter: grayscale(0%);
+            box-shadow: 0 0 25px var(--primary);
+        }
 
-/* --- Roster Monolith --- */
-.monolith-list { list-style: none; padding: 0; }
-.monolith-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-  font-family: var(--font-code);
-  transition: padding 0.3s;
-}
-.monolith-item:hover { padding-left: 10px; background: linear-gradient(90deg, rgba(157,78,221,0.1), transparent); }
-.rank-badge {
-  padding: 4px 8px; font-size: 0.7rem; border: 1px solid var(--primary);
-  color: var(--primary); text-transform: uppercase; letter-spacing: 1px;
-}
+        .about-text h3 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
 
-/* --- Interactive Elements --- */
-.cyber-btn {
-  background: var(--primary); color: #fff; border: none;
-  padding: 14px 28px; font-family: var(--font-display);
-  text-transform: uppercase; letter-spacing: 2px;
-  position: relative; overflow: hidden;
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  transition: transform 0.2s;
-}
-.cyber-btn:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(157,78,221,0.6); }
+        .about-text p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #aaa;
+        }
 
-/* --- Scrollbar --- */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #000; }
-::-webkit-scrollbar-thumb { background: var(--primary); }
+        /* --- ROSTER / MEDIA --- */
+        .media-section {
+            background: linear-gradient(to bottom, var(--darker), #0f0518);
+            text-align: center;
+        }
 
-/* --- Oath Section --- */
-.oath-container {
-  text-align: center; padding: 60px 0;
-  border-top: 1px solid rgba(157,78,221,0.3);
-  border-bottom: 1px solid rgba(157,78,221,0.3);
-  background: rgba(0,0,0,0.5);
-  position: relative;
-}
-.oath-line {
-  font-family: var(--font-display); font-size: 1.5rem; color: #fff;
-  opacity: 0; transform: translateY(20px);
-  transition: 0.5s;
-}
-.oath-line.visible { opacity: 1; transform: translateY(0); }
+        .card-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
 
-/* --- Login Modal (Cyber Style) --- */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 200;
-  display: flex; justify-content: center; align-items: center;
-  opacity: 0; pointer-events: none; transition: 0.3s;
-}
-.modal-overlay.active { opacity: 1; pointer-events: all; }
-.login-terminal {
-  width: 400px; background: #050505; border: 1px solid var(--primary);
-  padding: 30px; position: relative;
-  box-shadow: 0 0 30px rgba(157,78,221,0.1);
-}
-.login-terminal::before {
-  content: 'AUTH_REQUIRED'; position: absolute; top: -10px; left: 20px;
-  background: #050505; padding: 0 10px; color: var(--primary); font-family: var(--font-code); font-size: 0.8rem;
-}
+        .card {
+            width: 300px;
+            height: 400px;
+            background: var(--dark);
+            border: 1px solid #222;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            cursor: pointer;
+        }
 
-/* --- Mobile Nav --- */
-.mobile-toggle { display: none; }
-@media(max-width:768px){ .mobile-toggle { display: block; background:none; border:none; color:white; font-size:24px; } }
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+            opacity: 0.6;
+        }
 
-</style>
+        .card:hover {
+            border-color: var(--primary);
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(95, 38, 180, 0.3);
+        }
+
+        .card:hover img {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .card-text {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(transparent, var(--primary));
+            transform: translateY(100%);
+            transition: 0.3s;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .card:hover .card-text {
+            transform: translateY(0);
+        }
+
+        /* --- COPY IP SECTION --- */
+        .ip-bar {
+            background: url('anime.png') no-repeat center center/cover;
+            padding: 100px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .ip-bar::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+        }
+
+        .ip-container {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px 50px;
+            border: 1px solid var(--primary);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .server-ip {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+            cursor: pointer;
+        }
+
+        .click-hint {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 20px;
+            text-align: center;
+            background: var(--darker);
+            border-top: 1px solid #222;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes shake {
+            0% { text-shadow: 4px 4px 0px var(--primary); transform: translate(0,0); }
+            2% { text-shadow: -2px -2px 0px var(--primary); transform: translate(-2px,1px); }
+            4% { text-shadow: 2px 2px 0px var(--primary); transform: translate(2px,-1px); }
+            6% { text-shadow: 4px 4px 0px var(--primary); transform: translate(0,0); }
+            100% { text-shadow: 4px 4px 0px var(--primary); transform: translate(0,0); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            h1.glitch { font-size: 4rem; }
+            .about-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; } /* Add JS for hamburger menu if needed */
+        }
+    </style>
 </head>
 <body>
 
-<!-- AUDIO ENGINE (Silent by default) -->
-<audio id="sfx-hover" src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA=="></audio>
-<audio id="sfx-click" src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA=="></audio>
-<!-- Note: Real SFX would be loaded here. Placeholder used for validity. -->
-
-<!-- CUSTOM CURSOR -->
-<div class="cursor-dot"></div>
-<div class="cursor-circle"></div>
-
-<!-- BACKGROUND -->
-<div class="void-stage">
-  <div class="grid-floor"></div>
-</div>
-
-<!-- BREACH LANDING -->
-<div class="breach-gate" id="breachGate">
-  <div class="glitch-text" data-text="/SIX">/SIX</div>
-  <div class="breach-btn-wrap">
-    <button class="breach-trigger" id="breachBtn" onmousedown="startBreach()" onmouseup="cancelBreach()" onmouseleave="cancelBreach()" ontouchstart="startBreach()" ontouchend="cancelBreach()">
-      <div class="breach-fill" id="breachFill"></div>
-      <span id="breachText">Hold to Breach</span>
-    </button>
-  </div>
-</div>
-
-<!-- HUD HEADER -->
-<nav class="hud-header">
-  <div class="hud-brand">/SIX<span>_CLAN</span></div>
-  <div class="hud-status">
-    <div class="status-dot"></div>
-    SYSTEM ONLINE
-  </div>
-  <button class="mobile-toggle">☰</button>
-</nav>
-
-<!-- MAIN APP INTERFACE -->
-<main class="interface-layer" id="interfaceLayer">
-  
-  <div class="holo-grid">
-    
-    <!-- Hero Section -->
-    <div class="holo-card span-12" style="min-height: 400px; display:flex; flex-direction:column; justify-content:center;">
-      <span class="decrypt-text" data-value=">> INITIALIZING CONQUEST PROTOCOLS...">>> INITIALIZING...</span>
-      <h1 class="display-text">We Do Not Join Servers.<br>We <span>Take</span> Them.</h1>
-      <p style="max-width: 600px; color: #b0b0b0; line-height: 1.6;">
-        /six is not just a clan. It is a calculated force of domination. 
-        Founded on April 11, 2025, we recruit weapons, not players. 
-        Specializing in Crystal, Sword, and NethPot.
-      </p>
-      <div style="margin-top:30px; display:flex; gap: 20px;">
-        <button class="cyber-btn" onclick="openLogin()">Join the Legion</button>
-        <button class="cyber-btn" style="background:transparent; border:1px solid var(--primary);">View Gallery</button>
-      </div>
-    </div>
-
-    <!-- Discord Stats (Live Data Simulation) -->
-    <div class="holo-card span-4 hover-tilt">
-      <h3>Server Uplink</h3>
-      <div style="margin-top:20px; display:flex; align-items:center; gap:15px;">
-        <img id="ds-icon" src="" style="width:60px; height:60px; border-radius:10px; border:1px solid var(--primary);" alt="Server">
-        <div>
-          <div style="color:var(--primary); font-weight:800;">/six HQ</div>
-          <div style="font-size:0.8rem; color:#aaa;" id="ds-count">Loading data stream...</div>
+    <!-- NAVBAR -->
+    <nav>
+        <div class="nav-logo">
+            <!-- Uses the Chrome Text Image -->
+            <img src="logo.png" alt="SIX Logo">
         </div>
-      </div>
-      <div style="margin-top:15px; background:rgba(255,255,255,0.1); height:4px; width:100%;">
-        <div id="ds-bar" style="width:0%; height:100%; background:var(--primary); box-shadow:0 0 10px var(--primary); transition: width 1s ease;"></div>
-      </div>
-    </div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#gallery">Gallery</a>
+            <a href="https://discord.gg/sixx" target="_blank" style="color: var(--primary);">Discord</a>
+        </div>
+    </nav>
 
-    <!-- The Oath -->
-    <div class="holo-card span-8 hover-tilt">
-      <h3>The Oath</h3>
-      <div class="oath-container">
-        <div class="oath-line">We do not recruit players.</div>
-        <div class="oath-line">We forge <span style="color:var(--primary)">weapons</span>.</div>
-        <div class="oath-line">Every loss is remembered.</div>
-        <div class="oath-line">Every war is calculated.</div>
-      </div>
-    </div>
+    <!-- HERO SECTION -->
+    <header id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="glitch">SIX<span style="font-family: serif;">⛧</span></h1>
+            <p class="subtitle">DOMINANCE IS IN OUR BLOOD</p>
+            <a href="https://discord.gg/sixx" target="_blank" class="cta-btn">Join The Cult</a>
+        </div>
+    </header>
 
-    <!-- Roster Monolith -->
-    <div class="holo-card span-12">
-      <h3>Active Operatives</h3>
-      <ul class="monolith-list">
-        <li class="monolith-item">
-          <span>xla41r</span> <span class="rank-badge" style="border-color:#fff; color:#fff;">FOUNDER</span>
-        </li>
-        <li class="monolith-item">
-          <span>@lovelyxeiii_1</span> <span class="rank-badge">BEYOND</span>
-        </li>
-        <li class="monolith-item">
-          <span>@impsx</span> <span class="rank-badge" style="border-color:var(--danger); color:var(--danger)">HENERAL</span>
-        </li>
-         <li class="monolith-item">
-          <span>@headlock777ssnewss;</span> <span class="rank-badge" style="border-color:#57F287; color:#57F287">STAR</span>
-        </li>
-      </ul>
-      <div style="text-align:center; margin-top:20px;">
-        <a href="members.html" style="color:var(--primary); text-decoration:none; font-family:var(--font-code);">[VIEW FULL DATABASE]</a>
-      </div>
-    </div>
+    <!-- ABOUT SECTION -->
+    <section id="about" class="section">
+        <h2 class="section-title">Who We Are</h2>
+        <div class="about-grid">
+            <div class="about-img">
+                <!-- Uses the Wings/Skeleton Image -->
+                <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1391436744225722589/Untitled64_20250706231140.png?ex=6984b373&is=698361f3&hm=97b0663d52098a0c683e665e71771d93f9799d0c31541fbe1e9240590a6f7914&" alt="Angel Wings Skeleton">
+            </div>
+            <div class="about-text">
+                <h3>WE ARE SIX</h3>
+                <p>
+                    Forged in the chaos of anarchy servers and sharpened by crystal pvp. 
+                    SIX represents the pinnacle of coordination and aggression. 
+                    We don't just play; we takeover.
+                    <br><br>
+                    <span style="color: var(--primary); font-weight: bold;">Est. 2024 // Color Code: #5F26B4</span>
+                </p>
+            </div>
+        </div>
+    </section>
 
-  </div> <!-- End Grid -->
-  
-  <footer style="margin-top:60px; text-align:center; opacity:0.5; font-size:0.8rem; font-family:var(--font-code);">
-    SYSTEM ID: SAIS_2025 // ALL RIGHTS RESERVED
-  </footer>
+    <!-- GALLERY / VISUALS -->
+    <section id="gallery" class="section media-section">
+        <h2 class="section-title" style="text-align: center; border: none;">Visuals</h2>
+        
+        <div class="card-container">
+            <!-- Anime Card -->
+            <div class="card">
+                <img src="anime.png" alt="Anime Visual">
+                <div class="card-text">LEADERSHIP</div>
+            </div>
+            <!-- Car Card (reused for visual consistency) -->
+            <div class="card">
+                <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1391335858023432192/quality_restoration_20250706162944658.jpg?ex=6984557e&is=698303fe&hm=a1553ad23241141390e46bd0b32f65291e772ffc07b5a4518dde9d9bfcfc93fc&" alt="Drift Car">
+                <div class="card-text">LIFESTYLE</div>
+            </div>
+             <!-- Logo Card -->
+             <div class="card">
+                <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1393630838951772180/image-5.png?ex=69841d1c&is=6982cb9c&hm=47e1bb31634cb1e25d02ee72b65020aefaf576baceeb0ac8a47e0a3729408632&" style="padding: 40px; object-fit: contain;" alt="Chrome Logo">
+                <div class="card-text">BRAND</div>
+            </div>
+        </div>
+    </section>
 
-</main>
+    <!-- IP COPY SECTION -->
+    <section class="ip-bar">
+        <div class="ip-container">
+            <h3 style="margin-bottom: 10px;">SERVER IP</h3>
+            <div class="server-ip" onclick="copyIP()">play.sixclan.net</div>
+            <div class="click-hint" id="copy-status">(Click to copy)</div>
+        </div>
+    </section>
 
-<!-- LOGIN MODAL -->
-<div class="modal-overlay" id="loginModal">
-  <div class="login-terminal">
-    <h2 style="margin-bottom:20px; color:var(--primary);">IDENTITY VERIFICATION</h2>
-    <button class="cyber-btn" style="width:100%; margin-bottom:10px; background:#5865F2;" id="discordLogin">Authorize via Discord</button>
-    <button class="cyber-btn" style="width:100%; background:transparent; border:1px solid #333;" onclick="closeLogin()">Abort</button>
-  </div>
-</div>
+    <footer>
+        <p>&copy; 2024 SIX CLAN. All Rights Reserved.</p>
+        <p style="font-size: 0.7rem; margin-top: 5px; opacity: 0.5;">Designed for Domination.</p>
+    </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-/* ======================= GOD MODE SCRIPT ======================= */
+    <script>
+        // Copy IP Functionality
+        function copyIP() {
+            const ip = "play.sixclan.net"; // Change this to your actual server IP
+            navigator.clipboard.writeText(ip).then(() => {
+                const status = document.getElementById("copy-status");
+                status.innerText = "COPIED TO CLIPBOARD!";
+                status.style.color = "#5F26B4";
+                setTimeout(() => {
+                    status.innerText = "(Click to copy)";
+                    status.style.color = "#aaa";
+                }, 2000);
+            });
+        }
 
-// 1. Cursor Engine
-const cursorDot = document.querySelector('.cursor-dot');
-const cursorCircle = document.querySelector('.cursor-circle');
-
-window.addEventListener('mousemove', (e) => {
-  const x = e.clientX;
-  const y = e.clientY;
-  
-  // Direct follow for dot
-  cursorDot.style.transform = `translate(${x}px, ${y}px)`;
-  
-  // Slight delay for circle (Lag-free feel)
-  cursorCircle.animate({
-    left: `${x}px`,
-    top: `${y}px`
-  }, { duration: 500, fill: 'forwards' });
-});
-
-// Add hover states to all clickable elements
-document.querySelectorAll('button, a, .holo-card').forEach(el => {
-  el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
-  el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
-});
-
-// 2. Holographic Tilt Engine (Math-based, no heavy lib)
-document.addEventListener('mousemove', (e) => {
-  const cards = document.querySelectorAll('.hover-tilt');
-  const x = e.clientX / window.innerWidth;
-  const y = e.clientY / window.innerHeight;
-  
-  cards.forEach(card => {
-    const rect = card.getBoundingClientRect();
-    // Only animate if near mouse for performance
-    if(e.clientY > rect.top - 100 && e.clientY < rect.bottom + 100) {
-      const offsetX = (e.clientX - (rect.left + rect.width / 2)) * 0.01;
-      const offsetY = (e.clientY - (rect.top + rect.height / 2)) * 0.01;
-      card.style.transform = `perspective(1000px) rotateX(${-offsetY}deg) rotateY(${offsetX}deg)`;
-    } else {
-      card.style.transform = `perspective(1000px) rotateX(0) rotateY(0)`;
-    }
-  });
-});
-
-// 3. Breach Mechanic
-let breachTimer;
-const breachFill = document.getElementById('breachFill');
-const breachGate = document.getElementById('breachGate');
-const interfaceLayer = document.getElementById('interfaceLayer');
-
-function startBreach() {
-  breachFill.style.width = '100%';
-  breachFill.style.transition = 'width 1.5s cubic-bezier(0.1, 0.8, 0.2, 1)';
-  
-  breachTimer = setTimeout(() => {
-    // SUCCESS
-    document.getElementById('breachText').innerText = "ACCESS GRANTED";
-    breachGate.classList.add('open');
-    document.body.style.overflow = 'auto'; // Unlock scroll
-    interfaceLayer.classList.add('active');
-    
-    // Play sound (if we had real files)
-    // document.getElementById('sfx-click').play();
-    
-    // Start animations
-    startDecryption();
-    animateOath();
-    loadDiscordStats();
-    
-  }, 1500); // 1.5 seconds hold time
-}
-
-function cancelBreach() {
-  clearTimeout(breachTimer);
-  breachFill.style.width = '0%';
-  breachFill.style.transition = 'width 0.2s ease-out';
-}
-
-// 4. Text Decryption Effect
-const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890/[]#";
-
-function startDecryption() {
-  document.querySelectorAll('.decrypt-text').forEach(el => {
-    let iteration = 0;
-    const originalText = el.dataset.value;
-    let interval = setInterval(() => {
-      el.innerText = originalText
-        .split("")
-        .map((letter, index) => {
-          if(index < iteration) {
-            return originalText[index];
-          }
-          return letters[Math.floor(Math.random() * 26)];
-        })
-        .join("");
-      
-      if(iteration >= originalText.length) { 
-        clearInterval(interval);
-      }
-      
-      iteration += 1/3;
-    }, 30);
-  });
-}
-
-// 5. Scroll Animations (Intersection Observer)
-function animateOath() {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  });
-  
-  document.querySelectorAll('.oath-line').forEach((el, index) => {
-    el.style.transitionDelay = `${index * 200}ms`;
-    observer.observe(el);
-  });
-}
-
-// 6. Data Loading (Supabase/Discord)
-// (Re-using your existing logic but styled)
-const sb = supabase.createClient(
-    "https://tstsijdifhgmpaszqknr.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
-);
-
-document.getElementById("discordLogin").addEventListener("click", async () => {
-    await sb.auth.signInWithOAuth({
-      provider: "discord",
-      options: { redirectTo: window.location.origin + "/auth/callback.html" }
-    });
-});
-
-async function loadDiscordStats() {
-  // Simulate load for visual effect
-  const guildId = "1360258839429255208"; // Extracted from your icon link
-  const icon = `https://cdn.discordapp.com/icons/${guildId}/3ea76fc8a0cd48df0e3ce22e89d84305.png?size=256`;
-  
-  // Fake animated count up
-  let count = 0;
-  const target = 142; // Example number
-  const el = document.getElementById("ds-count");
-  const bar = document.getElementById("ds-bar");
-  document.getElementById("ds-icon").src = icon;
-  
-  const int = setInterval(() => {
-    count += Math.floor(Math.random() * 5) + 1;
-    if(count >= target) {
-      count = target;
-      clearInterval(int);
-    }
-    el.innerText = `${count} OPERATIVES ONLINE`;
-    bar.style.width = `${(count/800)*100}%`;
-  }, 30);
-}
-
-// 7. Modals
-function openLogin() {
-  document.getElementById('loginModal').classList.add('active');
-}
-function closeLogin() {
-  document.getElementById('loginModal').classList.remove('active');
-}
-
-</script>
+        // 3D Tilt Effect on Hero Title
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth / 2 - e.pageX) / 50;
+            const y = (window.innerHeight / 2 - e.pageY) / 50;
+            const title = document.querySelector('.glitch');
+            if(title) {
+                title.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+            }
+        });
+    </script>
 </body>
 </html>
