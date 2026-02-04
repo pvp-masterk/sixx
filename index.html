@@ -1,456 +1,1899 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIX ⛧ | DOMINANCE</title>
-    
-    <!-- FONTS -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- 'Metal Mania' looks like the Deicide font, 'Rajdhani' for UI -->
-    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>/six</title>
 
-    <style>
-        /* --- CONFIGURATION --- */
-        :root {
-            --brand-color: #5F26B4;
-            --brand-glow: #8e4ce8;
-            --bg-dark: #050505;
-            --bg-panel: #0a0a0a;
-            --text-main: #e0e0e0;
-            --text-dim: #888;
-        }
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        /* --- RESET & BASE --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: 'Rajdhani', sans-serif;
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-    @font-face {
-           font-family: 'Diecide Remain';
-          src: url('fonts/DeicideRemain.otf') format('opentype');
-          font-display: swap;
-        /* --- SCROLLBAR --- */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: var(--brand-color); }
+<style>
+/* ======================= RESET & BASE ======================= */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color:#e8e6f3;
+  background:#050006;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.5;
+}
 
-        /* --- SPECIAL FONT HANDLING --- */
-        /* This class is auto-applied to the word "SIX" via Javascript */
-       
-        .six-font {
-            font-family:'Diecide Remain', sans-serif;
-      background: linear-gradient(135deg, #c77dff, #9d4edd, #7b2cbf);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow:0 0 14px rgba(180,80,255,0.45);
-      letter-spacing:1px;
-      font-weight:900;
-      display:inline-block;
-        }
+/* lock scroll while landing is visible by inline style on body (set in JS) */
 
-        /* --- NAVIGATION --- */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            border-bottom: 1px solid rgba(95, 38, 180, 0.2);
-        }
+/* ======================= BACKGROUND LAYERS (STATIC) ======================= */
+.bg-wrap{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+.bg-layer{
+  position:absolute;
+  inset:-18%;
+  filter:blur(28px);
+  mix-blend-mode:screen;
+  opacity:.82;
+}
+.bg-layer.one{
+  background:radial-gradient(closest-side at 10% 20%, #2d004f 0%, transparent 35%),radial-gradient(closest-side at 80% 80%, #45003b 0%, transparent 30%);
+}
+.bg-layer.two{
+  background:linear-gradient(120deg, rgba(100,0,150,0.22), rgba(60,0,100,0.22));
+}
+.bg-layer.three{
+  background:radial-gradient(circle at 50% 50%, rgba(80,0,120,0.15), transparent 70%);
+}
 
-        .nav-logo { font-size: 2rem; }
-        
-        .nav-links { display: flex; gap: 30px; }
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            text-transform: uppercase;
-            font-weight: 700;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            transition: 0.3s;
-        }
-        .nav-links a:hover { color: var(--brand-color); text-shadow: 0 0 8px var(--brand-color); }
+/* ======================= /SIX CUSTOM FONT (local fallback) ======================= */
+@font-face {
+  font-family: 'Diecide Remain';
+  src: url('fonts/DeicideRemain.otf') format('opentype');
+  font-display: swap;
+}
 
-        /* --- HERO SECTION --- */
-        .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            background: url('https://images.unsplash.com/photo-1542317854-f9596aa56139?q=80&w=2070&auto=format&fit=crop') center/cover;
-            /* Using a dark drift car/neon background from Unsplash */
-        }
+/* six-text style */
+.six-text{
+  font-family:'Diecide Remain', sans-serif;
+  background: linear-gradient(135deg, #c77dff, #9d4edd, #7b2cbf);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow:0 0 14px rgba(180,80,255,0.45);
+  letter-spacing:1px;
+  font-weight:900;
+  display:inline-block;
+}
 
-        .hero::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, rgba(5,5,5,0.3), var(--bg-dark));
-        }
+/* ======================= LANDING (fullscreen, no scroll) ======================= */
+.landing{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:40px 20px;
+  background:linear-gradient(180deg, rgba(5,0,10,0.9), rgba(5,0,10,0.6));
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: opacity .6s ease, transform .6s ease;
+  will-change: opacity, transform;
+}
+.landing.hidden{
+  opacity:0;
+  transform: scale(.98);
+  pointer-events:none;
+}
+.brand-big{
+  font-size:clamp(64px,18vw,140px);
+  font-weight:900;
+  letter-spacing:8px;
+  line-height:0.84;
+  color:transparent;
+  -webkit-background-clip:text;
+  background-image:linear-gradient(180deg,#e0aaff,#9d4edd 40%,#5a189a 100%);
+  text-shadow:0 8px 28px rgba(90,24,154,0.55);
+  margin-bottom:18px;
+  font-family:'Diecide Remain',sans-serif;
+}
+.enter-card{
+  margin-top:20px;
+  border-radius:16px;
+  padding:18px 22px;
+  background:linear-gradient(145deg, rgba(90,24,154,0.14), rgba(45,0,90,0.06));
+  border:1px solid rgba(180,120,255,0.12);
+  backdrop-filter: blur(4px);
+  box-shadow:0 8px 22px rgba(30,0,60,0.22);
+  cursor:pointer;
+  max-width:720px;
+}
+.tagline{ color:#e2d9ff; opacity:.94; font-size:18px; line-height:1.5; }
 
-        .hero-content { position: relative; z-index: 2; padding: 0 20px; }
+/* ======================= MAIN APP (hidden behind landing until enter) ======================= */
+.app{
+  position:relative;
+  z-index:20;
+  max-width:1200px;
+  margin:48px auto;
+  padding:28px;
+  border-radius:18px;
+  background:linear-gradient(145deg, rgba(20,5,35,0.64), rgba(10,2,20,0.7));
+  border:1px solid rgba(150,80,220,0.12);
+  backdrop-filter: blur(8px);
+  box-shadow:0 18px 48px rgba(0,0,0,0.6);
+  opacity:0;
+  transform: translateY(18px) scale(.995);
+  transition: opacity .6s ease, transform .6s cubic-bezier(.2,.9,.2,1);
+}
+.app.active{ opacity:1; transform: translateY(0) scale(1); }
 
-        .hero h1 {
-            font-size: 8vw; /* Responsive huge text */
-            line-height: 1;
-            margin-bottom: 10px;
-            animation: pulseGlow 3s infinite alternate;
-        }
+/* ======================= SIDEBAR (iOS glass) ======================= */
+/* -------------------------
+   SIDEBAR + APP PUSH (replace current sidebar/app CSS)
+   ------------------------- */
+:root {
+  --sidebar-w: 240px;
+  --sidebar-bg: rgba(30,10,50,0.34);
+  --glass-border: rgba(255,255,255,0.06);
+}
 
-        .hero p {
-            font-size: 1.5rem;
-            letter-spacing: 5px;
-            color: #ccc;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
+/* Sidebar base (hidden off-screen by default) */
+.ios-sidebar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  padding: 28px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 140;
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border-right: 1px solid var(--glass-border);
+  box-shadow: 0 8px 40px rgba(40,10,90,0.18);
+  transform: translateX(calc(-1 * var(--sidebar-w))); /* hidden */
+  transition: transform .34s cubic-bezier(.2,.9,.2,1), opacity .28s ease;
+  opacity: 0.98;
+  will-change: transform;
+}
 
-        .cta-button {
-            padding: 15px 50px;
-            background: rgba(0,0,0,0.6);
-            border: 1px solid var(--brand-color);
-            color: #fff;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            text-decoration: none;
-            transition: 0.3s;
-            box-shadow: 0 0 15px rgba(95, 38, 180, 0.2);
-        }
+/* Visible */
+.ios-sidebar.visible{
+  transform: translateX(0);
+}
 
-        .cta-button:hover {
-            background: var(--brand-color);
-            box-shadow: 0 0 30px var(--brand-color);
-            transform: translateY(-2px);
-        }
+/* app container transition and pushed state */
+.app{
+  transition: transform .34s cubic-bezier(.2,.9,.2,1), box-shadow .34s ease, opacity .28s ease;
+  will-change: transform;
+}
+.app.shifted{
+  transform: translateX(var(--sidebar-w));
+  box-shadow: -12px 0 40px rgba(0,0,0,0.38);
+}
 
-        /* --- SECTIONS COMMON --- */
-        .section {
-            padding: 100px 10%;
-            position: relative;
-            border-bottom: 1px solid #111;
-        }
+/* toggle button (always visible) */
+.sidebar-toggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 160; /* above sidebar */
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(40,15,70,0.56);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(90,24,154,0.18);
+  transition: transform .2s ease, background .18s ease;
+  user-select: none;
+}
+.sidebar-toggle:hover{ transform: scale(1.04); background: rgba(80,30,140,0.56); }
 
-        .section-title {
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 700;
-            font-size: 3rem;
-            text-transform: uppercase;
-            margin-bottom: 60px;
-            border-left: 4px solid var(--brand-color);
-            padding-left: 20px;
-            background: linear-gradient(90deg, rgba(95,38,180,0.1), transparent);
-        }
+/* little shifted look for toggle when sidebar open */
+.sidebar-toggle.shifted{
+  transform: translateX(calc(var(--sidebar-w)));
+}
 
-        /* --- ABOUT (THE CULT) --- */
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 50px;
-            align-items: center;
-        }
+/* small screens: sidebar overlays (no push) */
+@media (max-width: 880px) {
+  .ios-sidebar{ transform: translateX(-100%); width: 88vw; }
+  .ios-sidebar.visible{ transform: translateX(0); }
+  .app.shifted{ transform: none; box-shadow: none; } /* avoid push on mobile */
+}
 
-        .about-text p { font-size: 1.1rem; margin-bottom: 20px; color: #bbb; }
-        
-        .about-visual {
-            height: 400px;
-            background: url('https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?q=80&w=2574&auto=format&fit=crop') center/cover;
-            /* Placeholder for Wings/Dark Aesthetic */
-            border: 1px solid var(--brand-color);
-            box-shadow: 0 0 20px rgba(95, 38, 180, 0.2);
-            filter: grayscale(80%);
-            transition: 0.5s;
-        }
-        .about-visual:hover { filter: grayscale(0%); box-shadow: 0 0 40px var(--brand-color); }
 
-        /* --- REQUIREMENTS (ARSENAL) --- */
-        .req-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
+/* ======================= APP HEADER ROW ======================= */
+.header-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; padding-bottom:16px; border-bottom:1px solid rgba(150,80,220,0.06); gap:12px; }
+.clan-title{ font-size:34px; font-weight:800; background:linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd); -webkit-background-clip:text; color:transparent; letter-spacing:3px; font-family:'Inter',sans-serif;}
+.meta{ margin-top:6px; color:#c9b6ff; font-size:14px; font-weight:500; }
 
-        .req-card {
-            background: var(--bg-panel);
-            padding: 30px;
-            border: 1px solid #222;
-            transition: 0.3s;
-        }
+/* ======================= CARDS & SECTIONS ======================= */
+.card{ 
+  background: linear-gradient(145deg, rgba(40,15,70,0.8), rgba(20,5,40,0.7)); 
+  border: 1px solid rgba(150,80,220,0.15); 
+  border-radius: 15px; 
+  padding: 25px; 
+  margin-bottom: 25px; 
+  backdrop-filter: blur(10px); 
+  box-shadow: 0 10px 25px rgba(10,0,25,0.3); 
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(88, 101, 242, 0.1) 0%, rgba(87, 242, 135, 0.05) 100%);
+  z-index: -1;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+.card {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform .35s;
+}
 
-        .req-card:hover { border-color: var(--brand-color); transform: translateY(-5px); }
-        
-        .req-card h3 { font-size: 1.5rem; margin-bottom: 10px; color: #fff; }
-        .req-card p { color: #888; font-size: 0.9rem; }
+.card:hover {
+  border-color: rgba(180, 120, 255, 0.65) !important;
+  box-shadow: 0 0 18px rgba(180, 120, 255, 0.55);
+  transform: translateY(-8px) scale(1.01);
+}
+.discord-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px;
+  gap: 25px;
+}
 
-        /* --- HIERARCHY (ROSTER) --- */
-        .roster-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-        }
+.ds-left {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
 
-        .rank-column {
-            flex: 1;
-            min-width: 300px;
-            background: #080808;
-            border: 1px solid #1a1a1a;
-            padding: 20px;
-            text-align: center;
-        }
+.ds-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 14px;
+  border: 2px solid rgba(180, 120, 255, 0.25);
+}
 
-        .rank-title {
-            color: var(--brand-color);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(95,38,180,0.5);
-            border-bottom: 1px solid #222;
-            padding-bottom: 10px;
-        }
+.ds-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #d8b9ff;
+}
 
-        .player-name {
-            display: block;
-            margin: 10px 0;
-            font-size: 1.1rem;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        .player-name:hover { color: var(--brand-color); letter-spacing: 1px; }
+.ds-created {
+  font-size: 14px;
+  color: #c9b6ff;
+}
 
-        /* --- SERVER IP SECTION --- */
-        .ip-section {
-            background: url('https://images.unsplash.com/photo-1620644780185-3f236428020a?q=80&w=2670&auto=format&fit=crop') center/cover; 
-            /* Placeholder for Anime/Cyberpunk Character */
-            padding: 150px 20px;
-            text-align: center;
-            position: relative;
-        }
+.ds-right {
+  flex: 0.8;
+}
 
-        .ip-section::before {
-            content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.85);
-        }
+.ds-count {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
 
-        .ip-box {
-            position: relative; z-index: 2;
-            display: inline-block;
-            border: 2px solid var(--brand-color);
-            padding: 40px 60px;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-        }
+.ds-total {
+  font-size: 14px;
+  opacity: 0.7;
+}
 
-        .ip-address {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #fff;
-            cursor: pointer;
-            font-family: 'Rajdhani', sans-serif;
-            letter-spacing: 2px;
-        }
+.ds-bar {
+  width: 100%;
+  height: 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
 
-        .copy-hint { margin-top: 10px; color: var(--brand-color); font-size: 0.8rem; letter-spacing: 1px; }
+#ds-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #b77bff, #7b2cbf);
+  transition: width 1s ease;
+  box-shadow: 0 0 12px rgba(180,120,255,0.5);
+}
 
-        /* --- FOOTER --- */
-        footer {
-            text-align: center;
-            padding: 30px;
-            background: #000;
-            font-size: 0.8rem;
-            color: #444;
-            border-top: 1px solid #111;
-        }
+.ds-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255,255,255,0.20); /* light stroke */
+  background: #7b2cbf;
+  color: white;
+  font-family:'Inter',sans-serif;
+  font-weight: 500;  /* not bold */
+  cursor: pointer;
+  transition: 
+    border-color .25s ease,
+    box-shadow .25s ease,
+    background .25s ease,
+    transform .25s ease;
+}
 
-        /* --- ANIMATIONS --- */
-        @keyframes pulseGlow {
-            0% { text-shadow: 0 0 10px var(--brand-color); }
-            100% { text-shadow: 0 0 30px var(--brand-color), 0 0 60px var(--brand-color); }
-        }
+/* HOVER EFFECT */
+.ds-btn:hover {
+  border-color: rgba(255,255,255,0.55);   /* brighter glowing stroke */
+  box-shadow: 0 0 12px rgba(255,255,255,0.35); /* soft outer glow */
+  background: #8b3ce0; /* slightly brighter purple */
+  transform: translateY(-2px);
+}
 
-        @media (max-width: 768px) {
-            .about-grid { grid-template-columns: 1fr; }
-            .nav-links { display: none; } /* Hidden on mobile for simplicity */
-            .section-title { font-size: 2rem; }
-        }
-    </style>
+
+
+/* gallery */
+.gallery-section{ padding:36px 0 18px; text-align:center; }
+.gallery-title{ font-family:'Inter',sans-serif; font-size:1.6rem; margin-bottom:18px; color:#fff; letter-spacing:1px; }
+.gallery-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+.banner-card{ 
+  position:relative; 
+  overflow:hidden; 
+  border-radius:12px; 
+  background:linear-gradient(145deg, rgba(30,0,50,0.84), rgba(0,0,20,0.88)); 
+  box-shadow:0 6px 18px rgba(120,0,180,0.12); 
+  transition: transform .16s ease; 
+}
+.banner-card:hover{ transform: translateY(-6px); }
+.banner-img{ width:100%; height:160px; object-fit:cover; display:block; }
+
+/* socials */
+.socials-section{ padding:28px 0 18px; text-align:center; }
+.socials-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; max-width:900px; margin:0 auto; }
+.social-card{ 
+  display:flex; 
+  flex-direction:column; 
+  align-items:center; 
+  gap:10px; 
+  padding:12px; 
+  text-decoration:none; 
+  color:inherit; 
+  border-radius:10px; 
+  background:linear-gradient(90deg, rgba(90,24,154,0.08), rgba(50,10,120,0.05)); 
+  border:1px solid rgba(150,80,220,0.06); 
+  transition: all 0.3s ease;
+}
+.social-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(90,24,154,0.2);
+}
+.social-icon{ width:64px; height:64px; object-fit:cover; border-radius:10px; border:2px solid rgba(180,120,255,0.18); }
+
+/* discord card */
+.discord-section{ display:flex; justify-content:center; margin-top:18px; }
+.discord-card{ 
+  background:linear-gradient(145deg, rgba(80,40,120,0.34), rgba(50,10,80,0.26)); 
+  border:1px solid rgba(180,120,255,0.12); 
+  border-radius:12px; 
+  padding:14px 18px; 
+  display:flex; 
+  align-items:center; 
+  gap:14px; 
+  box-shadow:0 6px 18px rgba(30,0,60,0.22); 
+}
+.discord-icon{ width:64px; height:64px; border-radius:10px; border:2px solid rgba(180,120,255,0.28); object-fit:cover; display:block; }
+.discord-name{ font-family:'Diecide Remain',sans-serif; font-size:20px; color:#d8b9ff; margin-bottom:4px; }
+.discord-date{ color:#c9b6ff; font-size:13px; margin-bottom:4px; }
+.discord-members{ font-weight:700; }
+
+/* progress */
+.progress-wrap{ width:160px; height:10px; background:rgba(255,255,255,0.06); border-radius:8px; overflow:hidden; }
+#progress-bar{ height:100%; width:0%; background:linear-gradient(90deg,#b77bff,#8f3fff); transition: width 1s linear; }
+
+/* buttons */
+.discord-btn{ 
+  width:100%; 
+  height:44px; 
+  border-radius:10px; 
+  border:none; 
+  cursor:pointer; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center; 
+  gap:10px; 
+  background:linear-gradient(90deg,#7b2cbf,#5a189a); 
+  color:#fff; 
+  font-weight:800; 
+  font-size:14px; 
+  box-shadow:0 6px 14px rgba(90,24,154,0.26); 
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.discord-btn:hover {
+  background:linear-gradient(90deg,#8a3fd4,#6a28d1);
+  transform: translateY(-3px);
+  box-shadow:0 10px 25px rgba(90,24,154,0.4);
+}
+.clanwar-btn{ 
+  margin-top:12px; 
+  width:100%; 
+  padding:12px; 
+  border-radius:10px; 
+  border:none; 
+  background:linear-gradient(90deg,#8a3fd4,#6a28d1); 
+  color:#fff; 
+  font-weight:800; 
+  cursor:pointer; 
+  transition: all 0.3s ease;
+}
+.clanwar-btn:hover {
+  transform: translateY(-3px);
+  box-shadow:0 10px 25px rgba(90,24,154,0.4);
+}
+
+/* footer */
+footer{ text-align:center; margin:32px 0 18px; color:#bfb6e9; opacity:0.9; font-size:13px; padding-top:18px; border-top:1px solid rgba(150,80,220,0.06); }
+
+/* modal */
+.modal{ 
+  position:fixed; 
+  inset:0; 
+  display:none; 
+  justify-content:center; 
+  align-items:center; 
+  background:rgba(5,0,10,0.6); 
+  backdrop-filter: blur(6px); 
+  z-index:120; 
+}
+.modal.active{ display:flex; }
+.modal-content{ 
+  position:relative; 
+  width:92%; 
+  max-width:520px; 
+  padding:20px; 
+  border-radius:16px; 
+  text-align:center; 
+  color:#fff; 
+  background:rgba(35,10,55,0.36); 
+  border:1px solid rgba(255,255,255,0.06); 
+  box-shadow:0 14px 36px rgba(0,0,0,0.7); 
+}
+
+/* banner preview modal separate style */
+.banner-preview{ max-width:90vw; max-height:80vh; object-fit:contain; border-radius:10px; }
+
+/* notification */
+.notification{ 
+  position:fixed; 
+  top:18px; 
+  right:18px; 
+  background:green; 
+  color:#fff; 
+  padding:10px 16px; 
+  border-radius:10px; 
+  display:none; 
+  font-weight:700; 
+  z-index:2000;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.notification.error{ background:#c94a4a; }
+
+/* small responsiveness */
+@media (max-width:900px){
+  .app{ margin:18px; padding:20px; }
+  .header-row{ flex-direction:column; align-items:flex-start; gap:12px; }
+}
+
+/* reduce motion */
+@media (prefers-reduced-motion: reduce){
+  *{ animation:none !important; transition:none !important; }
+  .bg-layer{ filter: blur(16px) !important; }
+}
+  /* ======================= WHO ARE WE SECTION ======================= */
+.who-section{
+  position: relative;
+  overflow: hidden;
+  padding: 28px;
+}
+
+.who-title{
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd);
+  -webkit-background-clip: text;
+  color: transparent;
+  font-weight: 800;
+}
+
+.who-wrap{
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.who-left{
+  flex: 1;
+  min-width: 260px;
+}
+
+.who-text{
+  color: #d8caff;
+  margin-bottom: 14px;
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+.who-highlight{
+  margin-top: 18px;
+  font-size: 17px;
+  font-weight: 700;
+  background: linear-gradient(90deg,#b47bff,#7b2cbf);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 12px rgba(140,60,255,0.45);
+}
+
+/* RIGHT CARD */
+.who-right{
+  flex: 0.6;
+  min-width: 240px;
+  display: flex;
+  justify-content: center;
+}
+
+.who-card{
+  width: 100%;
+  padding: 18px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(40,15,70,0.32), rgba(22,5,40,0.26));
+  border: 1px solid rgba(160,90,240,0.10);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 20px rgba(10,0,25,0.25);
+}
+
+.w-bullet{
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e8defe;
+  font-size: 15px;
+}
+
+.w-dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,#c77dff,#7b2cbf);
+  box-shadow: 0 0 12px rgba(150,70,255,0.6);
+}
+
+/* Floating holographic orb */
+.who-orb{
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(160,80,255,0.55), rgba(80,0,150,0.0));
+  filter: blur(40px);
+  border-radius: 50%;
+  animation: orbFloat 6s ease-in-out infinite alternate;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+@keyframes orbFloat{
+  from { transform: translateY(0px) translateX(0px); }
+  to   { transform: translateY(22px) translateX(-18px); }
+}
+/* ======================= CLAN ROSTER ======================= */
+.roster-section{
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.roster-title{
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  background: linear-gradient(90deg,#e0aaff,#c77dff,#9d4edd);
+  -webkit-background-clip: text;
+  color: transparent;
+  letter-spacing: 2px;
+}
+
+.roster-group{
+  margin-bottom: 26px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(150,80,220,0.12);
+}
+
+.roster-rank{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.rank-icon{
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(150,60,255,0.5));
+}
+
+.rank-name{
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  font-weight: 800;
+  background: linear-gradient(90deg,#b47bff,#7b2cbf);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 10px rgba(130,50,255,0.45);
+}
+
+.roster-list{
+  list-style: none;
+  margin-left: 12px;
+  padding-left: 0;
+}
+
+.roster-list li{
+  margin-bottom: 6px;
+  font-size: 15.5px;
+  color: #e8defe;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, rgba(40,15,70,0.25), rgba(20,5,40,0.22));
+  border: 1px solid rgba(150,80,220,0.08);
+  display: inline-block;
+  margin-right: 6px;
+  backdrop-filter: blur(4px);
+  transition: 0.2s ease;
+}
+
+.roster-list li:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(100,0,200,0.28);
+}
+/* ======================= RANK COLOR CUSTOMIZATIONS ======================= */
+
+/* ---------- FOUNDER ---------- */
+.roster-group:nth-of-type(1) .rank-name{
+  background: linear-gradient(90deg,#ffffff,#000000);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 10px rgba(255,255,255,0.35);
+}
+
+.roster-group:nth-of-type(1) .roster-list li{
+  background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(0,0,0,0.28));
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+/* ---------- BEYOND ---------- */
+.roster-group:nth-of-type(2) .rank-name{
+  background: linear-gradient(90deg,#ffffff,#000000);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 10px rgba(255,255,255,0.35);
+}
+
+.roster-group:nth-of-type(2) .roster-list li{
+  background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(0,0,0,0.26));
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+/* ---------- HENERAL (Deep Red + White) ---------- */
+.roster-group:nth-of-type(3) .rank-name{
+  background: linear-gradient(90deg,#ff9a9a,#b40000);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 10px rgba(255,0,0,0.45);
+}
+
+.roster-group:nth-of-type(3) .roster-list li{
+  background: linear-gradient(145deg, rgba(120,0,0,0.35), rgba(40,0,0,0.28));
+  border: 1px solid rgba(255,100,100,0.18);
+  box-shadow: 0 0 10px rgba(255,0,0,0.18);
+}
+
+/* ---------- STAR (Full Black + White Text Stroke) ---------- */
+.roster-group:nth-of-type(4) .rank-name{
+  color: #000000;
+  text-shadow: 
+    0 0 0.5px #ffffff,
+    0 0 1px #ffffff,
+    0 0 6px rgba(255,255,255,0.25);
+  -webkit-text-stroke: 1px rgba(255,255,255,0.8);
+  background: none;
+}
+
+.roster-group:nth-of-type(4) .roster-list li{
+  background: linear-gradient(145deg, rgba(0,0,0,0.9), rgba(20,20,20,0.8));
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #f0f0f0;
+  -webkit-text-stroke: 0.3px rgba(255,255,255,0.45);
+}
+/* ENHANCED LOGIN POPUP */
+#loginModal .modal-content {
+  background: rgba(25, 10, 40, 0.45);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 35px 30px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  animation: loginPop .55s cubic-bezier(.2,1,.3,1);
+  max-width: 380px; /* Add max-width to prevent oversized modal */
+  width: 90%; /* Responsive width */
+  margin: 0 auto; /* Center the modal */
+}
+
+/* entrance animation */
+@keyframes loginPop {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#loginModal h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #e9d8ff;
+  text-shadow: 0 0 18px rgba(140,60,255,0.5);
+  font-weight: 800;
+  text-align: center;
+}
+
+/* Remove or modify the generic glass-btn styles that conflict */
+.glass-btn {
+  /* Remove width: 100% and padding that conflict with specific button styles */
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: .28s ease;
+  border-radius: 14px; /* Keep your glass style radius */
+}
+
+/* GOOGLE BUTTON — enhanced official style */
+.login-google {
+  background: #ffffff !important;
+  border: 1px solid #dadce0 !important;
+  color: #3c4043 !important;
+  font-weight: 500 !important;
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif !important;
+  font-size: 14px !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+  transition: all 0.2s ease-in-out !important;
+  padding: 12px 20px !important; /* Slightly increased padding */
+  width: 100% !important; /* Controlled width */
+  max-width: 300px !important; /* Prevent excessive width */
+  margin: 0 auto 16px auto !important; /* Center and space buttons */
+  
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+}
+
+.login-google:hover {
+  background: #f8f9fa !important;
+  border-color: #d2e3fc !important;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.login-google:active {
+  background: #f1f3f4 !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+  transform: translateY(0) !important;
+}
+
+/* Google icon wrapper to match their design */
+.login-google::before {
+  content: '' !important;
+  display: inline-block !important;
+  width: 18px !important;
+  height: 18px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%233c4043' d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'/%3E%3Cpath fill='%2334A853' d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'/%3E%3Cpath fill='%23FBBC05' d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z'/%3E%3Cpath fill='%23EA4335' d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+}
+
+/* DISCORD BUTTON — enhanced Discord OAuth style */
+.login-discord {
+  background: #5865F2 !important;
+  border: none !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-family: 'Whitney', 'ABC Ginto Normal', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+  font-size: 14px !important;
+  border-radius: 3px !important;
+  box-shadow: 0 2px 6px rgba(88,101,242,0.2) !important;
+  transition: all 0.2s ease-in-out !important;
+  padding: 12px 20px !important; /* Slightly increased padding */
+  width: 100% !important; /* Controlled width */
+  max-width: 300px !important; /* Prevent excessive width */
+  margin: 0 auto 16px auto !important; /* Center and space buttons */
+  
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+}
+
+.login-discord:hover {
+  background: #4752c4 !important;
+  box-shadow: 0 4px 16px rgba(88,101,242,0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+.login-discord:active {
+  background: #3c45a5 !important;
+  box-shadow: 0 1px 3px rgba(88,101,242,0.3) !important;
+  transform: translateY(0) !important;
+}
+
+/* Discord icon wrapper to match their design */
+.login-discord::before {
+  content: '' !important;
+  display: inline-block !important;
+  width: 18px !important;
+  height: 18px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 127.14 96.36'%3E%3Cpath fill='%23ffffff' d='M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: contain !important;
+}
+
+/* Focus states for accessibility */
+.login-google:focus,
+.login-discord:focus {
+  outline: 2px solid #4285f4 !important;
+  outline-offset: 2px !important;
+}
+
+.login-google:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+.login-discord:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+/* Close button styles */
+#closeLoginBtn {
+  opacity: 0.6;
+  width: auto !important; /* Don't force full width */
+  padding: 10px 20px !important;
+  max-width: 150px !important;
+  margin: 10px auto 0 auto !important;
+}
+
+#closeLoginBtn:hover {
+  opacity: 1;
+}
+
+/* Button container for better layout */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+
+
+/* ======================= DRAGS-STYLE ANIMATIONS ======================= */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animate elements on scroll */
+.feature-card, .stat-item, .command-tier, .section-title {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.feature-card.animate, .stat-item.animate, .command-tier.animate, .section-title.animate {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Floating animation for hero elements */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Particle animation */
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* ======================= DRAGS-STYLE CARDS ======================= */
+.card {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(88, 101, 242, 0.1) 0%, rgba(87, 242, 135, 0.05) 100%);
+  z-index: -1;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* ======================= DRAGS-STYLE BUTTONS ======================= */
+.cta-button {
+  background: linear-gradient(90deg, #7b2cbf, #5a189a);
+  color: white;
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(90,24,154,0.3);
+}
+
+.cta-button:hover {
+  background: linear-gradient(90deg, #8a3fd4, #6a28d1);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(90,24,154,0.4);
+}
+
+.cta-button.outline {
+  background: transparent;
+  border: 2px solid #7b2cbf;
+  color: #7b2cbf;
+  box-shadow: none;
+}
+
+.cta-button.outline:hover {
+  background: rgba(123, 44, 191, 0.1);
+  color: #e0aaff;
+}
+
+.cta-button i {
+  transition: transform 0.3s ease;
+}
+
+.cta-button:hover i {
+  transform: translateX(3px);
+}
+
+/* ======================= DRAGS-STYLE SCROLLBAR ======================= */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050006;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #7b2cbf;
+  border-radius: 6px;
+  border: 3px solid #050006;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9d4edd;
+}
+
+/* ======================= DRAGS-STYLE FLOATING BUTTONS ======================= */
+.floating-buttons {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 999;
+}
+
+.floating-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #7b2cbf;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.floating-btn:hover {
+  background: #9d4edd;
+  transform: translateY(-5px) scale(1.1);
+  box-shadow: 0 8px 25px rgba(123, 44, 191, 0.6);
+}
+
+.floating-btn.secondary {
+  background: #57F287;
+  box-shadow: 0 5px 15px rgba(87, 242, 135, 0.4);
+}
+
+.floating-btn.secondary:hover {
+  background: #4ad97c;
+  box-shadow: 0 8px 25px rgba(87, 242, 135, 0.6);
+}
+
+/* ======================= DRAGS-STYLE TOAST ======================= */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(35,10,55,0.9);
+  color: #fff;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  border-left: 4px solid #7b2cbf;
+}
+
+.toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast i {
+  font-size: 20px;
+}
+
+/* ======================= DRAGS-STYLE BACK TO TOP ======================= */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #7b2cbf;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 999;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  background: #9d4edd;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(123, 44, 191, 0.6);
+}
+
+/* ======================= DRAGS-STYLE PARTICLES ======================= */
+.particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  background: rgba(123, 44, 191, 0.1);
+  border-radius: 50%;
+  animation: float-particle 15s infinite linear;
+}
+
+/* ======================= DRAGS-STYLE LOADER ======================= */
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #050006;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-logo {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.loader-logo img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.loader-bar {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loader-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #7b2cbf, #5a189a);
+  animation: loading 2s ease-in-out forwards;
+}
+
+.loader-tips {
+  margin-top: 30px;
+  max-width: 400px;
+  text-align: center;
+  opacity: 0.8;
+  font-size: 14px;
+  color: #c9b6ff;
+  min-height: 60px;
+}
+
+.loader-tips .tip {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 0 20px;
+}
+
+.loader-tips .tip.active {
+  display: block;
+  animation: fadeInOut 5s ease infinite;
+}
+
+@keyframes loading {
+  0% { width: 0; }
+  100% { width: 100%; }
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; transform: translateY(10px); }
+  20%, 80% { opacity: 1; transform: translateY(0); }
+}
+
+/* ======================= DRAGS-STYLE STAFF LINKS ======================= */
+.staff-link {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  text-decoration: none;
+  color: inherit;
+  padding: 15px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.staff-link:hover {
+  transform: translateX(10px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  background: rgba(123, 44, 191, 0.1);
+}
+
+/* ======================= DRAGS-STYLE RESPONSIVE ======================= */
+@media (max-width: 1200px) {
+  .hero-image {
+    width: 400px;
+    height: 400px;
+  }
+}
+
+@media (max-width: 992px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    padding-top: 100px;
+  }
+  
+  .hero-content {
+    max-width: 100%;
+    margin-bottom: 50px;
+  }
+  
+  .hero-buttons {
+    justify-content: center;
+  }
+  
+  .hero-image {
+    position: relative;
+    right: auto;
+    margin-top: 50px;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 15px 5%;
+  }
+  
+  .hero, .features, .community, .team, footer {
+    padding: 80px 5%;
+  }
+  
+  .hero-content h1 {
+    font-size: 36px;
+  }
+  
+  .hero-image {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .nav-links {
+    display: none;
+  }
+  
+  .stats {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .floating-buttons {
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .floating-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-buttons {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .cta-button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .cookie-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .cookie-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .hero-content h1 {
+    font-size: 32px;
+  }
+  
+  .hero-content p {
+    font-size: 16px;
+  }
+}
+
+</style>
 </head>
-<body>
+<body style="overflow:hidden"> <!-- locked initially to prevent scrolling during landing -->
 
-    <nav>
-        <div class="nav-logo auto-six">SIX</div>
-        <div class="nav-links">
-            <a href="#about">The Cult</a>
-            <a href="#hierarchy">Roster</a>
-            <a href="#requirements">Arsenal</a>
-            <a href="https://discord.gg/sixx" target="_blank" style="color:var(--brand-color);">Discord</a>
-        </div>
-    </nav>
+  <!-- Background layers -->
+  <div class="bg-wrap" aria-hidden="true">
+    <div class="bg-layer one"></div>
+    <div class="bg-layer two"></div>
+    <div class="bg-layer three"></div>
+  </div>
 
-    <!-- Hero / Landing -->
-    <header class="hero">
-        <div class="hero-content">
-            <h1 class="auto-six">SIX</h1>
-            <p>We Do Not Play. We Conquer.</p>
-            <a href="https://discord.gg/sixx" class="cta-button">Enter The Void</a>
-        </div>
-    </header>
+  <!-- LANDING (full screen) -->
+  <section class="landing" id="landing" role="dialog" aria-modal="true">
+    <div class="landing-inner" id="landingInner" role="button" tabindex="0" aria-label="Enter site" onclick="enterSite()" onkeydown="if(event.key==='Enter' || event.key===' ') enterSite()">
+      <div class="brand-big">/SIX</div>
+      <div class="enter-card">
+        <div class="tagline"><strong class="click-word">CLICK</strong> to enter <span class="six-text">/six</span>, a clan that has only one goal that is to Conquer and Destroy every server they join.</div>
+      </div>
+    </div>
+  </section>
 
-    <!-- About Section -->
-    <section id="about" class="section">
-        <h2 class="section-title">Identity</h2>
-        <div class="about-grid">
-            <div class="about-visual"></div>
-            <div class="about-text">
-                <p>
-                    <span class="auto-six">SIX</span> is not just a clan. It is a collective of the most aggressive Crystal PvP specialists and Anarchy veterans on the grid. 
-                </p>
-                <p>
-                    Born in the chaos of 2b2t and refined in competitive tier-lists, we operate with a single directive: **Total Domination.** 
-                    We move as one, we strike as one, and we leave nothing behind but coordinates.
-                </p>
-                <p style="color: var(--brand-color); font-weight: bold; margin-top: 20px;">
-                    TAG: &l&oSIX<br>
-                    COLOR: #5F26B4
-                </p>
-            </div>
+  <!-- SIDEBAR (hidden until after landing) -->
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu" onclick="document.querySelector('.ios-sidebar').classList.toggle('visible')">
+    ☰
+  </button>
+
+  <nav class="ios-sidebar" id="sidebar" aria-hidden="true">
+    <div class="sidebar-header">/six</div>
+    <ul class="sidebar-links">
+      <li><a href="index.html" class="nav-link active">Home</a></li>
+      <li><a href="achievements.html" class="nav-link">Achievements</a></li>
+      <li><a href="members.html" class="nav-link">Members</a></li>
+    </ul>
+  </nav>
+
+  <!-- MAIN APP -->
+  <main class="app" id="app" aria-hidden="true" role="main">
+    <div class="header-row">
+      <div>
+        <div>/six</div>
+        <div class="meta">Home</div>
+      </div>
+      
+    </div>
+<button id="login-discord" class="discord-btn">Login with Discord</button>
+
+
+    <!-- Member Tree Notification -->
+    <div class="card">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div style="font-size:20px">❗</div>
+        <div>
+          <div style="font-weight:800;margin-bottom:6px">Member Tree Has Been Moved</div>
+          <div style="color:#c9b6ff">The member tree is now on its own page for better performance.</div>
+          <div style="margin-top:8px"><a href="/members.html" style="text-decoration:none;padding:8px 12px;border-radius:10px;background:linear-gradient(90deg,#7b2cbf,#5a189a);color:#fff;font-weight:700">View Member Tree</a></div>
         </div>
+      </div>
+    </div>
+<!-- WHO ARE WE SECTION -->
+<section class="who-section card" aria-labelledby="whoTitle">
+  <div class="who-orb"></div>
+  <h2 id="whoTitle" class="who-title">
+    What is <span class="six-text">/six</span>?
+  </h2>
+
+  <div class="who-wrap">
+    <div class="who-left">
+      <p class="who-text">
+        <span class="six-text">/six</span>, also known as SAIS is a clan founded on 
+          April 11, 2025 by its Founder 3ryll
+        <span class="six-text">/six</span> has its own goal:  
+        <strong>Control and dominate every server we join and make the history.</strong>
+      </p>
+
+      <p class="who-text">
+        We mainly specialize in:  
+        Crystal • Sword • NethPot • UHC • SMP  
+        Our each member is respected and treated equally
+        We don't recruit players, we recruit <strong>weapons</strong>.
+      </p>
+
+      <p class="who-highlight">
+        Our identity is simple:  
+        <strong>Dominate. Conquer.</strong>
+      </p>
+    </div>
+
+    <div class="who-right">
+      <div class="who-card">
+        <div class="w-bullet">
+          <span class="w-dot"></span> Founded: <strong>2025</strong>
+        </div>
+        <div class="w-bullet">
+          <span class="w-dot"></span>  <span class="six-text">SAIS</span>
+        </div>
+        <div class="w-bullet">
+          <span class="w-dot"></span> Currently on 2 servers.
+        </div>
+        <div class="w-bullet">
+          <span class="w-dot"></span> High-Tier Pvpers
+        </div>
+        <div class="w-bullet">
+          <span class="w-dot"></span> Built to dominate every server we join.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- CLAN ROSTER -->
+<section class="roster-section card" aria-labelledby="rosterTitle">
+  <h2 id="rosterTitle" class="roster-title">Clan Roster</h2>
+
+  <div class="roster-group">
+    <div class="roster-rank">
+      <img src="assets/icons/six_bangel.png" class="rank-icon" alt="Founder Icon">
+      <div class="rank-name">FOUNDER</div>
+    </div>
+    <ul class="roster-list">
+      <li>xla41r</li>
+    </ul>
+  </div>
+
+  <div class="roster-group">
+    <div class="roster-rank">
+      <img src="https://cdn.discordapp.com/emojis/1433416839827947570.png?size=4096&lossless=true" class="rank-icon" alt="Beyond Icon">
+      <div class="rank-name">BEYOND</div>
+    </div>
+    <ul class="roster-list">
+      <li>@lovelyxeiii_1</li>
+      <li>@dashhszn4</li>
+      <li>@xzasza</li>
+      <li>@shintenshii</li>
+    </ul>
+  </div>
+
+  <div class="roster-group">
+    <div class="roster-rank">
+      <img src="assets/icons/heneral.png" class="rank-icon" alt="General Icon">
+      <div class="rank-name">HENERAL</div>
+    </div>
+    <ul class="roster-list">
+      <li>@impsx</li>
+      <li>@proglz</li>
+    </ul>
+  </div>
+
+  <div class="roster-group">
+    <div class="roster-rank">
+      <img src="https://cdn.discordapp.com/emojis/1433418046537470084.png?size=4096&lossless=true" class="rank-icon" alt="Star Icon">
+      <div class="rank-name">STAR</div>
+    </div>
+    <ul class="roster-list">
+      <li>@lovelyxeiii_1</li>
+      <li>@dashhszn4</li>
+      <li>@geloutzy4</li>
+      <li>@headlock777ssnewss;</li>
+      <li>@kyzaxks</li>
+      <li>@big2ck</li>
+      <li>@newfisch_03628</li>
+      <li>@fr_rui</li>
+      <li>@proglz</li>
+      <li>@penguinguy_6</li>
+      <li>@nefushi</li>
+      <li>@xzasza</li>
+      <li>@zxcygsatzshi</li>
+      <li>@solcery_</li>
+      <li>@vancars.</li>
+    </ul>
+  </div>
+</section>
+
+    <!-- Gallery -->
+    <section class="gallery-section card" aria-labelledby="galleryTitle">
+      <h2 id="galleryTitle" class="gallery-title">/six Banner Gallery</h2>
+      <div class="gallery-grid" id="galleryGrid">
+        <!-- Banner cards (keep same sources) -->
+        <div class="banner-card"><img class="banner-img" src="https://cdn.discordapp.com/attachments/1371525091833282752/1409814312582643762/quality_restoration_20250826161611300.jpg" alt="Banner 1"></div>
+        <div class="banner-card"><img class="banner-img" src="https://cdn.discordapp.com/attachments/1371525091833282752/1401944987473547284/lv_0_20250804230545.gif" alt="Banner 2"></div>
+        <div class="banner-card"><img class="banner-img" src="https://cdn.discordapp.com/attachments/1371525091833282752/1400024103142035487/Picsart_25-07-30_15-51-21-892.png" alt="Banner 3"></div>
+        <div class="banner-card"><img class="banner-img" src="https://cdn.discordapp.com/attachments/1371525091833282752/1391335858023432192/quality_restoration_20250706162944658.jpg" alt="Banner 4"></div>
+      </div>
     </section>
 
-    <!-- Requirements Section -->
-    <section id="requirements" class="section">
-        <h2 class="section-title">Requirements</h2>
-        <div class="req-grid">
-            <div class="req-card">
-                <h3>Combat Skill</h3>
-                <p>Must be proficient in Tier 1/2 Crystal PvP. Anchor/Totem logic is mandatory. We do not teach basics.</p>
-            </div>
-            <div class="req-card">
-                <h3>Communication</h3>
-                <p>Working microphone required. When a call is made, you listen. Silence in comms during fights is death.</p>
-            </div>
-            <div class="req-card">
-                <h3>Activity</h3>
-                <p>We are active daily. If you go offline for a week without notice, you are removed from <span class="auto-six">six</span>.</p>
-            </div>
-            <div class="req-card">
-                <h3>Loyalty</h3>
-                <p>Double-clanning is immediate blacklist. You are either with <span class="auto-six">six</span> or you are a target.</p>
-            </div>
-        </div>
+    <!-- Socials -->
+    <section class="socials-section card" aria-labelledby="socialsTitle">
+      <h2 id="socialsTitle" class="gallery-title">Contacts of <span class="six-text">/six</span></h2>
+      <div class="socials-grid">
+        <a href="https://discord.gg/tu6rpKhenw" class="social-card" target="_blank" rel="noopener noreferrer">
+          <img src="https://cdn.discordapp.com/icons/1360258839429255208/3ea76fc8a0cd48df0e3ce22e89d84305.png?size=4096" alt="Discord" class="social-icon">
+          <div style="font-weight:800">Discord</div>
+        </a>
+        <a href="https://tiktok.com/@xissais" class="social-card" target="_blank" rel="noopener noreferrer">
+          <img src="assets/icons/tiktok.svg" alt="TikTok" class="social-icon">
+          <div style="font-weight:800">TikTok</div>
+        </a>
+      </div>
     </section>
 
-    <!-- Hierarchy / Roster -->
-    <section id="hierarchy" class="section">
-        <h2 class="section-title">Hierarchy</h2>
-        <div class="roster-container">
-            <div class="rank-column">
-                <div class="rank-title">OWNERS</div>
-                <span class="player-name">LeaderName1</span>
-                <span class="player-name">LeaderName2</span>
-            </div>
-            <div class="rank-column">
-                <div class="rank-title">OFFICERS</div>
-                <span class="player-name">Officer1</span>
-                <span class="player-name">Officer2</span>
-                <span class="player-name">Officer3</span>
-            </div>
-            <div class="rank-column">
-                <div class="rank-title">MEMBERS</div>
-                <span class="player-name">Member_01</span>
-                <span class="player-name">Member_02</span>
-                <span class="player-name">Member_03</span>
-                <span class="player-name">Member_04</span>
-            </div>
+   
+
+    <section class="discord-stats card">
+  <div class="ds-left">
+    <img id="ds-icon" class="ds-icon" src="" alt="Discord icon">
+    <div>
+      <div class="ds-name">/six Discord</div>
+      <div class="ds-created">Created: <span id="ds-date">Loading...</span></div>
+    </div>
+  </div>
+
+  <div class="ds-right">
+    <div class="ds-count">
+      <span id="ds-members">0</span>
+      <span class="ds-total">/ 800</span>
+    </div>
+
+    <div class="ds-bar">
+      <div id="ds-bar-fill"></div>
+    </div>
+
+    <button class="ds-btn" onclick="window.open('https://discord.gg/tu6rpKhenw','_blank')">
+      Join Discord
+    </button>
+  </div>
+</section>
+
+
+    <footer>© 2025 <span class="six-text">/six</span> Clan - All rights reserved.</footer>
+  </main>
+
+  <!-- Banner Preview Modal -->
+  <div class="modal" id="bannerModal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <img id="bannerPreview" class="banner-preview" alt="Banner preview">
+      <div style="margin-top:12px;display:flex;gap:10px;justify-content:center">
+        <button class="discord-btn" id="closeBannerBtn" style="width:auto;padding:8px 12px">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rules Modal -->
+  <div class="modal" id="rulesModal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <h2>Clan War Rules</h2>
+      <p style="color:#c9b6ff">Please follow the clan war rules. (Edit these in the HTML to customize.)</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:8px">
+        <button id="understoodBtn" class="discord-btn" style="width:auto;padding:8px 12px">Understood</button>
+        <button id="closeRulesBtn" class="discord-btn" style="width:auto;padding:8px 12px;background:#666">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Modal -->
+  <div class="modal" id="applicationModal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <h2>Clan War Application</h2>
+      <form id="clanwarForm">
+        <div style="text-align:left">
+          <label style="display:block;margin-bottom:8px">* Clan Name:
+            <input type="text" name="clan_name" required placeholder="Enter your clan name" style="width:100%;margin-top:6px;padding:8px;border-radius:8px;border:none">
+          </label>
         </div>
-    </section>
-
-    <!-- Server IP / Footer -->
-    <section class="ip-section">
-        <div class="ip-box">
-            <h3 style="color: #ccc; margin-bottom: 10px; letter-spacing: 3px;">SERVER IP</h3>
-            <div class="ip-address auto-six" onclick="copyIP()" id="ip-text">PLAY.SIXCLAN.NET</div>
-            <div class="copy-hint" id="copy-status">[ CLICK TO COPY ]</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+          <button type="submit" class="discord-btn" style="width:auto;padding:8px 12px">Submit</button>
+          <button type="button" id="closeAppBtn" class="discord-btn" style="width:auto;padding:8px 12px;background:#666">Cancel</button>
         </div>
-    </section>
+      </form>
+    </div>
+  </div>
 
-    <footer>
-        &copy; 2024 <span class="auto-six">SIX</span>. ALL RIGHTS RESERVED. <br>
-        DESIGNED FOR WAR.
-    </footer>
+  <!-- Notifications -->
+  <div id="notification" class="notification" role="status" aria-live="polite"></div>
+<!-- 1. Import library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- JAVASCRIPT FOR LOGIC & AUTO-FONT -->
-    <script>
-        // 1. Auto-Format "SIX" text
-        // This script finds every element with class 'auto-six' or plain text in paragraphs
-        // and wraps the word "SIX" in the special glowing font span.
-        
-        document.addEventListener("DOMContentLoaded", function() {
-            // Function to wrap word in span
-            function stylizedSix(node) {
-                if (node.nodeType === 3) { // Text node
-                    const text = node.nodeValue;
-                    const regex = /\b(six)\b/gi; // Find 'six' case insensitive
-                    if (text.match(regex)) {
-                        const span = document.createElement('span');
-                        span.innerHTML = text.replace(regex, '<span class="six-font">SIX</span>');
-                        node.parentNode.replaceChild(span, node);
-                    }
-                } else if (node.nodeType === 1 && node.childNodes) {
-                    // Recurse through child nodes
-                    node.childNodes.forEach(stylizedSix);
-                }
-            }
+<!-- 2. Initialize Supabase -->
+<script>
+  const sb = supabase.createClient(
+    "https://tstsijdifhgmpaszqknr.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
+  );
+</script>
 
-            // Apply to specific containers to save performance (not whole body)
-            const targets = document.querySelectorAll('p, h1, h2, h3, .auto-six');
-            targets.forEach(target => {
-                // If it's a specific class, force it directly
-                if(target.classList.contains('auto-six') && target.innerText.toLowerCase() === 'six') {
-                    target.classList.add('six-font');
-                    target.classList.remove('auto-six'); // clean up
-                } else {
-                    stylizedSix(target);
-                }
-            });
-        });
+<!-- 3. Use it -->
+<script>
+  async function login() {
+    await sb.auth.signInWithOAuth({
+      provider: "discord",
+      options: { redirectTo: window.location.origin + "/auth/callback.html" }
+    });
+  }
+document.getElementById("login-discord").addEventListener("click", login);
+</script>
 
-        // 2. Copy IP Function
-        function copyIP() {
-            const ip = "play.sixclan.net";
-            navigator.clipboard.writeText(ip).then(() => {
-                const status = document.getElementById("copy-status");
-                const ipText = document.getElementById("ip-text");
-                
-                status.innerText = "COPIED TO CLIPBOARD!";
-                status.style.color = "#fff";
-                ipText.style.color = "#8e4ce8";
-                
-                setTimeout(() => {
-                    status.innerText = "[ CLICK TO COPY ]";
-                    status.style.color = "#5F26B4";
-                    ipText.style.color = "#fff";
-                }, 2000);
-            });
-        }
-    </script>
+
+<script>
+/* ======================= Behavior & Interactions ======================= */
+
+/* Utility: show notification */
+function showNotification(message, isError = false) {
+  const n = document.getElementById('notification');
+  n.textContent = message;
+  n.className = isError ? 'notification error' : 'notification';
+  n.style.display = 'block';
+  setTimeout(() => { n.style.display = 'none'; }, 4500);
+}
+
+/* Style instances of /six and SAIS */
+function styleSixText(root = document.body) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(node => {
+    if (node.nodeValue) {
+      const text = node.nodeValue;
+      if (/(\/six|sais)/i.test(text)) {
+        const span = document.createElement('span');
+        span.innerHTML = text.replace(/(\/six|sais)/gi, match => `<span class="six-text">${match}</span>`);
+        node.parentNode.replaceChild(span, node);
+      }
+    }
+  });
+}
+window.addEventListener('load', () => styleSixText());
+
+/* ENTER SITE: fade+scale transition, reveal sidebar & app and unlock scrolling */
+function enterSite() {
+  const landing = document.getElementById('landing');
+  const app = document.getElementById('app');
+  
+
+  // animate landing out
+  landing.classList.add('hidden');
+
+  // after transition, hide landing and show app
+  setTimeout(() => {
+    landing.style.display = 'none';
+   
+    
+    app.classList.add('active');
+    app.setAttribute('aria-hidden', 'false');
+    
+
+    // unlock scroll
+    document.body.style.overflow = 'auto';
+
+    // re-run /six styling within app
+    styleSixText(app);
+  }, 480);
+}
+
+/* Ensure landing is focusable keyboard-wise; prevent scroll while visible */
+document.addEventListener('DOMContentLoaded', () => {
+  // Ensure landing hides scroll (body style set inline at top)
+  // Add keyboard accessibility: pressing Enter or Space triggers enterSite
+  const landingInner = document.getElementById('landingInner');
+  landingInner.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') enterSite();
+  });
+});
+
+
+setTimeout(() => {
+  document.getElementById("loginModal").classList.add("active");
+}, 300);
+
+// -------------------------
+// Sidebar toggle & push JS
+// Replace any earlier toggle code with this block
+// -------------------------
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('sidebar');         // .ios-sidebar
+  const app = document.getElementById('app');                 // .app
+  const toggle = document.getElementById('sidebarToggle');    // toggle button
+  const SIDEBAR_VISIBLE_CLASS = 'visible';
+  const APP_SHIFTED_CLASS = 'shifted';
+  const TOGGLE_SHIFTED_CLASS = 'shifted';
+
+  if (!sidebar || !app || !toggle) {
+    // defensive fallback — if IDs changed this helps debugging
+    console.warn('Sidebar toggle setup: missing required elements (sidebar/app/toggle).');
+    return;
+  }
+
+  // helper: set aria attributes
+  function setAria(isOpen) {
+    sidebar.setAttribute('aria-hidden', String(!isOpen));
+    toggle.setAttribute('aria-expanded', String(isOpen));
+  }
+
+  // open/close function
+  function setOpen(open) {
+    sidebar.classList.toggle(SIDEBAR_VISIBLE_CLASS, open);
+    app.classList.toggle(APP_SHIFTED_CLASS, open);
+    toggle.classList.toggle(TOGGLE_SHIFTED_CLASS, open);
+    setAria(open);
+  }
+
+  // initial aria state
+  setAria(false);
+
+  // toggle on button click
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation(); // avoid the global click-close immediately firing
+    const willOpen = !sidebar.classList.contains(SIDEBAR_VISIBLE_CLASS);
+    setOpen(willOpen);
+  });
+
+  // clicking inside sidebar should not close it
+  sidebar.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  // click outside -> close (desktop behavior)
+  document.addEventListener('click', (e) => {
+    const target = e.target;
+    // if sidebar is open and click is outside sidebar AND not the toggle, close it
+    if (sidebar.classList.contains(SIDEBAR_VISIBLE_CLASS) && !sidebar.contains(target) && !toggle.contains(target)) {
+      setOpen(false);
+    }
+  });
+
+  // ESC to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar.classList.contains(SIDEBAR_VISIBLE_CLASS)) {
+      setOpen(false);
+    }
+  });
+  (function highlightNav() {
+  const current = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(link => {
+    if (link.getAttribute('href') === current || (current === '' && link.getAttribute('href') === 'index.html')) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
+  });
+})();
+});
+
+
+async function loadDiscordStats() {
+  const invite = "tu6rpKhenw";
+
+  try {
+    const res = await fetch(
+      `https://discord.com/api/v9/invites/${invite}?with_counts=true`
+    );
+
+    const data = await res.json();
+
+    const guild = data.guild;
+    const members = data.approximate_member_count || 0;
+    const goal = 800;
+
+    // icon
+    document.getElementById("ds-icon").src =
+      `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`;
+
+    // creation date
+    const created = new Date(Number(guild.id) / 4194304 + 1420070400000);
+    document.getElementById("ds-date").innerText = created.toDateString();
+
+    // numbers
+    document.getElementById("ds-members").innerText = members;
+    const progress = Math.min((members / goal) * 100, 100);
+    document.getElementById("ds-bar-fill").style.width = progress + "%";
+
+  } catch (err) {
+    console.warn("Discord stats failed:", err);
+  }
+}
+
+loadDiscordStats();
+
+
+/* ======================= Banner Modal Preview ======================= */
+const bannerModal = document.getElementById('bannerModal');
+const bannerPreview = document.getElementById('bannerPreview');
+const closeBannerBtn = document.getElementById('closeBannerBtn');
+
+document.querySelectorAll('.banner-img').forEach(img => {
+  img.addEventListener('click', () => {
+    bannerPreview.src = img.src;
+    bannerModal.classList.add('active');
+    bannerModal.setAttribute('aria-hidden', 'false');
+    // lock background scroll while modal open
+    document.body.style.overflow = 'hidden';
+  });
+});
+
+closeBannerBtn.addEventListener('click', closeBannerModal);
+bannerModal.addEventListener('click', (e) => { if (e.target === bannerModal) closeBannerModal(); });
+
+function closeBannerModal(){
+  bannerModal.classList.remove('active');
+  bannerModal.setAttribute('aria-hidden', 'true');
+  bannerPreview.src = '';
+  // restore scroll only if landing is removed
+  if (!document.getElementById('landing') || document.getElementById('landing').style.display === 'none') {
+    document.body.style.overflow = 'auto';
+  }
+}
+
+</script>
+
 </body>
 </html>
