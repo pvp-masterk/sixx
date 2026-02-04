@@ -3,178 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIX ⛧ | Minecraft Clan</title>
+    <title>SIX ⛧ | DOMINANCE</title>
+    
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- 'Metal Mania' looks like the Deicide font, 'Rajdhani' for UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+
     <style>
-        /* --- FONTS & VARIABLES --- */
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Montserrat:ital,wght@1,900&display=swap');
-
+        /* --- CONFIGURATION --- */
         :root {
-            --primary: #5F26B4;
-            --primary-glow: #7a3ee3;
-            --dark: #050505;
-            --darker: #000000;
-            --light: #ffffff;
-            --glass: rgba(255, 255, 255, 0.05);
+            --brand-color: #5F26B4;
+            --brand-glow: #8e4ce8;
+            --bg-dark: #050505;
+            --bg-panel: #0a0a0a;
+            --text-main: #e0e0e0;
+            --text-dim: #888;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-        }
-
+        /* --- RESET & BASE --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            background-color: var(--darker);
-            color: var(--light);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
             font-family: 'Rajdhani', sans-serif;
             overflow-x: hidden;
+            line-height: 1.6;
         }
 
         /* --- SCROLLBAR --- */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--dark); }
-        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary-glow); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--brand-color); }
+
+        /* --- SPECIAL FONT HANDLING --- */
+        /* This class is auto-applied to the word "SIX" via Javascript */
+        .six-font {
+            font-family: 'Metal Mania', cursive;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 400; /* Metal Mania is bold by default */
+            letter-spacing: 2px;
+            text-shadow: 
+                0 0 5px var(--brand-color),
+                0 0 10px var(--brand-color),
+                0 0 20px var(--brand-color),
+                0 0 40px var(--brand-color);
+            display: inline-block;
+            transform: scale(1.1); /* Make it slightly bigger than surrounding text */
+            margin: 0 2px;
+        }
 
         /* --- NAVIGATION --- */
         nav {
             position: fixed;
             top: 0;
             width: 100%;
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 50px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
             z-index: 1000;
-            border-bottom: 1px solid rgba(95, 38, 180, 0.3);
+            border-bottom: 1px solid rgba(95, 38, 180, 0.2);
         }
 
-        .nav-logo img {
-            height: 40px; /* Adjust based on your chrome text image */
-            filter: drop-shadow(0 0 5px var(--primary));
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
-
+        .nav-logo { font-size: 2rem; }
+        
+        .nav-links { display: flex; gap: 30px; }
         .nav-links a {
+            color: #fff;
             text-decoration: none;
-            color: var(--light);
-            font-weight: 600;
             text-transform: uppercase;
+            font-weight: 700;
+            font-size: 0.9rem;
             letter-spacing: 2px;
             transition: 0.3s;
-            position: relative;
         }
-
-        .nav-links a:hover {
-            color: var(--primary);
-            text-shadow: 0 0 10px var(--primary);
-        }
+        .nav-links a:hover { color: var(--brand-color); text-shadow: 0 0 8px var(--brand-color); }
 
         /* --- HERO SECTION --- */
         .hero {
             height: 100vh;
-            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             position: relative;
-            background: url('hero-bg.png') no-repeat center center/cover; /* Car Image */
-            overflow: hidden;
+            background: url('https://images.unsplash.com/photo-1542317854-f9596aa56139?q=80&w=2070&auto=format&fit=crop') center/cover;
+            /* Using a dark drift car/neon background from Unsplash */
         }
 
-        /* Overlay to make text readable */
-        .hero::before {
+        .hero::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.9) 100%);
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(5,5,5,0.3), var(--bg-dark));
         }
 
-        .hero-content {
-            position: relative;
-            z-index: 2;
+        .hero-content { position: relative; z-index: 2; padding: 0 20px; }
+
+        .hero h1 {
+            font-size: 8vw; /* Responsive huge text */
+            line-height: 1;
+            margin-bottom: 10px;
+            animation: pulseGlow 3s infinite alternate;
         }
 
-        /* Glitch Title Effect */
-        h1.glitch {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 8rem;
-            font-weight: 900;
-            font-style: italic;
-            color: var(--light);
-            text-transform: uppercase;
-            position: relative;
-            text-shadow: 4px 4px 0px var(--primary);
-            animation: shake 3s infinite;
-        }
-
-        .subtitle {
+        .hero p {
             font-size: 1.5rem;
             letter-spacing: 5px;
-            margin-bottom: 30px;
             color: #ccc;
+            margin-bottom: 30px;
+            text-transform: uppercase;
         }
 
-        .cta-btn {
-            padding: 15px 40px;
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--light);
+        .cta-button {
+            padding: 15px 50px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--brand-color);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
             font-size: 1.2rem;
-            font-weight: bold;
+            font-weight: 700;
             text-transform: uppercase;
             cursor: pointer;
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
             text-decoration: none;
-            display: inline-block;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(95, 38, 180, 0.2);
         }
 
-        .cta-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: var(--primary);
-            transition: 0.4s;
-            z-index: -1;
+        .cta-button:hover {
+            background: var(--brand-color);
+            box-shadow: 0 0 30px var(--brand-color);
+            transform: translateY(-2px);
         }
 
-        .cta-btn:hover::before {
-            left: 0;
-        }
-
-        .cta-btn:hover {
-            box-shadow: 0 0 20px var(--primary);
-        }
-
-        /* --- ABOUT / IDENTITY --- */
+        /* --- SECTIONS COMMON --- */
         .section {
-            padding: 80px 10%;
-            background: var(--darker);
+            padding: 100px 10%;
             position: relative;
+            border-bottom: 1px solid #111;
         }
 
         .section-title {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
             font-size: 3rem;
-            font-style: italic;
-            margin-bottom: 50px;
-            border-left: 5px solid var(--primary);
-            padding-left: 20px;
             text-transform: uppercase;
+            margin-bottom: 60px;
+            border-left: 4px solid var(--brand-color);
+            padding-left: 20px;
+            background: linear-gradient(90deg, rgba(95,38,180,0.1), transparent);
         }
 
+        /* --- ABOUT (THE CULT) --- */
         .about-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -182,267 +169,288 @@
             align-items: center;
         }
 
-        .about-img img {
-            width: 100%;
-            border: 1px solid var(--primary);
-            box-shadow: 0 0 15px rgba(95, 38, 180, 0.2);
-            filter: grayscale(100%);
-            transition: 0.5s;
-        }
-
-        .about-img img:hover {
-            filter: grayscale(0%);
-            box-shadow: 0 0 25px var(--primary);
-        }
-
-        .about-text h3 {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-
-        .about-text p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #aaa;
-        }
-
-        /* --- ROSTER / MEDIA --- */
-        .media-section {
-            background: linear-gradient(to bottom, var(--darker), #0f0518);
-            text-align: center;
-        }
-
-        .card-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .card {
-            width: 300px;
+        .about-text p { font-size: 1.1rem; margin-bottom: 20px; color: #bbb; }
+        
+        .about-visual {
             height: 400px;
-            background: var(--dark);
-            border: 1px solid #222;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
-        .card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            background: url('https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?q=80&w=2574&auto=format&fit=crop') center/cover;
+            /* Placeholder for Wings/Dark Aesthetic */
+            border: 1px solid var(--brand-color);
+            box-shadow: 0 0 20px rgba(95, 38, 180, 0.2);
+            filter: grayscale(80%);
             transition: 0.5s;
-            opacity: 0.6;
+        }
+        .about-visual:hover { filter: grayscale(0%); box-shadow: 0 0 40px var(--brand-color); }
+
+        /* --- REQUIREMENTS (ARSENAL) --- */
+        .req-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
 
-        .card:hover {
-            border-color: var(--primary);
-            transform: translateY(-10px);
-            box-shadow: 0 10px 30px rgba(95, 38, 180, 0.3);
-        }
-
-        .card:hover img {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-
-        .card-text {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(transparent, var(--primary));
-            transform: translateY(100%);
+        .req-card {
+            background: var(--bg-panel);
+            padding: 30px;
+            border: 1px solid #222;
             transition: 0.3s;
-            font-weight: bold;
-            font-size: 1.5rem;
         }
 
-        .card:hover .card-text {
-            transform: translateY(0);
-        }
+        .req-card:hover { border-color: var(--brand-color); transform: translateY(-5px); }
+        
+        .req-card h3 { font-size: 1.5rem; margin-bottom: 10px; color: #fff; }
+        .req-card p { color: #888; font-size: 0.9rem; }
 
-        /* --- COPY IP SECTION --- */
-        .ip-bar {
-            background: url('anime.png') no-repeat center center/cover;
-            padding: 100px 20px;
+        /* --- HIERARCHY (ROSTER) --- */
+        .roster-container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
-            align-items: center;
-            position: relative;
+            gap: 30px;
         }
 
-        .ip-bar::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-        }
-
-        .ip-container {
-            position: relative;
-            z-index: 2;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 30px 50px;
-            border: 1px solid var(--primary);
-            border-radius: 10px;
+        .rank-column {
+            flex: 1;
+            min-width: 300px;
+            background: #080808;
+            border: 1px solid #1a1a1a;
+            padding: 20px;
             text-align: center;
         }
 
-        .server-ip {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2rem;
-            font-weight: 900;
-            color: var(--primary);
-            text-shadow: 0 0 10px var(--primary);
-            cursor: pointer;
+        .rank-title {
+            color: var(--brand-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(95,38,180,0.5);
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
         }
 
-        .click-hint {
-            margin-top: 10px;
-            font-size: 0.8rem;
-            opacity: 0.7;
+        .player-name {
+            display: block;
+            margin: 10px 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: 0.2s;
         }
+        .player-name:hover { color: var(--brand-color); letter-spacing: 1px; }
+
+        /* --- SERVER IP SECTION --- */
+        .ip-section {
+            background: url('https://images.unsplash.com/photo-1620644780185-3f236428020a?q=80&w=2670&auto=format&fit=crop') center/cover; 
+            /* Placeholder for Anime/Cyberpunk Character */
+            padding: 150px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .ip-section::before {
+            content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.85);
+        }
+
+        .ip-box {
+            position: relative; z-index: 2;
+            display: inline-block;
+            border: 2px solid var(--brand-color);
+            padding: 40px 60px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .ip-address {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .copy-hint { margin-top: 10px; color: var(--brand-color); font-size: 0.8rem; letter-spacing: 1px; }
 
         /* --- FOOTER --- */
         footer {
-            padding: 20px;
             text-align: center;
-            background: var(--darker);
-            border-top: 1px solid #222;
-            color: #555;
-            font-size: 0.9rem;
+            padding: 30px;
+            background: #000;
+            font-size: 0.8rem;
+            color: #444;
+            border-top: 1px solid #111;
         }
 
-        /* Animations */
-        @keyframes shake {
-            0% { text-shadow: 4px 4px 0px var(--primary); transform: translate(0,0); }
-            2% { text-shadow: -2px -2px 0px var(--primary); transform: translate(-2px,1px); }
-            4% { text-shadow: 2px 2px 0px var(--primary); transform: translate(2px,-1px); }
-            6% { text-shadow: 4px 4px 0px var(--primary); transform: translate(0,0); }
-            100% { text-shadow: 4px 4px 0px var(--primary); transform: translate(0,0); }
+        /* --- ANIMATIONS --- */
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 10px var(--brand-color); }
+            100% { text-shadow: 0 0 30px var(--brand-color), 0 0 60px var(--brand-color); }
         }
 
-        /* Mobile Responsive */
         @media (max-width: 768px) {
-            h1.glitch { font-size: 4rem; }
             .about-grid { grid-template-columns: 1fr; }
-            .nav-links { display: none; } /* Add JS for hamburger menu if needed */
+            .nav-links { display: none; } /* Hidden on mobile for simplicity */
+            .section-title { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- NAVBAR -->
     <nav>
-        <div class="nav-logo">
-            <!-- Uses the Chrome Text Image -->
-            <img src="logo.png" alt="SIX Logo">
-        </div>
+        <div class="nav-logo auto-six">SIX</div>
         <div class="nav-links">
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
-            <a href="#gallery">Gallery</a>
-            <a href="https://discord.gg/sixx" target="_blank" style="color: var(--primary);">Discord</a>
+            <a href="#about">The Cult</a>
+            <a href="#hierarchy">Roster</a>
+            <a href="#requirements">Arsenal</a>
+            <a href="https://discord.gg/sixx" target="_blank" style="color:var(--brand-color);">Discord</a>
         </div>
     </nav>
 
-    <!-- HERO SECTION -->
-    <header id="home" class="hero">
+    <!-- Hero / Landing -->
+    <header class="hero">
         <div class="hero-content">
-            <h1 class="glitch">SIX<span style="font-family: serif;">⛧</span></h1>
-            <p class="subtitle">DOMINANCE IS IN OUR BLOOD</p>
-            <a href="https://discord.gg/sixx" target="_blank" class="cta-btn">Join The Cult</a>
+            <h1 class="auto-six">SIX</h1>
+            <p>We Do Not Play. We Conquer.</p>
+            <a href="https://discord.gg/sixx" class="cta-button">Enter The Void</a>
         </div>
     </header>
 
-    <!-- ABOUT SECTION -->
+    <!-- About Section -->
     <section id="about" class="section">
-        <h2 class="section-title">Who We Are</h2>
+        <h2 class="section-title">Identity</h2>
         <div class="about-grid">
-            <div class="about-img">
-                <!-- Uses the Wings/Skeleton Image -->
-                <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1391436744225722589/Untitled64_20250706231140.png?ex=6984b373&is=698361f3&hm=97b0663d52098a0c683e665e71771d93f9799d0c31541fbe1e9240590a6f7914&" alt="Angel Wings Skeleton">
-            </div>
+            <div class="about-visual"></div>
             <div class="about-text">
-                <h3>WE ARE SIX</h3>
                 <p>
-                    Forged in the chaos of anarchy servers and sharpened by crystal pvp. 
-                    SIX represents the pinnacle of coordination and aggression. 
-                    We don't just play; we takeover.
-                    <br><br>
-                    <span style="color: var(--primary); font-weight: bold;">Est. 2024 // Color Code: #5F26B4</span>
+                    <span class="auto-six">SIX</span> is not just a clan. It is a collective of the most aggressive Crystal PvP specialists and Anarchy veterans on the grid. 
+                </p>
+                <p>
+                    Born in the chaos of 2b2t and refined in competitive tier-lists, we operate with a single directive: **Total Domination.** 
+                    We move as one, we strike as one, and we leave nothing behind but coordinates.
+                </p>
+                <p style="color: var(--brand-color); font-weight: bold; margin-top: 20px;">
+                    TAG: &l&oSIX<br>
+                    COLOR: #5F26B4
                 </p>
             </div>
         </div>
     </section>
 
-    <!-- GALLERY / VISUALS -->
-    <section id="gallery" class="section media-section">
-        <h2 class="section-title" style="text-align: center; border: none;">Visuals</h2>
-        
-        <div class="card-container">
-            <!-- Anime Card -->
-            <div class="card">
-                <img src="anime.png" alt="Anime Visual">
-                <div class="card-text">LEADERSHIP</div>
+    <!-- Requirements Section -->
+    <section id="requirements" class="section">
+        <h2 class="section-title">Requirements</h2>
+        <div class="req-grid">
+            <div class="req-card">
+                <h3>Combat Skill</h3>
+                <p>Must be proficient in Tier 1/2 Crystal PvP. Anchor/Totem logic is mandatory. We do not teach basics.</p>
             </div>
-            <!-- Car Card (reused for visual consistency) -->
-            <div class="card">
-                <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1391335858023432192/quality_restoration_20250706162944658.jpg?ex=6984557e&is=698303fe&hm=a1553ad23241141390e46bd0b32f65291e772ffc07b5a4518dde9d9bfcfc93fc&" alt="Drift Car">
-                <div class="card-text">LIFESTYLE</div>
+            <div class="req-card">
+                <h3>Communication</h3>
+                <p>Working microphone required. When a call is made, you listen. Silence in comms during fights is death.</p>
             </div>
-             <!-- Logo Card -->
-             <div class="card">
-                <img src="https://cdn.discordapp.com/attachments/1371525091833282752/1393630838951772180/image-5.png?ex=69841d1c&is=6982cb9c&hm=47e1bb31634cb1e25d02ee72b65020aefaf576baceeb0ac8a47e0a3729408632&" style="padding: 40px; object-fit: contain;" alt="Chrome Logo">
-                <div class="card-text">BRAND</div>
+            <div class="req-card">
+                <h3>Activity</h3>
+                <p>We are active daily. If you go offline for a week without notice, you are removed from <span class="auto-six">six</span>.</p>
+            </div>
+            <div class="req-card">
+                <h3>Loyalty</h3>
+                <p>Double-clanning is immediate blacklist. You are either with <span class="auto-six">six</span> or you are a target.</p>
             </div>
         </div>
     </section>
 
-    <!-- IP COPY SECTION -->
-    <section class="ip-bar">
-        <div class="ip-container">
-            <h3 style="margin-bottom: 10px;">SERVER IP</h3>
-            <div class="server-ip" onclick="copyIP()">play.sixclan.net</div>
-            <div class="click-hint" id="copy-status">(Click to copy)</div>
+    <!-- Hierarchy / Roster -->
+    <section id="hierarchy" class="section">
+        <h2 class="section-title">Hierarchy</h2>
+        <div class="roster-container">
+            <div class="rank-column">
+                <div class="rank-title">OWNERS</div>
+                <span class="player-name">LeaderName1</span>
+                <span class="player-name">LeaderName2</span>
+            </div>
+            <div class="rank-column">
+                <div class="rank-title">OFFICERS</div>
+                <span class="player-name">Officer1</span>
+                <span class="player-name">Officer2</span>
+                <span class="player-name">Officer3</span>
+            </div>
+            <div class="rank-column">
+                <div class="rank-title">MEMBERS</div>
+                <span class="player-name">Member_01</span>
+                <span class="player-name">Member_02</span>
+                <span class="player-name">Member_03</span>
+                <span class="player-name">Member_04</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Server IP / Footer -->
+    <section class="ip-section">
+        <div class="ip-box">
+            <h3 style="color: #ccc; margin-bottom: 10px; letter-spacing: 3px;">SERVER IP</h3>
+            <div class="ip-address auto-six" onclick="copyIP()" id="ip-text">PLAY.SIXCLAN.NET</div>
+            <div class="copy-hint" id="copy-status">[ CLICK TO COPY ]</div>
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2024 SIX CLAN. All Rights Reserved.</p>
-        <p style="font-size: 0.7rem; margin-top: 5px; opacity: 0.5;">Designed for Domination.</p>
+        &copy; 2024 <span class="auto-six">SIX</span>. ALL RIGHTS RESERVED. <br>
+        DESIGNED FOR WAR.
     </footer>
 
+    <!-- JAVASCRIPT FOR LOGIC & AUTO-FONT -->
     <script>
-        // Copy IP Functionality
+        // 1. Auto-Format "SIX" text
+        // This script finds every element with class 'auto-six' or plain text in paragraphs
+        // and wraps the word "SIX" in the special glowing font span.
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            // Function to wrap word in span
+            function stylizedSix(node) {
+                if (node.nodeType === 3) { // Text node
+                    const text = node.nodeValue;
+                    const regex = /\b(six)\b/gi; // Find 'six' case insensitive
+                    if (text.match(regex)) {
+                        const span = document.createElement('span');
+                        span.innerHTML = text.replace(regex, '<span class="six-font">SIX</span>');
+                        node.parentNode.replaceChild(span, node);
+                    }
+                } else if (node.nodeType === 1 && node.childNodes) {
+                    // Recurse through child nodes
+                    node.childNodes.forEach(stylizedSix);
+                }
+            }
+
+            // Apply to specific containers to save performance (not whole body)
+            const targets = document.querySelectorAll('p, h1, h2, h3, .auto-six');
+            targets.forEach(target => {
+                // If it's a specific class, force it directly
+                if(target.classList.contains('auto-six') && target.innerText.toLowerCase() === 'six') {
+                    target.classList.add('six-font');
+                    target.classList.remove('auto-six'); // clean up
+                } else {
+                    stylizedSix(target);
+                }
+            });
+        });
+
+        // 2. Copy IP Function
         function copyIP() {
-            const ip = "play.sixclan.net"; // Change this to your actual server IP
+            const ip = "play.sixclan.net";
             navigator.clipboard.writeText(ip).then(() => {
                 const status = document.getElementById("copy-status");
+                const ipText = document.getElementById("ip-text");
+                
                 status.innerText = "COPIED TO CLIPBOARD!";
-                status.style.color = "#5F26B4";
+                status.style.color = "#fff";
+                ipText.style.color = "#8e4ce8";
+                
                 setTimeout(() => {
-                    status.innerText = "(Click to copy)";
-                    status.style.color = "#aaa";
+                    status.innerText = "[ CLICK TO COPY ]";
+                    status.style.color = "#5F26B4";
+                    ipText.style.color = "#fff";
                 }, 2000);
             });
         }
-
-        // 3D Tilt Effect on Hero Title
-        document.addEventListener('mousemove', (e) => {
-            const x = (window.innerWidth / 2 - e.pageX) / 50;
-            const y = (window.innerHeight / 2 - e.pageY) / 50;
-            const title = document.querySelector('.glitch');
-            if(title) {
-                title.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
-            }
-        });
     </script>
 </body>
 </html>
