@@ -614,19 +614,28 @@ const app = {
   icon: (path) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`,
   
 checkAuth: async () => {
-  const { data: { session } } = await supabaseClient.auth.getSession();
+  const { data: { session }, error: sessionError } =
+    await supabaseClient.auth.getSession();
+
+  console.log("SESSION:", session);
+  console.log("SESSION ERROR:", sessionError);
+
   if (!session) return;
 
-  const user = session.user;
-
-  const { data: profile } = await supabaseClient
+  const { data: profile, error: profileError } = await supabaseClient
     .from("profiles")
-    .select("username, avatar, role")
-    .eq("id", user.id)
-    .single();
+    .select("*")
+    .eq("id", session.user.id)
+    .maybeSingle(); // IMPORTANT: not .single()
+
+  console.log("PROFILE:", profile);
+  console.log("PROFILE ERROR:", profileError);
+
+  if (!profile) return;
 
   app.renderUserCard(profile);
 },
+
 
 renderUserCard: (profile) => {
   const container = document.getElementById("user-card");
