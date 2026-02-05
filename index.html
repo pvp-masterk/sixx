@@ -535,12 +535,14 @@ footer { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.2); font
   const { data, error } = await supabaseClient.auth.getSession();
   if (error) console.error(error);
 })();
-const ROLE_ICONS = {
-  founder: "👑",
-  admin: "🛡",
-  moderator: "🗡",
-  member: "🔮"
+
+  const ROLE_ICONS = {
+  founder: "/assets/owner.png",
+  admin: "/assets/admin.png",
+  moderator: "/assets/moderator.png",
+  member: "/assets/member.png"
 };
+
 
 /* ======================= DATA STORE (Centralized Configuration) ======================= */
 const DATA = {
