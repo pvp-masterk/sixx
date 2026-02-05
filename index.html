@@ -297,14 +297,58 @@ footer { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.2); font
 /* ================= USER SIDEBAR CARD ================= */
 .user-card {
   display: flex;
-  align-items: center;
   gap: 14px;
   padding: 16px;
-  margin-bottom: 30px;
   border-radius: 12px;
   background: rgba(255,255,255,0.03);
-  border: 1px solid var(--c-glass-border);
+  border: 1px solid rgba(255,255,255,0.06);
 }
+
+.avatar-skeleton {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0.05)
+  );
+  animation: shimmer 1.4s infinite;
+}
+
+.info-skeleton {
+  flex: 1;
+}
+
+.info-skeleton .line {
+  height: 12px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  animation: shimmer 1.4s infinite;
+}
+
+.info-skeleton .line.small {
+  width: 60%;
+  height: 10px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+.user-card.error {
+  border-color: #ff4d4d;
+  background: rgba(255,77,77,0.08);
+}
+
+.user-card.error .error-text {
+  font-size: 12px;
+  color: #ffb3b3;
+  line-height: 1.4;
+}
+
 
 .user-avatar {
   width: 46px;
@@ -369,7 +413,14 @@ footer { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.2); font
   </div>
 
   <nav id="sidebar" class="sidebar">
-    <div id="user-card"></div>
+    
+<div id="user-card" class="user-card loading">
+  <div class="avatar-skeleton"></div>
+  <div class="info-skeleton">
+    <div class="line"></div>
+    <div class="line small"></div>
+  </div>
+</div>
 
     <div style="margin-bottom: 40px;">
       <div class="brand-text" style="font-size: 40px;">/SIX</div>
@@ -616,49 +667,61 @@ const app = {
   icon: (path) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`,
   
 checkAuth: async () => {
-  const { data: { session }, error: sessionError } =
-    await supabaseClient.auth.getSession();
+  const card = document.getElementById("user-card");
 
-  console.log("SESSION:", session);
-  console.log("SESSION ERROR:", sessionError);
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) throw new Error("No session found");
 
-  if (!session) return;
+    const { data: profile, error } = await supabaseClient
+      .from("profiles")
+      .select("username, avatar, role")
+      .eq("id", session.user.id)
+      .maybeSingle();
 
-  const { data: profile, error: profileError } = await supabaseClient
-    .from("profiles")
-    .select("*")
-    .eq("id", session.user.id)
-    .maybeSingle(); // IMPORTANT: not .single()
+    if (error || !profile) throw new Error("Profile fetch failed");
 
-  console.log("PROFILE:", profile);
-  console.log("PROFILE ERROR:", profileError);
+    app.renderUserCard(profile);
 
-  if (!profile) return;
-
-  app.renderUserCard(profile);
+  } catch (err) {
+    console.error(err);
+    app.renderUserCardError(err.message);
+  }
 },
+
 
 
 renderUserCard: (profile) => {
   const container = document.getElementById("user-card");
-  if (!container || !profile) return;
-
   const role = profile.role || "member";
-  const icon = ROLE_ICONS[role] || "🔮";
+  const icon = ROLE_ICONS[role];
+
+  container.className = "user-card ready";
 
   container.innerHTML = `
-    <div class="user-card">
-      <img src="${profile.avatar}" class="user-avatar">
-      <div class="user-info">
-        <div class="user-name">${profile.username}</div>
-        <div class="user-rank rank-${role}">
-          <span class="rank-icon">${icon}</span>
-          ${role}
-        </div>
+    <img class="user-avatar" src="${profile.avatar}">
+    <div class="user-info">
+      <div class="user-name">${profile.username}</div>
+      <div class="user-rank rank-${role}">
+        <img class="rank-icon" src="${icon}">
+        ${role}
       </div>
     </div>
   `;
 },
+renderUserCardError: (msg) => {
+  const container = document.getElementById("user-card");
+  container.className = "user-card error";
+
+  container.innerHTML = `
+    <img class="user-avatar" src="/assets/ranks/error.png">
+    <div class="error-text">
+      <strong>Failed to load profile</strong><br>
+      Please report this error to the staff team.
+    </div>
+  `;
+},
+
 
 
   /* 2. RENDER FUNCTIONS */
