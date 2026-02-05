@@ -647,9 +647,9 @@ checkAuth: async () => {
 
   await supabaseClient.auth.signInWithOAuth({
     provider: "discord",
-    options: {
-      redirectTo: window.location.origin
-    }
+    await supabaseClient.auth.signInWithOAuth({
+  provider: "discord"
+});
   });
 },
 
