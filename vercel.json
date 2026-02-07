@@ -3,6 +3,10 @@
     {
       "source": "/@:username",
       "destination": "/@/index.html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/:path*.html"
     }
   ]
 }
