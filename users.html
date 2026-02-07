@@ -726,15 +726,16 @@
   }
 
   function setupEventListeners() {
-    let debounceTimer;
-    document.getElementById("searchBar").addEventListener("input", (e) => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(applyFiltersAndSort, 300); // 300ms debounce
-    });
+  let debounceTimer;
 
-    document.getElementById("sortSelect").addEventListener("change", applyFiltersAndSort);
-    document.getElementById("roleFilter").addEventListener("change", applyFiltersAndSort);
-  }
+  document.getElementById("searchBar").addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(applyFiltersAndSort, 300);
+  });
+
+  document.getElementById("roleFilter").addEventListener("change", applyFiltersAndSort);
+}
+
   function setupDropdown(dropdownId, onChange) {
   const dropdown = document.getElementById(dropdownId);
   const trigger = dropdown.querySelector('.dropdown-trigger');
