@@ -317,19 +317,16 @@ textarea {
 <script>
 /**
  * ==========================================
- * 1. CONFIGURATION (EDIT THIS SECTION)
+ * 1. CONFIGURATION
  * ==========================================
  */
 const CONFIG = {
   supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co",
   supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
   
-  // Default Images if user inputs are empty
   defaultAvatar: "https://cdn.discordapp.com/embed/avatars/0.png",
   defaultBanner: "https://via.placeholder.com/600x200/18181b/333?text=No+Banner",
 
-  // Define available roles here. 
-  // Icon can be a Phosphor icon class (e.g., 'ph-crown') or you can modify code to use images.
   availableRoles: [
     { id: 'Founder',   label: 'Founder',   icon: 'ph-crown' },
     { id: 'Admin',     label: 'Admin',     icon: 'ph-shield-check' },
@@ -348,7 +345,7 @@ const CONFIG = {
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 let currentProfileId = null;
 
-// DOM Element Cache (Easy access)
+// DOM Element Cache
 const DOM = {
   form: document.getElementById('profileForm'),
   inputs: {
@@ -373,24 +370,31 @@ const DOM = {
 init();
 
 async function init() {
-  const username = getUsernameFromURL();
-  
-  // 1. Render the Role Selection Grid immediately (empty state)
+  // 1. Render the Role Selection Grid immediately
   renderRoleGrid([]); 
 
-  if (!username) {
-    showToast("No username found in URL (use ?username=name)", "error");
+  // 2. CHECK AUTHENTICATION (Instead of checking URL)
+  DOM.btnText.innerText = "Checking Login...";
+  DOM.btn.disabled = true;
+
+  // Get current logged in user from Supabase Auth
+  const { data: { user }, error: authError } = await sb.auth.getUser();
+
+  if (authError || !user) {
+    showToast("You are not logged in.", "error");
+    DOM.btnText.innerText = "Please Log In";
+    // Optional: Redirect to login page here if needed
+    // window.location.href = '/login.html';
     return;
   }
 
-  // 2. Fetch Data
+  // 3. Fetch Data for YOUR profile (using your Auth ID)
   DOM.btnText.innerText = "Loading Profile...";
-  DOM.btn.disabled = true;
 
   const { data, error } = await sb
     .from("profiles")
     .select("*")
-    .eq("username", username)
+    .eq("id", user.id) // <--- THIS IS THE FIX. We filter by your ID, not the URL.
     .maybeSingle();
 
   DOM.btn.disabled = false;
@@ -399,16 +403,19 @@ async function init() {
   if (error || !data) {
     console.error(error);
     showToast("Profile not found or API error.", "error");
+    
+    // Fallback: If profile doesn't exist yet, we can set ID to current user so the save creates it
+    currentProfileId = user.id; 
     return;
   }
 
-  // 3. Populate Form
+  // 4. Populate Form
   currentProfileId = data.id;
   DOM.inputs.avatar.value = data.avatar || "";
   DOM.inputs.banner.value = data.banner_url || "";
   DOM.inputs.bio.value = data.bio || "";
   
-  // 4. Update Previews & Selected Roles
+  // 5. Update Previews & Selected Roles
   updatePreviews();
   renderRoleGrid(data.roles || []);
 }
@@ -419,18 +426,6 @@ async function init() {
  * ==========================================
  */
 
-// Get username from URL (supports /edit?username=abc OR /@abc/edit)
-function getUsernameFromURL() {
-  const path = window.location.pathname.split("/");
-  const pathUser = path.find(p => p.startsWith("@"));
-  
-  if (pathUser) return pathUser.replace("@", "");
-  
-  const params = new URLSearchParams(window.location.search);
-  return params.get("username");
-}
-
-// Render the grid of roles
 function renderRoleGrid(selectedRoles) {
   DOM.rolesGrid.innerHTML = ""; // Clear existing
 
@@ -462,7 +457,6 @@ function renderRoleGrid(selectedRoles) {
   });
 }
 
-// Update images based on inputs
 function updatePreviews() {
   const av = DOM.inputs.avatar.value.trim();
   const ban = DOM.inputs.banner.value.trim();
@@ -471,7 +465,6 @@ function updatePreviews() {
   DOM.previews.banner.src = ban || CONFIG.defaultBanner;
 }
 
-// Handle Loading State UI
 function setLoading(isLoading) {
   if (isLoading) {
     DOM.spinner.style.display = "block";
@@ -484,16 +477,13 @@ function setLoading(isLoading) {
   }
 }
 
-// Toast Notification System
 function showToast(msg, type = "success") {
   DOM.toastMsg.innerText = msg;
   DOM.toast.className = `toast show ${type}`;
   
-  // Icon handling
   if(type === 'success') DOM.toastIcon.className = "ph-fill ph-check-circle";
   else DOM.toastIcon.className = "ph-fill ph-warning-circle";
 
-  // Hide after 3s
   setTimeout(() => {
     DOM.toast.classList.remove("show");
   }, 3000);
@@ -514,14 +504,13 @@ DOM.form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   if (!currentProfileId) {
-    showToast("Error: No profile loaded.", "error");
+    showToast("Error: No user identified.", "error");
     return;
   }
 
   setLoading(true);
 
   // 1. Gather Data
-  // Select all active role cards and map to their ID
   const activeRoles = Array.from(document.querySelectorAll('.role-card.active'))
                            .map(el => el.dataset.roleId);
 
@@ -537,7 +526,7 @@ DOM.form.addEventListener('submit', async (e) => {
   const { error } = await sb
     .from("profiles")
     .update(updates)
-    .eq("id", currentProfileId);
+    .eq("id", currentProfileId); // Ensure we update the ID we fetched earlier
 
   setLoading(false);
 
@@ -548,7 +537,6 @@ DOM.form.addEventListener('submit', async (e) => {
     showToast("Profile updated successfully!");
   }
 });
-
 </script>
 </body>
 </html>
