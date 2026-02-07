@@ -368,6 +368,7 @@
 .ios-dropdown {
   position: relative;
   width: 100%;
+  z-index: 20;
 }
 
 .dropdown-trigger {
@@ -413,7 +414,8 @@
   opacity: 0;
   transform: translateY(-8px) scale(0.96);
   pointer-events: none;
-
+  z-index: 50;
+  pointer-events: auto;
   transition:
     opacity 0.25s ease,
     transform 0.35s cubic-bezier(.34,1.56,.64,1);
@@ -481,11 +483,19 @@
 </div>
 
 
-      <select id="roleFilter">
-        <option value="all">All Roles</option>
-        <option value="verified">Verified Only</option>
-        <option value="admin">Staff Only</option>
-      </select>
+      <div class="ios-dropdown" data-value="all" id="roleDropdown">
+  <button class="dropdown-trigger">
+    <span class="dropdown-label">All Roles</span>
+    <i class="ph ph-caret-down"></i>
+  </button>
+
+  <div class="dropdown-menu">
+    <button data-value="all" class="active">All Roles</button>
+    <button data-value="verified">Verified Only</button>
+    <button data-value="admin">Staff Only</button>
+  </div>
+</div>
+
     </div>
   </div>
 
@@ -517,11 +527,14 @@
 
   // -- INIT --
   document.addEventListener('DOMContentLoaded', async () => {
-    renderSkeletons(6); // Show 6 skeletons immediately
-    await fetchUsers();
-    setupEventListeners();
-    setupDropdown("sortDropdown", applyFiltersAndSort);
-  });
+  renderSkeletons(6);
+  await fetchUsers();
+  setupEventListeners();
+
+  setupDropdown("sortDropdown", applyFiltersAndSort);
+  setupDropdown("roleDropdown", applyFiltersAndSort);
+});
+
 
   // -- DATA FETCHING --
   async function fetchUsers() {
@@ -556,7 +569,8 @@
   function applyFiltersAndSort() {
     const searchQuery = document.getElementById("searchBar").value.toLowerCase();
     const sortValue = document.getElementById("sortDropdown").dataset.value;
-    const filterValue = document.getElementById("roleFilter").value;
+    const filterValue = document.getElementById("roleDropdown").dataset.value;
+
 
     // 1. Filter
     let result = allUsers.filter(user => {
@@ -738,6 +752,8 @@
 
   function setupDropdown(dropdownId, onChange) {
   const dropdown = document.getElementById(dropdownId);
+  if (!dropdown) return;
+
   const trigger = dropdown.querySelector('.dropdown-trigger');
   const label = dropdown.querySelector('.dropdown-label');
   const options = dropdown.querySelectorAll('.dropdown-menu button');
@@ -749,7 +765,9 @@
   });
 
   options.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+
       options.forEach(o => o.classList.remove('active'));
       btn.classList.add('active');
 
@@ -757,10 +775,11 @@
       label.textContent = btn.textContent;
 
       dropdown.classList.remove('open');
-      onChange(btn.dataset.value);
+      onChange();
     });
   });
 }
+
 
 function closeAllDropdowns(except = null) {
   document.querySelectorAll('.ios-dropdown').forEach(d => {
