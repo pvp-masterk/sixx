@@ -1,187 +1,413 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Users</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Explore Users</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Supabase -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-<style>
-:root {
-  --bg: #09090b;
-  --card-bg: rgba(24,24,27,0.6);
-  --border: rgba(255,255,255,0.1);
-  --accent: #5865F2;
-  --text-main: #fff;
-  --text-muted: #a1a1aa;
-}
+  <style>
+    :root {
+      --bg-color: #09090b;
+      --card-bg: rgba(24, 24, 27, 0.6);
+      --card-hover: rgba(39, 39, 42, 0.8);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --accent: #5865F2;
+      --text-main: #ffffff;
+      --text-muted: #a1a1aa;
+    }
 
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg);
-  color: var(--text-main);
-  min-height: 100vh;
-  padding: 20px;
-}
+    * { box-sizing: border-box; }
 
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-}
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      /* Matching Profile Page Background */
+      background-image: 
+        radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+        radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+        radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
 
-#searchBar {
-  display: block;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto 30px auto;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background-color: rgba(255,255,255,0.05);
-  color: var(--text-main);
-  font-size: 16px;
-}
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-#searchBar::placeholder {
-  color: var(--text-muted);
-}
+    /* Header & Search */
+    .header-section {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInDown 0.6s ease forwards;
+    }
 
-#usersList {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-}
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(to right, #fff, #a1a1aa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-/* User Card */
-.user-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+    .search-wrapper {
+      position: relative;
+      max-width: 500px;
+      margin: 20px auto 0;
+    }
 
-.user-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-}
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 20px;
+    }
 
-.card-banner {
-  width: 100%;
-  height: 80px;
-  background: linear-gradient(45deg,#4f46e5,#9333ea);
-  object-fit: cover;
-}
+    #searchBar {
+      width: 100%;
+      padding: 14px 14px 14px 48px;
+      border-radius: 24px;
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text-main);
+      font-size: 16px;
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+      outline: none;
+    }
 
-.card-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 2px solid var(--bg);
-  margin: -30px 0 0 16px;
-  object-fit: cover;
-  background: #27272a;
-}
+    #searchBar:focus {
+      border-color: var(--accent);
+      background: rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 0 4px rgba(88, 101, 242, 0.15);
+    }
 
-.card-body {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+    /* Grid Layout */
+    #usersList {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
 
-.card-username {
-  font-weight: 600;
-  font-size: 18px;
-}
+    /* User Card - Enhanced */
+    .user-card {
+      position: relative;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      text-decoration: none; /* For the anchor tag */
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+    }
 
-.card-bio {
-  font-size: 14px;
-  color: var(--text-muted);
-  max-height: 40px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+    .user-card:hover {
+      transform: translateY(-8px);
+      background: var(--card-hover);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
 
-.role-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 8px;
-}
+    /* Banner */
+    .card-banner {
+      height: 100px;
+      width: 100%;
+      object-fit: cover;
+      background: #27272a;
+    }
 
-.role-badge {
-  background: rgba(88,101,242,0.15);
-  color: var(--accent);
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 6px;
-}
-</style>
+    /* Avatar */
+    .card-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 4px solid #1c1c1f; /* Matches dark card bg */
+      background: #27272a;
+      object-fit: cover;
+      margin-top: -40px;
+      margin-left: 20px;
+      z-index: 2;
+    }
+
+    /* Card Content */
+    .card-body {
+      padding: 12px 20px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .name-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .card-username {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .card-handle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .card-bio {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #d4d4d8;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; /* Limit to 2 lines */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    /* "My Profile" Badge */
+    .my-profile-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 5;
+    }
+
+    .my-profile-badge i { color: var(--accent); }
+
+    /* Role Badges (Matches Profile Page) */
+    .role-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: auto; /* Pushes to bottom */
+    }
+
+    .role-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: white;
+      text-transform: capitalize;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .role-badge img {
+      width: 12px;
+      height: 12px;
+      object-fit: contain;
+    }
+
+    /* Loading/States */
+    .loader { text-align: center; color: var(--text-muted); margin-top: 40px; }
+    
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  </style>
 </head>
 <body>
 
-<h1>Users</h1>
-<input type="text" id="searchBar" placeholder="Search users...">
+<div class="container">
+  <div class="header-section">
+    <h1>Discover Users</h1>
+    <div class="search-wrapper">
+      <i class="ph ph-magnifying-glass search-icon"></i>
+      <input type="text" id="searchBar" placeholder="Search by username or handle...">
+    </div>
+  </div>
 
-<div id="usersList"></div>
+  <div id="usersList">
+    <!-- Cards injected here -->
+    <div class="loader">Loading users...</div>
+  </div>
+</div>
 
 <script>
-const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // -- CONFIG --
+  const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
+  
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function loadUsers(search = "") {
-  const { data: users, error } = await supabaseClient
-    .from("profiles")
-    .select("*")
-    .ilike("username", `%${search}%`) // search by username
-    .eq("public", true);
+  let allUsers = []; // Store users locally for faster filtering if needed
+  let currentUserSessionId = null;
 
-  if(error) {
-    console.error(error);
-    document.getElementById("usersList").innerHTML = `<p style="color:red;">Error loading users</p>`;
-    return;
+  // -- MAIN LOGIC --
+
+  async function init() {
+    // 1. Get Current User Session
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    currentUserSessionId = session?.user?.id || null;
+
+    // 2. Load Users
+    loadUsers();
   }
 
-  const container = document.getElementById("usersList");
-  container.innerHTML = "";
+  async function loadUsers(searchQuery = "") {
+    const listContainer = document.getElementById("usersList");
+    
+    // Only show loading on initial empty state or if desired
+    if(!allUsers.length && !searchQuery) {
+        listContainer.innerHTML = `<div class="loader"><i class="ph ph-spinner-gap ph-spin" style="font-size:24px"></i><br>Loading community...</div>`;
+    }
 
-  users.forEach(user => {
-    const avatar = user.avatar || "https://cdn.discordapp.com/embed/avatars/0.png";
-    const banner = user.banner_url || "";
+    let query = supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("public", true);
 
-    const card = document.createElement("div");
-    card.className = "user-card";
+    // Apply Search
+    if (searchQuery) {
+      query = query.ilike("username", `%${searchQuery}%`);
+    }
 
-    card.innerHTML = `
-      <div class="card-banner" style="background-image: url('${banner}'); background-size: cover; background-position: center;"></div>
-      <img class="card-avatar" src="${avatar}" alt="${user.username}">
-      <div class="card-body">
-        <div class="card-username">${user.username}</div>
-        <div class="card-bio">${user.bio || "No bio"}</div>
-        <div class="role-container">
-          ${user.roles ? user.roles.map(r => `<span class="role-badge">${r}</span>`).join("") : ""}
+    const { data, error } = await query;
+
+    if (error) {
+      console.error(error);
+      listContainer.innerHTML = `<div class="loader" style="color:#ef4444">Error loading users.</div>`;
+      return;
+    }
+
+    // -- SORTING LOGIC: Move "My Profile" to index 0 --
+    let sortedUsers = [...data];
+    if (currentUserSessionId) {
+      const myIndex = sortedUsers.findIndex(u => u.id === currentUserSessionId);
+      if (myIndex > -1) {
+        const myProfile = sortedUsers.splice(myIndex, 1)[0];
+        sortedUsers.unshift(myProfile); // Put at start
+      }
+    }
+
+    renderUsers(sortedUsers);
+  }
+
+  function renderUsers(users) {
+    const container = document.getElementById("usersList");
+    container.innerHTML = "";
+
+    if (users.length === 0) {
+      container.innerHTML = `<div class="loader">No users found.</div>`;
+      return;
+    }
+
+    // Helper for Animation Stagger
+    let delay = 0;
+
+    users.forEach(user => {
+      // Data Prep
+      const isMe = user.id === currentUserSessionId;
+      const avatar = user.avatar || "https://cdn.discordapp.com/embed/avatars/0.png";
+      const banner = user.banner_url 
+        ? `<img class="card-banner" src="${user.banner_url}" alt="banner">`
+        : `<div class="card-banner" style="background: linear-gradient(45deg, #4f46e5, #9333ea);"></div>`;
+      const bio = user.bio || "No bio available.";
+      
+      // Role Badges Logic
+      let rolesHTML = "";
+      if (user.roles && user.roles.length > 0) {
+        rolesHTML = user.roles.map(r => `
+          <span class="role-badge">
+            <img src="/assets/${r.toLowerCase()}.png" onerror="this.style.display='none'">
+            ${r}
+          </span>
+        `).join("");
+      }
+
+      // "My Profile" Badge Logic
+      const myProfileBadge = isMe 
+        ? `<div class="my-profile-badge"><i class="ph-fill ph-user-circle"></i> My Profile</div>` 
+        : ``;
+
+      // Create Card Element (Anchor Tag for Clickability)
+      const card = document.createElement("a");
+      card.href = `/@${user.username}`; // The link to profile
+      card.className = "user-card";
+      card.style.animationDelay = `${delay}s`; // Stagger animation
+      delay += 0.05; // Increment delay
+
+      card.innerHTML = `
+        ${myProfileBadge}
+        ${banner}
+        <img class="card-avatar" src="${avatar}" alt="${user.username}">
+        
+        <div class="card-body">
+          <div class="name-row">
+            <div>
+              <div class="card-username">${user.display_name || user.username}</div>
+              <div class="card-handle">@${user.username}</div>
+            </div>
+          </div>
+
+          <div class="card-bio">${escapeHtml(bio)}</div>
+
+          <div class="role-container">
+            ${rolesHTML}
+          </div>
         </div>
-      </div>
-    `;
-    container.appendChild(card);
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+  // Security: Prevent XSS
+  function escapeHtml(unsafe) {
+    if(!unsafe) return "";
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Debounce Search (Wait 300ms after typing stops to fetch)
+  let timeoutId;
+  document.getElementById("searchBar").addEventListener("input", (e) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      loadUsers(e.target.value.trim());
+    }, 300);
   });
-}
 
-// Initial load
-loadUsers();
+  // Start
+  init();
 
-// Search functionality
-document.getElementById("searchBar").addEventListener("input", e => {
-  const val = e.target.value.trim();
-  loadUsers(val);
-});
 </script>
 </body>
 </html>
