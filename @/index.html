@@ -2,88 +2,227 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Profile</title>
+  <title>Loading Profile...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  
+  <!-- Supabase -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Icons (Phosphor Icons) -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <style>
+    :root {
+      --bg-color: #09090b;
+      --card-bg: rgba(24, 24, 27, 0.6);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --accent: #5865F2; /* Discord Blurple */
+      --text-main: #ffffff;
+      --text-muted: #a1a1aa;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      background: #0b0b0f;
-      color: white;
-      font-family: Inter, system-ui;
+      background-color: var(--bg-color);
+      /* Subtle animated background */
+      background-image: 
+        radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+        radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+        radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .profile {
-      max-width: 420px;
-      margin: 60px auto;
-      padding: 24px;
+    /* Main Card */
+    .profile-card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      margin: 20px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease forwards;
     }
 
-    .avatar {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Banner Area */
+    .banner-container {
+      height: 160px;
+      width: 100%;
+      background-color: #27272a;
+      position: relative;
+    }
+
+    .banner {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
     }
 
-    .username {
-      font-size: 22px;
-      font-weight: 700;
-      margin-top: 12px;
+    /* Profile Header Info */
+    .profile-header {
+      padding: 0 24px;
+      position: relative;
+      margin-bottom: 16px;
     }
 
-    .verified {
-      margin-top: 6px;
-      font-size: 13px;
+    .avatar-wrapper {
+      margin-top: -50px; /* Pull avatar up into banner */
+      display: inline-block;
+      position: relative;
+    }
+
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #18181b; /* Matches card bg to create cutout effect */
+      background: #27272a;
+    }
+
+    .username-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .username {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: rgba(88, 101, 242, 0.15);
+      border: 1px solid rgba(88, 101, 242, 0.3);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-top: 8px;
+    }
+    
+    .badge i { font-size: 14px; }
+
+    /* Bio Section */
+    .content {
+      padding: 0 24px 32px 24px;
     }
 
     .bio {
-      margin-top: 14px;
-      color: #c9c9c9;
-      line-height: 1.5;
+      margin-top: 12px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      font-size: 15px;
+      white-space: pre-wrap; /* Preserves line breaks */
     }
 
-    .error {
+    /* States */
+    .error-state {
       text-align: center;
-      color: #ff6b6b;
+      padding: 40px;
+      color: #ef4444;
+    }
+
+    /* Skeleton Loading Animation */
+    .skeleton {
+      background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
+    }
+
+    .sk-banner { height: 160px; width: 100%; }
+    .sk-avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #18181b; margin-top: -50px; }
+    .sk-text { height: 20px; margin-bottom: 8px; }
+    .w-50 { width: 50%; }
+    .w-80 { width: 80%; }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
   </style>
 </head>
 <body>
 
-<div id="app" class="profile">
-  <div id="loading">Loading profile…</div>
+<div id="app" class="profile-card">
+  <!-- Initial Skeleton Loader -->
+  <div class="banner-container sk-banner skeleton"></div>
+  <div class="profile-header">
+    <div class="sk-avatar skeleton"></div>
+    <div class="sk-text w-50 skeleton" style="margin-top: 15px;"></div>
+    <div class="sk-text w-80 skeleton"></div>
+  </div>
 </div>
 
 <script>
-  const supabaseClient = supabase.createClient(
-    "https://tstsijdifhgmpaszqknr.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
+  // -- CONFIG --
+  const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
+  
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // -- UTILS --
+  
+  // Prevent XSS attacks from user Bio
+  function escapeHtml(unsafe) {
+    if (!unsafe) return "";
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Parse Username
+  const path = window.location.pathname;
+  const username = decodeURIComponent(
+    path.startsWith("/@") ? path.slice(2).replace(/\//g, "") : ""
   );
 
-  const path = window.location.pathname;
-const username = decodeURIComponent(
-  path.startsWith("/@") ? path.slice(2).replace(/\//g, "") : ""
-);
-
-console.log("Resolved username:", username);
-
+  // -- MAIN LOGIC --
 
   async function loadProfile() {
+    console.log("Fetching profile for:", username);
+
+    if (!username) {
+      renderError("No username provided in URL.");
+      return;
+    }
+
     const { data, error } = await supabaseClient
       .from("profiles")
       .select("*")
       .eq("username", username)
-      .eq("public", true)
+      .eq("public", true) // Assuming you have a boolean for public/private
       .single();
-    
-  console.log("DATA:", data);
-  console.log("ERROR:", error);
-    
+
     if (error || !data) {
-      renderError();
+      console.error(error);
+      renderError("Profile not found or is private.");
       return;
     }
 
@@ -91,39 +230,57 @@ console.log("Resolved username:", username);
   }
 
   function renderProfile(user) {
-  const avatar =
-    user.avatar_url ||
-    "https://cdn.discordapp.com/embed/avatars/0.png";
+    document.title = `${user.username} (@${user.username}) | Profile`;
+    
+    // Fallback assets
+    const avatar = user.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png";
+    const bannerHTML = user.banner_url 
+      ? `<img class="banner" src="${escapeHtml(user.banner_url)}" alt="Banner">`
+      : `<div class="banner" style="background: linear-gradient(45deg, #4f46e5, #9333ea);"></div>`;
 
-  const banner = user.banner_url || "";
+    // Sanitize bio to prevent XSS
+    const safeBio = escapeHtml(user.bio);
 
-  document.getElementById("app").innerHTML = `
-    ${banner ? `<img class="banner" src="${banner}">` : ""}
-
-    <img class="avatar" src="${avatar}" />
-
-    <div class="username">@${user.username}</div>
-
-    <div class="verified">
-      <span style="color:#22c55e">Verified</span>
-      <span style="color:#9ca3af"> via </span>
-      <span style="color:#5865F2;font-weight:600">Discord</span>
-    </div>
-
-    ${user.bio ? `<div class="bio">${user.bio}</div>` : ""}
-  `;
-}
-
-
-  function renderError() {
     document.getElementById("app").innerHTML = `
-      <div class="error">
-        Profile not found.<br><br>
-        Please report this error to the staff team.
+      <div class="banner-container">
+        ${bannerHTML}
+      </div>
+
+      <div class="profile-header">
+        <div class="avatar-wrapper">
+          <img class="avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(user.username)}" />
+        </div>
+
+        <div class="username-row">
+          <div class="username">@${escapeHtml(user.username)}</div>
+        </div>
+
+        <!-- Verified Badge -->
+        <div class="badge">
+          <i class="ph-fill ph-seal-check"></i>
+          <span>Verified via Discord</span>
+        </div>
+      </div>
+
+      <div class="content">
+        ${safeBio ? `<div class="bio">${safeBio}</div>` : `<div class="bio" style="font-style:italic; opacity:0.5">No bio available.</div>`}
       </div>
     `;
   }
 
+  function renderError(msg) {
+    document.title = "Profile Not Found";
+    document.getElementById("app").innerHTML = `
+      <div class="error-state">
+        <i class="ph ph-warning-circle" style="font-size: 48px; margin-bottom: 10px;"></i>
+        <h3>Ooops!</h3>
+        <p>${msg}</p>
+        <p style="font-size: 12px; margin-top: 20px; color: #666;">If you believe this is an error, please contact support.</p>
+      </div>
+    `;
+  }
+
+  // Start
   loadProfile();
 </script>
 
