@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Profile</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      font-family: Inter, sans-serif;
+      background: #0b0b0f;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 60px auto;
+      padding: 24px;
+      background: #10101a;
+      border-radius: 12px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #1a1a2e;
+      color: white;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 12px 20px;
+      background: #5865f2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    .success {
+      color: #22c55e;
+      margin-top: 8px;
+    }
+
+    .error {
+      color: #ff6b6b;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Edit Profile</h2>
+
+  <label>Username (vanity URL)</label>
+  <input type="text" id="username" placeholder="@username">
+
+  <label>Display Name</label>
+  <input type="text" id="display_name" placeholder="Your display name">
+
+  <label>Bio</label>
+  <textarea id="bio" rows="4" placeholder="Tell people about yourself"></textarea>
+
+  <label>Avatar URL</label>
+  <input type="text" id="avatar_url" placeholder="https://...">
+
+  <label>Banner URL</label>
+  <input type="text" id="banner_url" placeholder="https://...">
+
+  <button id="saveBtn">Save Profile</button>
+
+  <div id="status"></div>
+</div>
+
+<script>
+  const supabaseClient = supabase.createClient(
+    "https://tstsijdifhgmpaszqknr.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
+  );
+
+  let profileId;
+
+  async function loadProfile() {
+    const { data: session } = await supabaseClient.auth.getSession();
+    if (!session || !session.user) {
+      document.getElementById("status").innerHTML = "<div class='error'>You must be logged in</div>";
+      return;
+    }
+
+    profileId = session.user.id;
+
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id", profileId)
+      .single();
+
+    if (error) {
+      document.getElementById("status").innerHTML = `<div class='error'>Failed to load profile</div>`;
+      console.error(error);
+      return;
+    }
+
+    // populate fields
+    document.getElementById("username").value = data.username || "";
+    document.getElementById("display_name").value = data.display_name || "";
+    document.getElementById("bio").value = data.bio || "";
+    document.getElementById("avatar_url").value = data.avatar_url || "";
+    document.getElementById("banner_url").value = data.banner_url || "";
+  }
+
+  async function saveProfile() {
+    const username = document.getElementById("username").value.trim().toLowerCase();
+    const display_name = document.getElementById("display_name").value.trim();
+    const bio = document.getElementById("bio").value.trim();
+    const avatar_url = document.getElementById("avatar_url").value.trim();
+    const banner_url = document.getElementById("banner_url").value.trim();
+
+    if (!username) {
+      document.getElementById("status").innerHTML = "<div class='error'>Username cannot be empty</div>";
+      return;
+    }
+
+    // Optional: check for duplicate username
+    const { data: existing, error: checkError } = await supabaseClient
+      .from("profiles")
+      .select("id")
+      .eq("username", username)
+      .neq("id", profileId);
+
+    if (checkError) {
+      document.getElementById("status").innerHTML = "<div class='error'>Error checking username</div>";
+      console.error(checkError);
+      return;
+    }
+
+    if (existing.length > 0) {
+      document.getElementById("status").innerHTML = "<div class='error'>Username already taken</div>";
+      return;
+    }
+
+    // update profile
+    const { error } = await supabaseClient
+      .from("profiles")
+      .update({ username, display_name, bio, avatar_url, banner_url })
+      .eq("id", profileId);
+
+    if (error) {
+      document.getElementById("status").innerHTML = "<div class='error'>Failed to save profile</div>";
+      console.error(error);
+      return;
+    }
+
+    document.getElementById("status").innerHTML = "<div class='success'>Profile saved!</div>";
+  }
+
+  document.getElementById("saveBtn").addEventListener("click", saveProfile);
+
+  window.addEventListener("DOMContentLoaded", loadProfile);
+</script>
+
+</body>
+</html>
