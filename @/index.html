@@ -163,6 +163,23 @@
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
+    .role-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  margin: 2px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+  background: #3f3f46; /* Default gray */
+}
+
+/* Specific colors for specific roles */
+.role-founder { background: #E0245E; } /* Pinkish Red */
+.role-admin { background: #5865F2; }   /* Blurple */
+.role-mod { background: #1ABC9C; }     /* Teal */
+.role-verified { background: #F1C40F; color: black; } /* Gold */
   </style>
 </head>
 <body>
@@ -174,6 +191,7 @@
     <div class="sk-avatar skeleton"></div>
     <div class="sk-text w-50 skeleton" style="margin-top: 15px;"></div>
     <div class="sk-text w-80 skeleton"></div>
+    <div id="roleContainer"></div>
   </div>
 </div>
 
@@ -266,6 +284,22 @@
         ${safeBio ? `<div class="bio">${safeBio}</div>` : `<div class="bio" style="font-style:italic; opacity:0.5">No bio available.</div>`}
       </div>
     `;
+    // Assuming you have a <div id="roleContainer"></div> in your HTML
+const roleContainer = document.getElementById("roleContainer");
+
+// Clear previous
+roleContainer.innerHTML = '';
+
+// Check if roles exist (it comes as an array ['admin', 'verified'])
+if (profile.roles && profile.roles.length > 0) {
+  profile.roles.forEach(role => {
+    const span = document.createElement("span");
+    span.textContent = role;
+    // Add generic class + specific class (e.g., 'role-admin')
+    span.className = `role-badge role-${role.toLowerCase()}`; 
+    roleContainer.appendChild(span);
+  });
+}
   }
 
   function renderError(msg) {
