@@ -388,6 +388,37 @@ footer { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.2); font
   width: 14px;
   height: 14px;
 }
+/* ================= VERIFIED VIA DISCORD ================= */
+.verified-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.verified-badge .verified {
+  color: #3ba55d; /* Discord verified green */
+}
+
+.verified-badge .via {
+  color: #8b8b8b;
+  font-weight: 500;
+}
+
+.verified-badge .discord {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #5865f2; /* OFFICIAL Discord Blurple */
+}
+
+.discord-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
 
 </style>
 </head>
@@ -419,6 +450,15 @@ footer { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.2); font
   <div class="info-skeleton">
     <div class="line"></div>
     <div class="line small"></div>
+    <div class="verified-badge">
+  <span class="verified">Verified</span>
+  <span class="via">via</span>
+  <span class="discord">
+    <img src="/assets/discord.svg" class="discord-icon">
+    Discord
+  </span>
+</div>
+
   </div>
 </div>
 
@@ -702,6 +742,16 @@ renderUserCard: (profile) => {
     <img class="user-avatar" src="${profile.avatar}">
     <div class="user-info">
       <div class="user-name">${profile.username}</div>
+
+      <div class="verified-badge">
+        <span class="verified">Verified</span>
+        <span class="via">via</span>
+        <span class="discord">
+          <img src="/assets/discord.svg" class="discord-icon">
+          Discord
+        </span>
+      </div>
+
       <div class="user-rank rank-${role}">
         <img class="rank-icon" src="${icon}">
         ${role}
@@ -709,6 +759,7 @@ renderUserCard: (profile) => {
     </div>
   `;
 },
+
 renderUserCardError: (msg) => {
   const container = document.getElementById("user-card");
   container.className = "user-card error";
