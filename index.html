@@ -419,7 +419,102 @@ footer { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.2); font
   height: 14px;
   object-fit: contain;
 }
+/* ================= USER MENU DROPDOWN & ANIMATION ================= */
+.user-menu-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
+/* Make the card clickable */
+.user-card {
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  position: relative;
+}
+
+.user-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Chevron indicator */
+.card-chevron {
+  margin-left: auto;
+  transition: transform 0.3s ease;
+  color: var(--c-text-dim);
+}
+.user-menu-wrapper.open .card-chevron {
+  transform: rotate(180deg);
+}
+
+/* The Dropdown Container (Hidden by default) */
+.user-dropdown {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-menu-wrapper.open .user-dropdown {
+  max-height: 150px; /* Enough height for 2 buttons */
+  opacity: 1;
+  margin-top: -4px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: none;
+}
+
+/* Menu Buttons */
+.menu-action-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  padding: 10px;
+  border-radius: 8px;
+  color: #ccc;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.menu-action-btn:hover {
+  background: rgba(123, 44, 191, 0.15);
+  color: #fff;
+  border-color: rgba(123, 44, 191, 0.3);
+}
+
+/* Buffering Spinner */
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: none; /* Hidden by default */
+}
+
+.menu-action-btn.loading .btn-text,
+.menu-action-btn.loading svg {
+  display: none; /* Hide text/icon when loading */
+}
+
+.menu-action-btn.loading .btn-spinner {
+  display: block; /* Show spinner when loading */
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -731,32 +826,53 @@ checkAuth: async () => {
 
 
 renderUserCard: (profile) => {
-  const container = document.getElementById("user-card");
-  const role = profile.role || "member";
-  const icon = ROLE_ICONS[role];
+    // We target the parent wrapper we will create dynamically or the existing ID
+    const container = document.getElementById("user-card");
+    
+    // We need to change the outer HTML to support the wrapper structure
+    // or we inject the new structure inside the sidebar replacing the old card div completely.
+    // However, to keep it simple, we will replace the container's content 
+    // and change the container's classes.
+    
+    const role = profile.role || "member";
+    const username = profile.username;
+    
+    // 1. Create the wrapper HTML
+    const html = `
+      <div id="user-menu-wrapper" class="user-menu-wrapper">
+        <!-- The Trigger Card -->
+        <div class="user-card ready" onclick="app.toggleUserMenu()">
+          <img class="user-avatar" src="${profile.avatar}">
+          <div class="user-info">
+            <div class="user-name">${profile.username}</div>
+            <div class="user-rank rank-${role}">
+              ${role}
+            </div>
+          </div>
+          <!-- Chevron Icon -->
+          <svg class="icon card-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
 
-  container.className = "user-card ready";
-
-  container.innerHTML = `
-    <img class="user-avatar" src="${profile.avatar}">
-    <div class="user-info">
-      <div class="user-name">${profile.username}</div>
-
-      <div class="verified-badge">
-        <span class="verified">Verified</span>
-        <span class="via">via</span>
-        <span class="discord">
-          Discord
-        </span>
+        <!-- The Dropdown -->
+        <div class="user-dropdown">
+          <button class="menu-action-btn" onclick="app.delayedRedirect('/@${username}', this)">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="btn-text">View Profile</span>
+            <div class="btn-spinner"></div>
+          </button>
+          
+          <button class="menu-action-btn" onclick="app.delayedRedirect('/@${username}/edit', this)">
+             <svg class="icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <span class="btn-text">Edit Profile</span>
+            <div class="btn-spinner"></div>
+          </button>
+        </div>
       </div>
-
-      <div class="user-rank rank-${role}">
-        <img class="rank-icon" src="${icon}">
-        ${role}
-      </div>
-    </div>
-  `;
-},
+    `;
+    
+    // Replace the specific DOM element
+    container.outerHTML = html;
+  },
 
 renderUserCardError: (msg) => {
   const container = document.getElementById("user-card");
@@ -771,7 +887,24 @@ renderUserCardError: (msg) => {
   `;
 },
 
+/* 5. USER MENU LOGIC */
+  toggleUserMenu: () => {
+    const wrapper = document.getElementById('user-menu-wrapper');
+    wrapper.classList.toggle('open');
+  },
 
+  delayedRedirect: (url, btnElement) => {
+    // 1. Prevent double clicks
+    if (btnElement.classList.contains('loading')) return;
+
+    // 2. Start Animation
+    btnElement.classList.add('loading');
+
+    // 3. Wait 2 seconds (2000ms), then redirect
+    setTimeout(() => {
+      window.location.href = url;
+    }, 2000);
+  },
 
   /* 2. RENDER FUNCTIONS */
   renderNav: () => {
