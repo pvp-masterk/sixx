@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Explore Users</title>
+  <title>Explore Community</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Supabase -->
@@ -13,12 +13,15 @@
   <style>
     :root {
       --bg-color: #09090b;
-      --card-bg: rgba(24, 24, 27, 0.6);
-      --card-hover: rgba(39, 39, 42, 0.8);
-      --border-color: rgba(255, 255, 255, 0.1);
+      --card-bg: rgba(24, 24, 27, 0.4);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-bg: rgba(39, 39, 42, 0.6);
+      --card-hover-border: rgba(255, 255, 255, 0.15);
       --accent: #5865F2;
+      --accent-glow: rgba(88, 101, 242, 0.4);
       --text-main: #ffffff;
       --text-muted: #a1a1aa;
+      --verified-color: #3ba55c;
     }
 
     * { box-sizing: border-box; }
@@ -27,41 +30,65 @@
       margin: 0;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg-color);
-      /* Matching Profile Page Background */
+      /* Advanced Animated Background */
       background-image: 
         radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
         radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
         radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+      background-attachment: fixed;
       color: var(--text-main);
       min-height: 100vh;
       padding: 40px 20px;
+      overflow-x: hidden;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
     }
 
-    /* Header & Search */
+    /* --- Header Section --- */
     .header-section {
       text-align: center;
-      margin-bottom: 40px;
-      animation: fadeInDown 0.6s ease forwards;
+      margin-bottom: 50px;
+      animation: fadeInDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     h1 {
-      font-size: 2.5rem;
+      font-size: 3rem;
       font-weight: 800;
+      letter-spacing: -0.05em;
       margin-bottom: 10px;
-      background: linear-gradient(to right, #fff, #a1a1aa);
+      background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(255,255,255,0.1);
     }
 
-    .search-wrapper {
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    /* --- Control Bar (Search & Sort) --- */
+    .controls-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--card-border);
+      padding: 10px;
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      margin-bottom: 40px;
+      align-items: center;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .search-container {
+      flex: 1;
       position: relative;
-      max-width: 500px;
-      margin: 20px auto 0;
+      min-width: 250px;
     }
 
     .search-icon {
@@ -70,310 +97,484 @@
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-muted);
-      font-size: 20px;
+      pointer-events: none;
+    }
+
+    input, select {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      outline: none;
+      font-family: inherit;
     }
 
     #searchBar {
       width: 100%;
-      padding: 14px 14px 14px 48px;
-      border-radius: 24px;
-      border: 1px solid var(--border-color);
-      background: rgba(0, 0, 0, 0.3);
-      color: var(--text-main);
-      font-size: 16px;
-      backdrop-filter: blur(10px);
-      transition: all 0.2s ease;
-      outline: none;
+      padding-left: 44px;
     }
 
-    #searchBar:focus {
+    input:focus, select:focus {
+      background: rgba(0,0,0,0.5);
       border-color: var(--accent);
-      background: rgba(0, 0, 0, 0.5);
-      box-shadow: 0 0 0 4px rgba(88, 101, 242, 0.15);
+      box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.2);
     }
 
-    /* Grid Layout */
+    .filter-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      padding-right: 32px;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23a1a1aa%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px top 50%;
+      background-size: 10px auto;
+    }
+
+    /* --- Grid Layout --- */
     #usersList {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 24px;
     }
 
-    /* User Card - Enhanced */
+    /* --- User Card Enhanced --- */
     .user-card {
       position: relative;
       background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
       overflow: hidden;
-      text-decoration: none; /* For the anchor tag */
+      text-decoration: none;
       color: inherit;
       display: flex;
       flex-direction: column;
       backdrop-filter: blur(12px);
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      opacity: 0; /* Handled by animation */
       animation: fadeInUp 0.5s ease forwards;
-      opacity: 0;
     }
 
     .user-card:hover {
-      transform: translateY(-8px);
-      background: var(--card-hover);
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
-      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-8px) scale(1.01);
+      background: var(--card-hover-bg);
+      border-color: var(--card-hover-border);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.05);
     }
 
-    /* Banner */
+    /* Dynamic Border Glow based on Role (optional js injection) */
+    .user-card.is-staff:hover { border-color: rgba(255, 215, 0, 0.5); }
+
     .card-banner {
-      height: 100px;
+      height: 110px;
       width: 100%;
       object-fit: cover;
       background: #27272a;
+      mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
     }
 
-    /* Avatar */
-    .card-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 4px solid #1c1c1f; /* Matches dark card bg */
-      background: #27272a;
-      object-fit: cover;
-      margin-top: -40px;
-      margin-left: 20px;
-      z-index: 2;
-    }
-
-    /* Card Content */
-    .card-body {
-      padding: 12px 20px 20px 20px;
+    .card-content-wrapper {
+      padding: 0 24px 24px 24px;
       display: flex;
       flex-direction: column;
-      flex-grow: 1;
+      flex: 1;
+      margin-top: -50px; /* Pull up over banner */
     }
 
-    .name-row {
+    .avatar-wrapper {
+      position: relative;
+      width: 84px;
+      height: 84px;
+      margin-bottom: 12px;
+    }
+
+    .card-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid #18181b; /* Matches dark bg */
+      background: #27272a;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    /* Status Indicator Dot */
+    .status-dot {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #3ba55c; /* Online Green */
+      border: 3px solid #18181b;
+    }
+
+    .header-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 4px;
+    }
+
+    .user-identity {
+      display: flex;
+      flex-direction: column;
     }
 
     .card-username {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       font-weight: 700;
       color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* VERIFIED BADGE */
+    .verified-badge {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 4px rgba(59, 165, 92, 0.4));
     }
 
     .card-handle {
       font-size: 0.85rem;
       color: var(--text-muted);
+      font-family: 'Fira Code', monospace; /* Monospace for handle looks techy */
+      margin-top: 2px;
     }
 
     .card-bio {
-      margin-top: 10px;
+      margin-top: 14px;
       font-size: 0.9rem;
       color: #d4d4d8;
-      line-height: 1.5;
+      line-height: 1.6;
       display: -webkit-box;
-      -webkit-line-clamp: 2; /* Limit to 2 lines */
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      margin-bottom: 12px;
+      min-height: 2.8em; /* Keeps card height consistent */
     }
 
-    /* "My Profile" Badge */
-    .my-profile-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
-      color: #fff;
+    /* Metadata (Date) */
+    .meta-info {
       font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.1);
+      color: #71717a;
+      margin-top: 12px;
       display: flex;
       align-items: center;
-      gap: 4px;
-      z-index: 5;
+      gap: 6px;
     }
 
-    .my-profile-badge i { color: var(--accent); }
-
-    /* Role Badges (Matches Profile Page) */
+    /* Badges / Roles */
     .role-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin-top: auto; /* Pushes to bottom */
+      gap: 8px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
     }
 
     .role-badge {
       display: flex;
       align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
-      border-radius: 8px;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 6px;
       font-size: 0.75rem;
-      font-weight: 500;
-      color: white;
-      text-transform: capitalize;
+      font-weight: 600;
+      color: #e4e4e7;
       background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s;
+    }
+
+    .role-badge:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-1px);
     }
 
     .role-badge img {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
       object-fit: contain;
     }
 
-    /* Loading/States */
-    .loader { text-align: center; color: var(--text-muted); margin-top: 40px; }
-    
-    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    /* Special Role Styles */
+    .role-badge.verified {
+        background: rgba(59, 165, 92, 0.1);
+        border-color: rgba(59, 165, 92, 0.3);
+        color: #4ade80;
+    }
+
+    /* My Profile Tag */
+    .me-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px var(--accent-glow);
+      z-index: 10;
+    }
+
+    /* Skeleton Loader */
+    .skeleton {
+      background: rgba(255,255,255,0.05);
+      border-radius: 24px;
+      height: 350px;
+      position: relative;
+      overflow: hidden;
+    }
+    .skeleton::after {
+      content: "";
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      transform: translateX(-100%);
+      background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.05) 20%,
+        rgba(255, 255, 255, 0.1) 60%,
+        rgba(255, 255, 255, 0)
+      );
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer { 100% { transform: translateX(100%); } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
   </style>
 </head>
 <body>
 
 <div class="container">
+  
   <div class="header-section">
-    <h1>Discover Users</h1>
-    <div class="search-wrapper">
+    <h1>Explore Users</h1>
+    <div class="subtitle">Discover <span id="userCount">0</span> community members</div>
+  </div>
+
+  <!-- Advanced Controls: Search, Filter, Sort -->
+  <div class="controls-wrapper">
+    <div class="search-container">
       <i class="ph ph-magnifying-glass search-icon"></i>
-      <input type="text" id="searchBar" placeholder="Search by username or handle...">
+      <input type="text" id="searchBar" placeholder="Search by username, handle, or bio...">
+    </div>
+
+    <div class="filter-group">
+      <!-- Sorting -->
+      <select id="sortSelect">
+        <option value="newest">Sort: Newest Joined</option>
+        <option value="oldest">Sort: Oldest Joined</option>
+        <option value="alpha">Sort: A-Z</option>
+      </select>
+
+      <!-- Filtering -->
+      <select id="roleFilter">
+        <option value="all">Filter: All Roles</option>
+        <option value="verified">Verified Only</option>
+        <option value="staff">Staff Only</option>
+      </select>
     </div>
   </div>
 
   <div id="usersList">
-    <!-- Cards injected here -->
-    <div class="loader">Loading users...</div>
+    <!-- Skeleton Loaders (Initial State) -->
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
   </div>
+
 </div>
 
 <script>
-  // -- CONFIG --
+  // -- CONFIGURATION --
   const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
   
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  let allUsers = []; // Store users locally for faster filtering if needed
+  // Global State
+  let allUsers = [];
   let currentUserSessionId = null;
 
-  // -- MAIN LOGIC --
-
+  // -- INIT --
   async function init() {
-    // 1. Get Current User Session
+    // 1. Get Session (to identify 'Me')
     const { data: { session } } = await supabaseClient.auth.getSession();
     currentUserSessionId = session?.user?.id || null;
 
-    // 2. Load Users
-    loadUsers();
+    // 2. Fetch All Public Profiles
+    await fetchUsers();
   }
 
-  async function loadUsers(searchQuery = "") {
-    const listContainer = document.getElementById("usersList");
+  // -- FETCH DATA --
+  async function fetchUsers() {
+    // Show skeletons if needed, though usually on init
     
-    // Only show loading on initial empty state or if desired
-    if(!allUsers.length && !searchQuery) {
-        listContainer.innerHTML = `<div class="loader"><i class="ph ph-spinner-gap ph-spin" style="font-size:24px"></i><br>Loading community...</div>`;
-    }
-
-    let query = supabaseClient
+    const { data, error } = await supabaseClient
       .from("profiles")
       .select("*")
-      .eq("public", true);
-
-    // Apply Search
-    if (searchQuery) {
-      query = query.ilike("username", `%${searchQuery}%`);
-    }
-
-    const { data, error } = await query;
+      .eq("public", true); // Ensure RLS allows this
 
     if (error) {
-      console.error(error);
-      listContainer.innerHTML = `<div class="loader" style="color:#ef4444">Error loading users.</div>`;
+      console.error("Error fetching users:", error);
+      document.getElementById("usersList").innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#ef4444">Failed to load users.</div>`;
       return;
     }
 
-    // -- SORTING LOGIC: Move "My Profile" to index 0 --
-    let sortedUsers = [...data];
-    if (currentUserSessionId) {
-      const myIndex = sortedUsers.findIndex(u => u.id === currentUserSessionId);
-      if (myIndex > -1) {
-        const myProfile = sortedUsers.splice(myIndex, 1)[0];
-        sortedUsers.unshift(myProfile); // Put at start
-      }
-    }
-
-    renderUsers(sortedUsers);
+    allUsers = data || [];
+    document.getElementById("userCount").innerText = allUsers.length;
+    
+    applyFiltersAndSort(); // Render initial list
   }
 
+  // -- FILTER & SORT LOGIC --
+  function applyFiltersAndSort() {
+    const searchQuery = document.getElementById("searchBar").value.toLowerCase();
+    const sortValue = document.getElementById("sortSelect").value;
+    const filterValue = document.getElementById("roleFilter").value;
+
+    let filtered = allUsers.filter(user => {
+      // Search Logic
+      const matchSearch = 
+        (user.username && user.username.toLowerCase().includes(searchQuery)) ||
+        (user.display_name && user.display_name.toLowerCase().includes(searchQuery)) ||
+        (user.bio && user.bio.toLowerCase().includes(searchQuery));
+      
+      // Role Filter Logic
+      let matchRole = true;
+      if (filterValue === 'verified') {
+        matchRole = user.roles && user.roles.includes('verified');
+      } else if (filterValue === 'staff') {
+        // Assume 'admin', 'moderator', 'owner' count as staff
+        const staffRoles = ['admin', 'moderator', 'owner', 'staff'];
+        matchRole = user.roles && user.roles.some(r => staffRoles.includes(r));
+      }
+
+      return matchSearch && matchRole;
+    });
+
+    // Sort Logic
+    filtered.sort((a, b) => {
+      // Always put Current User first if they exist in list
+      if (a.id === currentUserSessionId) return -1;
+      if (b.id === currentUserSessionId) return 1;
+
+      if (sortValue === 'newest') {
+        return new Date(b.created_at) - new Date(a.created_at);
+      } else if (sortValue === 'oldest') {
+        return new Date(a.created_at) - new Date(b.created_at);
+      } else if (sortValue === 'alpha') {
+        const nameA = a.display_name || a.username;
+        const nameB = b.display_name || b.username;
+        return nameA.localeCompare(nameB);
+      }
+      return 0;
+    });
+
+    renderUsers(filtered);
+  }
+
+  // -- RENDER --
   function renderUsers(users) {
     const container = document.getElementById("usersList");
     container.innerHTML = "";
 
     if (users.length === 0) {
-      container.innerHTML = `<div class="loader">No users found.</div>`;
+      container.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:40px;">No users found matching your criteria.</div>`;
       return;
     }
 
-    // Helper for Animation Stagger
     let delay = 0;
 
     users.forEach(user => {
-      // Data Prep
       const isMe = user.id === currentUserSessionId;
       const avatar = user.avatar || "https://cdn.discordapp.com/embed/avatars/0.png";
-      const banner = user.banner_url 
-        ? `<img class="card-banner" src="${user.banner_url}" alt="banner">`
-        : `<div class="card-banner" style="background: linear-gradient(45deg, #4f46e5, #9333ea);"></div>`;
-      const bio = user.bio || "No bio available.";
+      // Default Gradient Banner if none provided
+      const bannerUrl = user.banner_url || ""; 
+      const bannerHTML = bannerUrl 
+        ? `<img class="card-banner" src="${bannerUrl}" loading="lazy" alt="banner">`
+        : `<div class="card-banner" style="background: linear-gradient(120deg, #18181b, #27272a);"></div>`;
+
+      const displayName = escapeHtml(user.display_name || user.username);
+      const handle = escapeHtml(user.username);
+      const bio = escapeHtml(user.bio || "No bio set.");
       
-      // Role Badges Logic
+      // Date formatting
+      const joinDate = user.created_at ? new Date(user.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : 'Unknown';
+
+      // --- VERIFIED BADGE LOGIC ---
+      const isVerified = user.roles && user.roles.includes('verified');
+      const verifiedIcon = isVerified 
+        ? `<img src="/assets/verified.png" class="verified-badge" title="Verified User" alt="Verified">` 
+        : '';
+
+      // Roles HTML
       let rolesHTML = "";
       if (user.roles && user.roles.length > 0) {
-        rolesHTML = user.roles.map(r => `
-          <span class="role-badge">
+        rolesHTML = user.roles.map(r => {
+          // Check if specific role class is needed
+          const isVer = r === 'verified' ? 'verified' : '';
+          return `
+          <span class="role-badge ${isVer}">
             <img src="/assets/${r.toLowerCase()}.png" onerror="this.style.display='none'">
             ${r}
           </span>
-        `).join("");
+        `}).join("");
+      } else {
+        rolesHTML = `<span class="role-badge" style="opacity:0.5">Member</span>`;
       }
 
-      // "My Profile" Badge Logic
-      const myProfileBadge = isMe 
-        ? `<div class="my-profile-badge"><i class="ph-fill ph-user-circle"></i> My Profile</div>` 
-        : ``;
+      // Special Card Classes
+      const staffClass = (user.roles && user.roles.some(r => ['admin','owner'].includes(r))) ? 'is-staff' : '';
 
-      // Create Card Element (Anchor Tag for Clickability)
       const card = document.createElement("a");
-      card.href = `/@${user.username}`; // The link to profile
-      card.className = "user-card";
-      card.style.animationDelay = `${delay}s`; // Stagger animation
-      delay += 0.05; // Increment delay
+      card.href = `/@${user.username}`;
+      card.className = `user-card ${staffClass}`;
+      card.style.animationDelay = `${delay}s`;
+      delay += 0.05;
 
       card.innerHTML = `
-        ${myProfileBadge}
-        ${banner}
-        <img class="card-avatar" src="${avatar}" alt="${user.username}">
+        ${isMe ? '<div class="me-badge">YOU</div>' : ''}
+        ${bannerHTML}
         
-        <div class="card-body">
-          <div class="name-row">
-            <div>
-              <div class="card-username">${user.display_name || user.username}</div>
-              <div class="card-handle">@${user.username}</div>
-            </div>
+        <div class="card-content-wrapper">
+          <div class="avatar-wrapper">
+            <img class="card-avatar" src="${avatar}" alt="${handle}">
+            ${isVerified ? '<div class="status-dot"></div>' : ''}
           </div>
 
-          <div class="card-bio">${escapeHtml(bio)}</div>
+          <div class="user-identity">
+            <div class="card-username">
+              ${displayName}
+              ${verifiedIcon}
+            </div>
+            <div class="card-handle">@${handle}</div>
+          </div>
+
+          <div class="card-bio">${bio}</div>
+
+          <div class="meta-info">
+            <i class="ph ph-calendar-blank"></i> Joined ${joinDate}
+          </div>
 
           <div class="role-container">
             ${rolesHTML}
@@ -385,7 +586,7 @@
     });
   }
 
-  // Security: Prevent XSS
+  // -- UTILITIES --
   function escapeHtml(unsafe) {
     if(!unsafe) return "";
     return unsafe
@@ -396,14 +597,16 @@
       .replace(/'/g, "&#039;");
   }
 
-  // Debounce Search (Wait 300ms after typing stops to fetch)
+  // -- EVENT LISTENERS --
+  // Debounce search
   let timeoutId;
-  document.getElementById("searchBar").addEventListener("input", (e) => {
+  document.getElementById("searchBar").addEventListener("input", () => {
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      loadUsers(e.target.value.trim());
-    }, 300);
+    timeoutId = setTimeout(applyFiltersAndSort, 200);
   });
+
+  document.getElementById("sortSelect").addEventListener("change", applyFiltersAndSort);
+  document.getElementById("roleFilter").addEventListener("change", applyFiltersAndSort);
 
   // Start
   init();
