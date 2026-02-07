@@ -294,7 +294,7 @@
   document.title = `${user.username} (@${user.username}) | Profile`;
 
   // Fallback assets
-  const avatar = user.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png";
+  const avatar = user.avatar || "https://cdn.discordapp.com/embed/avatars/0.png";
   const bannerHTML = user.banner_url 
     ? `<img class="banner" src="${escapeHtml(user.banner_url)}" alt="Banner">`
     : `<div class="banner" style="background: linear-gradient(45deg, #4f46e5, #9333ea);"></div>`;
