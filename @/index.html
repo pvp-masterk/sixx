@@ -162,10 +162,20 @@
     }
 
     .username-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.verified-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1;
+}
+
 
     .username {
       font-size: 24px;
@@ -365,8 +375,14 @@
         </div>
 
         <div class="username-row">
-          <div class="username">@${escapeHtml(user.username)}</div>
-        </div>
+  <div class="username">${escapeHtml(user.username)}</div>
+  ${
+    user.roles?.includes("Verified")
+      ? `<i class="ph-fill ph-seal-check verified-icon"></i>`
+      : ""
+  }
+</div>
+
 
         <div class="badge">
           <i class="ph-fill ph-seal-check"></i>
