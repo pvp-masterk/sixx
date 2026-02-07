@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      background: #0b0b0f;
+      color: white;
+      font-family: Inter, system-ui;
+    }
+
+    .profile {
+      max-width: 420px;
+      margin: 60px auto;
+      padding: 24px;
+    }
+
+    .avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .username {
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 12px;
+    }
+
+    .verified {
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    .bio {
+      margin-top: 14px;
+      color: #c9c9c9;
+      line-height: 1.5;
+    }
+
+    .error {
+      text-align: center;
+      color: #ff6b6b;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app" class="profile">
+  <div id="loading">Loading profile…</div>
+</div>
+
+<script>
+  const supabaseClient = supabase.createClient(
+    "https://tstsijdifhgmpaszqknr.supabase.co",
+    "YOUR_PUBLIC_ANON_KEY"
+  );
+
+  const username = decodeURIComponent(
+    window.location.pathname.replace("/@", "")
+  );
+
+  async function loadProfile() {
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("username", username)
+      .eq("public", true)
+      .maybeSingle();
+
+    if (error || !data) {
+      renderError();
+      return;
+    }
+
+    renderProfile(data);
+  }
+
+  function renderProfile(user) {
+    document.getElementById("app").innerHTML = `
+      <img class="avatar" src="${user.avatar_url}" />
+      <div class="username">@${user.username}</div>
+
+      <div class="verified">
+        <span style="color:#22c55e">Verified</span>
+        <span style="color:#9ca3af"> via </span>
+        <span style="color:#5865F2;font-weight:600">Discord</span>
+      </div>
+
+      ${user.bio ? `<div class="bio">${user.bio}</div>` : ""}
+    `;
+  }
+
+  function renderError() {
+    document.getElementById("app").innerHTML = `
+      <div class="error">
+        Profile not found.<br><br>
+        Please report this error to the staff team.
+      </div>
+    `;
+  }
+
+  loadProfile();
+</script>
+
+</body>
+</html>
