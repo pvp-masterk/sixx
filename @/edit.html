@@ -142,29 +142,26 @@ console.log("Editing profile for:", username);
   const msgDiv = document.getElementById("msg");
   const form = document.getElementById("editForm");
 
-  async function loadProfile() {
-    if (!username) {
-      msgDiv.textContent = "No username provided in URL.";
-      msgDiv.className = "message error";
-      return;
-    }
+  let profileId = null;
 
-    const { data, error } = await supabaseClient
-      .from("profiles")
-      .select("*")
-      .eq("username", username)
-      .single();
+async function loadProfile() {
+  if (!username) return showError("No username in URL");
 
-    if (error || !data) {
-      msgDiv.textContent = "Profile not found.";
-      msgDiv.className = "message error";
-      return;
-    }
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("username", username)
+    .single();
 
-    avatarInput.value = data.avatar_url || "";
-    bannerInput.value = data.banner_url || "";
-    bioInput.value = data.bio || "";
-  }
+  if (error || !data) return showError("Profile not found");
+
+  profileId = data.id; // save the id for updates
+
+  avatarInput.value = data.avatar_url || "";
+  bannerInput.value = data.banner_url || "";
+  bioInput.value = data.bio || "";
+}
+
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -178,11 +175,11 @@ console.log("Editing profile for:", username);
     };
 
     const { data, error } = await supabaseClient
-      .from("profiles")
-      .update(updates)
-      .eq("username", username)
-      .select()
-      .single();
+  .from("profiles")
+  .update(updates)
+  .eq("id", profileId) // <-- use the actual row ID
+  .select()
+  .single();
 
     if (error) {
       msgDiv.textContent = "Failed to update profile.";
