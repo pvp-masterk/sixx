@@ -63,9 +63,13 @@
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
   );
 
-  const username = decodeURIComponent(
-    window.location.pathname.replace("/@", "")
-  );
+  const path = window.location.pathname;
+const username = decodeURIComponent(
+  path.startsWith("/@") ? path.slice(2).replace(/\//g, "") : ""
+);
+
+console.log("Resolved username:", username);
+
 
   async function loadProfile() {
     const { data, error } = await supabaseClient
