@@ -5,34 +5,46 @@
 <title>Edit Profile</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+<!-- 1. EXTERNAL LIBRARIES -->
 <!-- Supabase -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<!-- Phosphor Icons -->
+<!-- Phosphor Icons (For UI icons) -->
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
+/* --- CSS VARIABLES (THEME) --- */
 :root {
-  --bg-color: #09090b;
-  --card-bg: rgba(24, 24, 27, 0.7);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --accent: #5865F2;
-  --accent-hover: #4752c4;
+  --bg-dark: #09090b;
+  --card-bg: rgba(20, 20, 23, 0.65);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-focus: rgba(88, 101, 242, 0.5);
+  
+  --primary: #5865F2;          /* Discord Blurple */
+  --primary-hover: #4752c4;
+  --success: #4ade80;
+  --error: #ef4444;
+  
   --text-main: #ffffff;
   --text-muted: #a1a1aa;
-  --input-bg: rgba(0, 0, 0, 0.4);
+  
+  --radius-lg: 24px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
 }
 
-* { box-sizing: border-box; }
+/* --- RESET & BODY --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  margin: 0;
-  background-color: var(--bg-color);
-  /* Aesthetic dark gradient background */
+  background-color: var(--bg-dark);
+  /* Cool gradient background */
   background-image: 
-    radial-gradient(circle at 15% 50%, rgba(88, 101, 242, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%);
+    radial-gradient(circle at 10% 20%, rgba(88, 101, 242, 0.15), transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.10), transparent 40%);
   color: var(--text-main);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', sans-serif;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -40,67 +52,80 @@ body {
   padding: 20px;
 }
 
-/* Main Container */
+/* --- MAIN CONTAINER --- */
 .container {
   width: 100%;
-  max-width: 500px;
+  max-width: 550px;
   background: var(--card-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border-color);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
   overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
 }
 
-/* Live Preview Section */
-.profile-preview {
+/* --- PREVIEW SECTION (TOP) --- */
+.preview-area {
   position: relative;
   width: 100%;
-  margin-bottom: 60px; /* Space for avatar overlap */
+  height: 220px; /* Combined height of banner + overlap */
 }
 
-.banner-img {
+.banner-display {
   width: 100%;
   height: 160px;
   object-fit: cover;
-  background-color: #1a1a1a;
+  background-color: #18181b;
   display: block;
 }
 
 .avatar-wrapper {
   position: absolute;
-  bottom: -50px;
-  left: 24px;
-  padding: 4px;
-  background: var(--card-bg); /* Cutout effect */
+  bottom: 10px;
+  left: 30px;
+  width: 110px;
+  height: 110px;
+  padding: 5px;
+  background: rgba(20, 20, 23, 0.8); /* Matches card bg to look like cutout */
   border-radius: 50%;
+  backdrop-filter: blur(10px);
 }
 
-.avatar-img {
-  width: 100px;
-  height: 100px;
+.avatar-display {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
   background-color: #27272a;
-  border: 2px solid var(--border-color);
 }
 
-/* Form Section */
-.form-content {
-  padding: 0 24px 24px 24px;
+/* --- FORM SECTION --- */
+.form-area {
+  padding: 10px 30px 30px 30px;
 }
 
-h2 { margin: 0 0 20px 0; font-size: 1.5rem; }
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-.form-group { margin-bottom: 16px; }
+/* Input Styles */
+.input-group {
+  margin-bottom: 20px;
+  position: relative;
+}
 
-label {
+.input-group label {
   display: block;
-  margin-bottom: 6px;
-  font-size: 0.85rem;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -109,139 +134,128 @@ label {
 
 input[type="text"], textarea {
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
-  background: var(--input-bg);
+  background: rgba(0, 0, 0, 0.3);
   color: var(--text-main);
+  font-family: inherit;
   font-size: 0.95rem;
   transition: all 0.2s ease;
 }
 
 input:focus, textarea:focus {
   outline: none;
-  border-color: var(--accent);
-  background: rgba(88, 101, 242, 0.1);
+  border-color: var(--primary);
+  background: rgba(88, 101, 242, 0.05);
+  box-shadow: 0 0 0 4px rgba(88, 101, 242, 0.1);
 }
 
-textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
+textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
 
-/* Button & Loading State */
-button {
+/* --- ROLES GRID --- */
+.roles-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.role-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.role-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.role-card.active {
+  background: rgba(88, 101, 242, 0.15);
+  border-color: var(--primary);
+}
+
+/* Icons inside role card */
+.role-icon {
+  font-size: 20px;
+  color: var(--text-muted);
+}
+.role-card.active .role-icon {
+  color: var(--primary);
+}
+
+.role-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* --- BUTTONS --- */
+.action-btn {
   width: 100%;
-  padding: 14px;
-  background: var(--accent);
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--primary);
   color: white;
   font-weight: 600;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
+  font-size: 1rem;
 }
 
-button:hover { background: var(--accent-hover); }
-button:disabled { opacity: 0.7; cursor: not-allowed; }
+.action-btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.action-btn:active { transform: translateY(1px); }
+.action-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
+/* Spinner */
 .spinner {
-  width: 18px;
-  height: 18px;
-  border: 3px solid rgba(255,255,255,0.3);
-  border-radius: 50%;
+  width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
   border-top-color: #fff;
-  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
   display: none;
 }
-
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Toast Notification */
+/* --- TOAST NOTIFICATION --- */
 .toast {
   position: fixed;
-  bottom: 24px;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%) translateY(100px);
   background: #18181b;
   border: 1px solid var(--border-color);
-  color: #fff;
   padding: 12px 24px;
-  border-radius: 30px;
-  font-weight: 500;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-  opacity: 0;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 100;
-}
-.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-.toast.success i { color: #4ade80; }
-.toast.error i { color: #ef4444; }
-.roles-dropdown {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 180px;
-  overflow-y: auto;
-  padding: 8px 10px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.role-item {
+  border-radius: 50px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.role-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateX(2px);
-}
-
-.role-item img {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-  border-radius: 50%;
-}
-
-.role-item span {
-  color: white;
-  font-family: 'Inter', sans-serif;
-  font-weight: 400;
-  font-size: 0.85rem;
-  text-transform: capitalize;
-}
-
-/* Checkmark */
-.role-item::after {
-  content: "✔";
-  color: #5865F2; /* Blurple accent */
-  position: absolute;
-  right: 12px;
-  font-size: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 1000;
 }
-
-.role-item.selected::after {
-  opacity: 1;
-}
-
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.success i { color: var(--success); }
+.toast.error i { color: var(--error); }
 
 </style>
 </head>
@@ -249,266 +263,291 @@ button:disabled { opacity: 0.7; cursor: not-allowed; }
 
 <div class="container">
   
-  <!-- Visual Preview (updates live) -->
-  <div class="profile-preview">
-    <img id="bannerPreview" class="banner-img" src="https://via.placeholder.com/500x160/1a1a1a/555?text=No+Banner" alt="Banner">
+  <!-- PREVIEW SECTION -->
+  <div class="preview-area">
+    <img id="prev-banner" class="banner-display" src="" alt="Banner">
     <div class="avatar-wrapper">
-      <img id="avatarPreview" class="avatar-img" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Avatar">
+      <img id="prev-avatar" class="avatar-display" src="" alt="Avatar">
     </div>
   </div>
 
-  <div class="form-content">
-    <h2>Edit Profile</h2>
-    <form id="editForm">
+  <!-- FORM SECTION -->
+  <div class="form-area">
+    <h2><i class="ph ph-pencil-simple"></i> Edit Profile</h2>
+    
+    <form id="profileForm">
       
-      <div class="form-group">
-        <label for="avatar">Avatar URL</label>
-        <input type="text" id="avatar" placeholder="https://..." autocomplete="off">
+      <div class="input-group">
+        <label>Avatar URL</label>
+        <input type="text" id="in-avatar" placeholder="https://imgur.com/..." autocomplete="off">
       </div>
 
-      <div class="form-group">
-        <label for="banner">Banner URL</label>
-        <input type="text" id="banner" placeholder="https://..." autocomplete="off">
+      <div class="input-group">
+        <label>Banner URL</label>
+        <input type="text" id="in-banner" placeholder="https://imgur.com/..." autocomplete="off">
       </div>
 
-      <div class="form-group">
-        <label for="bio">Bio</label>
-        <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
+      <div class="input-group">
+        <label>About You</label>
+        <textarea id="in-bio" placeholder="Write something cool..."></textarea>
       </div>
-      <div class="form-group">
-  <label for="rolesSelect">Select Roles to Display</label>
-  <div id="rolesSelect" class="roles-dropdown">
-    <!-- Roles checkboxes will be dynamically inserted here -->
-  </div>
-</div>
 
+      <div class="input-group">
+        <label>Display Roles</label>
+        <div id="roles-grid" class="roles-container">
+          <!-- Roles injected by JS -->
+        </div>
+      </div>
 
-      <button type="submit" id="saveBtn">
+      <button type="submit" id="save-btn" class="action-btn">
         <div class="spinner"></div>
-        <span id="btnText">Save Changes</span>
+        <span class="btn-text">Save Changes</span>
       </button>
+
     </form>
   </div>
 </div>
 
+<!-- TOAST -->
 <div id="toast" class="toast">
-  <i class="ph-fill ph-check-circle"></i>
-  <span id="toastMsg">Message</span>
+  <i class="ph-fill ph-check-circle" style="font-size: 1.2rem;"></i>
+  <span id="toast-msg">Notification</span>
 </div>
 
 <script>
-// --- Configuration ---
-const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
+/**
+ * ==========================================
+ * 1. CONFIGURATION (EDIT THIS SECTION)
+ * ==========================================
+ */
+const CONFIG = {
+  supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co",
+  supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
+  
+  // Default Images if user inputs are empty
+  defaultAvatar: "https://cdn.discordapp.com/embed/avatars/0.png",
+  defaultBanner: "https://via.placeholder.com/600x200/18181b/333?text=No+Banner",
 
-// --- Initialization ---
-// FIX: Assigned to 'sb' instead of 'supabase' to avoid overwriting the global library
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// DOM Elements
-const els = {
-  avatarInput: document.getElementById("avatar"),
-  bannerInput: document.getElementById("banner"),
-  bioInput: document.getElementById("bio"),
-  avatarPreview: document.getElementById("avatarPreview"),
-  bannerPreview: document.getElementById("bannerPreview"),
-  form: document.getElementById("editForm"),
-  saveBtn: document.getElementById("saveBtn"),
-  spinner: document.querySelector(".spinner"),
-  btnText: document.getElementById("btnText"),
-  toast: document.getElementById("toast"),
-  toastMsg: document.getElementById("toastMsg"),
-  toastIcon: document.querySelector("#toast i")
+  // Define available roles here. 
+  // Icon can be a Phosphor icon class (e.g., 'ph-crown') or you can modify code to use images.
+  availableRoles: [
+    { id: 'Founder',   label: 'Founder',   icon: 'ph-crown' },
+    { id: 'Admin',     label: 'Admin',     icon: 'ph-shield-check' },
+    { id: 'Moderator', label: 'Moderator', icon: 'ph-gavel' },
+    { id: 'Verified',  label: 'Verified',  icon: 'ph-check-fat' },
+    { id: 'Dev',       label: 'Developer', icon: 'ph-code' },
+    { id: 'VIP',       label: 'VIP',       icon: 'ph-star' }
+  ]
 };
 
-let profileId = null;
+/**
+ * ==========================================
+ * 2. APP STATE & INITIALIZATION
+ * ==========================================
+ */
+const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+let currentProfileId = null;
 
-// --- Helper Functions ---
-function showToast(msg, type = "success") {
-  els.toastMsg.textContent = msg;
-  els.toast.className = `toast show ${type}`;
-  els.toastIcon.className = type === "success" 
-    ? "ph-fill ph-check-circle" 
-    : "ph-fill ph-warning-circle";
+// DOM Element Cache (Easy access)
+const DOM = {
+  form: document.getElementById('profileForm'),
+  inputs: {
+    avatar: document.getElementById('in-avatar'),
+    banner: document.getElementById('in-banner'),
+    bio: document.getElementById('in-bio'),
+  },
+  previews: {
+    avatar: document.getElementById('prev-avatar'),
+    banner: document.getElementById('prev-banner'),
+  },
+  rolesGrid: document.getElementById('roles-grid'),
+  btn: document.getElementById('save-btn'),
+  spinner: document.querySelector('.spinner'),
+  btnText: document.querySelector('.btn-text'),
+  toast: document.getElementById('toast'),
+  toastMsg: document.getElementById('toast-msg'),
+  toastIcon: document.querySelector('#toast i')
+};
 
-  setTimeout(() => {
-    els.toast.classList.remove("show");
-  }, 3000);
+// Start the App
+init();
+
+async function init() {
+  const username = getUsernameFromURL();
+  
+  // 1. Render the Role Selection Grid immediately (empty state)
+  renderRoleGrid([]); 
+
+  if (!username) {
+    showToast("No username found in URL (use ?username=name)", "error");
+    return;
+  }
+
+  // 2. Fetch Data
+  DOM.btnText.innerText = "Loading Profile...";
+  DOM.btn.disabled = true;
+
+  const { data, error } = await sb
+    .from("profiles")
+    .select("*")
+    .eq("username", username)
+    .maybeSingle();
+
+  DOM.btn.disabled = false;
+  DOM.btnText.innerText = "Save Changes";
+
+  if (error || !data) {
+    console.error(error);
+    showToast("Profile not found or API error.", "error");
+    return;
+  }
+
+  // 3. Populate Form
+  currentProfileId = data.id;
+  DOM.inputs.avatar.value = data.avatar || "";
+  DOM.inputs.banner.value = data.banner_url || "";
+  DOM.inputs.bio.value = data.bio || "";
+  
+  // 4. Update Previews & Selected Roles
+  updatePreviews();
+  renderRoleGrid(data.roles || []);
 }
 
-function setLoading(isLoading) {
-  if (isLoading) {
-    els.spinner.style.display = "block";
-    els.btnText.textContent = "Saving...";
-    els.saveBtn.disabled = true;
-  } else {
-    els.spinner.style.display = "none";
-    els.btnText.textContent = "Save Changes";
-    els.saveBtn.disabled = false;
-  }
-}
+/**
+ * ==========================================
+ * 3. HELPER FUNCTIONS
+ * ==========================================
+ */
 
-// --- Logic ---
-
-// 1. Determine Username (Support /@user/edit OR ?username=user)
-function getUsername() {
-  const path = window.location.pathname; 
-  const segments = path.split("/");
+// Get username from URL (supports /edit?username=abc OR /@abc/edit)
+function getUsernameFromURL() {
+  const path = window.location.pathname.split("/");
+  const pathUser = path.find(p => p.startsWith("@"));
   
-  // Try path first: /@hailtheempire/edit
-  if (segments[1] && segments[1].startsWith("@")) {
-    return segments[1].slice(1);
-  }
+  if (pathUser) return pathUser.replace("@", "");
   
-  // Fallback to query param: edit.html?username=hailtheempire
   const params = new URLSearchParams(window.location.search);
   return params.get("username");
 }
 
-const username = getUsername();
+// Render the grid of roles
+function renderRoleGrid(selectedRoles) {
+  DOM.rolesGrid.innerHTML = ""; // Clear existing
 
-// 2. Load Profile Data
-async function loadProfile() {
-  if (!username) {
-    showToast("No username found in URL", "error");
-    return;
-  }
+  CONFIG.availableRoles.forEach(role => {
+    // Create Card
+    const card = document.createElement('div');
+    card.className = `role-card ${selectedRoles.includes(role.id) ? 'active' : ''}`;
+    card.dataset.roleId = role.id;
 
-  console.log(`Fetching profile for: ${username}`);
+    // Create Icon
+    const icon = document.createElement('i');
+    icon.className = `role-icon ph-fill ${role.icon}`;
 
-  const { data: profile, error } = await sb
-    .from("profiles")
-    .select("id, avatar, banner_url, bio")
-    .eq("username", username)
-    .maybeSingle();
+    // Create Label
+    const span = document.createElement('span');
+    span.className = 'role-name';
+    span.innerText = role.label;
 
-  if (error) {
-    console.error("Supabase Error Details:", error);
-    showToast(`Error: ${error.message}`, "error");
-    return;
-  }
+    // Append
+    card.appendChild(icon);
+    card.appendChild(span);
 
-  if (!profile) {
-    showToast("Profile not found", "error");
-    return;
-  }
-// Assuming profile.roles is an array like ['Admin', 'Verified']
-if (profile.roles && profile.roles.length > 0) {
-  profile.roles.forEach(r => {
-    const checkbox = document.querySelector(`#role_${r.toLowerCase()}`);
-    if (checkbox) checkbox.checked = true;
+    // Click Event to Toggle
+    card.addEventListener('click', () => {
+      card.classList.toggle('active');
+    });
+
+    DOM.rolesGrid.appendChild(card);
   });
 }
 
-  // Populate Data
-  profileId = profile.id;
-  els.avatarInput.value = profile.avatar || "";
-  els.bannerInput.value = profile.banner_url || "";
-  els.bioInput.value = profile.bio || "";
-
-  // Trigger preview updates
-  updatePreviews();
-}
-
-// 3. Live Previews
+// Update images based on inputs
 function updatePreviews() {
-  const avVal = els.avatarInput.value.trim();
-  const bnVal = els.bannerInput.value.trim();
-  
-  els.avatarPreview.src = avVal || "https://cdn.discordapp.com/embed/avatars/0.png";
-  els.bannerPreview.src = bnVal || "https://via.placeholder.com/500x160/1a1a1a/555?text=No+Banner";
+  const av = DOM.inputs.avatar.value.trim();
+  const ban = DOM.inputs.banner.value.trim();
+
+  DOM.previews.avatar.src = av || CONFIG.defaultAvatar;
+  DOM.previews.banner.src = ban || CONFIG.defaultBanner;
 }
 
-els.avatarInput.addEventListener("input", updatePreviews);
-els.bannerInput.addEventListener("input", updatePreviews);
+// Handle Loading State UI
+function setLoading(isLoading) {
+  if (isLoading) {
+    DOM.spinner.style.display = "block";
+    DOM.btnText.style.display = "none";
+    DOM.btn.disabled = true;
+  } else {
+    DOM.spinner.style.display = "none";
+    DOM.btnText.style.display = "block";
+    DOM.btn.disabled = false;
+  }
+}
 
-// 4. Save Changes
-els.form.addEventListener("submit", async (e) => {
+// Toast Notification System
+function showToast(msg, type = "success") {
+  DOM.toastMsg.innerText = msg;
+  DOM.toast.className = `toast show ${type}`;
+  
+  // Icon handling
+  if(type === 'success') DOM.toastIcon.className = "ph-fill ph-check-circle";
+  else DOM.toastIcon.className = "ph-fill ph-warning-circle";
+
+  // Hide after 3s
+  setTimeout(() => {
+    DOM.toast.classList.remove("show");
+  }, 3000);
+}
+
+/**
+ * ==========================================
+ * 4. EVENT LISTENERS
+ * ==========================================
+ */
+
+// Live Preview Update
+DOM.inputs.avatar.addEventListener('input', updatePreviews);
+DOM.inputs.banner.addEventListener('input', updatePreviews);
+
+// Form Submit
+DOM.form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (!profileId) {
-    showToast("Cannot save: No profile loaded", "error");
+
+  if (!currentProfileId) {
+    showToast("Error: No profile loaded.", "error");
     return;
   }
 
   setLoading(true);
 
-  const selectedRoles = getSelectedRoles();
+  // 1. Gather Data
+  // Select all active role cards and map to their ID
+  const activeRoles = Array.from(document.querySelectorAll('.role-card.active'))
+                           .map(el => el.dataset.roleId);
 
-const updates = {
-  avatar: els.avatarInput.value.trim() || null,
-  banner_url: els.bannerInput.value.trim() || null,
-  bio: els.bioInput.value.trim() || null,
-  roles: selectedRoles, // <-- save selected roles
-  updated_at: new Date().toISOString()
-};
+  const updates = {
+    avatar: DOM.inputs.avatar.value.trim() || null,
+    banner_url: DOM.inputs.banner.value.trim() || null,
+    bio: DOM.inputs.bio.value.trim() || null,
+    roles: activeRoles,
+    updated_at: new Date().toISOString()
+  };
 
-
-
+  // 2. Send to Supabase
   const { error } = await sb
     .from("profiles")
     .update(updates)
-    .eq("id", profileId);
+    .eq("id", currentProfileId);
 
   setLoading(false);
 
   if (error) {
-    console.error(error);
-    showToast("Failed to save changes", "error");
+    console.error("Save Error:", error);
+    showToast("Failed to save changes.", "error");
   } else {
     showToast("Profile updated successfully!");
   }
 });
-const availableRoles = [
-  { name: "Founder", icon: "founder.png" },
-  { name: "Admin", icon: "admin.png" },
-  { name: "Moderator", icon: "moderator.png" },
-  { name: "Verified", icon: "verified.png" }
-];
-
-const rolesSelect = document.getElementById("rolesSelect");
-
-// Build role items
-availableRoles.forEach(role => {
-  const div = document.createElement("div");
-  div.className = "role-item";
-  div.dataset.role = role.name;
-
-  const img = document.createElement("img");
-  img.src = `/assets/${role.icon}`;
-  img.alt = role.name;
-
-  const span = document.createElement("span");
-  span.textContent = role.name;
-
-  div.appendChild(img);
-  div.appendChild(span);
-
-  // Toggle selected state on click
-  div.addEventListener("click", () => {
-    div.classList.toggle("selected");
-  });
-
-  rolesSelect.appendChild(div);
-});
-
-// Pre-select roles from user profile
-function preselectRoles(userRoles) {
-  if (!userRoles) return;
-  userRoles.forEach(r => {
-    const el = rolesSelect.querySelector(`.role-item[data-role="${r}"]`);
-    if (el) el.classList.add("selected");
-  });
-}
-
-// On form submit, gather selected roles
-function getSelectedRoles() {
-  return Array.from(rolesSelect.querySelectorAll(".role-item.selected"))
-    .map(el => el.dataset.role);
-}
-
-
-// Initialize
-loadProfile();
 
 </script>
 </body>
