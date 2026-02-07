@@ -365,17 +365,17 @@ textarea {
       
       <div class="input-group">
         <label>Avatar URL</label>
-        <input type="text" id="in-avatar" placeholder="https://imgur.com/..." autocomplete="off">
+        <input type="text" id="in-avatar" placeholder="https://..." autocomplete="off">
       </div>
 
       <div class="input-group">
         <label>Banner URL</label>
-        <input type="text" id="in-banner" placeholder="https://imgur.com/..." autocomplete="off">
+        <input type="text" id="in-banner" placeholder="https://..." autocomplete="off">
       </div>
 
       <div class="input-group">
         <label>About You</label>
-        <textarea id="in-bio" placeholder="System directives..."></textarea>
+        <textarea id="in-bio" placeholder="Write about yourself here"></textarea>
       </div>
 
       <div class="input-group">
@@ -482,7 +482,7 @@ async function init() {
     .maybeSingle();
 
   DOM.btn.disabled = false;
-  DOM.btnText.innerText = "Execute Changes";
+  DOM.btnText.innerText = "Save Changes";
 
   if (error || !data) {
     console.error(error);
