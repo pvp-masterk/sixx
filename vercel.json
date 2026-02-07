@@ -5,6 +5,10 @@
       "destination": "/@/index.html"
     },
     {
+      "source": "/@:username/edit",
+      "destination": "/@/edit.html"
+    },
+    {
       "source": "/:path*",
       "destination": "/:path*.html"
     }
