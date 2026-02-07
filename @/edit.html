@@ -125,11 +125,16 @@
   
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // Get username from URL
-  const path = window.location.pathname;
-  const username = decodeURIComponent(
-    path.startsWith("/@") ? path.slice(2).replace(/\//g, "") : ""
-  );
+ // Parse username from URL
+const path = window.location.pathname;
+const segments = path.split("/");
+let username = "";
+if (segments[1] && segments[1].startsWith("@")) {
+  username = segments[1].slice(1);
+}
+
+console.log("Editing profile for:", username);
+
 
   const avatarInput = document.getElementById("avatar");
   const bannerInput = document.getElementById("banner");
