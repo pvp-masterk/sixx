@@ -176,10 +176,16 @@ async function loadProfile() {
 
     const { data, error } = await supabaseClient
   .from("profiles")
-  .update(updates)
-  .eq("id", profileId) // <-- use the actual row ID
+  .update({
+    avatar_url: avatarInput.value || null,
+    banner_url: bannerInput.value || null,
+    bio: bioInput.value || null,
+    updated_at: new Date().toISOString()
+  })
+  .eq("id", profileId)  // use the row's id
   .select()
   .single();
+
 
     if (error) {
       msgDiv.textContent = "Failed to update profile.";
