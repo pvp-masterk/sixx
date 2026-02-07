@@ -520,6 +520,7 @@
     renderSkeletons(6); // Show 6 skeletons immediately
     await fetchUsers();
     setupEventListeners();
+    setupDropdown("sortDropdown", applyFiltersAndSort);
   });
 
   // -- DATA FETCHING --
@@ -554,7 +555,7 @@
   // -- LOGIC: FILTER & SORT --
   function applyFiltersAndSort() {
     const searchQuery = document.getElementById("searchBar").value.toLowerCase();
-    const sortValue = document.getElementById("sortSelect").value;
+    const sortValue = document.getElementById("sortDropdown").dataset.value;
     const filterValue = document.getElementById("roleFilter").value;
 
     // 1. Filter
