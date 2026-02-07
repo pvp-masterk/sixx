@@ -1,5 +1,3 @@
-<!-- Paste your updated HTML/JS here. I will modify it based on your request. -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,835 +5,479 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>/six - Profile</title>
 
+<!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Supabase -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
 <style>
 :root {
   --primary: #7b2cbf;
   --primary-dark: #5a189a;
   --primary-light: rgba(123, 44, 191, 0.1);
   --secondary: #9d4edd;
-  --secondary-dark: #7b2cbf;
   --text: #e8e6f3;
-  --text-light: rgba(232, 230, 243, 0.7);
+  --text-muted: #a1a1aa;
   --bg: #050006;
-  --bg-dark: #030003;
-  --card-bg: rgba(40, 15, 70, 0.34);
-  --card-hover: rgba(60, 25, 90, 0.4);
-  --accent: #ff4081;
-  --accent-hover: #ff79a8;
-  --header-height: 80px;
-  --transition-fast: 0.2s ease;
-  --transition-medium: 0.3s ease;
-  --transition-slow: 0.5s ease;
+  --card-bg: rgba(20, 10, 30, 0.6);
+  --border: rgba(255, 255, 255, 0.08);
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Inter', sans-serif;
   background-color: var(--bg);
   color: var(--text);
-  overflow-x: hidden;
   min-height: 100vh;
-  padding-top: var(--header-height);
-}
-
-/* Background glow */
-.bg-layer {
-  position: fixed;
-  inset: -10%;
-  filter: blur(28px);
-  mix-blend-mode: screen;
-  opacity: 0.8;
-  pointer-events: none;
-}
-.bg-layer.one {
-  background: radial-gradient(closest-side at 10% 20%, #2d004f 0%, transparent 35%), 
-              radial-gradient(closest-side at 80% 80%, #45003b 0%, transparent 30%);
-}
-.bg-layer.two {
-  background: linear-gradient(120deg, rgba(100,0,150,0.22), rgba(60,0,100,0.22));
-}
-
-/* Header */
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: var(--header-height);
-  padding: 0 5%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 1000;
-  background: rgba(5, 0, 6, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: all var(--transition-medium);
-  box-shadow: 0 2px 30px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(150, 80, 220, 0.1);
-}
-
-header.scrolled {
-  height: 70px;
-  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
-}
-
-.logo {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--text);
-  text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 12px;
-  transition: transform var(--transition-fast);
-}
-
-.logo:hover {
-  transform: translateX(3px);
-}
-
-.logo i {
-  color: var(--primary);
-  font-size: 28px;
-  transition: transform var(--transition-medium);
-}
-
-.logo:hover i {
-  transform: rotate(15deg);
-}
-
-.nav-links {
-  display: flex;
-  gap: 25px;
-  height: 100%;
-}
-
-.nav-links a {
-  color: var(--text-light);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 16px;
-  position: relative;
-  transition: all var(--transition-fast);
-  height: 100%;
-  display: flex;
-  align-items: center;
-  padding: 0 5px;
-}
-
-.nav-links a:hover {
-  color: var(--text);
-}
-
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 3px;
-  background: var(--primary);
-  transition: width var(--transition-medium);
-  border-radius: 3px 3px 0 0;
-}
-
-.nav-links a:hover::after {
-  width: 100%;
-}
-
-.nav-links a.active {
-  color: var(--text);
-}
-
-.nav-links a.active::after {
-  width: 100%;
-}
-
-/* Profile Card */
-.profile-container {
-  max-width: 500px;
-  margin: 30px auto;
-  background: var(--card-bg);
-  border-radius: 20px;
-  padding: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  text-align: center;
-  animation: fadeInUp 0.6s ease both;
-  transition: all var(--transition-medium);
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(150, 80, 220, 0.15);
-  will-change: transform;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.profile-container::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity var(--transition-medium);
-  z-index: 0;
-}
-
-.profile-container:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-}
-
-.profile-container:hover::before {
-  opacity: 0.6;
-}
-
-.profile-avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 3px solid var(--primary);
-  object-fit: cover;
-  margin-bottom: 20px;
-  transition: all var(--transition-medium);
-  position: relative;
-  z-index: 2;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  align-self: center;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.profile-avatar:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(123, 44, 191, 0.4);
-}
-
-.profile-name {
-  font-size: 24px;
-  font-weight: 800;
-  margin-bottom: 5px;
-  position: relative;
-  z-index: 2;
-  display: inline-block;
-  padding: 0 5px;
-  color: #e0aaff;
-}
-
-.profile-id {
-  font-size: 18px;
-  color: var(--text-light);
-  margin-bottom: 10px;
-  position: relative;
-  z-index: 2;
-}
-
-/* Stats Section */
-.stats-container {
-  display: flex;
-  justify-content: space-between;
-  margin: 25px 0;
-  position: relative;
-  z-index: 2;
-  width: 100%;
-}
-
-.stat-item {
-  text-align: center;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  padding: 10px 15px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.stat-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-3px);
-}
-
-.stat-value {
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--primary);
-}
-
-.stat-label {
-  font-size: 13px;
-  color: var(--text-light);
-  margin-top: 3px;
-}
-
-/* Info sections */
-.info-section {
-  margin-top: 24px;
-  text-align: left;
-  border-top: 1px solid rgba(150,80,220,0.15);
-  padding-top: 18px;
-  width: 100%;
-  position: relative;
-  z-index: 2;
-}
-
-.section-title {
-  font-weight: 700;
-  font-size: 1rem;
-  color: #d0b4ff;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 0.9rem;
-}
-
-.info-label {
-  color: #b8a6ff;
-  opacity: 0.8;
-}
-
-.info-value {
-  color: #e0d5ff;
-  font-weight: 500;
-}
-
-/* Badges Section */
-.badge-box {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 20px;
-  border-radius: 16px;
-  margin-top: 25px;
-  max-width: 100%;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  z-index: 2;
-  transition: all var(--transition-medium);
-  width: 100%;
-}
-
-.badge-box:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-3px);
-}
-
-.badge-container {
-  display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 15px;
-  transition: all var(--transition-medium);
+  padding: 20px;
+  overflow-x: hidden;
 }
 
-.badge-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.badge-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  transition: all var(--transition-fast);
-  object-fit: contain;
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.badge-icon:hover {
-  transform: scale(1.15) rotate(5deg);
-}
-
-.badge-icon.glow {
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  animation: pulseGlow 2s infinite alternate;
-}
-
-.badge-tooltip {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(30, 30, 46, 0.95);
-  color: var(--text);
-  padding: 10px 15px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 400;
-  white-space: nowrap;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
-  opacity: 0;
-  pointer-events: none;
-  transition: all var(--transition-fast);
-  width: max-content;
-  max-width: 250px;
-  z-index: 10;
-  text-align: center;
-  line-height: 1.4;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.badge-wrapper:hover .badge-tooltip {
-  opacity: 1;
-  bottom: calc(100% + 15px);
-}
-
-.badge-tooltip strong {
-  font-weight: 700;
-  color: var(--secondary);
-  display: block;
-  margin-bottom: 5px;
-}
-
-.badge-tooltip span {
-  display: block;
-  font-weight: 400;
-  color: #aaa;
-}
-
-.badge-tooltip span:last-child {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  margin-top: 5px;
-}
-
-@keyframes rainbowGlow {
-  0% {
-    box-shadow: 0 0 8px #ff0000, 0 0 16px #ff9900;
-    border-color: #ff0000;
-  }
-  25% {
-    box-shadow: 0 0 8px #ff9900, 0 0 16px #ffff00;
-    border-color: #ff9900;
-  }
-  50% {
-    box-shadow: 0 0 8px #33ff00, 0 0 16px #00ffff;
-    border-color: #33ff00;
-  }
-  75% {
-    box-shadow: 0 0 8px #0066ff, 0 0 16px #9900ff;
-    border-color: #0066ff;
-  }
-  100% {
-    box-shadow: 0 0 8px #ff00aa, 0 0 16px #ff0000;
-    border-color: #ff00aa;
-  }
-}
-
-.badge-icon.rainbow {
-  animation: rainbowGlow 3s infinite ease-in-out;
-}
-
-@keyframes pulseGlow {
-  from { box-shadow: 0 0 5px rgba(255, 255, 255, 0.3); }
-  to { box-shadow: 0 0 15px rgba(255, 255, 255, 0.7); }
-}
-
-/* Logout Button */
-.logout-btn {
-  margin-top: 24px;
-  width: 100%;
-  padding: 12px 0;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 6px 14px rgba(90,24,154,0.26);
-  transition: all var(--transition-medium);
-  position: relative;
-  z-index: 2;
-  font-size: 16px;
-}
-
-.logout-btn:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(90deg, var(--secondary), var(--secondary-dark));
-  box-shadow: 0 8px 20px rgba(123, 44, 191, 0.4);
-}
-
-/* Loading state */
-.loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.loading-buffer {
+/* Background Effects */
+.bg-glow {
   position: fixed;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(123, 44, 191, 0.15) 0%, transparent 70%);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  text-align: center;
-  color: var(--text);
-  z-index: 9999;
-  background: rgba(5, 0, 6, 0.9);
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  backdrop-filter: blur(5px);
+  z-index: -1;
+  pointer-events: none;
 }
 
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid var(--primary);
-  border-top: 4px solid transparent;
+/* Profile Card */
+.profile-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 40px 30px;
+  text-align: center;
+  position: relative;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  animation: slideUp 0.6s ease-out;
+}
+
+/* --- EDIT BUTTON (New Addition) --- */
+.edit-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex; /* Hidden by default via JS if not owner */
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  z-index: 10;
+}
+
+.edit-btn:hover {
+  background: rgba(123, 44, 191, 0.2);
+  color: #fff;
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(123, 44, 191, 0.2);
+}
+
+/* Avatar */
+.avatar-wrapper {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 20px;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  margin: 0 auto 20px auto;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.1);
+  background: #1a1a1a;
+  transition: var(--transition);
+}
+
+.avatar-wrapper:hover .avatar-img {
+  border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(123, 44, 191, 0.3);
+}
+
+/* Text Info */
+.user-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.user-tag {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+.user-tag:hover { color: var(--primary); }
+.user-tag i { font-size: 0.8rem; opacity: 0.7; }
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 25px 0;
+  padding: 15px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-box {
+  padding: 5px;
+}
+
+.stat-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  display: block;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Badges */
+.badges-section {
+  text-align: left;
+  margin-top: 20px;
+}
+
+.section-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.badges-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.badge {
+  width: 32px;
+  height: 32px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: var(--transition);
+}
+.badge img { width: 20px; height: 20px; object-fit: contain; }
+
+/* Tooltip for Badge */
+.badge::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-5px);
+  background: #000;
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s;
+  border: 1px solid #333;
+}
+.badge:hover { background: rgba(255,255,255,0.1); transform: translateY(-3px); }
+.badge:hover::after { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+
+/* Buttons */
+.logout-btn {
+  margin-top: 30px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  box-shadow: 0 5px 20px rgba(239, 68, 68, 0.15);
+}
+
+/* Loading Overlay */
+.loader-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  z-index: 50;
+  transition: opacity 0.5s;
+}
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: var(--primary);
+  border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-@keyframes fadeInUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(30px);
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0);
-  }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@media (max-width: 768px) {
-  .profile-container {
-    margin: 20px 15px;
-    padding: 25px;
-  }
-  
-  .nav-links {
-    gap: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  header {
-    padding: 0 20px;
-  }
-  
-  .logo {
-    font-size: 20px;
-  }
-  
-  .nav-links {
-    gap: 12px;
-  }
-  
-  .nav-links a {
-    font-size: 14px;
-  }
-  
-  .profile-avatar {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .stats-container {
-    gap: 20px;
-  }
-}
+/* Utility: Hidden class */
+.hidden { display: none !important; }
 </style>
 </head>
 <body>
-  <!-- Glowing BG -->
-  <div class="bg-layer one"></div>
-  <div class="bg-layer two"></div>
 
-  
+<div class="bg-glow"></div>
 
-  <div id="loading-buffer" class="loading-buffer">
+<div class="profile-card">
+  <!-- Loading State -->
+  <div id="loader" class="loader-overlay">
     <div class="spinner"></div>
-    <p>Loading Profile Data...</p>
   </div>
 
-  <div class="profile-container">
-    <img id="avatar" class="profile-avatar" src="" alt="User Avatar">
-    <div id="name" class="profile-name">Loading...</div>
-    <div id="user-id" class="profile-id"></div>
-    
-    <!-- Stats Section -->
-    <div class="stats-container">
-      <div class="stat-item">
-        <div class="stat-value" id="likes-count">0</div>
-        <div class="stat-label">Likes</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="followers-count">0</div>
-        <div class="stat-label">Followers</div>
-      </div>
-    </div>
-    
-    <!-- Account Info Section -->
-    <div class="info-section">
-      <div class="section-title">Account Information</div>
-      <div class="info-item">
-        <span class="info-label">Discord ID</span>
-        <span class="info-value" id="discord-id">Not connected</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Account Created</span>
-        <span class="info-value" id="account-created">Loading...</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Last Login</span>
-        <span class="info-value" id="last-login">Loading...</span>
-      </div>
-    </div>
-    
-    <!-- Badges Section -->
-    <div class="badge-box">
-      <h4>Badges</h4>
-      <div id="badges-container" class="badge-container">
-        <!-- Badges will be dynamically added here -->
-      </div>
-    </div>
-    
-    <button id="logout" class="logout-btn">Logout</button>
+  <!-- EDIT BUTTON (Positioned Top Right) -->
+  <a id="edit-btn" href="#" class="edit-btn hidden" title="Edit Profile">
+    <i class="fa-solid fa-pen"></i>
+  </a>
+
+  <!-- Avatar -->
+  <div class="avatar-wrapper">
+    <img id="avatar" class="avatar-img" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Avatar">
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Info -->
+  <h1 id="name" class="user-name">...</h1>
+  <div class="user-tag" onclick="copyId()" title="Click to Copy ID">
+    @<span id="username-display">...</span>
+    <i class="fa-regular fa-copy"></i>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <span class="stat-val">0</span>
+      <span class="stat-label">Likes</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-val">0</span>
+      <span class="stat-label">Views</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-val" id="join-date">-</span>
+      <span class="stat-label">Joined</span>
+    </div>
+  </div>
+
+  <!-- Badges -->
+  <div class="badges-section">
+    <span class="section-label">ACHIEVEMENTS / ROLES</span>
+    <div id="badges-container" class="badges-container">
+      <!-- Badges injected via JS -->
+    </div>
+  </div>
+
+  <button onclick="logout()" class="logout-btn">
+    <i class="fa-solid fa-power-off"></i> Logout
+  </button>
+</div>
+
 <script>
-  /* --- Username routing patch added --- */
-  const pathParts = window.location.pathname.split("/").filter(Boolean);
-  let usernameFromURL = null;
-  if (pathParts[0] === "user" && pathParts[1]) {
-    usernameFromURL = decodeURIComponent(pathParts[1]);
-  }
+// --- CONFIGURATION ---
+const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
 
-  const sb = supabase.createClient(="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const sb = supabase.createClient(
-    "https://tstsijdifhgmpaszqknr.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
-  );
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  /* -------------------------------------------------------------------------- */
-  /*                               BADGE DEFINITIONS                             */
-  /* -------------------------------------------------------------------------- */
+// DOM Elements
+const els = {
+  loader: document.getElementById('loader'),
+  editBtn: document.getElementById('edit-btn'),
+  avatar: document.getElementById('avatar'),
+  name: document.getElementById('name'),
+  username: document.getElementById('username-display'),
+  joinDate: document.getElementById('join-date'),
+  badges: document.getElementById('badges-container')
+};
 
-  const badgeMap = {
-    vsi: { name: "VSI", icon: "https://cdn3.emoji.gg/emojis/2139-level-5.png", description: "VSI Rank - Basic membership level", rarity: "Uncommon", glow: false },
-    vsn: { name: "VSN", icon: "https://cdn3.emoji.gg/emojis/7463-level-20.png", description: "VSN Rank - Intermediate membership level", rarity: "Uncommon", glow: false },
-    vsg: { name: "VSG", icon: "https://cdn3.emoji.gg/emojis/3731-level-40.png", description: "VSG Rank - Advanced membership level", rarity: "Rare", glow: true },
-    vsultra: { name: "VS Ultra", icon: "https://cdn3.emoji.gg/emojis/6336-level-30.png", description: "VS Ultra Rank - Elite membership level", rarity: "Epic", glow: true },
-    vsplus: { name: "VS+", icon: "https://cdn3.emoji.gg/emojis/9034-member.png", description: "VS+ Rank - Premium membership level", rarity: "Epic", glow: true },
-    vsplusplus: { name: "VS++", icon: "https://cdn3.emoji.gg/emojis/5717-level-10.png", description: "VS++ Rank - VIP membership level", rarity: "Epic", glow: true },
-    vs: { name: "VS", icon: "https://cdn3.emoji.gg/emojis/4185-staff-team.png", description: "VS Rank - Highest membership level", rarity: "Legendary", glow: true },
-    early: { name: "Early User", icon: "https://cdn3.emoji.gg/emojis/7549-member.png", description: "Joined in the first week of /six", rarity: "Rare", glow: false },
-    staff: { name: "Staff", icon: "https://cdn3.emoji.gg/emojis/1415-moderator.png", description: "Official /six Staff Member", rarity: "Epic", glow: true },
-    verified: { name: "Verified", icon: "https://cdn3.emoji.gg/emojis/74424-partner.png", description: "Verified /six User", rarity: "Uncommon", glow: false },
-    dev: { name: "Developer", icon: "https://cdn3.emoji.gg/emojis/1166-partner.png", description: "/six Platform Developer", rarity: "Epic", glow: true },
-    owner: { name: "Founder & Owner", icon: "https://cdn3.emoji.gg/emojis/8259-owner.png", description: "The original founder of /six", rarity: "Legendary", glow: true },
+// --- LOGIC ---
 
-    /* AUTO DISCORD BADGES */
-    partner: { name: "Discord Partner", icon: "https://cdn3.emoji.gg/emojis/partner.png", description: "Official Discord Partner", rarity: "Legendary", glow: true },
-    hypesquad_events: { name: "HypeSquad Events", icon: "https://cdn3.emoji.gg/emojis/hypesquad.png", description: "Hypesquad Event Member", rarity: "Epic", glow: true },
-    hypesquad_bravery: { name: "HypeSquad Bravery", icon: "https://cdn3.emoji.gg/emojis/bravery.png", description: "House of Bravery", rarity: "Rare", glow: false },
-    hypesquad_brilliance: { name: "HypeSquad Brilliance", icon: "https://cdn3.emoji.gg/emojis/brilliance.png", description: "House of Brilliance", rarity: "Rare", glow: false },
-    hypesquad_balance: { name: "HypeSquad Balance", icon: "https://cdn3.emoji.gg/emojis/balance.png", description: "House of Balance", rarity: "Rare", glow: false },
-    bughunter_level_1: { name: "Bug Hunter", icon: "https://cdn3.emoji.gg/emojis/bughunter.png", description: "Discord Bug Hunter", rarity: "Epic", glow: true },
-    bughunter_level_2: { name: "Bug Hunter Level 2", icon: "https://cdn3.emoji.gg/emojis/bug2.png", description: "Discord Bug Buster", rarity: "Legendary", glow: true },
-    staff_badge: { name: "Discord Staff", icon: "https://cdn3.emoji.gg/emojis/staff.png", description: "Discord Staff Member", rarity: "Legendary", glow: true },
-    active_developer: { name: "Active Developer", icon: "https://cdn3.emoji.gg/emojis/activedev.png", description: "Active Discord Developer", rarity: "Epic", glow: true },
-    early_supporter: { name: "Early Supporter", icon: "https://cdn3.emoji.gg/emojis/early.png", description: "Early Discord Supporter", rarity: "Epic", glow: true }
-  };
-
-  /* -------------------------------------------------------------------------- */
-  /*                           AUTO DISCORD BADGE SYSTEM                         */
-  /* -------------------------------------------------------------------------- */
-
-  const discordFlagBadges = {
-    [1 << 0]: "staff_badge",
-    [1 << 1]: "partner",
-    [1 << 2]: "hypesquad_events",
-    [1 << 3]: "bughunter_level_1",
-    [1 << 6]: "hypesquad_bravery",
-    [1 << 7]: "hypesquad_brilliance",
-    [1 << 8]: "hypesquad_balance",
-    [1 << 9]: "early_supporter",
-    [1 << 14]: "bughunter_level_2",
-    [1 << 17]: "active_developer"
-  };
-
-  async function getDiscordFlags(user) {
-    if (!user.user_metadata.provider_token) return null;
-
-    const res = await fetch("https://discord.com/api/v10/users/@me", {
-      headers: { Authorization: `Bearer ${user.user_metadata.provider_token}` }
-    });
-
-    if (!res.ok) return null;
-    return await res.json();
-  }
-
-  function convertDiscordFlags(flags) {
-    const badgeKeys = [];
-    for (const [flag, badgeKey] of Object.entries(discordFlagBadges)) {
-      if (flags & Number(flag)) badgeKeys.push(badgeKey);
-    }
-    return badgeKeys;
-  }
-
-  function displayAutoBadges(badgeKeys) {
-    const container = document.getElementById("badges-container");
-    container.innerHTML = "";
-
-    if (badgeKeys.length === 0) return;
-
-    badgeKeys.forEach(key => {
-      const badge = badgeMap[key];
-      if (!badge) return;
-
-      const wrapper = document.createElement("div");
-      wrapper.className = "badge-wrapper";
-
-      const img = document.createElement("img");
-      img.src = badge.icon;
-      img.alt = badge.name;
-      img.className = "badge-icon";
-
-      if (badge.glow) img.classList.add("glow");
-      if (badge.rarity === "Legendary") img.classList.add("rainbow");
-
-      const tooltip = document.createElement("div");
-      tooltip.className = "badge-tooltip";
-      tooltip.innerHTML = `<strong>${badge.name}</strong><span>${badge.description}</span><span>${badge.rarity} Badge</span>`;
-
-      wrapper.appendChild(img);
-      wrapper.appendChild(tooltip);
-      container.appendChild(wrapper);
-    });
-  }
-
-  /* -------------------------------------------------------------------------- */
-  /*                          MANUAL BADGE SYSTEM (KEPT)                         */
-  /* -------------------------------------------------------------------------- */
-
-  const manualBadges = {
-    "5a062d5d-f7f3-4401-902a-003e81e4eda9": [
-      { key: "owner", order: 1 },
-      { key: "dev", order: 2 },
-      { key: "verified", order: 3 }
-    ]
-  };
-
-  function displayUserBadges(userId) {
-    const container = document.getElementById("badges-container");
-
-    const userBadges = manualBadges[userId] || [];
-    if (userBadges.length === 0) return;
-
-    userBadges.sort((a, b) => a.order - b.order).forEach(b => {
-      const badge = badgeMap[b.key];
-      if (!badge) return;
-
-      const wrapper = document.createElement("div");
-      wrapper.className = "badge-wrapper";
-
-      const img = document.createElement("img");
-      img.src = badge.icon;
-      img.alt = badge.name;
-      img.className = "badge-icon";
-
-      if (badge.glow) img.classList.add("glow");
-      if (badge.rarity === "Legendary") img.classList.add("rainbow");
-
-      const tooltip = document.createElement("div");
-      tooltip.className = "badge-tooltip";
-      tooltip.innerHTML = `<strong>${badge.name}</strong><span>${badge.description}</span><span>${badge.rarity} Badge</span>`;
-
-      wrapper.appendChild(img);
-      wrapper.appendChild(tooltip);
-      container.appendChild(wrapper);
-    });
-  }
-
-  /* -------------------------------------------------------------------------- */
-  /*                               PROFILE LOADER                                */
-  /* -------------------------------------------------------------------------- */
-
-  async function loadProfile() {
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) return (window.location.href = "/");
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const viewId = urlParams.get("id");
-    const user = session.user;
-    const targetId = viewId || user.id;
-
-    const isOwnProfile = targetId === user.id;
-    document.getElementById("edit-profile").style.display = isOwnProfile ? "block" : "none";
-
-    let profileUser = user;
-    if (viewId) {
-      const result = await sb.auth.admin.getUserById(targetId);
-      profileUser = result.data.user;
-    }
-
-    document.getElementById("avatar").src = profileUser.user_metadata.avatar_url || "";
-    document.getElementById("name").textContent = profileUser.user_metadata.full_name || "Unknown User";
-    document.getElementById("user-id").textContent = profileUser.id;
-
-    const discordId = profileUser.user_metadata.provider_id;
-    document.getElementById("discord-id").textContent = discordId || "Not connected";
-
-    document.getElementById("account-created").textContent = new Date(profileUser.created_at).toLocaleDateString();
-    document.getElementById("last-login").textContent = new Date(profileUser.last_sign_in_at).toLocaleDateString();
-
-    if (!viewId) {
-      const discordData = await getDiscordFlags(profileUser);
-      if (discordData && discordData.flags !== undefined) {
-        const autoKeys = convertDiscordFlags(discordData.flags);
-        displayAutoBadges(autoKeys);
-      }
-    }
-
-    displayUserBadges(profileUser.id);
-
-    document.getElementById("loading-buffer").style.display = "none";
-  }
-
-  async function logout() {
-    await sb.auth.signOut();
+async function initProfile() {
+  // 1. Check Authentication
+  const { data: { session } } = await sb.auth.getSession();
+  
+  // If not logged in, redirect to login page (adjust '/' to your login path)
+  if (!session) {
     window.location.href = "/";
+    return;
   }
 
-  document.getElementById("logout").addEventListener("click", logout);
-  document.addEventListener("DOMContentLoaded", loadProfile);
+  const currentUser = session.user;
+  
+  // 2. Determine who we are viewing
+  // URL Pattern: /profile.html?username=abc OR /@abc
+  let targetUsername = getUsernameFromUrl();
+  let isOwnProfile = false;
+
+  // If no username in URL, we view our own profile
+  if (!targetUsername) {
+    // We need to fetch our own username from DB because auth.user doesn't usually store the custom username
+    const { data: myProfile } = await sb.from('profiles').select('username').eq('id', currentUser.id).single();
+    if(myProfile) targetUsername = myProfile.username;
+    isOwnProfile = true;
+  } 
+
+  console.log("Viewing:", targetUsername);
+
+  // 3. Fetch Profile Data
+  // We use 'maybeSingle()' so it doesn't throw a 406 error if not found
+  const { data: profile, error } = await sb
+    .from('profiles')
+    .select('*')
+    .eq('username', targetUsername)
+    .maybeSingle();
+
+  if (error || !profile) {
+    alert("User not found!");
+    els.loader.style.display = 'none';
+    return;
+  }
+
+  // 4. Update UI
+  renderProfile(profile);
+
+  // 5. Check Ownership for Edit Button
+  // If the fetched profile ID matches the logged-in user's ID
+  if (profile.id === currentUser.id) {
+    els.editBtn.classList.remove('hidden');
+    // Set the link to the edit page
+    els.editBtn.href = `/@${profile.username}/edit`; // Or "edit-profile.html"
+  } else {
+    els.editBtn.classList.add('hidden');
+  }
+
+  // Hide Loader
+  setTimeout(() => {
+    els.loader.style.opacity = '0';
+    setTimeout(() => els.loader.style.display = 'none', 500);
+  }, 500);
+}
+
+// --- HELPER FUNCTIONS ---
+
+function renderProfile(data) {
+  els.avatar.src = data.avatar || "https://cdn.discordapp.com/embed/avatars/0.png";
+  els.name.textContent = data.display_name || data.username || "User"; // Handle display name if you have it
+  els.username.textContent = data.username;
+  
+  // Format Date (e.g., "Oct 2023")
+  const date = new Date(data.created_at || Date.now());
+  els.joinDate.textContent = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+  // Render Roles/Badges
+  els.badges.innerHTML = '';
+  if (data.roles && Array.isArray(data.roles)) {
+    data.roles.forEach(role => {
+      const badge = createBadge(role);
+      if(badge) els.badges.appendChild(badge);
+    });
+  } else {
+    els.badges.innerHTML = '<span style="font-size:0.8rem; opacity:0.5; font-style:italic;">No badges yet.</span>';
+  }
+}
+
+function createBadge(roleName) {
+  // Map role names to Icons (You can use images or FontAwesome)
+  const map = {
+    'Founder': { icon: 'fa-crown', color: '#fbbf24' },
+    'Admin': { icon: 'fa-shield-halved', color: '#ef4444' },
+    'Verified': { icon: 'fa-check-circle', color: '#3b82f6' },
+    'Member': { icon: 'fa-user', color: '#a1a1aa' }
+  };
+
+  const config = map[roleName] || { icon: 'fa-certificate', color: '#fff' };
+
+  const div = document.createElement('div');
+  div.className = 'badge';
+  div.setAttribute('data-tooltip', roleName);
+  div.innerHTML = `<i class="fa-solid ${config.icon}" style="color: ${config.color}"></i>`;
+  
+  return div;
+}
+
+function getUsernameFromUrl() {
+  const path = window.location.pathname;
+  // Handle /@username format
+  if (path.includes('/@')) {
+    const parts = path.split('/@');
+    return parts[1] ? parts[1].split('/')[0] : null;
+  }
+  // Handle ?username= format
+  const params = new URLSearchParams(window.location.search);
+  return params.get('username');
+}
+
+function copyId() {
+  const txt = els.username.textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    alert("Username copied: " + txt);
+  });
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = "/";
+}
+
+// Start
+initProfile();
 </script>
 
 </body>
