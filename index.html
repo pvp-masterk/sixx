@@ -829,7 +829,9 @@ footer {
     const data = await res.json();
 
     const countEl = document.getElementById("discord-count");
-    countEl.textContent = `${data.presence_count} online • ${data.members.length} members`;
+    countEl.innerHTML = `
+  <span style="color:#fff;font-weight:700">${data.presence_count}</span> online
+`;
   } catch (err) {
     console.warn("Discord widget fetch failed", err);
     const countEl = document.getElementById("discord-count");
