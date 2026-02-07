@@ -742,13 +742,15 @@
   function setupEventListeners() {
   let debounceTimer;
 
-  document.getElementById("searchBar").addEventListener("input", () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(applyFiltersAndSort, 300);
-  });
-
-  document.getElementById("roleFilter").addEventListener("change", applyFiltersAndSort);
+  const searchBar = document.getElementById("searchBar");
+  if (searchBar) {
+    searchBar.addEventListener("input", () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(applyFiltersAndSort, 300);
+    });
+  }
 }
+
 
   function setupDropdown(dropdownId, onChange) {
   const dropdown = document.getElementById(dropdownId);
