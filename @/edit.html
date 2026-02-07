@@ -184,31 +184,64 @@ button:disabled { opacity: 0.7; cursor: not-allowed; }
 .roles-dropdown {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  max-height: 150px;
+  gap: 8px;
+  max-height: 180px;
   overflow-y: auto;
-  padding: 6px 10px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 8px 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.roles-dropdown label {
+.role-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-  color: white;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
 }
 
-.roles-dropdown input[type="checkbox"] {
-  accent-color: #5865F2; /* Discord-style accent */
-  width: 16px;
-  height: 16px;
+.role-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(2px);
 }
+
+.role-item img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.role-item span {
+  color: white;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+/* Checkmark */
+.role-item::after {
+  content: "✔";
+  color: #5865F2; /* Blurple accent */
+  position: absolute;
+  right: 12px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.role-item.selected::after {
+  opacity: 1;
+}
+
 
 </style>
 </head>
@@ -426,34 +459,54 @@ const updates = {
     showToast("Profile updated successfully!");
   }
 });
-// Define available roles
 const availableRoles = [
   { name: "Founder", icon: "founder.png" },
   { name: "Admin", icon: "admin.png" },
-  { name: "Mod", icon: "moderator.png" },
+  { name: "Mod", icon: "mod.png" },
   { name: "Verified", icon: "verified.png" }
 ];
 
 const rolesSelect = document.getElementById("rolesSelect");
 
-// Populate checkboxes
+// Build role items
 availableRoles.forEach(role => {
-  const id = `role_${role.name.toLowerCase()}`;
+  const div = document.createElement("div");
+  div.className = "role-item";
+  div.dataset.role = role.name;
 
-  const label = document.createElement("label");
+  const img = document.createElement("img");
+  img.src = `/assets/${role.icon}`;
+  img.alt = role.name;
 
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.value = role.name;
-  checkbox.id = id;
+  const span = document.createElement("span");
+  span.textContent = role.name;
 
-  const text = document.createTextNode(role.name);
+  div.appendChild(img);
+  div.appendChild(span);
 
-  label.appendChild(checkbox);
-  label.appendChild(text);
+  // Toggle selected state on click
+  div.addEventListener("click", () => {
+    div.classList.toggle("selected");
+  });
 
-  rolesSelect.appendChild(label);
+  rolesSelect.appendChild(div);
 });
+
+// Pre-select roles from user profile
+function preselectRoles(userRoles) {
+  if (!userRoles) return;
+  userRoles.forEach(r => {
+    const el = rolesSelect.querySelector(`.role-item[data-role="${r}"]`);
+    if (el) el.classList.add("selected");
+  });
+}
+
+// On form submit, gather selected roles
+function getSelectedRoles() {
+  return Array.from(rolesSelect.querySelectorAll(".role-item.selected"))
+    .map(el => el.dataset.role);
+}
+
 
 // Initialize
 loadProfile();
