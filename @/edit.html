@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Edit Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    :root {
+      --bg-color: #09090b;
+      --card-bg: rgba(24, 24, 27, 0.6);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --accent: #5865F2;
+      --text-main: #ffffff;
+      --text-muted: #a1a1aa;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-color);
+      background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                        radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                        radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      overflow: hidden;
+      padding: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: rgba(0,0,0,0.3);
+      color: var(--text-main);
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover { background: #4752c4; }
+
+    .message {
+      margin-top: 12px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .success { color: #4ade80; }
+    .error { color: #ef4444; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Edit Profile</h2>
+
+  <form id="editForm">
+    <label for="avatar">Avatar URL</label>
+    <input type="text" id="avatar" placeholder="https://cdn.discordapp.com/..." />
+
+    <label for="banner">Banner URL</label>
+    <input type="text" id="banner" placeholder="https://example.com/banner.png" />
+
+    <label for="bio">Bio</label>
+    <textarea id="bio" placeholder="Write something about yourself..."></textarea>
+
+    <button type="submit">Save Changes</button>
+    <div id="msg" class="message"></div>
+  </form>
+</div>
+
+<script>
+  // -- CONFIG --
+  const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
+  
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Get username from URL
+  const path = window.location.pathname;
+  const username = decodeURIComponent(
+    path.startsWith("/@") ? path.slice(2).replace(/\//g, "") : ""
+  );
+
+  const avatarInput = document.getElementById("avatar");
+  const bannerInput = document.getElementById("banner");
+  const bioInput = document.getElementById("bio");
+  const msgDiv = document.getElementById("msg");
+  const form = document.getElementById("editForm");
+
+  async function loadProfile() {
+    if (!username) {
+      msgDiv.textContent = "No username provided in URL.";
+      msgDiv.className = "message error";
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("username", username)
+      .single();
+
+    if (error || !data) {
+      msgDiv.textContent = "Profile not found.";
+      msgDiv.className = "message error";
+      return;
+    }
+
+    avatarInput.value = data.avatar_url || "";
+    bannerInput.value = data.banner_url || "";
+    bioInput.value = data.bio || "";
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msgDiv.textContent = "";
+    
+    const updates = {
+      avatar_url: avatarInput.value || null,
+      banner_url: bannerInput.value || null,
+      bio: bioInput.value || null,
+      updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .update(updates)
+      .eq("username", username)
+      .select()
+      .single();
+
+    if (error) {
+      msgDiv.textContent = "Failed to update profile.";
+      msgDiv.className = "message error";
+    } else {
+      msgDiv.textContent = "Profile updated successfully!";
+      msgDiv.className = "message success";
+    }
+  });
+
+  loadProfile();
+</script>
+
+</body>
+</html>
