@@ -391,7 +391,7 @@ textarea {
 
       <button type="submit" id="save-btn" class="action-btn">
         <div class="spinner"></div>
-        <span class="btn-text">Execute Changes</span>
+        <span class="btn-text">Save Changes</span>
       </button>
 
     </form>
@@ -623,7 +623,7 @@ DOM.form.addEventListener('submit', async (e) => {
     console.error("Save Error:", error);
     showToast("Update Failed.", "error");
   } else {
-    showToast("Profile protocol updated.");
+    showToast("Profile updated.");
   }
 });
 
