@@ -635,7 +635,17 @@
       const username = user.username || "Unknown";
       const displayName = user.display_name || username;
       const bio = user.bio || "No biography provided.";
-      const avatarUrl = user.avatar_url || `https://ui-avatars.com/api/?name=${displayName}&background=random`;
+      const avatarUrl =
+  user.avatar && user.avatar.trim() !== ""
+    ? user.avatar
+    : `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=18181b&color=fff`;
+
+const bannerUrl =
+  user.banner_url && user.banner_url.trim() !== ""
+    ? user.banner_url
+    : null;
+
+
       
       // Determine Main Role for Badge
       const roles = user.roles || [];
@@ -658,7 +668,14 @@
       // Add href functionality via JS to prevent dragging issues with spotlight
       
       card.innerHTML = `
-        <div class="card-banner" style="background: ${getRandomGradient(username)}"></div>
+        <div class="card-banner">
+  ${
+    bannerUrl
+      ? `<img src="${bannerUrl}" alt="Banner" style="width:100%;height:100%;object-fit:cover;">`
+      : `<div style="width:100%;height:100%;background:${getRandomGradient(username)}"></div>`
+  }
+</div>
+
         
         <div class="card-body">
           <div class="avatar-wrapper">
