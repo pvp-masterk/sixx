@@ -12,21 +12,27 @@
 /* ======================= 1. CORE VARIABLES & RESET ======================= */
 :root {
   --c-bg: #030005;
+  --c-bg-alt: #0a0510;
   --c-accent: #7b2cbf;
   --c-accent-light: #9d4edd;
   --c-accent-glow: #e0aaff;
   --c-text-main: #e8e6f3;
-  --c-text-dim: #b8b0d0;
-  --c-glass: rgba(20, 5, 35, 0.65);
-  --c-glass-border: rgba(150, 80, 255, 0.1);
+  --c-text-dim: #8f8ba0;
+  
+  /* Enhanced Glass Variables */
+  --c-glass: rgba(10, 5, 20, 0.6);
+  --c-glass-hover: rgba(20, 10, 35, 0.8);
+  --c-glass-border: rgba(255, 255, 255, 0.08);
+  --c-glass-border-hover: rgba(157, 78, 221, 0.5);
+  
   --font-main: 'Inter', sans-serif;
-  --font-brand: 'Diecide Remain', serif; /* Local Fallback */
+  --font-brand: 'Diecide Remain', serif;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @font-face {
   font-family: 'Diecide Remain';
-  src: url('fonts/DeicideRemain.otf') format('opentype'); /* Ensure this path is correct */
+  src: url('fonts/DeicideRemain.otf') format('opentype');
   font-display: swap;
 }
 
@@ -37,18 +43,32 @@ body {
   font-family: var(--font-main);
   background: var(--c-bg);
   color: var(--c-text-main);
-  overflow: hidden; /* Locked initially for landing */
+  overflow: hidden; 
   line-height: 1.6;
 }
 
+/* Texture Overlay (Scanlines) - Adds depth without lag */
+body::after {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 900;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.15),
+    rgba(0,0,0,0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  background-size: 100% 4px;
+}
+
 /* Scrollbar */
-::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--c-bg); }
 ::-webkit-scrollbar-thumb { background: #331050; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--c-accent); }
 
 /* Icons */
-svg.icon { width: 1.2em; height: 1.2em; fill: currentColor; vertical-align: middle; margin-bottom: 2px; }
+svg.icon { width: 1.2em; height: 1.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; margin-bottom: 2px; }
 
 /* The /six Brand Text Style */
 .brand-text {
@@ -57,7 +77,7 @@ svg.icon { width: 1.2em; height: 1.2em; fill: currentColor; vertical-align: midd
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 20px rgba(157, 78, 221, 0.4);
+  text-shadow: 0 0 25px rgba(157, 78, 221, 0.5);
   font-weight: 900;
   letter-spacing: 1px;
 }
@@ -67,13 +87,15 @@ svg.icon { width: 1.2em; height: 1.2em; fill: currentColor; vertical-align: midd
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
 }
 .bg-blob {
-  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4;
-  will-change: transform;
+  position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3;
+  will-change: transform; animation: breath 10s infinite alternate ease-in-out;
 }
-.bg-blob.one { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(#4a0072, transparent 70%); }
-.bg-blob.two { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(#240046, transparent 70%); }
+.bg-blob.one { top: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(#4a0072, transparent 70%); }
+.bg-blob.two { bottom: -20%; right: -10%; width: 70vw; height: 70vw; background: radial-gradient(#240046, transparent 70%); animation-delay: -5s; }
 
-/* ======================= 3. LANDING EXPERIENCE ======================= */
+@keyframes breath { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+/* ======================= 3. LANDING EXPERIENCE (UNCHANGED) ======================= */
 .landing-screen {
   position: fixed; inset: 0; z-index: 1000;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -110,57 +132,76 @@ svg.icon { width: 1.2em; height: 1.2em; fill: currentColor; vertical-align: midd
 
 @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
-/* ======================= 4. SIDEBAR & NAVIGATION ======================= */
+/* ======================= 4. ENHANCED SIDEBAR ======================= */
 .sidebar-trigger {
-  position: fixed; top: 25px; left: 25px; z-index: 100;
-  width: 50px; height: 50px;
-  background: rgba(10, 5, 20, 0.8);
+  position: fixed; top: 30px; left: 30px; z-index: 100;
+  width: 45px; height: 45px;
+  background: rgba(10, 5, 20, 0.4);
   border: 1px solid var(--c-glass-border);
-  border-radius: 12px;
+  border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   color: #fff; cursor: pointer;
-  transition: 0.3s;
-  backdrop-filter: blur(10px);
+  transition: all 0.4s var(--ease-out);
+  backdrop-filter: blur(8px);
 }
-.sidebar-trigger:hover { transform: scale(1.05); border-color: var(--c-accent); }
+.sidebar-trigger:hover { 
+  background: var(--c-accent); 
+  border-color: var(--c-accent-light); 
+  transform: rotate(90deg) scale(1.1); 
+  box-shadow: 0 0 15px rgba(123, 44, 191, 0.5);
+}
 
 .sidebar {
-  position: fixed; top: 0; left: 0; bottom: 0; width: 280px;
-  background: rgba(5, 2, 10, 0.95);
-  backdrop-filter: blur(20px);
+  position: fixed; top: 0; left: 0; bottom: 0; width: 300px;
+  background: linear-gradient(90deg, #05020a, rgba(5, 2, 10, 0.9));
   border-right: 1px solid var(--c-glass-border);
   z-index: 99;
   padding: 100px 30px 40px;
   transform: translateX(-100%);
-  transition: transform 0.5s var(--ease-out);
+  transition: transform 0.6s var(--ease-out);
+  display: flex; flex-direction: column;
 }
-.sidebar.active { transform: translateX(0); }
+.sidebar.active { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
+
+/* Decoration line in sidebar */
+.sidebar::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 1px;
+  background: linear-gradient(180deg, transparent, var(--c-accent), transparent);
+  opacity: 0.5;
+}
 
 .nav-item {
-  display: flex; align-items: center; gap: 15px;
-  padding: 16px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 18px;
+  padding: 16px 20px; margin-bottom: 12px;
   color: var(--c-text-dim);
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: 12px;
   transition: 0.3s;
   font-weight: 500;
   border: 1px solid transparent;
+  position: relative; overflow: hidden;
 }
 .nav-item:hover, .nav-item.active {
-  background: rgba(123, 44, 191, 0.15);
+  background: rgba(255,255,255,0.03);
   color: #fff;
-  border-color: rgba(123, 44, 191, 0.3);
+  border-color: rgba(255,255,255,0.08);
+  padding-left: 25px; /* Slide effect */
+}
+.nav-item.active { border-color: var(--c-accent); background: rgba(123, 44, 191, 0.1); }
+
+/* Tiny glow dot on active nav */
+.nav-item.active::after {
+  content: ''; position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+  width: 6px; height: 6px; background: var(--c-accent-light); border-radius: 50%;
+  box-shadow: 0 0 10px var(--c-accent);
 }
 
-/* ======================= 5. MAIN CONTENT LAYOUT ======================= */
+/* ======================= 5. BENTO GRID LAYOUT ======================= */
 .app-container {
-  position: relative;
-  z-index: 10;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 100px 20px 40px;
-  opacity: 0;
-  transform: translateY(20px);
+  position: relative; z-index: 10;
+  max-width: 1200px; margin: 0 auto;
+  padding: 100px 20px 60px;
+  opacity: 0; transform: translateY(20px);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
 .app-container.visible { opacity: 1; transform: translateY(0); }
@@ -168,353 +209,213 @@ svg.icon { width: 1.2em; height: 1.2em; fill: currentColor; vertical-align: midd
 /* Header */
 .app-header {
   display: flex; justify-content: space-between; align-items: flex-end;
-  margin-bottom: 50px; border-bottom: 1px solid var(--c-glass-border); padding-bottom: 20px;
+  margin-bottom: 40px; padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
-.header-title { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: var(--c-text-dim); }
-.header-brand { font-size: 32px; }
+.header-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; color: var(--c-accent); margin-bottom: 4px; }
+.header-brand { font-size: 42px; line-height: 1; }
+
 .login-btn-main {
-  padding: 10px 24px;
-  background: var(--c-accent);
-  border: none; border-radius: 6px;
-  color: #fff; font-weight: 600; font-size: 14px;
+  padding: 12px 28px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff; font-weight: 600; font-size: 13px;
   cursor: pointer; transition: 0.3s;
-  display: flex; align-items: center; gap: 8px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  display: flex; align-items: center; gap: 10px;
+  overflow: hidden; position: relative;
 }
-.login-btn-main:hover { background: var(--c-accent-light); transform: translateY(-2px); }
+.login-btn-main::before {
+  content: ''; position: absolute; top:0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: 0.5s;
+}
+.login-btn-main:hover { border-color: var(--c-accent); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+.login-btn-main:hover::before { left: 100%; }
 
-/* ======================= 6. CARDS & SECTIONS ======================= */
-.grid-section { display: grid; gap: 30px; }
+/* GRID SYSTEM */
+.grid-section { 
+  display: grid; 
+  grid-template-columns: 1fr; 
+  gap: 24px; 
+}
+@media(min-width: 900px) {
+  .grid-section { 
+    grid-template-columns: repeat(12, 1fr); 
+    grid-auto-rows: minmax(180px, auto);
+  }
+  .col-span-12 { grid-column: span 12; }
+  .col-span-8  { grid-column: span 8; }
+  .col-span-6  { grid-column: span 6; }
+  .col-span-4  { grid-column: span 4; }
+  .row-span-2  { grid-row: span 2; }
+}
 
+/* CARD STYLING - Enhanced */
 .card {
   background: var(--c-glass);
   border: 1px solid var(--c-glass-border);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 30px;
   position: relative; overflow: hidden;
-  transition: transform 0.3s, border-color 0.3s;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  backdrop-filter: blur(12px);
+  display: flex; flex-direction: column;
 }
-.card:hover { border-color: rgba(157, 78, 221, 0.3); transform: translateY(-5px); }
+
+/* Card Hover Glow */
+.card::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(157, 78, 221, 0.06), transparent 40%);
+  opacity: 0; transition: opacity 0.5s; pointer-events: none;
+}
+.card:hover::after { opacity: 1; }
+
+.card:hover { 
+  border-color: var(--c-glass-border-hover); 
+  transform: translateY(-4px); 
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5); 
+}
 
 /* Section Titles */
 .section-title {
-  font-size: 22px; font-weight: 800; margin-bottom: 25px;
-  display: flex; align-items: center; gap: 12px;
-  color: #fff;
+  font-size: 18px; font-weight: 700; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+  color: #fff; letter-spacing: -0.5px;
 }
-.section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--c-glass-border), transparent); }
+.section-title .icon { color: var(--c-text-dim); transition: 0.3s; }
+.card:hover .section-title .icon { color: var(--c-accent-glow); }
 
-/* Identity Section */
-.identity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-@media(max-width: 800px) { .identity-grid { grid-template-columns: 1fr; } }
+/* CONTENT STYLES */
+.desc-text { color: var(--c-text-dim); font-size: 15px; margin-bottom: 20px; line-height: 1.7; }
 
-.stat-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.stat-label { color: var(--c-text-dim); display: flex; align-items: center; gap: 8px; }
-.stat-val { font-weight: 700; color: #fff; }
-
-/* Roster Styling */
-.roster-category { margin-bottom: 30px; }
-.rank-header {
-  display: flex; align-items: center; gap: 12px; margin-bottom: 15px;
-  padding: 10px 15px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.03), transparent);
-  border-left: 3px solid;
+/* Stat Boxes */
+.stats-container { display: flex; gap: 15px; margin-top: auto; }
+.mini-stat {
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
+  padding: 12px 16px; border-radius: 10px; flex: 1;
 }
-.rank-title { font-weight: 800; letter-spacing: 2px; text-transform: uppercase; font-size: 14px; }
-.member-grid { display: flex; flex-wrap: wrap; gap: 10px; }
-.member-tag {
-  background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08);
-  padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 500;
-  display: flex; align-items: center; gap: 8px;
-  transition: 0.2s;
-}
-.member-tag:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+.ms-label { font-size: 11px; text-transform: uppercase; color: var(--c-text-dim); margin-bottom: 4px; display: block; }
+.ms-val { font-size: 16px; font-weight: 700; color: #fff; }
 
-/* Specific Rank Colors */
-.rank-founder { border-color: #fff; color: #fff; }
-.rank-founder .icon { color: #ffd700; }
-.rank-beyond { border-color: #9d4edd; color: #e0aaff; }
-.rank-heneral { border-color: #d00000; color: #ff6b6b; }
-.rank-star { border-color: #000; text-shadow: 0 0 2px #fff; color: #fff; }
+/* Roster Styling - Grid of chips */
+.roster-grid { display: grid; gap: 20px; }
+.rank-group { border-left: 2px solid rgba(255,255,255,0.05); padding-left: 20px; transition: 0.3s; }
+.rank-group:hover { border-color: var(--c-accent); background: linear-gradient(90deg, rgba(123,44,191,0.05), transparent); }
 
-/* Timeline */
-.timeline { position: relative; padding-left: 20px; border-left: 2px solid rgba(255,255,255,0.1); }
-.timeline-item { position: relative; margin-bottom: 25px; padding-left: 20px; }
-.timeline-item::before {
-  content: ''; position: absolute; left: -26px; top: 5px; width: 10px; height: 10px;
-  background: var(--c-bg); border: 2px solid var(--c-accent); border-radius: 50%;
+.rank-title { 
+  font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; 
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
 }
-.t-date { font-size: 12px; color: var(--c-accent-glow); margin-bottom: 4px; font-weight: 700; }
-.t-desc { font-size: 14px; color: var(--c-text-dim); }
+.members-list { display: flex; flex-wrap: wrap; gap: 8px; }
 
-/* Gallery */
-.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-.gallery-item {
-  aspect-ratio: 16/9; background: #111; border-radius: 8px; overflow: hidden; cursor: pointer; border: 1px solid transparent; transition: 0.3s;
+.member-chip {
+  background: rgba(255,255,255,0.03); 
+  border: 1px solid transparent;
+  padding: 6px 12px; border-radius: 6px; 
+  font-size: 13px; font-weight: 500; color: #ccc;
+  transition: 0.2s; cursor: default;
 }
-.gallery-item:hover { border-color: var(--c-accent); }
-.gallery-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; opacity: 0; }
-.gallery-img.loaded { opacity: 1; }
-.gallery-item:hover .gallery-img { transform: scale(1.1); }
+.member-chip:hover { 
+  background: #fff; color: #000; 
+  transform: scale(1.05); 
+  box-shadow: 0 0 15px var(--c-accent);
+}
+.rank-founder .member-chip { border-color: rgba(255, 215, 0, 0.3); color: #ffeebb; }
+.rank-beyond .member-chip { border-color: rgba(157, 78, 221, 0.3); color: #e0aaff; }
+
+/* Timeline - Minimalist */
+.timeline-item { 
+  position: relative; padding-left: 25px; margin-bottom: 25px; 
+  border-left: 1px solid rgba(255,255,255,0.1); 
+}
+.timeline-item::after {
+  content: ''; position: absolute; left: -3px; top: 6px; width: 5px; height: 5px; background: var(--c-accent);
+  box-shadow: 0 0 8px var(--c-accent);
+}
+.t-date { font-size: 11px; font-weight: 700; color: var(--c-accent-glow); margin-bottom: 2px; letter-spacing: 1px; }
+.t-desc { font-size: 14px; color: #ddd; }
+
+/* Gallery - Clean Grid */
+.gallery-strip { 
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; height: 100%;
+}
+.gallery-thumb {
+  background: #111; border-radius: 8px; overflow: hidden; cursor: pointer; 
+  position: relative; aspect-ratio: 16/9;
+}
+.gallery-thumb img { 
+  width: 100%; height: 100%; object-fit: cover; transition: 0.5s; opacity: 0.7; filter: grayscale(50%);
+}
+.gallery-thumb:hover img { transform: scale(1.1); opacity: 1; filter: grayscale(0%); }
+
+/* Socials Button Custom */
+.social-tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; text-decoration: none; color: #fff;
+  border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px;
+  transition: 0.3s;
+}
+.social-tile:hover { background: rgba(88, 101, 242, 0.1); border-color: #5865F2; }
+.social-tile svg { width: 30px; height: 30px; margin-bottom: 10px; }
 
 /* Footer */
-footer { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.2); font-size: 12px; }
+footer { 
+  text-align: center; padding-top: 40px; color: var(--c-text-dim); font-size: 12px; 
+  border-top: 1px solid rgba(255,255,255,0.05); margin-top: 40px;
+}
 
-/* ======================= 7. MODALS (Login & Image) ======================= */
+/* ======================= 6. MODALS & USER CARD ======================= */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
   z-index: 2000; display: flex; align-items: center; justify-content: center;
   opacity: 0; pointer-events: none; transition: 0.3s;
 }
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
-/* Login Box */
 .login-box {
-  width: 100%; max-width: 400px;
+  width: 100%; max-width: 380px;
   background: #0f0518; border: 1px solid var(--c-glass-border);
-  padding: 40px; border-radius: 20px; text-align: center;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-  transform: scale(0.95); transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 40px; border-radius: 24px; text-align: center;
+  box-shadow: 0 0 50px rgba(123, 44, 191, 0.1);
+  transform: scale(0.9); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .modal-overlay.active .login-box { transform: scale(1); }
 
-.login-title { font-size: 24px; font-weight: 700; margin-bottom: 10px; color: #fff; }
-.login-sub { color: var(--c-text-dim); font-size: 14px; margin-bottom: 30px; }
-
-.social-login-btn {
-  width: 100%; padding: 14px; margin-bottom: 12px;
-  border-radius: 8px; border: none; font-weight: 600; font-size: 14px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-  transition: 0.2s;
-}
-.btn-discord { background: #5865F2; color: white; }
-.btn-discord:hover { background: #4752c4; }
-.btn-close-modal { background: transparent; color: #666; font-size: 12px; margin-top: 15px; cursor: pointer; }
-.btn-close-modal:hover { color: #fff; }
-
-/* Image Preview Modal */
-.preview-img { max-width: 90vw; max-height: 80vh; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
-/* ================= USER SIDEBAR CARD ================= */
+/* User Card Styles */
+.user-menu-wrapper { margin-bottom: 40px; width: 100%; }
 .user-card {
-  display: flex;
-  gap: 14px;
-  padding: 16px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 15px; padding: 12px;
+  border-radius: 14px; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: 0.3s;
 }
+.user-card:hover, .user-menu-wrapper.open .user-card { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.2); }
+.user-avatar { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; }
+.user-name { font-weight: 700; color: #fff; font-size: 14px; }
+.user-rank { font-size: 10px; text-transform: uppercase; font-weight: 800; opacity: 0.8; letter-spacing: 1px; margin-top: 2px;}
 
-.avatar-skeleton {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: linear-gradient(
-    90deg,
-    rgba(255,255,255,0.05),
-    rgba(255,255,255,0.12),
-    rgba(255,255,255,0.05)
-  );
-  animation: shimmer 1.4s infinite;
-}
-
-.info-skeleton {
-  flex: 1;
-}
-
-.info-skeleton .line {
-  height: 12px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 6px;
-  margin-bottom: 8px;
-  animation: shimmer 1.4s infinite;
-}
-
-.info-skeleton .line.small {
-  width: 60%;
-  height: 10px;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: 200px 0; }
-}
-.user-card.error {
-  border-color: #ff4d4d;
-  background: rgba(255,77,77,0.08);
-}
-
-.user-card.error .error-text {
-  font-size: 12px;
-  color: #ffb3b3;
-  line-height: 1.4;
-}
-
-
-.user-avatar {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.user-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.user-name {
-  font-weight: 700;
-  font-size: 14px;
-  color: #fff;
-}
-
-/* ================= USER RANK ICONS ================= */
-.user-rank {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.rank-founder { color: #ffd700; }
-.rank-admin { color: #ff4d4d; }
-.rank-moderator { color: #4dabf7; }
-.rank-member { color: #9d4edd; }
-
-.rank-icon {
-  width: 14px;
-  height: 14px;
-}
-/* ================= VERIFIED VIA DISCORD ================= */
-.verified-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  margin-top: 4px;
-}
-
-.verified-badge .verified {
-  color: #3ba55d; /* Discord verified green */
-}
-
-.verified-badge .via {
-  color: #8b8b8b;
-  font-weight: 500;
-}
-
-.verified-badge .discord {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #5865f2; /* OFFICIAL Discord Blurple */
-}
-
-.discord-icon {
-  width: 14px;
-  height: 14px;
-  object-fit: contain;
-}
-/* ================= USER MENU DROPDOWN & ANIMATION ================= */
-.user-menu-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Make the card clickable */
-.user-card {
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
-  position: relative;
-}
-
-.user-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Chevron indicator */
-.card-chevron {
-  margin-left: auto;
-  transition: transform 0.3s ease;
-  color: var(--c-text-dim);
-}
-.user-menu-wrapper.open .card-chevron {
-  transform: rotate(180deg);
-}
-
-/* The Dropdown Container (Hidden by default) */
 .user-dropdown {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 0 0 12px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  max-height: 0; overflow: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(0,0,0,0.2); border-radius: 0 0 12px 12px;
 }
-
-.user-menu-wrapper.open .user-dropdown {
-  max-height: 150px; /* Enough height for 2 buttons */
-  opacity: 1;
-  margin-top: -4px;
-  padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-top: none;
-}
-
-/* Menu Buttons */
+.user-menu-wrapper.open .user-dropdown { max-height: 150px; padding: 10px; border: 1px solid rgba(255,255,255,0.06); border-top: none; }
 .menu-action-btn {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid transparent;
-  padding: 10px;
-  border-radius: 8px;
-  color: #ccc;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s;
-  width: 100%;
+  width: 100%; padding: 10px; margin-bottom: 4px; border-radius: 8px;
+  background: transparent; border: none; color: #ccc; font-size: 13px;
+  display: flex; align-items: center; gap: 10px; cursor: pointer; transition: 0.2s;
 }
+.menu-action-btn:hover { background: rgba(123, 44, 191, 0.2); color: #fff; }
 
-.menu-action-btn:hover {
-  background: rgba(123, 44, 191, 0.15);
-  color: #fff;
-  border-color: rgba(123, 44, 191, 0.3);
-}
+.preview-img { max-width: 90vw; max-height: 85vh; border-radius: 12px; box-shadow: 0 0 80px rgba(0,0,0,1); }
 
-/* Buffering Spinner */
-.btn-spinner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  display: none; /* Hidden by default */
-}
+/* Loaders/Skeletons */
+.avatar-skeleton { width: 42px; height: 42px; background: rgba(255,255,255,0.05); border-radius: 10px; animation: pulse 1.5s infinite; }
+.info-skeleton .line { height: 10px; width: 80px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-bottom: 6px; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
-.menu-action-btn.loading .btn-text,
-.menu-action-btn.loading svg {
-  display: none; /* Hide text/icon when loading */
-}
+/* Glitch/Scramble Effect helper class */
+.scramble-text { display: inline-block; min-width: 50px; }
 
-.menu-action-btn.loading .btn-spinner {
-  display: block; /* Show spinner when loading */
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -534,31 +435,21 @@ footer { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.2); font
 
   <!-- NAVIGATION SIDEBAR -->
   <div class="sidebar-trigger" onclick="app.toggleSidebar()">
-    <!-- Menu Icon -->
-    <svg class="icon" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <svg class="icon" style="width:24px;height:24px;" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
   </div>
 
   <nav id="sidebar" class="sidebar">
-    
-<div id="user-card" class="user-card loading">
-  <div class="avatar-skeleton"></div>
-  <div class="info-skeleton">
-    <div class="line"></div>
-    <div class="line small"></div>
-    <div class="verified-badge">
-  <span class="verified">Verified</span>
-  <span class="via">via</span>
-  <span class="discord">
-    Discord
-  </span>
-</div>
+    <div id="user-card" class="user-card loading">
+      <div class="avatar-skeleton"></div>
+      <div class="info-skeleton">
+        <div class="line"></div>
+        <div class="line" style="width:50px"></div>
+      </div>
+    </div>
 
-  </div>
-</div>
-
-    <div style="margin-bottom: 40px;">
-      <div class="brand-text" style="font-size: 40px;">/SIX</div>
-      <div style="font-size: 12px; color: #666; letter-spacing: 1px;">MENU</div>
+    <div style="margin-bottom: 40px; padding-left: 10px;">
+      <div class="brand-text" style="font-size: 32px; line-height:1.2;">/SIX</div>
+      <div style="font-size: 10px; color: #666; letter-spacing: 2px;">MAIN MENU</div>
     </div>
     <div id="nav-links">
       <!-- Generated by JS -->
@@ -571,479 +462,371 @@ footer { text-align: center; padding: 40px 0; color: rgba(255,255,255,0.2); font
     <!-- Header -->
     <header class="app-header">
       <div>
-        <div class="header-title">Official Portal</div>
-        <div class="header-brand brand-text">/six</div>
+        <div class="header-title">Secure Portal</div>
+        <div class="header-brand brand-text" data-value="/six">/six</div>
       </div>
       <button class="login-btn-main" onclick="app.toggleLogin(true)">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
         <span>MEMBER ACCESS</span>
       </button>
     </header>
 
-    <!-- CONTENT GRID -->
+    <!-- BENTO GRID LAYOUT -->
     <div class="grid-section">
 
-      <!-- 1. IDENTITY CARD -->
-      <section class="card" id="about">
+      <!-- 1. IDENTITY CARD (Big Feature) -->
+      <section class="card col-span-8" id="about">
         <h2 class="section-title">
-          <svg class="icon" style="color:var(--c-accent)" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          Identity Protocol
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span class="scramble-hover" data-text="Identity Protocol">Identity Protocol</span>
         </h2>
-        <div class="identity-grid">
-          <div>
-            <p style="color:var(--c-text-dim); margin-bottom: 20px;">
-              <span class="brand-text">/six</span> (SAIS) is a clan founded on April 11, 2025 by lair. 
-              We are not a community; we are a weapon. Our directive is absolute control over every environment we infiltrate.
-            </p>
-            <p style="color:#fff; font-weight:600;">"We don't recruit players. We recruit weapons."</p>
-          </div>
-          <div style="background:rgba(0,0,0,0.3); padding: 20px; border-radius: 12px;">
-            <div class="stat-row">
-              <span class="stat-label"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Founded</span>
-              <span class="stat-val">2025</span>
+        <div style="display:flex; flex-direction:column; height:100%;">
+          <p class="desc-text">
+            <span class="brand-text">/six</span> (SAIS) is not a community; we are a kinetic weapon. Founded on April 11, 2025 by lair. Our directive is absolute control over every environment we infiltrate.
+            <br><br>
+            <em style="color:#fff; border-left: 2px solid var(--c-accent); padding-left:10px;">"We don't recruit players. We recruit weapons."</em>
+          </p>
+          
+          <div class="stats-container">
+            <div class="mini-stat">
+              <span class="ms-label">Founded</span>
+              <span class="ms-val">2025</span>
             </div>
-            <div class="stat-row">
-              <span class="stat-label"><svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Alias</span>
-              <span class="stat-val brand-text">SAIS</span>
+            <div class="mini-stat">
+              <span class="ms-label">Alias</span>
+              <span class="ms-val brand-text">SAIS</span>
             </div>
-            <div class="stat-row">
-              <span class="stat-label"><svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Focus</span>
-              <span class="stat-val">CPVP / NethPot / UHC</span>
+            <div class="mini-stat">
+              <span class="ms-label">Target</span>
+              <span class="ms-val">CPVP</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- 2. ROSTER -->
-      <section class="card" id="roster">
+      <!-- 2. SOCIALS / STATUS (Compact) -->
+      <section class="card col-span-4" id="socials">
+        <h2 class="section-title"><span class="scramble-hover" data-text="Network">Network</span></h2>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; height:100%;">
+          <a href="https://discord.gg/tu6rpKhenw" target="_blank" class="social-tile">
+            <svg class="icon" style="color:#5865F2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM3 20a6 6 0 0 1 12 0v1H3v-1z"/></svg>
+            <span style="font-weight:700; font-size:14px;">DISCORD</span>
+            <span id="discord-count" style="font-size:11px; color:#888; margin-top:4px;">Fetching...</span>
+          </a>
+          <a href="https://tiktok.com/@xissais" target="_blank" class="social-tile">
+            <svg class="icon" style="color:#fff" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+            <span style="font-weight:700; font-size:14px;">TIKTOK</span>
+            <span style="font-size:11px; color:#888; margin-top:4px;">Media</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- 3. ROSTER (Full Width) -->
+      <section class="card col-span-12" id="roster">
         <h2 class="section-title">
           <svg class="icon" style="color:#d00000" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Active Personnel
+          <span class="scramble-hover" data-text="Active Personnel">Active Personnel</span>
         </h2>
-        <div id="roster-container">
+        <div id="roster-container" class="roster-grid">
           <!-- Filled by JS -->
         </div>
       </section>
 
-      <!-- 3. TIMELINE & CODE (Split View) -->
-      <div class="identity-grid">
-        <section class="card" id="history">
-          <h2 class="section-title">
-            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Legacy
-          </h2>
-          <div class="timeline" id="timeline-container">
-            <!-- Filled by JS -->
-          </div>
-        </section>
+      <!-- 4. TIMELINE -->
+      <section class="card col-span-6" id="history">
+        <h2 class="section-title">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="scramble-hover" data-text="Legacy Timeline">Legacy Timeline</span>
+        </h2>
+        <div id="timeline-container" style="margin-top:10px;">
+          <!-- Filled by JS -->
+        </div>
+      </section>
 
-        <section class="card">
-          <h2 class="section-title">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            Directives
-          </h2>
-          <ul style="list-style:none; padding:0; color:var(--c-text-dim);">
-            <li style="margin-bottom:15px; display:flex; gap:10px;">
-              <span style="color:var(--c-accent)">01.</span> Loyalty to the clan is absolute.
-            </li>
-            <li style="margin-bottom:15px; display:flex; gap:10px;">
-              <span style="color:var(--c-accent)">02.</span> Disrespect leads to immediate termination.
-            </li>
-            <li style="margin-bottom:15px; display:flex; gap:10px;">
-              <span style="color:var(--c-accent)">03.</span> We do not yield. We dominate.
-            </li>
-          </ul>
-        </section>
-      </div>
+      <!-- 5. DIRECTIVES -->
+      <section class="card col-span-6">
+        <h2 class="section-title">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span class="scramble-hover" data-text="Core Directives">Core Directives</span>
+        </h2>
+        <ul style="list-style:none; padding:0; color:var(--c-text-dim);">
+          <li style="margin-bottom:15px; display:flex; gap:12px; align-items:flex-start;">
+            <span style="color:var(--c-accent); font-family:monospace; font-weight:700;">01_</span> 
+            <span>Loyalty to the clan is absolute. Betrayal is not an option.</span>
+          </li>
+          <li style="margin-bottom:15px; display:flex; gap:12px; align-items:flex-start;">
+            <span style="color:var(--c-accent); font-family:monospace; font-weight:700;">02_</span> 
+            <span>Respect the hierarchy. Disrespect leads to immediate termination.</span>
+          </li>
+          <li style="margin-bottom:15px; display:flex; gap:12px; align-items:flex-start;">
+            <span style="color:var(--c-accent); font-family:monospace; font-weight:700;">03_</span> 
+            <span>We do not yield. We dominate every server we touch.</span>
+          </li>
+        </ul>
+      </section>
 
-      <!-- 4. GALLERY -->
-      <section class="card" id="gallery">
+      <!-- 6. VISUALS -->
+      <section class="card col-span-12" id="gallery">
         <h2 class="section-title">
           <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          Visual Archives
+          <span class="scramble-hover" data-text="Visual Archives">Visual Archives</span>
         </h2>
-        <div class="gallery-grid" id="gallery-container">
+        <div class="gallery-strip" id="gallery-container">
           <!-- Filled by JS -->
         </div>
-      </section>
-
-      <!-- 5. SOCIALS -->
-      <section class="card" id="socials" style="text-align:center;">
-        <h2 class="section-title" style="justify-content:center;">Comms Channels</h2>
-        <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
-          <a href="https://discord.gg/tu6rpKhenw" target="_blank" class="login-btn-main" style="background:#5865F2; text-decoration:none;">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-            DISCORD
-          </a>
-          <a href="https://tiktok.com/@xissais" target="_blank" class="login-btn-main" style="background:#000; border:1px solid #333; text-decoration:none;">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
-            TIKTOK
-          </a>
-        </div>
-        <div id="discord-stats" style="margin-top:15px; color:#666;">LOADING DATA...</div>
       </section>
 
     </div>
 
     <footer>
-      &copy; 2025 <span class="brand-text">/six</span>. Built for domination.
+      &copy; 2025 <span class="brand-text">/six</span>. Built for domination. <br>
+      <span style="opacity:0.5; font-size:10px;">SECURE CONNECTION ESTABLISHED</span>
     </footer>
   </main>
 
   <!-- LOGIN MODAL -->
   <div id="login-modal" class="modal-overlay">
     <div class="login-box">
-      <div class="login-title">AUTHENTICATION</div>
-      <div class="login-sub">Access /six secure database</div>
+      <div class="brand-text" style="font-size:28px; margin-bottom:10px;">/SIX</div>
+      <div style="color:#aaa; font-size:14px; margin-bottom:30px;">Authenticate Identity</div>
       
-      <button class="social-login-btn btn-discord" onclick="app.login('discord')">
-        <svg class="icon" viewBox="0 0 24 24" fill="white"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-        Continue with Discord
+      <button class="login-btn-main" style="width:100%; justify-content:center; background:#5865F2; border:none;" onclick="app.login('discord')">
+        <svg class="icon" viewBox="0 0 24 24" fill="white" style="stroke:none;"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Discord Auth
       </button>
 
-      <div onclick="app.toggleLogin(false)" class="btn-close-modal">ABORT SEQUENCE</div>
+      <div onclick="app.toggleLogin(false)" style="margin-top:20px; font-size:12px; color:#666; cursor:pointer; letter-spacing:1px;">ABORT</div>
     </div>
   </div>
 
-  <!-- IMAGE PREVIEW MODAL -->
+  <!-- IMAGE PREVIEW -->
   <div id="preview-modal" class="modal-overlay" onclick="app.closePreview()">
     <img id="preview-img-el" class="preview-img" src="" alt="Preview">
   </div>
+
+<!-- LOGIC -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
 <script>
+  // Mouse tracking for glow effect
+  document.addEventListener('mousemove', e => {
+    document.querySelectorAll('.card').forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    });
+  });
+
   const supabaseClient = supabase.createClient(
-  "https://tstsijdifhgmpaszqknr.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
-);
-(async () => {
-  const { data, error } = await supabaseClient.auth.getSession();
-  if (error) console.error(error);
-})();
+    "https://tstsijdifhgmpaszqknr.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
+  );
 
-  const ROLE_ICONS = {
-  founder: "/assets/owner.png",
-  admin: "/assets/admin.png",
-  moderator: "/assets/moderator.png",
-  member: "/assets/member.png"
-};
+  const DATA = {
+    nav: [
+      { label: "Identity", href: "#about", icon: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>' },
+      { label: "Personnel", href: "#roster", icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>' },
+      { label: "Legacy", href: "#history", icon: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' },
+      { label: "Archives", href: "#gallery", icon: '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>' },
+    ],
+    roster: [
+      { rank: "FOUNDER", class: "rank-founder", members: ["xla41r"] },
+      { rank: "BEYOND", class: "rank-beyond", members: ["@lovelyxeiii_1", "@dashhszn4", "@xzasza", "@shintenshii"] },
+      { rank: "HENERAL", class: "rank-heneral", members: ["@impsx", "@proglz"] },
+      { rank: "STAR", class: "rank-star", members: ["@lovelyxeiii_1", "@dashhszn4", "@geloutzy4", "@headlock777", "@kyzaxks", "@big2ck", "@newfisch_03628", "@fr_rui", "@proglz", "@penguinguy_6", "@nefushi", "@xzasza", "@zxcygsatzshi", "@solcery_", "@vancars."] }
+    ],
+    timeline: [
+      { date: "APR 2025", desc: "Foundation of /six by 3ryll." },
+      { date: "MAY 2025", desc: "First server domination event." },
+      { date: "JUN 2025", desc: "Acquisition of high-tier assets." },
+      { date: "NOW", desc: "Controlling 2 major servers." }
+    ],
+    gallery: [
+      "https://cdn.discordapp.com/attachments/1371525091833282752/1409814312582643762/quality_restoration_20250826161611300.jpg",
+      "https://cdn.discordapp.com/attachments/1371525091833282752/1401944987473547284/lv_0_20250804230545.gif",
+      "https://cdn.discordapp.com/attachments/1371525091833282752/1400024103142035487/Picsart_25-07-30_15-51-21-892.png",
+      "https://cdn.discordapp.com/attachments/1371525091833282752/1391335858023432192/quality_restoration_20250706162944658.jpg"
+    ]
+  };
 
-
-/* ======================= DATA STORE (Centralized Configuration) ======================= */
-const DATA = {
-  nav: [
-    { label: "About Us", href: "#about", icon: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>' },
-    { label: "Roster", href: "#roster", icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>' },
-    { label: "History", href: "#history", icon: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' },
-    { label: "Visuals", href: "#gallery", icon: '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>' },
-  ],
- 
-  roster: [
-    {
-      rank: "FOUNDER",
-      class: "rank-founder",
-      icon: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>', // Crown Star
-      members: ["xla41r"]
+  const app = {
+    init: () => {
+      app.checkAuth();
+      app.renderNav();
+      app.renderRoster();
+      app.renderTimeline();
+      app.renderGallery();
+      app.fetchDiscordStats();
+      app.formatBrandText();
+      app.initScramble();
     },
-    {
-      rank: "BEYOND",
-      class: "rank-beyond",
-      icon: '<path d="M18 12L12 2L6 12"/><path d="M2 22h20"/>', // Chevron/Ascension
-      members: ["@lovelyxeiii_1", "@dashhszn4", "@xzasza", "@shintenshii"]
+
+    /* Text Scramble Effect for visual flair */
+    initScramble: () => {
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ/<>[]#";
+      document.querySelectorAll('.scramble-hover').forEach(el => {
+        el.onmouseover = event => {
+          let iteration = 0;
+          let interval = setInterval(() => {
+            event.target.innerText = event.target.innerText
+              .split("")
+              .map((letter, index) => {
+                if(index < iteration) return event.target.dataset.text[index];
+                return letters[Math.floor(Math.random() * 26)];
+              })
+              .join("");
+            
+            if(iteration >= event.target.dataset.text.length) clearInterval(interval);
+            iteration += 1/3;
+          }, 30);
+        }
+      });
     },
-    {
-      rank: "HENERAL",
-      class: "rank-heneral",
-      icon: '<rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>', // General Icon
-      members: ["@impsx", "@proglz"]
+
+    checkAuth: async () => {
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) throw new Error("No session");
+        const { data: profile } = await supabaseClient
+          .from("profiles").select("username, avatar, role").eq("id", session.user.id).maybeSingle();
+        if (profile) app.renderUserCard(profile);
+      } catch (err) {
+        // Stay in loading state or show guest text
+        const container = document.getElementById("user-card");
+        container.innerHTML = `<div style="font-size:12px; color:#666;">GUEST ACCESS</div>`;
+        container.className = "user-card";
+      }
     },
-    {
-      rank: "STAR",
-      class: "rank-star",
-      icon: '<polygon points="12 2 2 22 22 22"/>', // Triangle
-      members: [
-        "@lovelyxeiii_1", "@dashhszn4", "@geloutzy4", "@headlock777",
-        "@kyzaxks", "@big2ck", "@newfisch_03628", "@fr_rui", "@proglz",
-        "@penguinguy_6", "@nefushi", "@xzasza", "@zxcygsatzshi", "@solcery_", "@vancars."
-      ]
-    }
-  ],
 
-  timeline: [
-    { date: "APR 2025", desc: "Foundation of /six by 3ryll." },
-    { date: "MAY 2025", desc: "First server domination event." },
-    { date: "JUN 2025", desc: "Recruitment of high-tier assets begins." },
-    { date: "NOW", desc: "Controlling 2 major servers." }
-  ],
+    renderUserCard: (profile) => {
+      const container = document.getElementById("user-card");
+      container.outerHTML = `
+        <div id="user-menu-wrapper" class="user-menu-wrapper">
+          <div class="user-card" onclick="app.toggleUserMenu()">
+            <img class="user-avatar" src="${profile.avatar}">
+            <div class="user-info">
+              <div class="user-name">${profile.username}</div>
+              <div class="user-rank rank-${profile.role || 'member'}">${profile.role || 'member'}</div>
+            </div>
+            <svg class="icon" style="margin-left:auto; width:16px;" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div class="user-dropdown">
+            <button class="menu-action-btn" onclick="location.href='/@${profile.username}'">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg> View Profile
+            </button>
+            <button class="menu-action-btn" onclick="location.href='/settings'">
+              <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings
+            </button>
+          </div>
+        </div>
+      `;
+    },
 
-  gallery: [
-    "https://cdn.discordapp.com/attachments/1371525091833282752/1409814312582643762/quality_restoration_20250826161611300.jpg",
-    "https://cdn.discordapp.com/attachments/1371525091833282752/1401944987473547284/lv_0_20250804230545.gif",
-    "https://cdn.discordapp.com/attachments/1371525091833282752/1400024103142035487/Picsart_25-07-30_15-51-21-892.png",
-    "https://cdn.discordapp.com/attachments/1371525091833282752/1391335858023432192/quality_restoration_20250706162944658.jpg"
-  ]
-};
+    toggleUserMenu: () => {
+      document.getElementById('user-menu-wrapper').classList.toggle('open');
+    },
 
-/* ======================= APPLICATION LOGIC ======================= */
-const app = {
-  
-  init: () => {
-    app.checkAuth();
-    app.renderNav();
-    app.renderRoster();
-    app.renderTimeline();
-    app.renderGallery();
-    app.fetchDiscordStats();
-    app.formatBrandText();
-  },
+    renderNav: () => {
+      const container = document.getElementById('nav-links');
+      DATA.nav.forEach(item => {
+        container.innerHTML += `
+          <a href="${item.href}" class="nav-item" onclick="app.toggleSidebar()">
+            <svg class="icon" viewBox="0 0 24 24">${item.icon}</svg> ${item.label}
+          </a>
+        `;
+      });
+    },
 
-  /* 1. DOM MANIPULATION HELPER FOR ICONS */
-  icon: (path) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`,
-  
-checkAuth: async () => {
-  const card = document.getElementById("user-card");
-
-  try {
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (!session) throw new Error("No session found");
-
-    const { data: profile, error } = await supabaseClient
-      .from("profiles")
-      .select("username, avatar, role")
-      .eq("id", session.user.id)
-      .maybeSingle();
-
-    if (error || !profile) throw new Error("Profile fetch failed");
-
-    app.renderUserCard(profile);
-
-  } catch (err) {
-    console.error(err);
-    app.renderUserCardError(err.message);
-  }
-},
-
-
-
-renderUserCard: (profile) => {
-    // We target the parent wrapper we will create dynamically or the existing ID
-    const container = document.getElementById("user-card");
-    
-    // We need to change the outer HTML to support the wrapper structure
-    // or we inject the new structure inside the sidebar replacing the old card div completely.
-    // However, to keep it simple, we will replace the container's content 
-    // and change the container's classes.
-    
-    const role = profile.role || "member";
-    const username = profile.username;
-    
-    // 1. Create the wrapper HTML
-    const html = `
-      <div id="user-menu-wrapper" class="user-menu-wrapper">
-        <!-- The Trigger Card -->
-        <div class="user-card ready" onclick="app.toggleUserMenu()">
-          <img class="user-avatar" src="${profile.avatar}">
-          <div class="user-info">
-            <div class="user-name">${profile.username}</div>
-            <div class="user-rank rank-${role}">
-              ${role}
+    renderRoster: () => {
+      const container = document.getElementById('roster-container');
+      DATA.roster.forEach(grp => {
+        container.innerHTML += `
+          <div class="rank-group ${grp.class}">
+            <div class="rank-title">${grp.rank}</div>
+            <div class="members-list">
+              ${grp.members.map(m => `<div class="member-chip">${m}</div>`).join('')}
             </div>
           </div>
-          <!-- Chevron Icon -->
-          <svg class="icon card-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-        </div>
-
-        <!-- The Dropdown -->
-        <div class="user-dropdown">
-          <button class="menu-action-btn" onclick="app.delayedRedirect('/@${username}', this)">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span class="btn-text">View Profile</span>
-            <div class="btn-spinner"></div>
-          </button>
-          
-          <button class="menu-action-btn" onclick="app.delayedRedirect('/@${username}/edit', this)">
-             <svg class="icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            <span class="btn-text">Edit Profile</span>
-            <div class="btn-spinner"></div>
-          </button>
-        </div>
-      </div>
-    `;
-    
-    // Replace the specific DOM element
-    container.outerHTML = html;
-  },
-
-renderUserCardError: (msg) => {
-  const container = document.getElementById("user-card");
-  container.className = "user-card error";
-
-  container.innerHTML = `
-    <img class="user-avatar" src="/assets/ranks/error.png">
-    <div class="error-text">
-      <strong>Failed to load profile</strong><br>
-      Please report this error to the staff team.
-    </div>
-  `;
-},
-
-/* 5. USER MENU LOGIC */
-  toggleUserMenu: () => {
-    const wrapper = document.getElementById('user-menu-wrapper');
-    wrapper.classList.toggle('open');
-  },
-
-  delayedRedirect: (url, btnElement) => {
-    // 1. Prevent double clicks
-    if (btnElement.classList.contains('loading')) return;
-
-    // 2. Start Animation
-    btnElement.classList.add('loading');
-
-    // 3. Wait 2 seconds (2000ms), then redirect
-    setTimeout(() => {
-      window.location.href = url;
-    }, 2000);
-  },
-
-  /* 2. RENDER FUNCTIONS */
-  renderNav: () => {
-    const container = document.getElementById('nav-links');
-    DATA.nav.forEach(item => {
-      container.innerHTML += `
-        <a href="${item.href}" class="nav-item" onclick="app.toggleSidebar()">
-          ${app.icon(item.icon)} ${item.label}
-        </a>
-      `;
-    });
-  },
-
-  renderRoster: () => {
-    const container = document.getElementById('roster-container');
-    DATA.roster.forEach(grp => {
-      const html = `
-        <div class="roster-category ${grp.class}">
-          <div class="rank-header">
-            ${app.icon(grp.icon)}
-            <span class="rank-title">${grp.rank}</span>
-          </div>
-          <div class="member-grid">
-            ${grp.members.map(m => `<div class="member-tag">${m}</div>`).join('')}
-          </div>
-        </div>
-      `;
-      container.innerHTML += html;
-    });
-  },
-
-  renderTimeline: () => {
-    const container = document.getElementById('timeline-container');
-    DATA.timeline.forEach(t => {
-      container.innerHTML += `
-        <div class="timeline-item">
-          <div class="t-date">${t.date}</div>
-          <div class="t-desc">${t.desc}</div>
-        </div>
-      `;
-    });
-  },
-
-  renderGallery: () => {
-    const container = document.getElementById('gallery-container');
-    DATA.gallery.forEach(src => {
-      const div = document.createElement('div');
-      div.className = 'gallery-item';
-      div.onclick = () => app.openPreview(src);
-      
-      const img = document.createElement('img');
-      img.className = 'gallery-img';
-      img.loading = 'lazy'; // Performance boost
-      img.onload = () => img.classList.add('loaded');
-      img.src = src;
-      
-      div.appendChild(img);
-      container.appendChild(div);
-    });
-  },
-
-  /* 3. INTERACTIONS */
-  enter: () => {
-    document.getElementById('landing').classList.add('hidden');
-    document.body.style.overflow = 'auto'; // Unlock scroll
-    setTimeout(() => {
-      document.getElementById('landing').style.display = 'none';
-      document.getElementById('main-app').classList.add('visible');
-    }, 600);
-  },
-
-  toggleSidebar: () => {
-    document.getElementById('sidebar').classList.toggle('active');
-  },
-
-  toggleLogin: (show) => {
-    const modal = document.getElementById('login-modal');
-    show ? modal.classList.add('active') : modal.classList.remove('active');
-  },
-
-  login: async (provider) => {
-  if (provider !== "discord") return;
-
-  await supabaseClient.auth.signInWithOAuth({
-    provider: "discord"
-  });
-},
-
-
-
-  /* 4. UTILITIES */
-  openPreview: (src) => {
-    document.getElementById('preview-img-el').src = src;
-    document.getElementById('preview-modal').classList.add('active');
-  },
-  
-  closePreview: () => {
-    document.getElementById('preview-modal').classList.remove('active');
-  },
-
-  formatBrandText: () => {
-    // Auto-styles any text matching /six or sais
-    // This is run after render to catch generated content
-    setTimeout(() => {
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      let node;
-      const nodesToReplace = [];
-      while(node = walker.nextNode()) {
-        if(node.nodeValue.match(/(\/six|sais)/i) && node.parentElement.tagName !== 'SCRIPT' && !node.parentElement.classList.contains('brand-text')) {
-          nodesToReplace.push(node);
-        }
-      }
-      nodesToReplace.forEach(node => {
-        const span = document.createElement('span');
-        span.innerHTML = node.nodeValue.replace(/(\/six|sais)/gi, '<span class="brand-text">$1</span>');
-        node.parentElement.replaceChild(span, node);
+        `;
       });
-    }, 100);
-  },
+    },
 
-  fetchDiscordStats: async () => {
-    try {
-      // Mocking fetch for reliability in demo - replace with real API call if needed
-      // const res = await fetch(`https://discord.com/api/v9/invites/tu6rpKhenw?with_counts=true`);
-      // const data = await res.json();
-      
-      // Simulating a response to ensure UI looks good immediately
+    renderTimeline: () => {
+      const container = document.getElementById('timeline-container');
+      DATA.timeline.forEach(t => {
+        container.innerHTML += `
+          <div class="timeline-item">
+            <div class="t-date">${t.date}</div>
+            <div class="t-desc">${t.desc}</div>
+          </div>
+        `;
+      });
+    },
+
+    renderGallery: () => {
+      const container = document.getElementById('gallery-container');
+      DATA.gallery.forEach(src => {
+        container.innerHTML += `
+          <div class="gallery-thumb" onclick="app.openPreview('${src}')">
+            <img src="${src}" loading="lazy">
+          </div>
+        `;
+      });
+    },
+
+    enter: () => {
+      document.getElementById('landing').classList.add('hidden');
+      document.body.style.overflow = 'auto';
       setTimeout(() => {
-         document.getElementById('discord-stats').innerHTML = `
-           <span style="color:#43b581">●</span> <strong>Online</strong> • 800+ Members
-         `;
-      }, 1000);
-    } catch(e) { console.log(e); }
-  }
-};
+        document.getElementById('landing').style.display = 'none';
+        document.getElementById('main-app').classList.add('visible');
+      }, 600);
+    },
 
-// Start System
-window.addEventListener('DOMContentLoaded', app.init);
+    toggleSidebar: () => { document.getElementById('sidebar').classList.toggle('active'); },
+    
+    toggleLogin: (show) => {
+      const modal = document.getElementById('login-modal');
+      show ? modal.classList.add('active') : modal.classList.remove('active');
+    },
 
+    login: async (p) => { if(p==='discord') await supabaseClient.auth.signInWithOAuth({provider:"discord"}); },
+
+    openPreview: (src) => {
+      document.getElementById('preview-img-el').src = src;
+      document.getElementById('preview-modal').classList.add('active');
+    },
+    
+    closePreview: () => { document.getElementById('preview-modal').classList.remove('active'); },
+
+    formatBrandText: () => {
+      setTimeout(() => {
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        let node;
+        const nodesToReplace = [];
+        while(node = walker.nextNode()) {
+          if(node.nodeValue.match(/(\/six|sais)/i) && node.parentElement.tagName !== 'SCRIPT' && !node.parentElement.classList.contains('brand-text')) {
+            nodesToReplace.push(node);
+          }
+        }
+        nodesToReplace.forEach(node => {
+          const span = document.createElement('span');
+          span.innerHTML = node.nodeValue.replace(/(\/six|sais)/gi, '<span class="brand-text">$1</span>');
+          node.parentElement.replaceChild(span, node);
+        });
+      }, 100);
+    },
+
+    fetchDiscordStats: () => {
+      setTimeout(() => {
+         document.getElementById('discord-count').innerText = `824 Online`;
+         document.getElementById('discord-count').style.color = "#43b581";
+      }, 800);
+    }
+  };
+
+  window.addEventListener('DOMContentLoaded', app.init);
 </script>
 </body>
 </html>
