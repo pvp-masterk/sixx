@@ -817,12 +817,26 @@ footer {
       }, 100);
     },
 
-    fetchDiscordStats: () => {
-      setTimeout(() => {
-         document.getElementById('discord-count').innerText = `824 Online`;
-         document.getElementById('discord-count').style.color = "#43b581";
-      }, 800);
-    }
+    fetchDiscordStats: async () => {
+  const SERVER_ID = "1449293244973191265";
+
+  try {
+    const res = await fetch(
+      `https://discord.com/api/guilds/${SERVER_ID}/widget.json`
+    );
+    if (!res.ok) throw new Error("Widget disabled");
+
+    const data = await res.json();
+
+    const countEl = document.getElementById("discord-count");
+    countEl.textContent = `${data.presence_count} online • ${data.members.length} members`;
+  } catch (err) {
+    console.warn("Discord widget fetch failed", err);
+    const countEl = document.getElementById("discord-count");
+    countEl.textContent = "Server online";
+  }
+}
+
   };
 
   window.addEventListener('DOMContentLoaded', app.init);
