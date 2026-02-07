@@ -145,56 +145,51 @@ console.log("Editing profile for:", username);
   let profileId = null;
 
 async function loadProfile() {
-  if (!username) return showError("No username in URL");
+  if (!username) return showError("No username provided");
 
+  // Fetch the profile
   const { data, error } = await supabaseClient
     .from("profiles")
-    .select("*")
+    .select("id, avatar_url, banner_url, bio") // only select needed fields
     .eq("username", username)
     .single();
 
   if (error || !data) return showError("Profile not found");
 
-  profileId = data.id; // save the id for updates
+  profileId = data.id; // MUST be string
 
   avatarInput.value = data.avatar_url || "";
   bannerInput.value = data.banner_url || "";
   bioInput.value = data.bio || "";
 }
 
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    msgDiv.textContent = "";
-    
-    const updates = {
-      avatar_url: avatarInput.value || null,
-      banner_url: bannerInput.value || null,
-      bio: bioInput.value || null,
-      updated_at: new Date().toISOString()
-    };
+  if (!profileId) return showError("Profile not loaded");
 
-    const { data, error } = await supabaseClient
-  .from("profiles")
-  .update({
+  const updates = {
     avatar_url: avatarInput.value || null,
     banner_url: bannerInput.value || null,
     bio: bioInput.value || null,
     updated_at: new Date().toISOString()
-  })
-  .eq("id", profileId)  // use the row's id
-  .select()
-  .single();
+  };
 
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .update(updates)
+    .eq("id", profileId)
+    .select()
+    .single();
 
-    if (error) {
-      msgDiv.textContent = "Failed to update profile.";
-      msgDiv.className = "message error";
-    } else {
-      msgDiv.textContent = "Profile updated successfully!";
-      msgDiv.className = "message success";
-    }
-  });
+  if (error) {
+    console.error(error);
+    showError("Failed to update profile. Likely RLS / invalid key.");
+  } else {
+    showSuccess("Profile updated successfully!");
+  }
+});
+
 
   loadProfile();
 </script>
