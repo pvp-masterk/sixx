@@ -3,15 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <title>/six - Edit Profile</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 <!-- 1. EXTERNAL LIBRARIES -->
-<!-- Supabase -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<!-- Phosphor Icons -->
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
 
 <style>
 /* ======================= 1. CORE VARIABLES & RESET ======================= */
@@ -19,18 +16,24 @@
   --c-bg: #030005;
   --c-bg-alt: #0a0510;
   --c-accent: #7b2cbf;
-  --c-accent-light: #9d4edd;
-  --c-accent-glow: #e0aaff;
+  --c-accent-hover: #9d4edd;
+  --c-accent-glow: rgba(123, 44, 191, 0.5);
+  
   --c-text-main: #e8e6f3;
   --c-text-dim: #8f8ba0;
   
-  --c-glass: rgba(10, 5, 20, 0.65);
-  --c-glass-hover: rgba(20, 10, 35, 0.8);
+  --c-glass: rgba(10, 5, 20, 0.75); /* Slightly darker for better contrast */
   --c-glass-border: rgba(255, 255, 255, 0.08);
-  --c-glass-border-hover: rgba(157, 78, 221, 0.5);
+  --c-glass-highlight: rgba(255, 255, 255, 0.03);
+  
+  --radius-lg: 24px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
   
   --font-main: 'Inter', sans-serif;
-  --font-brand: 'Cinzel', serif; /* Fallback for Diecide */
+  --font-brand: 'Cinzel', serif;
+  
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -47,303 +50,202 @@ body {
   overflow-x: hidden;
 }
 
-/* Texture Overlay (Scanlines) */
+/* Optimized Scanline Texture */
 body::after {
   content: "";
-  position: fixed; inset: 0; pointer-events: none; z-index: 900;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0,0,0,0.15),
-    rgba(0,0,0,0.15) 1px,
-    transparent 1px,
-    transparent 2px
-  );
-  background-size: 100% 4px;
+  position: fixed; inset: 0; pointer-events: none; z-index: 999;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 3px, 3px 100%;
+  opacity: 0.6;
 }
 
-/* ======================= 2. BACKGROUND & PARTICLES ======================= */
-.bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+/* ======================= 2. BACKGROUND ANIMATION ======================= */
+.bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+
 .bg-blob {
-  position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3;
-  will-change: transform; animation: breath 10s infinite alternate ease-in-out;
+  position: absolute; border-radius: 50%; 
+  filter: blur(80px); opacity: 0.4;
+  will-change: transform; /* Performance Boost */
+  animation: float 20s infinite alternate ease-in-out;
 }
-.bg-blob.one { top: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(#4a0072, transparent 70%); }
-.bg-blob.two { bottom: -20%; right: -10%; width: 70vw; height: 70vw; background: radial-gradient(#240046, transparent 70%); animation-delay: -5s; }
-@keyframes breath { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+.bg-blob.one { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #4a0072 0%, transparent 70%); }
+.bg-blob.two { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, #240046 0%, transparent 70%); animation-delay: -5s; }
+
+@keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(20px, -20px) scale(1.1); } }
 
 /* ======================= 3. MAIN CONTAINER ======================= */
 .container {
   position: relative; z-index: 10;
-  width: 100%;
-  max-width: 550px;
+  width: 100%; max-width: 520px;
   background: var(--c-glass);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--c-glass-border);
-  border-radius: 24px;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: border-color 0.3s ease;
+  transform: translateZ(0); /* GPU Promotion */
+  opacity: 0; animation: fadeIn 0.8s var(--ease-spring) forwards;
 }
 
-.container:hover { border-color: var(--c-glass-border-hover); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-/* --- HEADER / TITLE --- */
+/* --- HEADER --- */
 .header-area {
-  padding: 30px 30px 10px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: 25px 30px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
 }
 
 h2 {
-  font-family: var(--font-brand);
-  font-size: 1.8rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #e0aaff, #9d4edd, #7b2cbf);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-shadow: 0 0 25px rgba(157, 78, 221, 0.3);
+  font-family: var(--font-brand); font-size: 1.5rem; font-weight: 700;
+  background: linear-gradient(135deg, #e0aaff 0%, #7b2cbf 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  letter-spacing: 1px;
 }
-
-.back-link {
-  color: var(--c-text-dim);
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: 0.3s;
-  display: flex; align-items: center; gap: 5px;
-}
-.back-link:hover { color: #fff; }
 
 /* --- PREVIEW SECTION --- */
 .preview-area {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  margin-top: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  position: relative; width: 100%; height: 180px;
+  background: #05020a;
 }
 
 .banner-display {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-  background-color: #05020a;
-  display: block;
-  opacity: 0.95;
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: 0.8; transition: opacity 0.3s;
 }
 
-
 .avatar-wrapper {
-  position: absolute;
-  bottom: 10px;
-  left: 30px;
-  width: 100px;
-  height: 100px;
+  position: absolute; bottom: -40px; left: 30px;
+  width: 90px; height: 90px;
   padding: 4px;
-  background: rgba(10, 5, 20, 0.9);
+  background: var(--c-bg-alt);
   border: 1px solid var(--c-glass-border);
-  border-radius: 20px; /* Squircle like index */
-  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+  z-index: 2;
 }
 
 .avatar-display {
-  width: 100%;
-  height: 100%;
-  border-radius: 16px;
-  object-fit: cover;
+  width: 100%; height: 100%;
+  border-radius: 14px; object-fit: cover;
   background-color: #1a1a1a;
 }
 
 /* --- FORM SECTION --- */
-.form-area {
-  padding: 20px 30px 40px 30px;
-}
+.form-area { padding: 50px 30px 30px 30px; }
 
-.input-group {
-  margin-bottom: 24px;
-  position: relative;
-}
-
+.input-group { margin-bottom: 20px; }
 .input-group label {
-  display: block;
-  margin-bottom: 10px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--c-accent);
-  text-transform: uppercase;
-  letter-spacing: 2px;
+  display: block; margin-bottom: 8px;
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--c-text-dim); text-transform: uppercase; letter-spacing: 1.5px;
 }
 
+/* Inputs */
+.input-wrapper { position: relative; }
 input[type="text"], textarea {
-  width: 100%;
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(0, 0, 0, 0.3);
+  width: 100%; padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--c-glass-border);
+  background: rgba(0, 0, 0, 0.4);
   color: var(--c-text-main);
-  font-family: inherit;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
+  font-family: inherit; font-size: 0.9rem;
+  transition: all 0.2s ease;
 }
 
 input:focus, textarea:focus {
-  outline: none;
   border-color: var(--c-accent);
   background: rgba(123, 44, 191, 0.05);
-  box-shadow: 0 0 20px rgba(123, 44, 191, 0.1);
+  box-shadow: 0 0 0 4px rgba(123, 44, 191, 0.1);
 }
 
-textarea {
-  min-height: 100px;
-  resize: vertical;
-  line-height: 1.6;
-}
+textarea { min-height: 90px; resize: none; line-height: 1.5; }
 
-/* --- ROLES GRID --- */
+/* Roles Grid */
 .roles-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 12px;
-  margin-top: 5px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px; margin-top: 5px;
 }
 
 .role-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  user-select: none;
-  position: relative;
-  overflow: hidden;
+  background: var(--c-glass-highlight);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer; transition: all 0.2s ease;
 }
 
-.role-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(157, 78, 221, 0.3);
-  transform: translateY(-2px);
-}
+.role-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
 
 .role-card.active {
-  background: rgba(123, 44, 191, 0.15);
+  background: rgba(123, 44, 191, 0.2);
   border-color: var(--c-accent);
-  box-shadow: 0 0 15px rgba(123, 44, 191, 0.2);
+  box-shadow: 0 4px 12px rgba(123, 44, 191, 0.15);
 }
 
 .role-icon-img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-  transition: all 0.3s ease;
-  opacity: 0.5;
-  filter: grayscale(100%);
+  width: 24px; height: 24px; object-fit: contain;
+  opacity: 0.6; filter: grayscale(100%); transition: 0.3s;
 }
 
-.role-card.active .role-icon-img {
-  opacity: 1;
-  filter: grayscale(0%);
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 5px var(--c-accent));
-}
+.role-card.active .role-icon-img { opacity: 1; filter: grayscale(0%); transform: scale(1.1); }
+.role-name { font-size: 0.75rem; color: var(--c-text-dim); font-weight: 500; }
+.role-card.active .role-name { color: #fff; }
 
-.role-name {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--c-text-dim);
-}
-.role-card.active .role-name { color: #fff; text-shadow: 0 0 10px var(--c-accent); }
-
-/* --- ACTION BUTTON --- */
+/* Button */
 .action-btn {
-  width: 100%;
-  margin-top: 30px;
-  padding: 16px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-size: 0.9rem;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  position: relative;
-  overflow: hidden;
-}
-
-.action-btn::before {
-  content: ''; position: absolute; top:0; left: -100%; width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  transition: 0.5s;
+  width: 100%; margin-top: 25px; padding: 15px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid var(--c-glass-border);
+  color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem;
+  border-radius: var(--radius-md);
+  cursor: pointer; transition: all 0.3s var(--ease-spring);
+  position: relative; overflow: hidden;
+  display: flex; justify-content: center; align-items: center; gap: 10px;
 }
 
 .action-btn:hover { 
-  border-color: var(--c-accent); 
-  transform: translateY(-2px); 
-  box-shadow: 0 0 30px rgba(123, 44, 191, 0.4);
+  background: var(--c-accent); border-color: var(--c-accent);
+  box-shadow: 0 0 25px var(--c-accent-glow);
+  transform: translateY(-2px);
 }
-.action-btn:hover::before { left: 100%; }
+.action-btn:active { transform: scale(0.98); }
+.action-btn:disabled { opacity: 0.6; cursor: wait; pointer-events: none; }
 
-.action-btn:active { transform: translateY(1px); }
-.action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-
-/* Spinner */
+/* Loading Spinner */
 .spinner {
-  width: 20px; height: 20px;
-  border: 2px solid rgba(255,255,255,0.1);
-  border-top-color: var(--c-accent-glow);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
   display: none;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* --- TOAST NOTIFICATION --- */
+/* Toast */
 .toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%) translateY(100px);
-  background: #0f0518;
-  border: 1px solid var(--c-accent);
-  color: #fff;
-  padding: 14px 28px;
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 0 30px rgba(123, 44, 191, 0.3);
-  opacity: 0;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  z-index: 1000;
+  position: fixed; bottom: 30px; left: 50%;
+  transform: translate(-50%, 50px); opacity: 0;
+  background: #0f0518; border: 1px solid var(--c-glass-border);
+  padding: 12px 24px; border-radius: 50px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: all 0.4s var(--ease-spring);
+  z-index: 1000; pointer-events: none;
 }
-.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-.toast.success i { color: #4ade80; text-shadow: 0 0 10px #4ade80; }
-.toast.error i { color: #ef4444; text-shadow: 0 0 10px #ef4444; }
+.toast.show { transform: translate(-50%, 0); opacity: 1; }
+.toast span { font-size: 0.9rem; font-weight: 500; }
+.toast.success { border-color: #4ade80; color: #4ade80; }
+.toast.error { border-color: #ef4444; color: #ef4444; }
+
+/* Helper classes */
+.hidden { display: none !important; }
 
 </style>
 </head>
 <body>
 
-<!-- Background Ambience -->
+<!-- Background -->
 <div class="bg-fixed">
   <div class="bg-blob one"></div>
   <div class="bg-blob two"></div>
@@ -351,40 +253,45 @@ textarea {
 
 <div class="container">
   
-  
+  <div class="header-area">
+    <h2>/six</h2>
+  </div>
 
-  <!-- PREVIEW SECTION -->
+  <!-- Preview -->
   <div class="preview-area">
-    <img id="prev-banner" class="banner-display" src="" alt="Banner">
+    <img id="prev-banner" class="banner-display" src="" alt="">
     <div class="avatar-wrapper">
-      <img id="prev-avatar" class="avatar-display" src="" alt="Avatar">
+      <img id="prev-avatar" class="avatar-display" src="" alt="">
     </div>
   </div>
 
-  <!-- FORM SECTION -->
+  <!-- Form -->
   <div class="form-area">
-    
     <form id="profileForm">
       
       <div class="input-group">
         <label>Avatar URL</label>
-        <input type="text" id="in-avatar" placeholder="https://..." autocomplete="off">
+        <div class="input-wrapper">
+          <input type="text" id="in-avatar" placeholder="https://imgur.com/..." autocomplete="off">
+        </div>
       </div>
 
       <div class="input-group">
         <label>Banner URL</label>
-        <input type="text" id="in-banner" placeholder="https://..." autocomplete="off">
+        <div class="input-wrapper">
+          <input type="text" id="in-banner" placeholder="https://imgur.com/..." autocomplete="off">
+        </div>
       </div>
 
       <div class="input-group">
         <label>About You</label>
-        <textarea id="in-bio" placeholder="Write about yourself here"></textarea>
+        <textarea id="in-bio" placeholder="Tell us about yourself..."></textarea>
       </div>
 
       <div class="input-group">
-        <label>Display Roles</label>
+        <label>Roles</label>
         <div id="roles-grid" class="roles-container">
-          <!-- Roles injected by JS -->
+          <!-- JS Injected -->
         </div>
       </div>
 
@@ -397,235 +304,175 @@ textarea {
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- Toast -->
 <div id="toast" class="toast">
-  <i class="ph-fill ph-check-circle" style="font-size: 1.2rem;"></i>
-  <span id="toast-msg">Notification</span>
+  <i class="ph-bold" id="toast-icon"></i>
+  <span id="toast-msg"></span>
 </div>
 
 <script>
-/**
- * ==========================================
- * 1. CONFIGURATION
- * ==========================================
- */
+/* ================= CONFIGURATION ================= */
+// REPLACE with your actual Project URL & Public Key
 const CONFIG = {
-  supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co",
+  supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co", 
   supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
   
   defaultAvatar: "https://cdn.discordapp.com/embed/avatars/0.png",
-  defaultBanner: "https://via.placeholder.com/600x200/0a0510/333?text=No+Banner",
+  defaultBanner: "https://i.pinimg.com/originals/2b/2b/28/2b2b287959954e38e6840d0497557457.gif", // Dark aesthetic fallback
 
-  // Define roles using PNG filenames found in your root assets folder
-  availableRoles: [
+  // Roles available for selection
+  roles: [
     { id: 'Founder',   label: 'Founder',   icon: 'founder.png' },
     { id: 'Admin',     label: 'Admin',     icon: 'admin.png' },
-    { id: 'Moderator', label: 'Moderator', icon: 'moderator.png' },
+    { id: 'Moderator', label: 'Mod',       icon: 'moderator.png' },
     { id: 'Verified',  label: 'Verified',  icon: 'verified.png' },
-    { id: 'Dev',       label: 'Developer', icon: 'dev.png' },
+    { id: 'Dev',       label: 'Dev',       icon: 'dev.png' },
     { id: 'VIP',       label: 'VIP',       icon: 'vip.png' }
   ]
 };
 
-/**
- * ==========================================
- * 2. APP STATE & INITIALIZATION
- * ==========================================
- */
+/* ================= APP LOGIC ================= */
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 let currentProfileId = null;
 
-// DOM Element Cache
-const DOM = {
+// UI Elements
+const els = {
   form: document.getElementById('profileForm'),
-  inputs: {
-    avatar: document.getElementById('in-avatar'),
-    banner: document.getElementById('in-banner'),
-    bio: document.getElementById('in-bio'),
-  },
-  previews: {
-    avatar: document.getElementById('prev-avatar'),
-    banner: document.getElementById('prev-banner'),
-  },
+  avatarIn: document.getElementById('in-avatar'),
+  bannerIn: document.getElementById('in-banner'),
+  bioIn: document.getElementById('in-bio'),
+  prevAvatar: document.getElementById('prev-avatar'),
+  prevBanner: document.getElementById('prev-banner'),
   rolesGrid: document.getElementById('roles-grid'),
   btn: document.getElementById('save-btn'),
   spinner: document.querySelector('.spinner'),
   btnText: document.querySelector('.btn-text'),
   toast: document.getElementById('toast'),
   toastMsg: document.getElementById('toast-msg'),
-  toastIcon: document.querySelector('#toast i')
+  toastIcon: document.getElementById('toast-icon')
 };
 
-// Start the App
-init();
+// 1. Initialize
+(async function init() {
+  renderRoles([]);
+  updatePreviews(); // Load defaults immediately
 
-async function init() {
-  // 1. Initial Render (Empty Grid)
-  renderRoleGrid([]); 
-
-  // 2. AUTH CHECK
-  DOM.btnText.innerText = "Authenticating...";
-  DOM.btn.disabled = true;
-
-  const { data: { user }, error: authError } = await sb.auth.getUser();
-
-  if (authError || !user) {
-    showToast("Access Denied: Not logged in.", "error");
-    DOM.btnText.innerText = "Authentication Failed";
-    return;
-  }
-
-  // 3. FETCH PROFILE based on USER ID
-  DOM.btnText.innerText = "Retrieving Data...";
-
-  const { data, error } = await sb
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  DOM.btn.disabled = false;
-  DOM.btnText.innerText = "Save Changes";
-
-  if (error || !data) {
-    console.error(error);
-    showToast("Profile not found or API error.", "error");
-    
-    // Fallback: If profile doesn't exist yet, we prepare to create it for this user
-    currentProfileId = user.id; 
-    return;
-  }
-
-  // 4. Populate Form with Database Values
-  currentProfileId = data.id;
-  DOM.inputs.avatar.value = data.avatar || "";
-  DOM.inputs.banner.value = data.banner_url || "";
-  DOM.inputs.bio.value = data.bio || "";
+  setLoading(true, "Authenticating...");
   
-  updatePreviews();
-  renderRoleGrid(data.roles || []);
-}
+  // Auth Check
+  const { data: { user }, error: authErr } = await sb.auth.getUser();
+  if (authErr || !user) {
+    showToast("Not logged in", "error");
+    setLoading(false, "Login Required");
+    els.btn.disabled = true;
+    return;
+  }
 
-/**
- * ==========================================
- * 3. HELPER FUNCTIONS
- * ==========================================
- */
+  // Fetch Profile
+  setLoading(true, "Loading Profile...");
+  const { data, error } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
 
-// Render the grid of roles using IMAGES
-function renderRoleGrid(selectedRoles) {
-  DOM.rolesGrid.innerHTML = ""; // Clear existing
-
-  CONFIG.availableRoles.forEach(role => {
-    const card = document.createElement('div');
-    card.className = `role-card ${selectedRoles.includes(role.id) ? 'active' : ''}`;
-    card.dataset.roleId = role.id;
-
-    // --- CREATE IMAGE TAG ---
-    // Assuming file structure: /assets/icon.png relative to parent or root
-    const img = document.createElement('img');
-    img.src = `../assets/${role.icon}`; 
-    img.className = 'role-icon-img';
-    img.alt = role.label;
-
-    // Fallback if image fails
-    img.onerror = function() {
-      this.style.display='none'; 
-    };
-
-    const span = document.createElement('span');
-    span.className = 'role-name';
-    span.innerText = role.label;
-
-    card.appendChild(img);
-    card.appendChild(span);
-
-    // Toggle Selection
-    card.addEventListener('click', () => {
-      card.classList.toggle('active');
-    });
-
-    DOM.rolesGrid.appendChild(card);
-  });
-}
-
-function updatePreviews() {
-  const av = DOM.inputs.avatar.value.trim();
-  const ban = DOM.inputs.banner.value.trim();
-
-  DOM.previews.avatar.src = av || CONFIG.defaultAvatar;
-  DOM.previews.banner.src = ban || CONFIG.defaultBanner;
-}
-
-function setLoading(isLoading) {
-  if (isLoading) {
-    DOM.spinner.style.display = "block";
-    DOM.btnText.style.display = "none";
-    DOM.btn.disabled = true;
+  if (data) {
+    currentProfileId = data.id;
+    els.avatarIn.value = data.avatar || "";
+    els.bannerIn.value = data.banner_url || "";
+    els.bioIn.value = data.bio || "";
+    renderRoles(data.roles || []);
+    updatePreviews();
   } else {
-    DOM.spinner.style.display = "none";
-    DOM.btnText.style.display = "block";
-    DOM.btn.disabled = false;
+    // New user fallback
+    currentProfileId = user.id;
   }
-}
-
-function showToast(msg, type = "success") {
-  DOM.toastMsg.innerText = msg;
-  DOM.toast.className = `toast show ${type}`;
   
-  if(type === 'success') DOM.toastIcon.className = "ph-fill ph-check-circle";
-  else DOM.toastIcon.className = "ph-fill ph-warning-circle";
+  setLoading(false);
+})();
 
-  setTimeout(() => {
-    DOM.toast.classList.remove("show");
-  }, 3000);
-}
+// 2. Event Listeners (Debounced for performance)
+els.avatarIn.addEventListener('input', debounce(updatePreviews, 500));
+els.bannerIn.addEventListener('input', debounce(updatePreviews, 500));
 
-/**
- * ==========================================
- * 4. EVENT LISTENERS
- * ==========================================
- */
-DOM.inputs.avatar.addEventListener('input', updatePreviews);
-DOM.inputs.banner.addEventListener('input', updatePreviews);
-
-DOM.form.addEventListener('submit', async (e) => {
+els.form.addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (!currentProfileId) return;
 
-  if (!currentProfileId) {
-    showToast("Error: No authenticated user.", "error");
-    return;
-  }
+  setLoading(true, "Saving...");
 
-  setLoading(true);
-
-  // Collect selected roles
-  const activeRoles = Array.from(document.querySelectorAll('.role-card.active'))
-                           .map(el => el.dataset.roleId);
-
+  const activeRoles = Array.from(document.querySelectorAll('.role-card.active')).map(el => el.dataset.roleId);
+  
   const updates = {
-    avatar: DOM.inputs.avatar.value.trim() || null,
-    banner_url: DOM.inputs.banner.value.trim() || null,
-    bio: DOM.inputs.bio.value.trim() || null,
+    avatar: els.avatarIn.value.trim() || null,
+    banner_url: els.bannerIn.value.trim() || null,
+    bio: els.bioIn.value.trim() || null,
     roles: activeRoles,
     updated_at: new Date().toISOString()
   };
 
-  const { error } = await sb
-    .from("profiles")
-    .update(updates)
-    .eq("id", currentProfileId);
+  const { error } = await sb.from("profiles").update(updates).eq("id", currentProfileId);
 
   setLoading(false);
-
+  
   if (error) {
-    console.error("Save Error:", error);
-    showToast("Update Failed.", "error");
+    console.error(error);
+    showToast("Failed to save changes", "error");
   } else {
-    showToast("Profile updated.");
+    showToast("Profile updated successfully", "success");
   }
 });
 
+/* ================= HELPERS ================= */
+
+// Debounce: Prevents lag by waiting until user stops typing to execute heavy tasks (like image loading)
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+function updatePreviews() {
+  const av = els.avatarIn.value.trim();
+  const bn = els.bannerIn.value.trim();
+  
+  // Only update src if changed to prevent flickering
+  if(els.prevAvatar.src !== (av || CONFIG.defaultAvatar)) 
+    els.prevAvatar.src = av || CONFIG.defaultAvatar;
+    
+  if(els.prevBanner.src !== (bn || CONFIG.defaultBanner))
+    els.prevBanner.src = bn || CONFIG.defaultBanner;
+}
+
+function renderRoles(selectedRoles) {
+  els.rolesGrid.innerHTML = "";
+  CONFIG.roles.forEach(role => {
+    const card = document.createElement('div');
+    card.className = `role-card ${selectedRoles.includes(role.id) ? 'active' : ''}`;
+    card.dataset.roleId = role.id;
+    
+    // Using relative path assuming assets folder exists
+    card.innerHTML = `
+      <img src="../assets/${role.icon}" class="role-icon-img" onerror="this.style.display='none'">
+      <span class="role-name">${role.label}</span>
+    `;
+    
+    card.addEventListener('click', () => card.classList.toggle('active'));
+    els.rolesGrid.appendChild(card);
+  });
+}
+
+function setLoading(isLoading, text = "Save Changes") {
+  els.btn.disabled = isLoading;
+  els.btnText.textContent = text;
+  els.spinner.style.display = isLoading ? "block" : "none";
+}
+
+function showToast(msg, type) {
+  els.toastMsg.innerText = msg;
+  els.toast.className = `toast show ${type}`;
+  els.toastIcon.className = type === 'success' ? 'ph-bold ph-check-circle' : 'ph-bold ph-warning-circle';
+  
+  setTimeout(() => els.toast.classList.remove('show'), 3000);
+}
 </script>
 </body>
 </html>
