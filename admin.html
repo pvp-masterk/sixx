@@ -74,11 +74,14 @@ const sb = supabase.createClient(
   if (!user) return location.href = "/login.html";
 
   // Verify admin
-  const { data: me } = await sb
-    .from("profiles")
-    .select("is_admin")
-    .eq("id", user.id)
-    .single();
+  const { data: me, error } = await sb
+  .from("profiles")
+  .select("id, is_admin")
+  .eq("id", user.id)
+  .single();
+
+console.log("Admin check:", me, error);
+
 
   if (!me?.is_admin) {
     alert("Access denied");
