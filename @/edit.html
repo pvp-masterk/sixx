@@ -322,9 +322,7 @@ const CONFIG = {
     { id: 'Founder',   label: 'Founder',   icon: 'founder.png' },
     { id: 'Admin',     label: 'Admin',     icon: 'admin.png' },
     { id: 'Moderator', label: 'Mod',       icon: 'moderator.png' },
-    { id: 'Verified',  label: 'Verified',  icon: 'verified.png' },
-    { id: 'Dev',       label: 'Dev',       icon: 'dev.png' },
-    { id: 'VIP',       label: 'VIP',       icon: 'vip.png' }
+    { id: 'Verified',  label: 'Verified',  icon: 'verified.png' }
   ]
 };
 
@@ -441,21 +439,28 @@ function updatePreviews() {
 
 function renderRoles(selectedRoles) {
   els.rolesGrid.innerHTML = "";
-  CONFIG.roles.forEach(role => {
-    const card = document.createElement('div');
-    card.className = `role-card ${selectedRoles.includes(role.id) ? 'active' : ''}`;
-    card.dataset.roleId = role.id;
-    
-    // Using relative path assuming assets folder exists
-    card.innerHTML = `
-      <img src="../assets/${role.icon}" class="role-icon-img" onerror="this.style.display='none'">
-      <span class="role-name">${role.label}</span>
-    `;
-    
-    card.addEventListener('click', () => card.classList.toggle('active'));
-    els.rolesGrid.appendChild(card);
-  });
+
+  // Only render roles that the user currently has
+  CONFIG.roles
+    .filter(role => selectedRoles.includes(role.id))
+    .forEach(role => {
+      const card = document.createElement('div');
+      card.className = `role-card active`; // Always active because user has it
+      card.dataset.roleId = role.id;
+
+      // Create role inner HTML
+      card.innerHTML = `
+        <img src="../assets/${role.icon}" class="role-icon-img" onerror="this.style.display='none'">
+        <span class="role-name">${role.label}</span>
+      `;
+
+      // Optional: clicking can still toggle active if you want editing
+      card.addEventListener('click', () => card.classList.toggle('active'));
+
+      els.rolesGrid.appendChild(card);
+    });
 }
+
 
 function setLoading(isLoading, text = "Save Changes") {
   els.btn.disabled = isLoading;
