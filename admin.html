@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>/six — Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+  background:#030005;
+  font-family:Inter, sans-serif;
+  color:#e8e6f3;
+  padding:30px;
+}
+
+h1 { margin-bottom:20px; }
+
+.user-card {
+  background:#0a0510;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.user-info {
+  font-size:0.9rem;
+}
+
+.badge {
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:0.7rem;
+  margin-left:6px;
+}
+
+.admin { background:#7b2cbf; }
+.banned { background:#ef4444; }
+
+button {
+  background:#7b2cbf;
+  border:none;
+  color:#fff;
+  padding:8px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  margin-left:6px;
+}
+
+button.danger { background:#ef4444; }
+button.secondary { background:#444; }
+</style>
+</head>
+
+<body>
+
+<h1>Admin Panel</h1>
+<div id="users"></div>
+
+<script>
+const sb = supabase.createClient(
+  "https://tstsijdifhgmpaszqknr.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
+);
+
+(async function init() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return location.href = "/login.html";
+
+  // Verify admin
+  const { data: me } = await sb
+    .from("profiles")
+    .select("is_admin")
+    .eq("id", user.id)
+    .single();
+
+  if (!me?.is_admin) {
+    alert("Access denied");
+    location.href = "/";
+    return;
+  }
+
+  loadUsers();
+})();
+
+async function loadUsers() {
+  const { data: users } = await sb
+    .from("profiles")
+    .select("id, username, roles, is_admin, is_banned");
+
+  const container = document.getElementById("users");
+  container.innerHTML = "";
+
+  users.forEach(u => {
+    const card = document.createElement("div");
+    card.className = "user-card";
+
+    card.innerHTML = `
+      <div class="user-info">
+        <strong>${u.username || u.id}</strong>
+        ${u.is_admin ? `<span class="badge admin">ADMIN</span>` : ""}
+        ${u.is_banned ? `<span class="badge banned">BANNED</span>` : ""}
+        <div>Roles: ${(u.roles || []).join(", ")}</div>
+      </div>
+      <div>
+        <button onclick="toggleBan('${u.id}', ${u.is_banned})"
+          class="${u.is_banned ? 'secondary' : 'danger'}">
+          ${u.is_banned ? "Unban" : "Ban"}
+        </button>
+        <button onclick="addRole('${u.id}')">Add Role</button>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+async function toggleBan(id, banned) {
+  await sb.from("profiles")
+    .update({ is_banned: !banned })
+    .eq("id", id);
+
+  loadUsers();
+}
+
+async function addRole(id) {
+  const role = prompt("Enter role name:");
+  if (!role) return;
+
+  const { data } = await sb
+    .from("profiles")
+    .select("roles")
+    .eq("id", id)
+    .single();
+
+  const roles = new Set(data.roles || []);
+  roles.add(role);
+
+  await sb.from("profiles")
+    .update({ roles: [...roles] })
+    .eq("id", id);
+
+  loadUsers();
+}
+</script>
+</body>
+</html>
