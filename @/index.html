@@ -413,7 +413,7 @@
 
       // Create Edit Button
       const editBtn = document.createElement("a");
-      editBtn.href = "/settings/profile"; // Link to your edit page
+     editBtn.href = `/@${encodeURIComponent(username)}/edit`; // Dynamic link based on username
       editBtn.className = "btn btn-primary";
       editBtn.innerHTML = `<i class="ph-bold ph-pencil-simple"></i> Edit Profile`;
       
