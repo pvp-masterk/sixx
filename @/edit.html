@@ -13,11 +13,13 @@
 <style>
 :root {
   --bg-color: #09090b;
-  --card-bg: rgba(24, 24, 27, 0.6);
-  --border-color: rgba(255, 255, 255, 0.1);
+  --card-bg: rgba(24, 24, 27, 0.7);
+  --border-color: rgba(255, 255, 255, 0.08);
   --accent: #5865F2;
+  --accent-hover: #4752c4;
   --text-main: #ffffff;
   --text-muted: #a1a1aa;
+  --input-bg: rgba(0, 0, 0, 0.4);
 }
 
 * { box-sizing: border-box; }
@@ -25,215 +27,361 @@
 body {
   margin: 0;
   background-color: var(--bg-color);
-  background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                    radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                    radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+  /* Aesthetic dark gradient background */
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(88, 101, 242, 0.15), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%);
   color: var(--text-main);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
-.card {
+/* Main Container */
+.container {
   width: 100%;
-  max-width: 480px;
+  max-width: 500px;
   background: var(--card-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-color);
   border-radius: 24px;
   overflow: hidden;
-  padding: 24px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
-h2 {
-  margin-top: 0;
-  text-align: center;
+/* Live Preview Section */
+.profile-preview {
+  position: relative;
+  width: 100%;
+  margin-bottom: 60px; /* Space for avatar overlap */
 }
+
+.banner-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  background-color: #1a1a1a;
+  display: block;
+}
+
+.avatar-wrapper {
+  position: absolute;
+  bottom: -50px;
+  left: 24px;
+  padding: 4px;
+  background: var(--card-bg); /* Cutout effect */
+  border-radius: 50%;
+}
+
+.avatar-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #27272a;
+  border: 2px solid var(--border-color);
+}
+
+/* Form Section */
+.form-content {
+  padding: 0 24px 24px 24px;
+}
+
+h2 { margin: 0 0 20px 0; font-size: 1.5rem; }
+
+.form-group { margin-bottom: 16px; }
 
 label {
   display: block;
-  margin-top: 16px;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: var(--text-main);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 input[type="text"], textarea {
   width: 100%;
-  margin-top: 8px;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
-  background: rgba(0,0,0,0.3);
+  background: var(--input-bg);
   color: var(--text-main);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
 }
 
-textarea { resize: vertical; min-height: 80px; }
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(88, 101, 242, 0.1);
+}
 
+textarea { resize: vertical; min-height: 100px; line-height: 1.5; }
+
+/* Button & Loading State */
 button {
-  margin-top: 20px;
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background: var(--accent);
-  color: #fff;
-  font-weight: 700;
+  color: white;
+  font-weight: 600;
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: 0.2s;
-}
-
-button:hover { background: #4752c4; }
-
-.message {
-  margin-top: 12px;
-  text-align: center;
-  font-weight: 600;
-}
-
-.success { color: #4ade80; }
-.error { color: #ef4444; }
-
-.preview {
-  margin-top: 16px;
+  transition: background 0.2s;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.preview img {
-  max-width: 100%;
-  border-radius: 16px;
-  margin-top: 8px;
-  border: 2px solid var(--border-color);
+button:hover { background: var(--accent-hover); }
+button:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s linear infinite;
+  display: none;
 }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #18181b;
+  border: 1px solid var(--border-color);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: 500;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 100;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.success i { color: #4ade80; }
+.toast.error i { color: #ef4444; }
+
 </style>
 </head>
 <body>
 
-<div class="card">
-  <h2>Edit Profile</h2>
-
-  <form id="editForm">
-    <label for="avatar">Avatar URL</label>
-    <input type="text" id="avatar" placeholder="https://cdn.discordapp.com/..." />
-
-    <label for="banner">Banner URL</label>
-    <input type="text" id="banner" placeholder="https://example.com/banner.png" />
-
-    <label for="bio">Bio</label>
-    <textarea id="bio" placeholder="Write something about yourself..."></textarea>
-
-    <div class="preview">
-      <div>Avatar Preview:</div>
-      <img id="avatarPreview" src="" alt="Avatar Preview">
-      <div style="margin-top:12px;">Banner Preview:</div>
-      <img id="bannerPreview" src="" alt="Banner Preview">
+<div class="container">
+  
+  <!-- Visual Preview (updates live) -->
+  <div class="profile-preview">
+    <img id="bannerPreview" class="banner-img" src="https://via.placeholder.com/500x160/1a1a1a/555?text=No+Banner" alt="Banner">
+    <div class="avatar-wrapper">
+      <img id="avatarPreview" class="avatar-img" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Avatar">
     </div>
+  </div>
 
-    <button type="submit">Save Changes</button>
-    <div id="msg" class="message"></div>
-  </form>
+  <div class="form-content">
+    <h2>Edit Profile</h2>
+    <form id="editForm">
+      
+      <div class="form-group">
+        <label for="avatar">Avatar URL</label>
+        <input type="text" id="avatar" placeholder="https://..." autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label for="banner">Banner URL</label>
+        <input type="text" id="banner" placeholder="https://..." autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label for="bio">Bio</label>
+        <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
+      </div>
+
+      <button type="submit" id="saveBtn">
+        <div class="spinner"></div>
+        <span id="btnText">Save Changes</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast">
+  <i class="ph-fill ph-check-circle"></i>
+  <span id="toastMsg">Message</span>
 </div>
 
 <script>
+// --- Configuration ---
 const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
 
-// Use global supabase object (already included via <script>)
-supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// --- Initialization ---
+// FIX: Assigned to 'sb' instead of 'supabase' to avoid overwriting the global library
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const avatarInput = document.getElementById("avatar");
-const bannerInput = document.getElementById("banner");
-const bioInput = document.getElementById("bio");
-const avatarPreview = document.getElementById("avatarPreview");
-const bannerPreview = document.getElementById("bannerPreview");
-const msgDiv = document.getElementById("msg");
-const form = document.getElementById("editForm");
-
-// Parse username from URL
-const path = window.location.pathname; // "/@username/edit"
-const segments = path.split("/");
-let username = "";
-if (segments[1] && segments[1].startsWith("@")) {
-  username = segments[1].slice(1);
-}
+// DOM Elements
+const els = {
+  avatarInput: document.getElementById("avatar"),
+  bannerInput: document.getElementById("banner"),
+  bioInput: document.getElementById("bio"),
+  avatarPreview: document.getElementById("avatarPreview"),
+  bannerPreview: document.getElementById("bannerPreview"),
+  form: document.getElementById("editForm"),
+  saveBtn: document.getElementById("saveBtn"),
+  spinner: document.querySelector(".spinner"),
+  btnText: document.getElementById("btnText"),
+  toast: document.getElementById("toast"),
+  toastMsg: document.getElementById("toastMsg"),
+  toastIcon: document.querySelector("#toast i")
+};
 
 let profileId = null;
 
-// Load profile by username
+// --- Helper Functions ---
+function showToast(msg, type = "success") {
+  els.toastMsg.textContent = msg;
+  els.toast.className = `toast show ${type}`;
+  els.toastIcon.className = type === "success" 
+    ? "ph-fill ph-check-circle" 
+    : "ph-fill ph-warning-circle";
+
+  setTimeout(() => {
+    els.toast.classList.remove("show");
+  }, 3000);
+}
+
+function setLoading(isLoading) {
+  if (isLoading) {
+    els.spinner.style.display = "block";
+    els.btnText.textContent = "Saving...";
+    els.saveBtn.disabled = true;
+  } else {
+    els.spinner.style.display = "none";
+    els.btnText.textContent = "Save Changes";
+    els.saveBtn.disabled = false;
+  }
+}
+
+// --- Logic ---
+
+// 1. Determine Username (Support /@user/edit OR ?username=user)
+function getUsername() {
+  const path = window.location.pathname; 
+  const segments = path.split("/");
+  
+  // Try path first: /@hailtheempire/edit
+  if (segments[1] && segments[1].startsWith("@")) {
+    return segments[1].slice(1);
+  }
+  
+  // Fallback to query param: edit.html?username=hailtheempire
+  const params = new URLSearchParams(window.location.search);
+  return params.get("username");
+}
+
+const username = getUsername();
+
+// 2. Load Profile Data
 async function loadProfile() {
   if (!username) {
-    msgDiv.textContent = "No username in URL";
-    msgDiv.className = "message error";
+    showToast("No username found in URL", "error");
     return;
   }
 
-  const { data: profile, error } = await supabase
+  console.log(`Fetching profile for: ${username}`);
+
+  const { data: profile, error } = await sb
     .from("profiles")
     .select("id, avatar_url, banner_url, bio")
     .eq("username", username)
-    .maybeSingle(); // <-- key change
+    .maybeSingle();
 
-  if (error || !profile) {
-    msgDiv.textContent = "Profile not found";
-    msgDiv.className = "message error";
+  if (error) {
+    console.error("Supabase Error Details:", error);
+    showToast(`Error: ${error.message}`, "error");
     return;
   }
 
+  if (!profile) {
+    showToast("Profile not found", "error");
+    return;
+  }
+
+  // Populate Data
   profileId = profile.id;
+  els.avatarInput.value = profile.avatar_url || "";
+  els.bannerInput.value = profile.banner_url || "";
+  els.bioInput.value = profile.bio || "";
 
-  avatarInput.value = profile.avatar_url || "";
-  bannerInput.value = profile.banner_url || "";
-  bioInput.value = profile.bio || "";
-
-  avatarPreview.src = avatarInput.value || "https://cdn.discordapp.com/embed/avatars/0.png";
-  bannerPreview.src = bannerInput.value || "https://via.placeholder.com/480x160.png?text=Banner";
+  // Trigger preview updates
+  updatePreviews();
 }
 
+// 3. Live Previews
+function updatePreviews() {
+  const avVal = els.avatarInput.value.trim();
+  const bnVal = els.bannerInput.value.trim();
+  
+  els.avatarPreview.src = avVal || "https://cdn.discordapp.com/embed/avatars/0.png";
+  els.bannerPreview.src = bnVal || "https://via.placeholder.com/500x160/1a1a1a/555?text=No+Banner";
+}
 
-// Live preview
-avatarInput.addEventListener("input", () => {
-  avatarPreview.src = avatarInput.value || "https://cdn.discordapp.com/embed/avatars/0.png";
-});
-bannerInput.addEventListener("input", () => {
-  bannerPreview.src = bannerInput.value || "https://via.placeholder.com/480x160.png?text=Banner";
-});
+els.avatarInput.addEventListener("input", updatePreviews);
+els.bannerInput.addEventListener("input", updatePreviews);
 
-// Save changes
-form.addEventListener("submit", async (e) => {
+// 4. Save Changes
+els.form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (!profileId) return;
+  if (!profileId) {
+    showToast("Cannot save: No profile loaded", "error");
+    return;
+  }
+
+  setLoading(true);
 
   const updates = {
-    avatar_url: avatarInput.value || null,
-    banner_url: bannerInput.value || null,
-    bio: bioInput.value || null,
+    avatar_url: els.avatarInput.value.trim() || null,
+    banner_url: els.bannerInput.value.trim() || null,
+    bio: els.bioInput.value.trim() || null,
     updated_at: new Date().toISOString()
   };
 
-  const { data: updated, error } = await supabase
+  const { error } = await sb
     .from("profiles")
     .update(updates)
-    .eq("id", profileId)
-    .select()
-    .single();
+    .eq("id", profileId);
+
+  setLoading(false);
 
   if (error) {
     console.error(error);
-    msgDiv.textContent = "Failed to update profile. Check fields or keys.";
-    msgDiv.className = "message error";
+    showToast("Failed to save changes", "error");
   } else {
-    msgDiv.textContent = "Profile updated successfully!";
-    msgDiv.className = "message success";
+    showToast("Profile updated successfully!");
   }
 });
 
+// Initialize
 loadProfile();
-</script>
 
+</script>
 </body>
 </html>
