@@ -819,6 +819,8 @@ footer {
 
     fetchDiscordStats: async () => {
   const SERVER_ID = "1449293244973191265";
+  const countEl = document.getElementById("discord-count");
+  if (!countEl) return;
 
   try {
     const res = await fetch(
@@ -828,16 +830,15 @@ footer {
 
     const data = await res.json();
 
-    const countEl = document.getElementById("discord-count");
     countEl.innerHTML = `
-  <span style="color:#fff;font-weight:700">${data.presence_count}</span> online
-`;
+      <span style="color:#fff;font-weight:700">${data.presence_count}</span> online
+    `;
   } catch (err) {
     console.warn("Discord widget fetch failed", err);
-    const countEl = document.getElementById("discord-count");
-    countEl.textContent = "Server online";
+    countEl.textContent = "Discord server";
   }
 }
+
 
   };
 
