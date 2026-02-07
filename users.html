@@ -451,6 +451,26 @@
   background: rgba(99,102,241,0.15);
   color: var(--accent);
 }
+.user-name-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-verified {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px; /* optical alignment */
+}
+
+.user-verified img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
 
   </style>
@@ -650,7 +670,13 @@ const bannerUrl =
       // Determine Main Role for Badge
       const roles = user.roles || [];
       let badgeHtml = '<span class="role-badge member"><i class="ph ph-user"></i> Member</span>';
-      
+      // Verified icon next to username (same as profile)
+const verifiedIconHtml = roles.includes('verified')
+  ? `<span class="user-verified">
+       <img src="/assets/verified.png" alt="Verified">
+     </span>`
+  : "";
+
       if (roles.includes('admin') || roles.includes('owner')) {
         badgeHtml = '<span class="role-badge admin"><i class="ph-fill ph-shield-check"></i> Staff</span>';
       } else if (roles.includes('verified')) {
@@ -684,12 +710,15 @@ const bannerUrl =
           </div>
 
           <div class="user-info">
-            <h3>
-              ${escapeHtml(displayName)}
-            </h3>
-            <span class="handle" onclick="copyToClipboard('${username}', event)">@${escapeHtml(username)}</span>
-          </div>
+  <h3 class="user-name-row">
+    <span>${escapeHtml(displayName)}</span>
+    ${verifiedIconHtml}
+  </h3>
 
+  <span class="handle" onclick="copyToClipboard('${username}', event)">
+    @${escapeHtml(username)}
+  </span>
+</div>
           <div class="bio">${escapeHtml(bio)}</div>
 
           <div class="card-footer">
