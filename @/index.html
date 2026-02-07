@@ -272,70 +272,73 @@
   }
 
   function renderProfile(user) {
-    document.title = `${user.username} (@${user.username}) | Profile`;
-    
-    // Fallback assets
-    const avatar = user.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png";
-    const bannerHTML = user.banner_url 
-      ? `<img class="banner" src="${escapeHtml(user.banner_url)}" alt="Banner">`
-      : `<div class="banner" style="background: linear-gradient(45deg, #4f46e5, #9333ea);"></div>`;
+  document.title = `${user.username} (@${user.username}) | Profile`;
 
-    // Sanitize bio to prevent XSS
-    const safeBio = escapeHtml(user.bio);
+  // Fallback assets
+  const avatar = user.avatar_url || "https://cdn.discordapp.com/embed/avatars/0.png";
+  const bannerHTML = user.banner_url 
+    ? `<img class="banner" src="${escapeHtml(user.banner_url)}" alt="Banner">`
+    : `<div class="banner" style="background: linear-gradient(45deg, #4f46e5, #9333ea);"></div>`;
 
-    document.getElementById("app").innerHTML = `
-      <div class="banner-container">
-        ${bannerHTML}
+  // Sanitize bio to prevent XSS
+  const safeBio = escapeHtml(user.bio);
+
+  // Render main profile card
+  document.getElementById("app").innerHTML = `
+    <div class="banner-container">
+      ${bannerHTML}
+    </div>
+
+    <div class="profile-header">
+      <div class="avatar-wrapper">
+        <img class="avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(user.username)}" />
       </div>
 
-      <div class="profile-header">
-        <div class="avatar-wrapper">
-          <img class="avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(user.username)}" />
-        </div>
-
-        <div class="username-row">
-          <div class="username">@${escapeHtml(user.username)}</div>
-        </div>
-
-        <!-- Verified Badge -->
-        <div class="badge">
-          <i class="ph-fill ph-seal-check"></i>
-          <span>Verified via Discord</span>
-        </div>
+      <div class="username-row">
+        <div class="username">@${escapeHtml(user.username)}</div>
       </div>
 
-      <div class="content">
-        ${safeBio ? `<div class="bio">${safeBio}</div>` : `<div class="bio" style="font-style:italic; opacity:0.5">No bio available.</div>`}
+      <!-- Verified Badge -->
+      <div class="badge">
+        <i class="ph-fill ph-seal-check"></i>
+        <span>Verified via Discord</span>
       </div>
-    `;
-    // Example: roles array from Supabase
-const roles = [
-  { name: "Admin", icon: "admin.png" },
-  { name: "Verified", icon: "verified.png" },
-  { name: "Founder", icon: "owner.png" }
-];
 
-const roleContainer = document.getElementById("roleContainer");
-roleContainer.innerHTML = ''; // clear previous
+      <!-- Role Container -->
+      <div id="roleContainer" class="role-container"></div>
+    </div>
 
-roles.forEach(role => {
-  const span = document.createElement("span");
-  span.className = `role-badge role-${role.name.toLowerCase()}`;
+    <div class="content">
+      ${safeBio ? `<div class="bio">${safeBio}</div>` : `<div class="bio" style="font-style:italic; opacity:0.5">No bio available.</div>`}
+    </div>
+  `;
 
-  // Add icon
-  const img = document.createElement("img");
-  img.src = `/assets/${role.icon}`;
-  img.alt = role.name;
-  span.appendChild(img);
+  // Render roles dynamically
+  const roleContainer = document.getElementById("roleContainer");
+  roleContainer.innerHTML = ''; // clear previous
 
-  // Add role text
-  const text = document.createTextNode(role.name);
-  span.appendChild(text);
+  // Example: user.roles should be an array like ['Admin', 'Verified', 'Founder']
+  if (user.roles && user.roles.length > 0) {
+    user.roles.forEach(roleName => {
+      const span = document.createElement("span");
+      span.className = `role-badge role-${roleName.toLowerCase()}`;
 
-  roleContainer.appendChild(span);
-});
+      // Add role icon from /assets/
+      const img = document.createElement("img");
+      // Make icon name lowercase and replace spaces with underscores if needed
+      img.src = `/assets/${roleName.toLowerCase()}.png`;
+      img.alt = roleName;
+      span.appendChild(img);
 
+      // Add role text
+      const text = document.createTextNode(roleName);
+      span.appendChild(text);
+
+      roleContainer.appendChild(span);
+    });
   }
+}
+
 
   function renderError(msg) {
     document.title = "Profile Not Found";
