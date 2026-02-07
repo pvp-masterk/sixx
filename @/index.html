@@ -174,13 +174,21 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  color: white;
-  background: #3f3f46; /* default gray */
+  color: white; /* Text always white */
+  
+  /* Glass background */
+  background: rgba(255, 255, 255, 0.05); /* Very transparent white */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
+  -webkit-backdrop-filter: blur(10px);
+
+  /* iOS-style stroke */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -191,11 +199,11 @@
   border-radius: 50%;
 }
 
-/* Hover effect like Discord */
 .role-badge:hover {
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
+
 
 /* Role-specific colors */
 .role-founder { background: #E0245E; } /* Pinkish Red */
