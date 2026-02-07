@@ -143,6 +143,7 @@ button:hover { background: #4752c4; }
 const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
 
+// Use global supabase object (already included via <script>)
 supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const avatarInput = document.getElementById("avatar");
@@ -154,7 +155,7 @@ const msgDiv = document.getElementById("msg");
 const form = document.getElementById("editForm");
 
 // Parse username from URL
-const path = window.location.pathname;
+const path = window.location.pathname; // "/@username/edit"
 const segments = path.split("/");
 let username = "";
 if (segments[1] && segments[1].startsWith("@")) {
@@ -163,7 +164,7 @@ if (segments[1] && segments[1].startsWith("@")) {
 
 let profileId = null;
 
-// Load profile from Supabase
+// Load profile by username
 async function loadProfile() {
   if (!username) {
     msgDiv.textContent = "No username in URL";
@@ -174,20 +175,20 @@ async function loadProfile() {
   const { data, error } = await supabase
     .from("profiles")
     .select("id, avatar_url, banner_url, bio")
-    .eq("username", username)
-    .single();
+    .eq("username", username);
 
-  if (error || !data) {
+  if (error || !data || data.length === 0) {
     msgDiv.textContent = "Profile not found";
     msgDiv.className = "message error";
     return;
   }
 
-  profileId = data.id;
+  const profile = data[0]; // take the first matching profile
+  profileId = profile.id;
 
-  avatarInput.value = data.avatar_url || "";
-  bannerInput.value = data.banner_url || "";
-  bioInput.value = data.bio || "";
+  avatarInput.value = profile.avatar_url || "";
+  bannerInput.value = profile.banner_url || "";
+  bioInput.value = profile.bio || "";
 
   avatarPreview.src = avatarInput.value || "https://cdn.discordapp.com/embed/avatars/0.png";
   bannerPreview.src = bannerInput.value || "https://via.placeholder.com/480x160.png?text=Banner";
@@ -213,7 +214,7 @@ form.addEventListener("submit", async (e) => {
     updated_at: new Date().toISOString()
   };
 
-  const { data, error } = await supabase
+  const { data: updated, error } = await supabase
     .from("profiles")
     .update(updates)
     .eq("id", profileId)
@@ -222,7 +223,7 @@ form.addEventListener("submit", async (e) => {
 
   if (error) {
     console.error(error);
-    msgDiv.textContent = "Failed to update profile. Check RLS or keys.";
+    msgDiv.textContent = "Failed to update profile. Check fields or keys.";
     msgDiv.className = "message error";
   } else {
     msgDiv.textContent = "Profile updated successfully!";
