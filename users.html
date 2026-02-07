@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Community Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Supabase -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #09090b;
+      --card-bg: rgba(24, 24, 27, 0.6);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #6366f1; /* Indigo */
+      --accent-glow: rgba(99, 102, 241, 0.3);
+      --text-main: #fafafa;
+      --text-muted: #a1a1aa;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      /* Deep space mesh gradient */
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.15), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.15), transparent 25%);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 24px;
+    }
+
+    /* --- Header --- */
+    .header-section {
+      text-align: center;
+      margin-bottom: 60px;
+      animation: slideDown 0.8s ease-out;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      background: linear-gradient(to right, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .highlight-count {
+      color: var(--accent);
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* --- Controls (Glass Bar) --- */
+    .controls-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      padding: 16px;
+      border-radius: 16px;
+      backdrop-filter: blur(16px);
+      margin-bottom: 40px;
+      align-items: center;
+      box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    .search-container {
+      flex: 2;
+      position: relative;
+      min-width: 300px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1.2rem;
+    }
+
+    input, select {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      width: 100%;
+    }
+
+    #searchBar { padding-left: 44px; }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      background: rgba(0,0,0,0.6);
+    }
+
+    .filter-group {
+      flex: 1;
+      display: flex;
+      gap: 12px;
+      min-width: 300px;
+    }
+
+    /* --- Grid --- */
+    #usersList {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      position: relative;
+    }
+
+    /* --- Card Design (Spotlight Effect) --- */
+    .user-card {
+      position: relative;
+      background: var(--card-bg);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+      /* For Spotlight Effect */
+      --mouse-x: 0px;
+      --mouse-y: 0px;
+    }
+
+    /* Spotlight Gradient Overlay */
+    .user-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(
+        800px circle at var(--mouse-x) var(--mouse-y), 
+        rgba(255, 255, 255, 0.06), 
+        transparent 40%
+      );
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .user-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+      border-color: rgba(255,255,255,0.15);
+    }
+    
+    .user-card:hover::before { opacity: 1; }
+
+    .card-banner {
+      height: 120px;
+      width: 100%;
+      object-fit: cover;
+      background: #18181b;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-body {
+      padding: 0 24px 24px;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .avatar-wrapper {
+      margin-top: -50px;
+      margin-bottom: 16px;
+      position: relative;
+      width: fit-content;
+    }
+
+    .avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 24px; /* Squircle */
+      border: 4px solid var(--bg-dark);
+      background: #27272a;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .role-badge {
+      position: absolute;
+      bottom: 0;
+      right: -10px;
+      background: var(--bg-dark);
+      border: 1px solid var(--card-border);
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .role-badge.verified { color: var(--success); border-color: rgba(16, 185, 129, 0.2); }
+    .role-badge.admin { color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
+    .role-badge.member { color: var(--text-muted); }
+
+    .user-info h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .handle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.2s;
+      display: inline-block;
+    }
+    .handle:hover { color: var(--accent); }
+    .handle:active { transform: scale(0.98); }
+
+    .bio {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      color: #d4d4d8;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 2.7em;
+    }
+
+    .card-footer {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #71717a;
+    }
+
+    .footer-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* --- Skeleton Loader --- */
+    .skeleton-card {
+      background: rgba(255,255,255,0.02);
+      border-radius: 20px;
+      height: 380px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+
+    .skeleton-card::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      animation: shimmer 1.5s infinite;
+      transform: translateX(-100%);
+    }
+
+    @keyframes shimmer {
+      100% { transform: translateX(100%); }
+    }
+    
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Toast Notification --- */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #fff;
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* --- Pagination Button --- */
+    .load-more-container {
+      margin-top: 40px;
+      text-align: center;
+      display: none; /* Hidden by default */
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="header-section">
+    <h1>Explore Community</h1>
+    <div class="subtitle">
+      Connect with <span id="userCount" class="highlight-count">...</span> developers, designers, and creators building the future.
+    </div>
+  </div>
+
+  <div class="controls-wrapper">
+    <div class="search-container">
+      <i class="ph ph-magnifying-glass search-icon"></i>
+      <input type="text" id="searchBar" placeholder="Search by name, handle, or keywords...">
+    </div>
+
+    <div class="filter-group">
+      <select id="sortSelect">
+        <option value="newest">Newest Members</option>
+        <option value="oldest">Oldest Members</option>
+        <option value="alpha">Alphabetical (A-Z)</option>
+      </select>
+
+      <select id="roleFilter">
+        <option value="all">All Roles</option>
+        <option value="verified">Verified Only</option>
+        <option value="admin">Staff Only</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="usersList">
+    <!-- Skeletons injected by JS on load -->
+  </div>
+  
+  <div class="load-more-container">
+    <button id="loadMoreBtn" class="btn-primary">Load More</button>
+  </div>
+
+</div>
+
+<!-- Toast Notification -->
+<div id="toast"><i class="ph-fill ph-check-circle" style="color:var(--success)"></i> Copied to clipboard!</div>
+
+<script>
+  // -- CONFIGURATION --
+  // Note: Ensure your RLS policies in Supabase allow 'select' on 'profiles' for 'anon' or 'authenticated'.
+  const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
+  
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // -- STATE MANAGEMENT --
+  let allUsers = [];
+  let displayedUsers = [];
+  let isLoading = true;
+
+  // -- INIT --
+  document.addEventListener('DOMContentLoaded', async () => {
+    renderSkeletons(6); // Show 6 skeletons immediately
+    await fetchUsers();
+    setupEventListeners();
+  });
+
+  // -- DATA FETCHING --
+  async function fetchUsers() {
+    isLoading = true;
+    
+    // Fetch profiles from Supabase
+    const { data, error } = await supabaseClient
+      .from("profiles")
+      .select("*")
+      .order('created_at', { ascending: false }); // Initial fetch newest first
+
+    if (error) {
+      console.error("Supabase Error:", error);
+      document.getElementById("usersList").innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; color: #ef4444; padding: 40px;">
+          <i class="ph ph-warning-circle" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
+          Failed to load community members. Please try again later.
+        </div>`;
+      return;
+    }
+
+    // Process Data
+    allUsers = data || [];
+    document.getElementById("userCount").innerText = allUsers.length;
+    
+    // Render
+    isLoading = false;
+    applyFiltersAndSort();
+  }
+
+  // -- LOGIC: FILTER & SORT --
+  function applyFiltersAndSort() {
+    const searchQuery = document.getElementById("searchBar").value.toLowerCase();
+    const sortValue = document.getElementById("sortSelect").value;
+    const filterValue = document.getElementById("roleFilter").value;
+
+    // 1. Filter
+    let result = allUsers.filter(user => {
+      // Search Logic (Name, Handle, Bio)
+      const matchesSearch = 
+        (user.display_name?.toLowerCase().includes(searchQuery)) ||
+        (user.username?.toLowerCase().includes(searchQuery)) ||
+        (user.bio?.toLowerCase().includes(searchQuery));
+      
+      // Role Logic (Assumes 'roles' is an array of strings in DB, e.g. ["admin", "verified"])
+      // Adjust this based on your actual DB structure
+      let matchesRole = true;
+      const userRoles = user.roles || []; // Fallback if null
+      
+      if (filterValue === 'verified') {
+        matchesRole = userRoles.includes('verified');
+      } else if (filterValue === 'admin') {
+        matchesRole = userRoles.some(r => ['admin', 'moderator', 'owner'].includes(r));
+      }
+
+      return matchesSearch && matchesRole;
+    });
+
+    // 2. Sort
+    result.sort((a, b) => {
+      const dateA = new Date(a.created_at || 0);
+      const dateB = new Date(b.created_at || 0);
+
+      if (sortValue === 'newest') return dateB - dateA;
+      if (sortValue === 'oldest') return dateA - dateB;
+      if (sortValue === 'alpha') {
+        const nameA = a.display_name || a.username || "";
+        const nameB = b.display_name || b.username || "";
+        return nameA.localeCompare(nameB);
+      }
+      return 0;
+    });
+
+    renderUsers(result);
+  }
+
+  // -- RENDER UI --
+  function renderUsers(users) {
+    const list = document.getElementById("usersList");
+    list.innerHTML = "";
+
+    if (users.length === 0) {
+      list.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 60px;">
+          <i class="ph ph-ghost" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
+          <p>No users found matching your search.</p>
+        </div>`;
+      return;
+    }
+
+    users.forEach(user => {
+      // Safe Data Access
+      const username = user.username || "Unknown";
+      const displayName = user.display_name || username;
+      const bio = user.bio || "No biography provided.";
+      const avatarUrl = user.avatar_url || `https://ui-avatars.com/api/?name=${displayName}&background=random`;
+      
+      // Determine Main Role for Badge
+      const roles = user.roles || [];
+      let badgeHtml = '<span class="role-badge member"><i class="ph ph-user"></i> Member</span>';
+      
+      if (roles.includes('admin') || roles.includes('owner')) {
+        badgeHtml = '<span class="role-badge admin"><i class="ph-fill ph-shield-check"></i> Staff</span>';
+      } else if (roles.includes('verified')) {
+        badgeHtml = '<span class="role-badge verified"><i class="ph-fill ph-check-circle"></i> Verified</span>';
+      }
+
+      // Date Formatting
+      const joinDate = user.created_at 
+        ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+        : 'Unknown';
+
+      // HTML Template
+      const card = document.createElement('div');
+      card.className = 'user-card';
+      // Add href functionality via JS to prevent dragging issues with spotlight
+      
+      card.innerHTML = `
+        <div class="card-banner" style="background: ${getRandomGradient(username)}"></div>
+        
+        <div class="card-body">
+          <div class="avatar-wrapper">
+            <img class="avatar" src="${avatarUrl}" alt="${username}" onerror="this.src='https://ui-avatars.com/api/?name=?'">
+            ${badgeHtml}
+          </div>
+
+          <div class="user-info">
+            <h3>
+              ${escapeHtml(displayName)}
+            </h3>
+            <span class="handle" onclick="copyToClipboard('${username}', event)">@${escapeHtml(username)}</span>
+          </div>
+
+          <div class="bio">${escapeHtml(bio)}</div>
+
+          <div class="card-footer">
+            <div class="footer-item">
+              <i class="ph ph-calendar-blank"></i> Joined ${joinDate}
+            </div>
+            <div class="footer-item">
+               <i class="ph ph-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Spotlight Effect Event Listener (Per Card)
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+
+      // Link Behavior
+      card.style.cursor = "pointer";
+      card.addEventListener('click', (e) => {
+        // Don't trigger if they clicked the handle (copy action)
+        if(!e.target.classList.contains('handle')) {
+          // window.location.href = `/profile/${username}`; // Uncomment to enable linking
+          console.log(`Navigating to ${username}`);
+        }
+      });
+
+      list.appendChild(card);
+    });
+  }
+
+  function renderSkeletons(count) {
+    const list = document.getElementById("usersList");
+    list.innerHTML = "";
+    for(let i=0; i<count; i++) {
+      list.innerHTML += `<div class="skeleton-card"></div>`;
+    }
+  }
+
+  // -- UTILS --
+  function escapeHtml(text) {
+    if (!text) return "";
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  }
+
+  function getRandomGradient(str) {
+    // Generate a consistent gradient based on username string
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const c1 = Math.floor(Math.abs(Math.sin(hash) * 16777215)).toString(16);
+    const c2 = Math.floor(Math.abs(Math.cos(hash) * 16777215)).toString(16);
+    return `linear-gradient(135deg, #${c1.padEnd(6,'0')}, #${c2.padEnd(6,'0')})`;
+  }
+
+  function copyToClipboard(text, event) {
+    event.stopPropagation(); // Stop card click
+    navigator.clipboard.writeText(text).then(() => {
+      const toast = document.getElementById("toast");
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2000);
+    });
+  }
+
+  function setupEventListeners() {
+    let debounceTimer;
+    document.getElementById("searchBar").addEventListener("input", (e) => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(applyFiltersAndSort, 300); // 300ms debounce
+    });
+
+    document.getElementById("sortSelect").addEventListener("change", applyFiltersAndSort);
+    document.getElementById("roleFilter").addEventListener("change", applyFiltersAndSort);
+  }
+</script>
+
+</body>
+</html>
