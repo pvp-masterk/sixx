@@ -39,7 +39,6 @@
 
 body {
   background-color: var(--bg-dark);
-  /* Cool gradient background */
   background-image: 
     radial-gradient(circle at 10% 20%, rgba(88, 101, 242, 0.15), transparent 40%),
     radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.10), transparent 40%);
@@ -71,7 +70,7 @@ body {
 .preview-area {
   position: relative;
   width: 100%;
-  height: 220px; /* Combined height of banner + overlap */
+  height: 220px;
 }
 
 .banner-display {
@@ -89,7 +88,7 @@ body {
   width: 110px;
   height: 110px;
   padding: 5px;
-  background: rgba(20, 20, 23, 0.8); /* Matches card bg to look like cutout */
+  background: rgba(20, 20, 23, 0.8);
   border-radius: 50%;
   backdrop-filter: blur(10px);
 }
@@ -187,25 +186,23 @@ textarea {
   border-color: var(--primary);
 }
 
-/* --- DELETE THE OLD .role-icon STYLES AND PASTE THIS --- */
-
-/* Style for the PNG Image */
+/* --- IMAGE ROLE ICONS --- */
 .role-icon-img {
   width: 24px;
   height: 24px;
   object-fit: contain;
   transition: all 0.2s ease;
   
-  /* Optional: Make it slightly transparent/grey when NOT selected */
+  /* Dim/Grayscale when not selected */
   opacity: 0.5;
-  filter: grayscale(100%); 
+  filter: grayscale(100%);
 }
 
-/* When the card is active (selected) */
 .role-card.active .role-icon-img {
+  /* Bright/Color when selected */
   opacity: 1;
   filter: grayscale(0%);
-  transform: scale(1.1); /* Slight pop effect */
+  transform: scale(1.1);
 }
 
 .role-name {
@@ -291,17 +288,17 @@ textarea {
       
       <div class="input-group">
         <label>Avatar URL</label>
-        <input type="text" id="in-avatar" placeholder="https://..." autocomplete="off">
+        <input type="text" id="in-avatar" placeholder="https://imgur.com/..." autocomplete="off">
       </div>
 
       <div class="input-group">
         <label>Banner URL</label>
-        <input type="text" id="in-banner" placeholder="https://..." autocomplete="off">
+        <input type="text" id="in-banner" placeholder="https://imgur.com/..." autocomplete="off">
       </div>
 
       <div class="input-group">
         <label>About You</label>
-        <textarea id="in-bio" placeholder="Write about yourself"></textarea>
+        <textarea id="in-bio" placeholder="Write something cool..."></textarea>
       </div>
 
       <div class="input-group">
@@ -329,7 +326,7 @@ textarea {
 <script>
 /**
  * ==========================================
- * 1. CONFIGURATION
+ * 1. CONFIGURATION (EDIT THIS SECTION)
  * ==========================================
  */
 const CONFIG = {
@@ -339,12 +336,14 @@ const CONFIG = {
   defaultAvatar: "https://cdn.discordapp.com/embed/avatars/0.png",
   defaultBanner: "https://via.placeholder.com/600x200/18181b/333?text=No+Banner",
 
+  // Define roles using PNG filenames found in your root assets folder
   availableRoles: [
-    // Change 'icon' to your filename inside assets folder
-    { id: 'Founder',   label: 'Founder',   icon: 'assets/founder.png' },
-    { id: 'Admin',     label: 'Admin',     icon: 'assets/admin.png' },
-    { id: 'Moderator', label: 'Moderator', icon: 'assets/moderator.png' },
-    { id: 'Verified',  label: 'Verified',  icon: 'assets/verified.png' }
+    { id: 'Founder',   label: 'Founder',   icon: 'founder.png' },
+    { id: 'Admin',     label: 'Admin',     icon: 'admin.png' },
+    { id: 'Moderator', label: 'Moderator', icon: 'moderator.png' },
+    { id: 'Verified',  label: 'Verified',  icon: 'verified.png' },
+    { id: 'Dev',       label: 'Developer', icon: 'dev.png' },
+    { id: 'VIP',       label: 'VIP',       icon: 'vip.png' }
   ]
 };
 
@@ -381,31 +380,30 @@ const DOM = {
 init();
 
 async function init() {
-  // 1. Render the Role Selection Grid immediately
+  // 1. Initial Render (Empty Grid)
   renderRoleGrid([]); 
 
-  // 2. CHECK AUTHENTICATION (Instead of checking URL)
+  // 2. AUTH CHECK - IGNORE URL
+  // We strictly ask Supabase: "Who is the logged-in user?"
   DOM.btnText.innerText = "Checking Login...";
   DOM.btn.disabled = true;
 
-  // Get current logged in user from Supabase Auth
   const { data: { user }, error: authError } = await sb.auth.getUser();
 
   if (authError || !user) {
     showToast("You are not logged in.", "error");
     DOM.btnText.innerText = "Please Log In";
-    // Optional: Redirect to login page here if needed
-    // window.location.href = '/login.html';
+    // window.location.href = '/login'; // Optional Redirect
     return;
   }
 
-  // 3. Fetch Data for YOUR profile (using your Auth ID)
+  // 3. FETCH PROFILE based on USER ID (Not URL)
   DOM.btnText.innerText = "Loading Profile...";
 
   const { data, error } = await sb
     .from("profiles")
     .select("*")
-    .eq("id", user.id) // <--- THIS IS THE FIX. We filter by your ID, not the URL.
+    .eq("id", user.id) // This ensures we only load YOUR data
     .maybeSingle();
 
   DOM.btn.disabled = false;
@@ -415,18 +413,17 @@ async function init() {
     console.error(error);
     showToast("Profile not found or API error.", "error");
     
-    // Fallback: If profile doesn't exist yet, we can set ID to current user so the save creates it
+    // Fallback: If profile doesn't exist yet, we prepare to create it for this user
     currentProfileId = user.id; 
     return;
   }
 
-  // 4. Populate Form
+  // 4. Populate Form with Database Values
   currentProfileId = data.id;
   DOM.inputs.avatar.value = data.avatar || "";
   DOM.inputs.banner.value = data.banner_url || "";
   DOM.inputs.bio.value = data.bio || "";
   
-  // 5. Update Previews & Selected Roles
   updatePreviews();
   renderRoleGrid(data.roles || []);
 }
@@ -437,36 +434,35 @@ async function init() {
  * ==========================================
  */
 
-// Render the grid of roles
+// Render the grid of roles using IMAGES
 function renderRoleGrid(selectedRoles) {
   DOM.rolesGrid.innerHTML = ""; // Clear existing
 
   CONFIG.availableRoles.forEach(role => {
-    // Create Card
     const card = document.createElement('div');
     card.className = `role-card ${selectedRoles.includes(role.id) ? 'active' : ''}`;
     card.dataset.roleId = role.id;
 
-    // --- CHANGED SECTION START ---
-    
-    // Create Image Element instead of Icon
+    // --- CREATE IMAGE TAG ---
+    // Since this file is in a folder (e.g. /@/), we use "../assets/" to go back to root
     const img = document.createElement('img');
-    img.src = `assets/${role.icon}`; // Points to assets/filename.png
+    img.src = `../assets/${role.icon}`; 
     img.className = 'role-icon-img';
     img.alt = role.label;
-    
-    // --- CHANGED SECTION END ---
 
-    // Create Label
+    // Fallback if image fails
+    img.onerror = function() {
+      this.style.display='none'; // hide broken image
+    };
+
     const span = document.createElement('span');
     span.className = 'role-name';
     span.innerText = role.label;
 
-    // Append (Add img instead of icon)
     card.appendChild(img);
     card.appendChild(span);
 
-    // Click Event to Toggle
+    // Toggle Selection
     card.addEventListener('click', () => {
       card.classList.toggle('active');
     });
@@ -512,23 +508,20 @@ function showToast(msg, type = "success") {
  * 4. EVENT LISTENERS
  * ==========================================
  */
-
-// Live Preview Update
 DOM.inputs.avatar.addEventListener('input', updatePreviews);
 DOM.inputs.banner.addEventListener('input', updatePreviews);
 
-// Form Submit
 DOM.form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   if (!currentProfileId) {
-    showToast("Error: No user identified.", "error");
+    showToast("Error: No authenticated user.", "error");
     return;
   }
 
   setLoading(true);
 
-  // 1. Gather Data
+  // Collect selected roles
   const activeRoles = Array.from(document.querySelectorAll('.role-card.active'))
                            .map(el => el.dataset.roleId);
 
@@ -540,11 +533,10 @@ DOM.form.addEventListener('submit', async (e) => {
     updated_at: new Date().toISOString()
   };
 
-  // 2. Send to Supabase
   const { error } = await sb
     .from("profiles")
     .update(updates)
-    .eq("id", currentProfileId); // Ensure we update the ID we fetched earlier
+    .eq("id", currentProfileId);
 
   setLoading(false);
 
@@ -555,6 +547,7 @@ DOM.form.addEventListener('submit', async (e) => {
     showToast("Profile updated successfully!");
   }
 });
+
 </script>
 </body>
 </html>
