@@ -167,14 +167,19 @@
   gap: 6px;
 }
 
-.verified-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--accent);
-  font-size: 18px;
-  line-height: 1;
+.verified-badge {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: middle;
 }
+
+.verified-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 
 
     .username {
@@ -375,13 +380,18 @@
         </div>
 
         <div class="username-row">
-  <div class="username">${escapeHtml(user.username)}</div>
+  <span class="username">${escapeHtml(user.username)}</span>
   ${
-    user.roles?.includes("Verified")
-      ? `<i class="ph-fill ph-seal-check verified-icon"></i>`
+    Array.isArray(user.roles) && user.roles.includes("Verified")
+      ? `
+        <span class="verified-badge">
+          <img src="/assets/verified.png" alt="Verified">
+        </span>
+      `
       : ""
   }
 </div>
+
 
 
         <div class="badge">
