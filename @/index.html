@@ -176,24 +176,29 @@
   gap: 4px;
   padding: 4px 10px;
   border-radius: 12px;
-  font-size: 0.85rem; /* 13.5-14px */
-  font-weight: 400; /* normal, not bold */
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; /* clean & luxury */
-  text-transform: none;
-  color: white;
--webkit-font-smoothing: antialiased; /* for Chrome, Safari */
--moz-osx-font-smoothing: grayscale;  /* for Firefox */
+  font-size: 0.85rem;
+  font-weight: 400;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-  /* Glass/frosted effect */
+  /* Capitalize first letter of each word */
+  text-transform: capitalize;
+
+  color: white;
+
+  /* Glass effect */
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-
-  /* iOS-like stroke */
   border: 1px solid rgba(255, 255, 255, 0.2);
+
+  /* Crisp text */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-shadow: 0 0 1px rgba(0,0,0,0.15);
 
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+
 
 .role-badge img {
   width: 14px;
