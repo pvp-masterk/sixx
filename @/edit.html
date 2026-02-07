@@ -187,13 +187,25 @@ textarea {
   border-color: var(--primary);
 }
 
-/* Icons inside role card */
-.role-icon {
-  font-size: 20px;
-  color: var(--text-muted);
+/* --- DELETE THE OLD .role-icon STYLES AND PASTE THIS --- */
+
+/* Style for the PNG Image */
+.role-icon-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  transition: all 0.2s ease;
+  
+  /* Optional: Make it slightly transparent/grey when NOT selected */
+  opacity: 0.5;
+  filter: grayscale(100%); 
 }
-.role-card.active .role-icon {
-  color: var(--primary);
+
+/* When the card is active (selected) */
+.role-card.active .role-icon-img {
+  opacity: 1;
+  filter: grayscale(0%);
+  transform: scale(1.1); /* Slight pop effect */
 }
 
 .role-name {
@@ -279,17 +291,17 @@ textarea {
       
       <div class="input-group">
         <label>Avatar URL</label>
-        <input type="text" id="in-avatar" placeholder="https://imgur.com/..." autocomplete="off">
+        <input type="text" id="in-avatar" placeholder="https://..." autocomplete="off">
       </div>
 
       <div class="input-group">
         <label>Banner URL</label>
-        <input type="text" id="in-banner" placeholder="https://imgur.com/..." autocomplete="off">
+        <input type="text" id="in-banner" placeholder="https://..." autocomplete="off">
       </div>
 
       <div class="input-group">
         <label>About You</label>
-        <textarea id="in-bio" placeholder="Write something cool..."></textarea>
+        <textarea id="in-bio" placeholder="Write about yourself"></textarea>
       </div>
 
       <div class="input-group">
@@ -328,12 +340,11 @@ const CONFIG = {
   defaultBanner: "https://via.placeholder.com/600x200/18181b/333?text=No+Banner",
 
   availableRoles: [
-    { id: 'Founder',   label: 'Founder',   icon: 'ph-crown' },
-    { id: 'Admin',     label: 'Admin',     icon: 'ph-shield-check' },
-    { id: 'Moderator', label: 'Moderator', icon: 'ph-gavel' },
-    { id: 'Verified',  label: 'Verified',  icon: 'ph-check-fat' },
-    { id: 'Dev',       label: 'Developer', icon: 'ph-code' },
-    { id: 'VIP',       label: 'VIP',       icon: 'ph-star' }
+    // Change 'icon' to your filename inside assets folder
+    { id: 'Founder',   label: 'Founder',   icon: 'founder.png' },
+    { id: 'Admin',     label: 'Admin',     icon: 'admin.png' },
+    { id: 'Moderator', label: 'Moderator', icon: 'moderator.png' },
+    { id: 'Verified',  label: 'Verified',  icon: 'verified.png' }
   ]
 };
 
@@ -426,6 +437,7 @@ async function init() {
  * ==========================================
  */
 
+// Render the grid of roles
 function renderRoleGrid(selectedRoles) {
   DOM.rolesGrid.innerHTML = ""; // Clear existing
 
@@ -435,17 +447,23 @@ function renderRoleGrid(selectedRoles) {
     card.className = `role-card ${selectedRoles.includes(role.id) ? 'active' : ''}`;
     card.dataset.roleId = role.id;
 
-    // Create Icon
-    const icon = document.createElement('i');
-    icon.className = `role-icon ph-fill ${role.icon}`;
+    // --- CHANGED SECTION START ---
+    
+    // Create Image Element instead of Icon
+    const img = document.createElement('img');
+    img.src = `assets/${role.icon}`; // Points to assets/filename.png
+    img.className = 'role-icon-img';
+    img.alt = role.label;
+    
+    // --- CHANGED SECTION END ---
 
     // Create Label
     const span = document.createElement('span');
     span.className = 'role-name';
     span.innerText = role.label;
 
-    // Append
-    card.appendChild(icon);
+    // Append (Add img instead of icon)
+    card.appendChild(img);
     card.appendChild(span);
 
     // Click Event to Toggle
