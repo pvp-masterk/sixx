@@ -181,6 +181,34 @@ button:disabled { opacity: 0.7; cursor: not-allowed; }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 .toast.success i { color: #4ade80; }
 .toast.error i { color: #ef4444; }
+.roles-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.roles-dropdown label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: white;
+  cursor: pointer;
+}
+
+.roles-dropdown input[type="checkbox"] {
+  accent-color: #5865F2; /* Discord-style accent */
+  width: 16px;
+  height: 16px;
+}
 
 </style>
 </head>
@@ -214,6 +242,13 @@ button:disabled { opacity: 0.7; cursor: not-allowed; }
         <label for="bio">Bio</label>
         <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
       </div>
+      <div class="form-group">
+  <label for="rolesSelect">Select Roles to Display</label>
+  <div id="rolesSelect" class="roles-dropdown">
+    <!-- Roles checkboxes will be dynamically inserted here -->
+  </div>
+</div>
+
 
       <button type="submit" id="saveBtn">
         <div class="spinner"></div>
@@ -324,6 +359,13 @@ async function loadProfile() {
     showToast("Profile not found", "error");
     return;
   }
+// Assuming profile.roles is an array like ['Admin', 'Verified']
+if (profile.roles && profile.roles.length > 0) {
+  profile.roles.forEach(r => {
+    const checkbox = document.querySelector(`#role_${r.toLowerCase()}`);
+    if (checkbox) checkbox.checked = true;
+  });
+}
 
   // Populate Data
   profileId = profile.id;
@@ -357,12 +399,18 @@ els.form.addEventListener("submit", async (e) => {
 
   setLoading(true);
 
-  const updates = {
-    avatar: els.avatarInput.value.trim() || null,
-    banner_url: els.bannerInput.value.trim() || null,
-    bio: els.bioInput.value.trim() || null,
-    updated_at: new Date().toISOString()
-  };
+  const selectedRoles = Array.from(
+  document.querySelectorAll('#rolesSelect input[type="checkbox"]:checked')
+).map(cb => cb.value);
+
+const updates = {
+  avatar: els.avatarInput.value.trim() || null,
+  banner_url: els.bannerInput.value.trim() || null,
+  bio: els.bioInput.value.trim() || null,
+  roles: selectedRoles, // <-- store selected roles
+  updated_at: new Date().toISOString()
+};
+
 
   const { error } = await sb
     .from("profiles")
@@ -377,6 +425,34 @@ els.form.addEventListener("submit", async (e) => {
   } else {
     showToast("Profile updated successfully!");
   }
+});
+// Define available roles
+const availableRoles = [
+  { name: "Founder", icon: "founder.png" },
+  { name: "Admin", icon: "admin.png" },
+  { name: "Mod", icon: "moderator.png" },
+  { name: "Verified", icon: "verified.png" }
+];
+
+const rolesSelect = document.getElementById("rolesSelect");
+
+// Populate checkboxes
+availableRoles.forEach(role => {
+  const id = `role_${role.name.toLowerCase()}`;
+
+  const label = document.createElement("label");
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.value = role.name;
+  checkbox.id = id;
+
+  const text = document.createTextNode(role.name);
+
+  label.appendChild(checkbox);
+  label.appendChild(text);
+
+  rolesSelect.appendChild(label);
 });
 
 // Initialize
