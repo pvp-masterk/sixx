@@ -161,11 +161,23 @@
       border-color: rgba(255, 255, 255, 0.3);
     }
 
-    .username-row {
+    .profile-name {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.username-row {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
+
+.role-row {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 
 .verified-badge {
   width: 18px;
@@ -379,18 +391,25 @@
           </div>
         </div>
 
-        <div class="username-row">
-  <span class="username">${escapeHtml(user.username)}</span>
-  ${
-    Array.isArray(user.roles) && user.roles.includes("Verified")
-      ? `
-        <span class="verified-badge">
-          <img src="/assets/verified.png" alt="Verified">
-        </span>
-      `
-      : ""
-  }
+        <div class="profile-name">
+  <div class="username-row">
+    <span class="username">${escapeHtml(user.username)}</span>
+    ${
+      Array.isArray(user.roles) && user.roles.includes("Verified")
+        ? `
+          <span class="verified-badge">
+            <img src="/assets/verified.png" alt="Verified">
+          </span>
+        `
+        : ""
+    }
+  </div>
+
+  <div class="role-row">
+    ${user.role ? escapeHtml(user.role) : ""}
+  </div>
 </div>
+
 
 
 
