@@ -327,7 +327,7 @@ async function loadProfile() {
 
   // Populate Data
   profileId = profile.id;
-  els.avatarInput.value = profile.avatar_url || "";
+  els.avatarInput.value = profile.avatar || "";
   els.bannerInput.value = profile.banner_url || "";
   els.bioInput.value = profile.bio || "";
 
@@ -358,7 +358,7 @@ els.form.addEventListener("submit", async (e) => {
   setLoading(true);
 
   const updates = {
-    avatar_url: els.avatarInput.value.trim() || null,
+    avatar: els.avatarInput.value.trim() || null,
     banner_url: els.bannerInput.value.trim() || null,
     bio: els.bioInput.value.trim() || null,
     updated_at: new Date().toISOString()
