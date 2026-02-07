@@ -172,18 +172,18 @@ async function loadProfile() {
     return;
   }
 
-  const { data, error } = await supabase
+  const { data: profile, error } = await supabase
     .from("profiles")
     .select("id, avatar_url, banner_url, bio")
-    .eq("username", username);
+    .eq("username", username)
+    .maybeSingle(); // <-- key change
 
-  if (error || !data || data.length === 0) {
+  if (error || !profile) {
     msgDiv.textContent = "Profile not found";
     msgDiv.className = "message error";
     return;
   }
 
-  const profile = data[0]; // take the first matching profile
   profileId = profile.id;
 
   avatarInput.value = profile.avatar_url || "";
@@ -193,6 +193,7 @@ async function loadProfile() {
   avatarPreview.src = avatarInput.value || "https://cdn.discordapp.com/embed/avatars/0.png";
   bannerPreview.src = bannerInput.value || "https://via.placeholder.com/480x160.png?text=Banner";
 }
+
 
 // Live preview
 avatarInput.addEventListener("input", () => {
