@@ -77,8 +77,11 @@ console.log("Resolved username:", username);
       .select("*")
       .eq("username", username)
       .eq("public", true)
-      .maybeSingle();
-
+      .single();
+    
+  console.log("DATA:", data);
+  console.log("ERROR:", error);
+    
     if (error || !data) {
       renderError();
       return;
@@ -88,19 +91,29 @@ console.log("Resolved username:", username);
   }
 
   function renderProfile(user) {
-    document.getElementById("app").innerHTML = `
-      <img class="avatar" src="${user.avatar_url}" />
-      <div class="username">@${user.username}</div>
+  const avatar =
+    user.avatar_url ||
+    "https://cdn.discordapp.com/embed/avatars/0.png";
 
-      <div class="verified">
-        <span style="color:#22c55e">Verified</span>
-        <span style="color:#9ca3af"> via </span>
-        <span style="color:#5865F2;font-weight:600">Discord</span>
-      </div>
+  const banner = user.banner_url || "";
 
-      ${user.bio ? `<div class="bio">${user.bio}</div>` : ""}
-    `;
-  }
+  document.getElementById("app").innerHTML = `
+    ${banner ? `<img class="banner" src="${banner}">` : ""}
+
+    <img class="avatar" src="${avatar}" />
+
+    <div class="username">@${user.username}</div>
+
+    <div class="verified">
+      <span style="color:#22c55e">Verified</span>
+      <span style="color:#9ca3af"> via </span>
+      <span style="color:#5865F2;font-weight:600">Discord</span>
+    </div>
+
+    ${user.bio ? `<div class="bio">${user.bio}</div>` : ""}
+  `;
+}
+
 
   function renderError() {
     document.getElementById("app").innerHTML = `
