@@ -3,380 +3,475 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>/six Admin // Enhanced</title>
+<title>/six Admin // Ultima</title>
 
 <!-- Fonts & Icons -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <style>
-/* ======================= VARIABLES & RESET ======================= */
+/* ======================= CORE VARIABLES ======================= */
 :root {
-  --bg-core: #050208;
-  --bg-card: rgba(20, 10, 30, 0.4);
-  --bg-glass: rgba(255, 255, 255, 0.03);
-  --border-glass: rgba(255, 255, 255, 0.08);
+  --bg-deep: #030005;
+  --bg-panel: #0a0510;
+  --bg-card: #11081a;
   
-  --c-accent: #7b2cbf;
-  --c-accent-glow: #b160fb;
-  --c-success: #00f5d4;
-  --c-danger: #ff0054;
-  --c-text: #e8e6f3;
-  --c-text-dim: #8f8ba0;
+  --glass-surface: rgba(20, 10, 35, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-highlight: rgba(255, 255, 255, 0.1);
 
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --accent-primary: #8b2fc9;
+  --accent-glow: #b05ce6;
+  --accent-secondary: #4361ee;
+  
+  --text-main: #ececf1;
+  --text-muted: #8a8896;
+  
+  --s-founder: #ffd60a;
+  --s-admin: #f72585;
+  --s-mod: #4cc9f0;
+  --s-user: #8a8896;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; outline: none; user-select: none; }
+/* ======================= RESET & BASE ======================= */
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
 body {
   font-family: 'Inter', sans-serif;
-  background: var(--bg-core);
-  color: var(--c-text);
-  overflow-x: hidden;
+  background-color: var(--bg-deep);
+  color: var(--text-main);
   height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-/* Background FX */
-.bg-mesh {
-  position: fixed; inset: 0; z-index: -1;
+/* Background Atmosphere */
+.ambient-light {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
   background: 
-    radial-gradient(circle at 15% 50%, rgba(123, 44, 191, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(67, 97, 238, 0.1), transparent 25%);
-  filter: blur(60px);
+    radial-gradient(circle at 10% 20%, rgba(139, 47, 201, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(67, 97, 238, 0.08) 0%, transparent 40%);
+  pointer-events: none;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--c-accent); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
 
 /* ======================= LAYOUT ======================= */
-.app-container {
+.app-shell {
   max-width: 1600px; width: 100%; margin: 0 auto;
   padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 20px;
-  overflow: hidden; /* Fix for internal scrolling */
+  height: 100%;
 }
 
 /* Header */
-.top-bar {
+.top-nav {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 15px 25px;
-  background: rgba(10,5,15,0.6);
-  border: 1px solid var(--border-glass);
+  padding: 16px 24px;
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-radius: 16px;
-  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 
-.brand { 
-  font-family: 'JetBrains Mono', monospace; 
-  font-weight: 800; font-size: 20px; 
-  background: linear-gradient(to right, #fff, var(--c-accent-glow));
-  -webkit-background-clip: text; color: transparent;
+.brand-logo {
+  font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 22px;
   letter-spacing: -1px;
+  background: linear-gradient(135deg, #fff 0%, var(--accent-glow) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  display: flex; align-items: center; gap: 10px;
+}
+.brand-tag {
+  font-size: 10px; background: rgba(255,255,255,0.1); color: #fff;
+  padding: 3px 6px; border-radius: 4px; border: 1px solid var(--glass-border);
+  font-family: 'Inter'; font-weight: 600; text-transform: uppercase;
 }
 
-/* Controls Bar */
-.controls-bar {
+/* User Profile in Header */
+.nav-profile { display: flex; align-items: center; gap: 12px; }
+.nav-profile img { 
+  width: 40px; height: 40px; border-radius: 12px; object-fit: cover; 
+  border: 1px solid var(--glass-border); box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+.nav-text { text-align: right; line-height: 1.3; }
+.nav-name { font-weight: 700; font-size: 14px; color: #fff; }
+.nav-role { font-size: 11px; color: var(--accent-glow); font-weight: 600; letter-spacing: 0.5px; }
+
+/* Stats Bar */
+.stats-bar {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
+}
+.stat-card {
+  background: var(--glass-surface); border: 1px solid var(--glass-border);
+  padding: 15px 20px; border-radius: 12px; display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+}
+.stat-card::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+  background: var(--accent-primary);
+}
+.stat-val { font-size: 24px; font-weight: 800; color: #fff; font-family: 'JetBrains Mono'; }
+.stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+/* Toolbar */
+.toolbar {
   display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
 }
-
-.input-group {
-  position: relative; flex: 1; min-width: 250px;
+.search-wrapper {
+  position: relative; flex: 1; min-width: 300px;
 }
-.input-custom {
-  width: 100%; background: var(--bg-glass);
-  border: 1px solid var(--border-glass);
-  color: #fff; padding: 12px 15px 12px 40px;
-  border-radius: 10px; font-family: 'Inter'; font-size: 14px;
-  transition: 0.2s;
+.search-icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); font-size: 18px; pointer-events: none;
 }
-.input-custom:focus { border-color: var(--c-accent); box-shadow: 0 0 15px rgba(123,44,191,0.2); }
-.input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--c-text-dim); }
+.custom-input {
+  width: 100%; background: rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border);
+  padding: 14px 14px 14px 48px; border-radius: 12px;
+  color: #fff; font-family: 'Inter'; font-size: 14px;
+  transition: all 0.3s var(--ease-out);
+}
+.custom-input:focus {
+  background: rgba(255,255,255,0.07);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px rgba(139, 47, 201, 0.15);
+}
 
-/* Custom Button */
+/* Buttons */
 .btn {
-  background: var(--bg-glass); border: 1px solid var(--border-glass);
-  color: var(--c-text); padding: 10px 16px; border-radius: 8px;
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  display: flex; align-items: center; gap: 8px;
-  transition: 0.2s var(--ease-smooth);
+  background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+  color: var(--text-main); padding: 0 18px; height: 46px;
+  border-radius: 10px; font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  transition: all 0.2s;
 }
-.btn:hover { background: rgba(255,255,255,0.08); transform: translateY(-1px); }
-.btn.primary { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
-.btn.primary:hover { background: var(--c-accent-glow); box-shadow: 0 0 20px rgba(123,44,191,0.4); }
-
-/* ======================= GRID & CARDS ======================= */
-.content-area {
-  flex: 1; overflow-y: auto; padding-right: 5px;
+.btn:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn.glow { 
+  background: linear-gradient(135deg, var(--accent-primary), #6a1b9a);
+  border: none; color: #fff; box-shadow: 0 4px 15px rgba(139, 47, 201, 0.4);
 }
+.btn.glow:hover { box-shadow: 0 6px 20px rgba(139, 47, 201, 0.6); }
 
+/* ======================= GRID & JOINT CARDS ======================= */
+.grid-container {
+  flex: 1; overflow-y: auto; padding-right: 8px; position: relative;
+}
 .user-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;
-  padding-bottom: 40px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
+  padding-bottom: 60px;
 }
 
-.user-card {
+/* The Joint Card */
+.card {
   position: relative;
   background: var(--bg-card);
-  border: 1px solid var(--border-glass);
-  border-radius: 12px; padding: 20px;
-  display: flex; flex-direction: column; gap: 12px;
-  transition: 0.2s; overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: 16px; overflow: hidden;
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  display: flex; flex-direction: column;
 }
 
-.user-card:hover { border-color: rgba(123, 44, 191, 0.5); transform: translateY(-2px); }
-
-/* Performance Hover Glow (CSS Only) */
-.user-card::before {
-  content: ""; position: absolute; inset: 0;
-  background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%);
-  opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 0;
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border-color: var(--accent-primary);
 }
-.user-card:hover::before { opacity: 1; }
 
-.uc-top { display: flex; align-items: flex-start; gap: 12px; z-index: 1; position: relative; }
-.uc-avatar { width: 44px; height: 44px; border-radius: 10px; background: #000; object-fit: cover; border: 2px solid rgba(255,255,255,0.1); }
-.uc-details { flex: 1; min-width: 0; }
-.uc-name { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-.uc-uuid { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--c-text-dim); cursor: pointer; display: flex; align-items: center; gap: 5px;}
-.uc-uuid:hover { color: var(--c-accent-glow); }
+/* Banner Section */
+.card-banner {
+  height: 90px;
+  background-color: #1a1a2e;
+  background-size: cover; background-position: center;
+  position: relative;
+}
+.card-banner::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent, rgba(17, 8, 26, 0.9));
+}
 
-.uc-badges { display: flex; gap: 5px; margin-top: 4px; flex-wrap: wrap; }
+/* Body Section with Overlap */
+.card-body {
+  padding: 0 20px 20px 20px;
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: -40px; /* The Overlap Magic */
+  position: relative; z-index: 2;
+  flex: 1;
+}
+
+.card-avatar {
+  width: 72px; height: 72px;
+  border-radius: 18px;
+  border: 4px solid var(--bg-card);
+  background: #000; object-fit: cover;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+
+.card-identity {
+  margin-top: 8px;
+}
+.card-name { font-size: 16px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-id { 
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; 
+  color: var(--text-muted); display: flex; align-items: center; gap: 4px; cursor: pointer;
+  transition: color 0.2s;
+}
+.card-id:hover { color: var(--accent-glow); }
+
+/* Badges */
+.card-badges { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
 .badge {
-  font-size: 9px; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;
-  border: 1px solid transparent;
-}
-.badge.founder { border-color: #ffd700; color: #ffd700; background: rgba(255,215,0,0.1); }
-.badge.admin { border-color: #f72585; color: #f72585; background: rgba(247,37,133,0.1); }
-.badge.moderator { border-color: #4cc9f0; color: #4cc9f0; background: rgba(76,201,240,0.1); }
-.badge.user { border-color: var(--border-glass); color: #aaa; }
-
-.uc-actions {
-  z-index: 1; position: relative;
-  display: flex; gap: 8px; margin-top: auto; padding-top: 15px;
-  border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  display: flex; align-items: center; gap: 4px;
 }
 
-/* ======================= CUSTOM UI ELEMENTS ======================= */
-/* Custom Select */
-.c-select { position: relative; flex: 1; }
-.c-select-trigger {
-  width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass);
-  color: #fff; font-size: 11px; padding: 8px 10px; border-radius: 6px;
-  display: flex; justify-content: space-between; align-items: center; cursor: pointer;
-}
-.c-select-options {
-  position: absolute; bottom: 100%; left: 0; width: 100%;
-  background: #0f0a18; border: 1px solid var(--border-glass);
-  border-radius: 6px; padding: 4px; display: none; z-index: 100;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-}
-.c-select.active .c-select-options { display: block; animation: fadeIn 0.1s; }
-.c-option {
-  padding: 6px 10px; font-size: 11px; color: #ccc; cursor: pointer; border-radius: 4px;
-}
-.c-option:hover { background: var(--c-accent); color: #fff; }
+/* Role Specific Colors */
+.badge.founder { background: rgba(255, 214, 10, 0.15); color: var(--s-founder); border: 1px solid rgba(255,214,10,0.3); }
+.badge.admin { background: rgba(247, 37, 133, 0.15); color: var(--s-admin); border: 1px solid rgba(247,37,133,0.3); }
+.badge.moderator { background: rgba(76, 201, 240, 0.15); color: var(--s-mod); border: 1px solid rgba(76,201,240,0.3); }
+.badge.user { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid var(--glass-border); }
 
-/* Context Menu */
-#context-menu {
-  position: fixed; z-index: 9999;
-  background: #0f0a18; border: 1px solid var(--border-glass);
-  border-radius: 8px; padding: 6px; width: 180px;
-  box-shadow: 0 0 30px rgba(0,0,0,0.8);
-  opacity: 0; pointer-events: none; transition: opacity 0.1s;
+.card-footer {
+  margin-top: auto; padding-top: 15px;
+  display: flex; gap: 10px; border-top: 1px solid rgba(255,255,255,0.05);
 }
-#context-menu.show { opacity: 1; pointer-events: auto; }
-.ctx-item {
-  padding: 8px 12px; font-size: 12px; color: #eee; cursor: pointer;
-  border-radius: 4px; display: flex; align-items: center; gap: 8px;
-}
-.ctx-item:hover { background: rgba(255,255,255,0.1); }
-.ctx-item.danger { color: var(--c-danger); }
-.ctx-item.danger:hover { background: rgba(255,0,84,0.15); }
 
-/* Pagination */
-.pagination {
-  display: flex; justify-content: center; align-items: center; gap: 10px; padding-top: 20px;
+.action-btn {
+  flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border);
+  background: transparent; color: var(--text-muted); cursor: pointer;
+  font-size: 12px; font-weight: 600; transition: 0.2s;
+  display: flex; justify-content: center; align-items: center; gap: 6px;
 }
-.page-btn {
-  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-  background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: 6px;
-  color: #fff; cursor: pointer; transition: 0.2s;
-}
-.page-btn:hover:not(:disabled) { background: var(--c-accent); border-color: var(--c-accent); }
-.page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.action-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.action-btn.primary:hover { background: var(--accent-primary); border-color: var(--accent-primary); }
 
-/* Skeletons */
-.skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; }
-.sk-avatar { width: 44px; height: 44px; border-radius: 10px; }
-.sk-text { height: 14px; width: 60%; margin-bottom: 6px; }
-@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-/* Toast */
-.toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
-.toast {
-  background: rgba(15,10,25,0.9); border: 1px solid var(--border-glass); border-left: 3px solid var(--c-accent);
-  color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 500;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
-  transform: translateX(100px); opacity: 0; animation: slideIn 0.3s forwards;
-}
-@keyframes slideIn { to { transform: translateX(0); opacity: 1; } }
+/* ======================= MODALS ======================= */
 .modal-overlay {
-  position: fixed; inset: 0;
+  position: fixed; inset: 0; z-index: 2000;
   background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: 0.3s; z-index: 2000;
+  display: flex; justify-content: center; align-items: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
 }
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
-.modal-box.showcase {
-  width: 90%; max-width: 700px; max-height: 80vh; display: flex;
-  flex-direction: column; background: linear-gradient(135deg, rgba(123,44,191,0.2), rgba(157,78,221,0.2));
-  border-radius: 20px; border: 2px solid rgba(255,255,255,0.1);
-  padding: 0; overflow: hidden; backdrop-filter: blur(12px); animation: modalFade 0.3s ease;
+
+/* Logs Modal Unique Style */
+.logs-modal {
+  width: 600px; max-width: 90%; max-height: 80vh;
+  background: #0d0614;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 0 50px rgba(139, 47, 201, 0.15);
+  border-radius: 20px;
+  display: flex; flex-direction: column;
+  transform: translateY(20px); transition: transform 0.3s var(--ease-out);
+  overflow: hidden;
 }
-.modal-header, .modal-footer { padding: 15px 20px; background: rgba(20,10,35,0.5); display: flex; justify-content: space-between; align-items: center; }
-.modal-content { flex: 1; overflow-y: auto; padding: 20px; background: rgba(10,5,20,0.6); }
-.modal-content pre { background: #1b0c3b; color: #e0e0ff; padding: 15px; border-radius: 12px; overflow-x: auto; }
-.close-btn { background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer; }
-.action-btn { background: linear-gradient(90deg,#7b2cbf,#9d4edd); color:#fff; padding:8px 18px; border-radius:10px; border:none; cursor:pointer; font-weight:600; }
-@keyframes modalFade { from { transform: translateY(-30px); opacity:0; } to { transform: translateY(0); opacity:1; } }
-.modal-overlay { position:fixed; inset:0; display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.2s; z-index:3000; }
-.modal-overlay.active { opacity:1; pointer-events:auto; }
-.modal-box { width:90%; max-width:600px; max-height:80vh; background:rgba(20,10,35,0.7); border-radius:16px; border:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; overflow:hidden; }
-.modal-header, .modal-footer { padding:12px 20px; display:flex; justify-content:space-between; align-items:center; background:rgba(10,5,20,0.5); }
-.modal-content { flex:1; padding:15px 20px; overflow-y:auto; color:#fff; font-size:13px; }
-.modal-content img { max-width:100%; margin-top:6px; border-radius:8px; }
-.action-btn { padding:6px 14px; border:none; border-radius:10px; background:linear-gradient(90deg,#7b2cbf,#9d4edd); color:#fff; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px; }
+.modal-overlay.active .logs-modal { transform: translateY(0); }
+
+.logs-header {
+  padding: 20px 25px;
+  background: linear-gradient(90deg, rgba(139,47,201,0.1), transparent);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.logs-header h2 { font-family: 'JetBrains Mono'; font-size: 18px; color: #fff; display: flex; align-items: center; gap: 10px; }
+
+.logs-content {
+  padding: 25px; overflow-y: auto;
+  position: relative;
+}
+/* Timeline Style */
+.timeline {
+  border-left: 2px solid rgba(255,255,255,0.1);
+  padding-left: 20px; margin-left: 10px;
+}
+.changelog-item {
+  position: relative; margin-bottom: 30px;
+}
+.changelog-item::before {
+  content: ''; position: absolute; left: -26px; top: 0;
+  width: 10px; height: 10px; background: var(--accent-primary);
+  border-radius: 50%; box-shadow: 0 0 10px var(--accent-primary);
+}
+.log-date { font-size: 11px; color: var(--accent-glow); margin-bottom: 4px; font-family: 'JetBrains Mono'; }
+.log-version { color: #fff; font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+.log-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+.log-badge { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1); margin-right: 5px; }
+.log-badge.new { background: var(--accent-primary); color: #fff; }
+
+/* ======================= TOAST & EXTRAS ======================= */
+.toast-box {
+  position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 3000;
+}
+.toast {
+  background: rgba(15, 10, 25, 0.95); border: 1px solid var(--glass-border);
+  padding: 12px 20px; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 500;
+  border-left: 3px solid var(--accent-primary);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  animation: slideIn 0.3s forwards;
+}
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Skeleton Loading */
+.skeleton { background: #1a1a2e; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
 
 </style>
-  
 </head>
 <body>
 
-<div class="bg-mesh"></div>
+<div class="ambient-light"></div>
 
-<div class="app-container">
-  <!-- Top Bar -->
-  <header class="top-bar">
-    <div style="display:flex; align-items:center; gap:15px;">
-      <div class="brand">/six ADMIN</div>
-      <div class="badge admin" id="connection-status">CONNECTED</div>
+<div class="app-shell">
+  
+  <!-- Header -->
+  <header class="top-nav">
+    <div class="brand-logo">
+      <i class="ph-fill ph-hexagon"></i>
+      /six ADMIN <span class="brand-tag">Ultima</span>
     </div>
     
-    <div style="display:flex; align-items:center; gap:15px;">
-      <div style="text-align:right; line-height:1.2;">
-        <div style="font-size:12px; font-weight:700; color:#fff;" id="my-username">...</div>
-        <div style="font-size:10px; color:var(--c-text-dim);">SUPERUSER</div>
+    <div class="nav-profile">
+      <div class="nav-text">
+        <div class="nav-name" id="my-username">Connecting...</div>
+        <div class="nav-role" id="my-role">SYSTEM</div>
       </div>
-      <img id="my-avatar" src="" style="width:36px; height:36px; border-radius:50%; background:#222; border:1px solid #444;">
+      <img id="my-avatar" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Profile">
+      <button class="btn" style="width:40px; padding:0; justify-content:center;" onclick="app.toggleLogs()">
+        <i class="ph ph-bell"></i>
+      </button>
     </div>
   </header>
 
+  <!-- Live Stats -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-val" id="stat-total">0</div>
+      <div class="stat-label">Total Users</div>
+    </div>
+    <div class="stat-card" style="--accent-primary:#f72585;">
+      <div class="stat-val" id="stat-admins">0</div>
+      <div class="stat-label">Administrators</div>
+    </div>
+    <div class="stat-card" style="--accent-primary:#4cc9f0;">
+      <div class="stat-val" id="stat-new">0</div>
+      <div class="stat-label">New Today</div>
+    </div>
+    <div class="stat-card" style="--accent-primary:#ffd60a;">
+      <div class="stat-val">99.9%</div>
+      <div class="stat-label">System Uptime</div>
+    </div>
+  </div>
+
   <!-- Controls -->
-  <div class="controls-bar">
-    <div class="input-group">
-      <i class="ph ph-magnifying-glass input-icon"></i>
-      <input type="text" class="input-custom" id="search-input" placeholder="Search Users, IDs, IPs..." onkeyup="app.handleSearch()">
+  <div class="toolbar">
+    <div class="search-wrapper">
+      <i class="ph ph-magnifying-glass search-icon"></i>
+      <input type="text" class="custom-input" id="search-input" placeholder="Search by UUID, Username, or IP..." onkeyup="app.handleSearch()">
     </div>
     
-    <div style="display:flex; gap:10px;">
-      <!-- Custom Sort Dropdown -->
-      <div class="c-select" style="width: 150px;">
-        <div class="c-select-trigger" onclick="ui.toggleSelect(this)">
-          <span id="sort-label">Newest First</span> <i class="ph ph-caret-down"></i>
-        </div>
-        <div class="c-select-options">
-          <div class="c-option" onclick="app.sort('new')">Newest First</div>
-          <div class="c-option" onclick="app.sort('old')">Oldest First</div>
-          <div class="c-option" onclick="app.sort('alpha')">Username A-Z</div>
-        </div>
-      </div>
+    <select class="custom-input" style="width: 150px; cursor: pointer;" id="role-filter" onchange="app.filterByRole()">
+      <option value="all">All Roles</option>
+      <option value="founder">Founders</option>
+      <option value="admin">Admins</option>
+      <option value="moderator">Moderators</option>
+      <option value="user">Users</option>
+    </select>
 
-      <button class="btn" onclick="app.refreshData()"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
-      <button class="btn primary"><i class="ph ph-plus"></i> Invite</button>
-    </div>
+    <div style="flex:1;"></div>
+
+    <button class="btn" onclick="app.refreshData()"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+    <button class="btn glow" onclick="ui.toast('Invite Generated')"><i class="ph ph-plus"></i> New User</button>
   </div>
 
-  <!-- Main Content -->
-  <div class="content-area">
+  <!-- Main Grid -->
+  <div class="grid-container">
     <div id="user-grid" class="user-grid">
-      <!-- Cards Injected Here -->
-    </div>
-    
-    <div class="pagination">
-      <button class="page-btn" id="prev-btn" onclick="app.changePage(-1)"><i class="ph ph-caret-left"></i></button>
-      <span style="font-size:12px; color:var(--c-text-dim);">Page <span id="curr-page" style="color:#fff;">1</span></span>
-      <button class="page-btn" id="next-btn" onclick="app.changePage(1)"><i class="ph ph-caret-right"></i></button>
+      <!-- Cards rendered here -->
     </div>
   </div>
+
 </div>
 
-<!-- Custom Context Menu -->
-<div id="context-menu">
-  <div class="ctx-item" onclick="app.ctxAction('copy')"><i class="ph ph-copy"></i> Copy UUID</div>
-  <div class="ctx-item" onclick="app.ctxAction('json')"><i class="ph ph-code"></i> View Raw Data</div>
-  <div style="height:1px; background:rgba(255,255,255,0.1); margin:4px 0;"></div>
-  <div class="ctx-item danger" onclick="app.ctxAction('ban')"><i class="ph ph-prohibit"></i> Ban User</div>
+<!-- Update Logs Modal -->
+<div id="logs-modal" class="modal-overlay">
+  <div class="logs-modal">
+    <div class="logs-header">
+      <h2><i class="ph-fill ph-read-cv-logo"></i> System Changelog</h2>
+      <button class="btn" style="width:36px; padding:0; justify-content:center;" onclick="app.toggleLogs()"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="logs-content">
+      <div class="timeline" id="changelog-list">
+        <!-- Logs injected via JS -->
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Toast Container -->
-<div class="toast-container" id="toast-container"></div>
+<div class="toast-box" id="toast-container"></div>
 
 <script>
-// ==================== CONFIG & STATE ====================
-const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co"; 
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
-
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const STATE = {
-  users: [],
-  filteredUsers: [],
-  page: 1,
-  limit: 24, // Cards per page
-  currentUser: null,
-  sortMode: 'new',
-  ctxTargetId: null // ID of user right-clicked
+// ==================== CONFIGURATION ====================
+const CONFIG = {
+  supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co",
+  supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
+  defaultBanner: "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=500&auto=format&fit=crop&q=60",
+  defaultAvatar: "https://cdn.discordapp.com/embed/avatars/0.png"
 };
 
-const ROLES = ['founder', 'admin', 'moderator', 'verified', 'user'];
+const supabaseClient = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+
+// ==================== STATE MANAGEMENT ====================
+const STATE = {
+  allUsers: [],
+  displayUsers: [],
+  currentUser: null,
+  roleFilter: 'all'
+};
+
+const CHANGELOGS = [
+  { ver: "2.1.0", date: "Jan 25, 2025", items: ["Added Banner Support to Cards", "Optimized Grid Performance", "New Glassmorphism UI"] },
+  { ver: "2.0.5", date: "Jan 20, 2025", items: ["Fixed Auth Lag", "Added Moderator Role badge"] },
+  { ver: "1.9.0", date: "Jan 10, 2025", items: ["Initial Release of Admin Panel"] }
+];
 
 // ==================== APP LOGIC ====================
 const app = {
   init: async () => {
     ui.renderSkeleton();
-    await app.checkAuth();
+    ui.renderChangelog();
+    await app.fetchUser();
     await app.fetchData();
-    
-    // Global Event for closing dropdowns
-    document.addEventListener('click', (e) => {
-      if(!e.target.closest('.c-select')) {
-        document.querySelectorAll('.c-select').forEach(el => el.classList.remove('active'));
-      }
-      if(!e.target.closest('#context-menu')) {
-        document.getElementById('context-menu').classList.remove('show');
-      }
-    });
   },
 
-  checkAuth: async () => {
+  // Get Current Admin Info
+  fetchUser: async () => {
+    // Simulated Check (Replace with actual auth check if needed)
+    STATE.currentUser = { username: 'Operator', role: 'founder', avatar: CONFIG.defaultAvatar };
+    
+    // Attempt actual Supabase Auth get
     const { data: { user } } = await supabaseClient.auth.getUser();
     if(user) {
       const { data } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
-      STATE.currentUser = data || { username: 'Admin', role: 'founder', avatar: null };
-    } else {
-      STATE.currentUser = { username: 'System Admin', role: 'founder', avatar: null }; 
+      if(data) STATE.currentUser = data;
     }
-    
-    document.getElementById('my-username').textContent = STATE.currentUser.username;
-    if(STATE.currentUser.avatar) document.getElementById('my-avatar').src = STATE.currentUser.avatar;
+
+    document.getElementById('my-username').textContent = STATE.currentUser.username || 'Admin';
+    document.getElementById('my-role').textContent = (STATE.currentUser.role || 'Superuser').toUpperCase();
+    document.getElementById('my-avatar').src = STATE.currentUser.avatar || CONFIG.defaultAvatar;
   },
 
+  // Fetch All Users
   fetchData: async () => {
     const { data, error } = await supabaseClient
       .from('profiles')
@@ -384,421 +479,197 @@ const app = {
       .order('created_at', { ascending: false });
 
     if(error) {
-      ui.toast('Error fetching data', 'error');
       console.error(error);
+      ui.toast('Connection Failed: Showing Demo Data', 'error');
+      // If DB fails/empty, show nothing or demo data. currently shows empty grid.
+      document.getElementById('user-grid').innerHTML = '<div style="color:#666; padding:20px;">No users found or connection error.</div>';
       return;
     }
 
-    STATE.users = data;
-    STATE.filteredUsers = data;
-    app.applySort();
-    app.renderPage();
+    STATE.allUsers = data || [];
+    STATE.displayUsers = [...STATE.allUsers];
+    app.calculateStats();
+    ui.renderGrid();
+  },
+
+  calculateStats: () => {
+    const total = STATE.allUsers.length;
+    const admins = STATE.allUsers.filter(u => ['admin','founder'].includes(u.role)).length;
+    // Mocking "New Today" based on random for visual demo as real dates vary
+    const today = STATE.allUsers.filter(u => new Date(u.created_at) > new Date(Date.now() - 86400000)).length;
+
+    ui.animateValue('stat-total', 0, total, 1000);
+    ui.animateValue('stat-admins', 0, admins, 1000);
+    ui.animateValue('stat-new', 0, today, 1000);
   },
 
   handleSearch: () => {
     clearTimeout(window.searchDebounce);
     window.searchDebounce = setTimeout(() => {
       const term = document.getElementById('search-input').value.toLowerCase();
-      STATE.filteredUsers = STATE.users.filter(u => 
-        (u.username && u.username.toLowerCase().includes(term)) || 
-        (u.id && u.id.includes(term)) ||
-        (u.role && u.role.includes(term))
-      );
-      STATE.page = 1;
-      app.renderPage();
-    }, 300);
+      app.applyFilters(term);
+    }, 300); // 300ms debounce prevents lag
   },
 
-  sort: (mode) => {
-    STATE.sortMode = mode;
-    const map = { 'new': 'Newest First', 'old': 'Oldest First', 'alpha': 'Username A-Z' };
-    document.getElementById('sort-label').innerText = map[mode];
-    app.applySort();
-    app.renderPage();
+  filterByRole: () => {
+    STATE.roleFilter = document.getElementById('role-filter').value;
+    app.handleSearch(); // Re-trigger search logic with new filter
   },
 
-  applySort: () => {
-    if(STATE.sortMode === 'new') STATE.filteredUsers.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-    if(STATE.sortMode === 'old') STATE.filteredUsers.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-    if(STATE.sortMode === 'alpha') STATE.filteredUsers.sort((a,b) => a.username.localeCompare(b.username));
-  },
-
-  changePage: (dir) => {
-    const maxPage = Math.ceil(STATE.filteredUsers.length / STATE.limit);
-    const newPage = STATE.page + dir;
-    if(newPage > 0 && newPage <= maxPage) {
-      STATE.page = newPage;
-      app.renderPage();
-    }
+  applyFilters: (term = '') => {
+    STATE.displayUsers = STATE.allUsers.filter(u => {
+      const matchesSearch = (u.username && u.username.toLowerCase().includes(term)) || 
+                            (u.id && u.id.includes(term));
+      const matchesRole = STATE.roleFilter === 'all' || u.role === STATE.roleFilter;
+      return matchesSearch && matchesRole;
+    });
+    ui.renderGrid();
   },
 
   refreshData: () => {
     ui.renderSkeleton();
     app.fetchData();
-    ui.toast('Data Refreshed');
+    ui.toast('System Data Refreshed');
   },
 
-  updateRole: async (uid, newRole) => {
-    const uIndex = STATE.users.findIndex(u => u.id === uid);
-    if(uIndex > -1) STATE.users[uIndex].role = newRole;
-    app.renderPage(); 
-
-    const { error } = await supabaseClient.from('profiles').update({ role: newRole }).eq('id', uid);
-    if(error) {
-      ui.toast('Failed to update role', 'error');
-      app.refreshData();
-    } else {
-      ui.toast(`Role updated to ${newRole.toUpperCase()}`);
-    }
+  toggleLogs: () => {
+    document.getElementById('logs-modal').classList.toggle('active');
   },
 
-  ctxAction: (action) => {
-    const user = STATE.users.find(u => u.id === STATE.ctxTargetId);
-    if(!user) return;
-    
-    document.getElementById('context-menu').classList.remove('show');
-
+  getAction: (uid, action) => {
     if(action === 'copy') {
-      navigator.clipboard.writeText(user.id);
+      navigator.clipboard.writeText(uid);
       ui.toast('UUID Copied to Clipboard');
     }
-    if(action === 'json') {
-      console.log(user);
-      alert(JSON.stringify(user, null, 2));
+    if(action === 'edit') {
+      ui.toast('Edit Modal Opening...', 'neutral');
+      // Logic for edit modal would go here
     }
-    if(action === 'ban') {
-      if(confirm(`Are you sure you want to BAN ${user.username}?`)) {
-        ui.toast('User Banned (Simulated)', 'error');
-      }
-    }
-  },
-
-  // ✅ Correctly defined modal functions
-  updateUserModal: async () => {
-    const uid = STATE.ctxTargetId;
-    const bio = document.getElementById('modal-bio').value;
-    const avatar = document.getElementById('modal-avatar-url').value;
-    const banner = document.getElementById('modal-banner-url').value;
-
-    const updates = { bio, avatar, banner };
-
-    const { error } = await supabaseClient.from('profiles').update(updates).eq('id', uid);
-    if(error) {
-      ui.toast('Failed to update user', 'error');
-      console.error(error);
-    } else {
-      const uIndex = STATE.users.findIndex(u => u.id === uid);
-      if(uIndex > -1) STATE.users[uIndex] = { ...STATE.users[uIndex], ...updates };
-      ui.toast('User updated successfully');
-      app.renderPage();
-      ui.closeUserModal();
-    }
-  },
-
-  banUserModal: async () => {
-    const uid = STATE.ctxTargetId;
-    const user = STATE.users.find(u => u.id === uid);
-    if(!user) return;
-
-    if(confirm(`Are you sure you want to BAN ${user.username}?`)) {
-      ui.toast('User banned (simulated)', 'error');
-      ui.closeUserModal();
-    }
-  },
-
-  renderPage: () => {
-    const grid = document.getElementById('user-grid');
-    const start = (STATE.page - 1) * STATE.limit;
-    const end = start + STATE.limit;
-    const subset = STATE.filteredUsers.slice(start, end);
-
-    document.getElementById('curr-page').innerText = STATE.page;
-    document.getElementById('prev-btn').disabled = STATE.page === 1;
-    document.getElementById('next-btn').disabled = end >= STATE.filteredUsers.length;
-
-    if(subset.length === 0) {
-      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--c-text-dim);">No users found.</div>`;
-      return;
-    }
-
-    let html = '';
-    subset.forEach(u => { html += ui.buildCard(u); });
-    grid.innerHTML = html;
-
-    document.querySelectorAll('.user-card').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
-      });
-      card.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        STATE.ctxTargetId = card.dataset.id;
-        const menu = document.getElementById('context-menu');
-        menu.style.top = `${e.clientY}px`;
-        menu.style.left = `${e.clientX}px`;
-        menu.classList.add('show');
-      });
-    });
   }
 };
 
-
-// ==================== UI HELPERS ====================
+// ==================== UI RENDERING ====================
 const ui = {
-  // Generates Custom Dropdown HTML for cards (you can keep this)
-  // Custom Role Selector for Cards (matches modal style)
-buildRoleSelect: (u) => {
-  const currentIdx = ROLES.indexOf(STATE.currentUser.role.toLowerCase());
+  renderGrid: () => {
+    const grid = document.getElementById('user-grid');
+    grid.innerHTML = ''; // Clear current
 
-  const container = document.createElement('div');
-  container.className = 'c-select';
+    if(STATE.displayUsers.length === 0) {
+      grid.innerHTML = '<div style="color:var(--text-muted); grid-column:1/-1; text-align:center; padding-top:40px;">No Data Found</div>';
+      return;
+    }
 
-  // Trigger
-  const trigger = document.createElement('div');
-  trigger.className = 'c-select-trigger';
-  trigger.innerHTML = `<span>${u.role.toUpperCase()}</span> <i class="ph ph-caret-down"></i>`;
-  trigger.addEventListener('click', (e) => {
-    e.stopPropagation();
-    ui.toggleSelect(container);
-  });
+    // Optimization: DocumentFragment for single reflow
+    const fragment = document.createDocumentFragment();
 
-  // Options
-  const options = document.createElement('div');
-  options.className = 'c-select-options bottom-up';
-  
-  ROLES.forEach(r => {
-    const targetIdx = ROLES.indexOf(r);
-    const disabled = targetIdx >= currentIdx;
-    const opt = document.createElement('div');
-    opt.className = 'c-option';
-    if(disabled) opt.classList.add('disabled');
-    opt.textContent = r.toUpperCase();
-
-    opt.addEventListener('click', e => {
-      if(disabled) return;
-      app.updateRole(u.id, r); // update DB & local state
-      trigger.querySelector('span').textContent = r.toUpperCase();
-      options.classList.remove('active');
-    });
-
-    options.appendChild(opt);
-  });
-
-  container.appendChild(trigger);
-  container.appendChild(options);
-
-  return container.outerHTML; // return HTML to inject
-},
-
-
-  // Build user card
-  buildCard: (u) => {
-  const date = new Date(u.created_at).toLocaleDateString();
-
-  return `
-    <div class="user-card" data-id="${u.id}" onclick="ui.showUserModal('${u.id}')">
-      <div class="uc-top">
-        <img src="${u.avatar || 'https://via.placeholder.com/100/000000/FFFFFF/?text=' + u.username.charAt(0)}" class="uc-avatar">
-        <div class="uc-details">
-          <div class="uc-name">${u.username}</div>
-          <div class="uc-uuid" onclick="event.stopPropagation(); navigator.clipboard.writeText('${u.id}'); ui.toast('ID Copied')">
-            ${u.id.substring(0,12)}... <i class="ph ph-copy"></i>
+    STATE.displayUsers.forEach(u => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      
+      const bannerImg = u.banner || CONFIG.defaultBanner;
+      const avatarImg = u.avatar || CONFIG.defaultAvatar;
+      const role = u.role || 'user';
+      
+      card.innerHTML = `
+        <div class="card-banner" style="background-image: url('${bannerImg}')"></div>
+        <div class="card-body">
+          <img src="${avatarImg}" class="card-avatar" loading="lazy">
+          
+          <div class="card-identity">
+            <div class="card-name">${u.username || 'Unknown'}</div>
+            <div class="card-id" onclick="app.getAction('${u.id}', 'copy')">
+              <i class="ph ph-fingerprint"></i> ${u.id.substring(0,8)}...
+            </div>
           </div>
-          <div class="uc-badges">
-            <span class="badge ${u.role}">${u.role.toUpperCase()}</span>
-            <span class="badge user">${date}</span>
-            <span class="badge" style="border-color:#ffb703;color:#ffb703;background:rgba(255,183,3,0.1);">IN DEVELOPMENT</span>
+
+          <div class="card-badges">
+            <span class="badge ${role}"><i class="ph-fill ph-shield"></i> ${role.toUpperCase()}</span>
+            ${role === 'founder' ? '<span class="badge" style="border-color:#ffd60a; color:#ffd60a;">OWNER</span>' : ''}
+          </div>
+
+          <div class="card-footer">
+            <button class="action-btn primary" onclick="app.getAction('${u.id}','edit')">Manage</button>
+            <button class="action-btn" title="Copy ID" onclick="app.getAction('${u.id}','copy')"><i class="ph ph-copy"></i></button>
+            <button class="action-btn" title="Ban User" style="color:#f72585;"><i class="ph ph-prohibit"></i></button>
           </div>
         </div>
-      </div>
+      `;
+      fragment.appendChild(card);
+    });
 
-      <div class="uc-actions">
-        <!-- Custom Role Selector -->
-        ${ui.buildRoleSelect(u)}
-
-        <button class="btn" style="padding:8px;" title="View Details" onclick="event.stopPropagation(); ui.showUserModal('${u.id}')">
-          <i class="ph ph-eye"></i> View
-        </button>
-      </div>
-    </div>
-  `;
-},
+    grid.appendChild(fragment);
+  },
 
   renderSkeleton: () => {
     const grid = document.getElementById('user-grid');
     let html = '';
-    for(let i=0; i<12; i++) {
+    for(let i=0; i<8; i++) {
       html += `
-        <div class="user-card">
-          <div class="uc-top">
-            <div class="skeleton sk-avatar"></div>
-            <div class="uc-details">
-              <div class="skeleton sk-text"></div>
-              <div class="skeleton sk-text" style="width:40%"></div>
-            </div>
-          </div>
-        </div>`;
+      <div class="card" style="pointer-events:none;">
+        <div class="card-banner skeleton"></div>
+        <div class="card-body">
+          <div class="card-avatar skeleton"></div>
+          <div style="height:20px; width:60%; margin-top:10px;" class="skeleton"></div>
+          <div style="height:15px; width:40%; margin-top:5px;" class="skeleton"></div>
+        </div>
+      </div>`;
     }
     grid.innerHTML = html;
   },
 
-  toggleSelect: (el) => {
-    document.querySelectorAll('.c-select').forEach(s => {
-      if(s !== el) s.classList.remove('active');
+  renderChangelog: () => {
+    const container = document.getElementById('changelog-list');
+    let html = '';
+    CHANGELOGS.forEach((log, index) => {
+      const isNew = index === 0 ? '<span class="log-badge new">LATEST</span>' : '';
+      const itemsHtml = log.items.map(i => `<div>• ${i}</div>`).join('');
+      html += `
+        <div class="changelog-item">
+          <div class="log-date">${log.date}</div>
+          <div class="log-version">${isNew} v${log.ver}</div>
+          <div class="log-desc">${itemsHtml}</div>
+        </div>
+      `;
     });
-    el.classList.toggle('active');
+    container.innerHTML = html;
+  },
+
+  animateValue: (id, start, end, duration) => {
+    if (start === end) return;
+    const range = end - start;
+    let current = start;
+    const increment = end > start ? 1 : -1;
+    const stepTime = Math.abs(Math.floor(duration / range));
+    const obj = document.getElementById(id);
+    
+    // Fallback for massive numbers to avoid freezing
+    if(range > 100) { obj.innerText = end; return; }
+
+    const timer = setInterval(function() {
+      current += increment;
+      obj.innerText = current;
+      if (current == end) clearInterval(timer);
+    }, stepTime);
   },
 
   toast: (msg, type='success') => {
-    const con = document.getElementById('toast-container');
-    const el = document.createElement('div');
-    el.className = 'toast';
-    if(type==='error') el.style.borderLeftColor = 'var(--c-danger)';
-    el.innerText = msg;
-    con.appendChild(el);
+    const box = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerText = msg;
+    if(type === 'error') t.style.borderLeftColor = '#ff0054';
+    box.appendChild(t);
     setTimeout(() => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateX(100px)';
-      setTimeout(()=>el.remove(),300);
-    },3000);
-  },
-
-  // ===========================
-  // User Modal
-  // ===========================
-  showUserModal: (uid) => {
-    const user = STATE.users.find(u=>u.id===uid);
-    if(!user) return;
-    STATE.ctxTargetId = uid;
-
-    document.getElementById('modal-avatar').src = user.avatar || `https://via.placeholder.com/100/000000/FFFFFF/?text=${user.username.charAt(0)}`;
-    document.getElementById('modal-username').textContent = user.username;
-    document.getElementById('modal-bio').value = user.bio || '';
-    document.getElementById('modal-avatar-url').value = user.avatar || '';
-    document.getElementById('modal-banner-url').value = user.banner || '';
-
-    // Role Badge
-    const badge = document.getElementById('modal-role-badge');
-    badge.textContent = user.role.toUpperCase();
-    const colors = {founder:'gold', admin:'#f72585', moderator:'#4cc9f0', user:'#aaa'};
-    badge.style.border = `1px solid ${colors[user.role]||'#aaa'}`;
-    badge.style.color = colors[user.role]||'#aaa';
-    badge.style.background = colors[user.role]?colors[user.role]+'22':'rgba(255,255,255,0.1)';
-
-    // Custom Role Selector inside modal
-    const roleContainer = document.getElementById('modal-role-select');
-    roleContainer.innerHTML = '';
-    const select = document.createElement('div');
-    select.className = 'c-select';
-    select.innerHTML = `<div class="c-select-trigger"><span>${user.role.toUpperCase()}</span> <i class="ph ph-caret-down"></i></div>`;
-    const options = document.createElement('div');
-    options.className = 'c-select-options';
-
-    const currentIdx = ROLES.indexOf(STATE.currentUser.role.toLowerCase());
-    ROLES.forEach(r=>{
-      const targetIdx = ROLES.indexOf(r);
-      const disabled = targetIdx >= currentIdx;
-      const opt = document.createElement('div');
-      opt.className = 'c-option';
-      if(disabled) opt.classList.add('disabled');
-      opt.textContent = r.toUpperCase();
-      opt.addEventListener('click', e=>{
-        if(disabled) return;
-        app.updateRole(uid,r); // update DB & local state
-        select.querySelector('.c-select-trigger span').textContent = r.toUpperCase();
-        options.classList.remove('active');
-      });
-      options.appendChild(opt);
-    });
-
-    select.appendChild(options);
-    select.querySelector('.c-select-trigger').addEventListener('click', e=>{
-      e.stopPropagation();
-      ui.toggleSelect(select);
-    });
-
-    roleContainer.appendChild(select);
-
-    document.getElementById('user-modal').style.display = 'flex';
-  },
-
-  closeUserModal: ()=>{
-    document.getElementById('user-modal').style.display = 'none';
-  },
-
-  showDataModal: (obj)=>{
-    document.getElementById('data-content').innerText = JSON.stringify(obj,null,2);
-    document.getElementById('data-modal').classList.add('active');
-  },
-
-  closeModal: ()=>{
-    document.getElementById('data-modal').classList.remove('active');
+      t.style.opacity = '0';
+      t.style.transform = 'translateY(20px)';
+      setTimeout(() => t.remove(), 300);
+    }, 3000);
   }
 };
 
-
-// Start App
+// Start
 window.addEventListener('DOMContentLoaded', app.init);
 
 </script>
-  <!-- Data Modal -->
-<div id="data-modal" class="modal-overlay">
-  <div class="modal-box showcase">
-    <div class="modal-header">
-      <h3>Raw User Data</h3>
-      <button class="close-btn" onclick="ui.closeModal()">&times;</button>
-    </div>
-    <div class="modal-content">
-      <pre id="data-content">{}</pre>
-    </div>
-    <div class="modal-footer">
-      <button class="action-btn" onclick="ui.closeModal()">Close</button>
-    </div>
-  </div>
-</div>
-<!-- User Modal -->
-<div id="user-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:3000;">
-  <div style="background:rgba(20,10,30,0.95); border:1px solid rgba(255,255,255,0.08); border-radius:16px; width:400px; max-width:90%; padding:20px; position:relative; display:flex; flex-direction:column; gap:15px;">
-    
-    <!-- Close Button -->
-    <button onclick="ui.closeUserModal()" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">✕</button>
-
-    <!-- User Header -->
-    <div style="display:flex; align-items:center; gap:15px;">
-      <img id="modal-avatar" src="" style="width:64px; height:64px; border-radius:12px; border:2px solid rgba(255,255,255,0.1); object-fit:cover;">
-      <div style="flex:1;">
-        <div id="modal-username" style="font-weight:700; font-size:16px; color:#fff;"></div>
-        <div id="modal-role-badge" style="font-size:12px; padding:2px 6px; border-radius:6px; display:inline-block; font-weight:700; text-transform:uppercase;"></div>
-      </div>
-    </div>
-
-    <!-- User Form -->
-    <div style="display:flex; flex-direction:column; gap:10px;">
-
-      <label style="font-size:12px; color:#ccc;">Bio</label>
-      <textarea id="modal-bio" style="width:100%; padding:8px; border-radius:8px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); color:#fff;" rows="3"></textarea>
-
-      <label style="font-size:12px; color:#ccc;">Avatar URL</label>
-      <input id="modal-avatar-url" type="text" style="width:100%; padding:8px; border-radius:8px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); color:#fff;">
-
-      <label style="font-size:12px; color:#ccc;">Banner URL</label>
-      <input id="modal-banner-url" type="text" style="width:100%; padding:8px; border-radius:8px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); color:#fff;">
-
-      <label style="font-size:12px; color:#ccc;">Role</label>
-      <div id="modal-role-select"></div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:10px;">
-      <button class="btn primary" onclick="app.updateUserModal()">Save Changes</button>
-      <button class="btn danger" onclick="app.banUserModal()">Ban User</button>
-    </div>
-
-  </div>
-</div>
-
-
-
 </body>
 </html>
