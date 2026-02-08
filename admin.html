@@ -245,8 +245,16 @@ body {
 .close-btn { background: transparent; border: none; color: #fff; font-size: 24px; cursor: pointer; }
 .action-btn { background: linear-gradient(90deg,#7b2cbf,#9d4edd); color:#fff; padding:8px 18px; border-radius:10px; border:none; cursor:pointer; font-weight:600; }
 @keyframes modalFade { from { transform: translateY(-30px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+.modal-overlay { position:fixed; inset:0; display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:0.2s; z-index:3000; }
+.modal-overlay.active { opacity:1; pointer-events:auto; }
+.modal-box { width:90%; max-width:600px; max-height:80vh; background:rgba(20,10,35,0.7); border-radius:16px; border:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; overflow:hidden; }
+.modal-header, .modal-footer { padding:12px 20px; display:flex; justify-content:space-between; align-items:center; background:rgba(10,5,20,0.5); }
+.modal-content { flex:1; padding:15px 20px; overflow-y:auto; color:#fff; font-size:13px; }
+.modal-content img { max-width:100%; margin-top:6px; border-radius:8px; }
+.action-btn { padding:6px 14px; border:none; border-radius:10px; background:linear-gradient(90deg,#7b2cbf,#9d4edd); color:#fff; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:4px; }
 
 </style>
+  
 </head>
 <body>
 
@@ -357,13 +365,11 @@ const app = {
   },
 
   checkAuth: async () => {
-    // Simple Auth Check Mockup (Replace with strict logic if needed)
     const { data: { user } } = await supabaseClient.auth.getUser();
     if(user) {
       const { data } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
       STATE.currentUser = data || { username: 'Admin', role: 'founder', avatar: null };
     } else {
-      // Fallback for demo purposes if not logged in
       STATE.currentUser = { username: 'System Admin', role: 'founder', avatar: null }; 
     }
     
@@ -398,9 +404,9 @@ const app = {
         (u.id && u.id.includes(term)) ||
         (u.role && u.role.includes(term))
       );
-      STATE.page = 1; // Reset to page 1 on search
+      STATE.page = 1;
       app.renderPage();
-    }, 300); // 300ms Debounce to prevent lag
+    }, 300);
   },
 
   sort: (mode) => {
@@ -432,9 +438,7 @@ const app = {
     ui.toast('Data Refreshed');
   },
 
-  // Role Update Logic
   updateRole: async (uid, newRole) => {
-    // Optimistic UI Update (Update local data first for instant feel)
     const uIndex = STATE.users.findIndex(u => u.id === uid);
     if(uIndex > -1) STATE.users[uIndex].role = newRole;
     app.renderPage(); 
@@ -442,13 +446,12 @@ const app = {
     const { error } = await supabaseClient.from('profiles').update({ role: newRole }).eq('id', uid);
     if(error) {
       ui.toast('Failed to update role', 'error');
-      app.refreshData(); // Revert
+      app.refreshData();
     } else {
       ui.toast(`Role updated to ${newRole.toUpperCase()}`);
     }
   },
 
-  // Context Menu Actions
   ctxAction: (action) => {
     const user = STATE.users.find(u => u.id === STATE.ctxTargetId);
     if(!user) return;
@@ -461,12 +464,45 @@ const app = {
     }
     if(action === 'json') {
       console.log(user);
-      alert(JSON.stringify(user, null, 2)); // Simple alert for now, could be a modal
+      alert(JSON.stringify(user, null, 2));
     }
     if(action === 'ban') {
       if(confirm(`Are you sure you want to BAN ${user.username}?`)) {
         ui.toast('User Banned (Simulated)', 'error');
       }
+    }
+  },
+
+  // ✅ Correctly defined modal functions
+  updateUserModal: async () => {
+    const uid = STATE.ctxTargetId;
+    const bio = document.getElementById('modal-bio').value;
+    const avatar = document.getElementById('modal-avatar-url').value;
+    const banner = document.getElementById('modal-banner-url').value;
+
+    const updates = { bio, avatar, banner };
+
+    const { error } = await supabaseClient.from('profiles').update(updates).eq('id', uid);
+    if(error) {
+      ui.toast('Failed to update user', 'error');
+      console.error(error);
+    } else {
+      const uIndex = STATE.users.findIndex(u => u.id === uid);
+      if(uIndex > -1) STATE.users[uIndex] = { ...STATE.users[uIndex], ...updates };
+      ui.toast('User updated successfully');
+      app.renderPage();
+      ui.closeUserModal();
+    }
+  },
+
+  banUserModal: async () => {
+    const uid = STATE.ctxTargetId;
+    const user = STATE.users.find(u => u.id === uid);
+    if(!user) return;
+
+    if(confirm(`Are you sure you want to BAN ${user.username}?`)) {
+      ui.toast('User banned (simulated)', 'error');
+      ui.closeUserModal();
     }
   },
 
@@ -476,7 +512,6 @@ const app = {
     const end = start + STATE.limit;
     const subset = STATE.filteredUsers.slice(start, end);
 
-    // Update pagination controls
     document.getElementById('curr-page').innerText = STATE.page;
     document.getElementById('prev-btn').disabled = STATE.page === 1;
     document.getElementById('next-btn').disabled = end >= STATE.filteredUsers.length;
@@ -486,21 +521,16 @@ const app = {
       return;
     }
 
-    // Build HTML String (Faster than creating elements individually)
     let html = '';
-    subset.forEach(u => {
-      html += ui.buildCard(u);
-    });
+    subset.forEach(u => { html += ui.buildCard(u); });
     grid.innerHTML = html;
 
-    // Attach local hover events for the glow effect (Highly Optimized)
     document.querySelectorAll('.user-card').forEach(card => {
       card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
         card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
         card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
       });
-      // Context Menu Attach
       card.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         STATE.ctxTargetId = card.dataset.id;
@@ -513,61 +543,64 @@ const app = {
   }
 };
 
+
 // ==================== UI HELPERS ====================
 const ui = {
   // Generates Custom Dropdown HTML
   buildRoleSelect: (u) => {
-  // Only allow editing if current user has higher privs
-  const currentIdx = ROLES.indexOf(STATE.currentUser.role.toLowerCase());
-  const targetIdx = ROLES.indexOf(u.role.toLowerCase());
+    // Only allow editing if current user has higher privs
+    const currentIdx = ROLES.indexOf(STATE.currentUser.role.toLowerCase());
+    const targetIdx = ROLES.indexOf(u.role.toLowerCase());
 
-  const optionsHtml = ROLES.map(r => {
-    const rIdx = ROLES.indexOf(r);
-    const disabled = rIdx >= currentIdx; // Can't assign same or higher role
-    return `<div class="c-option" 
-                onclick="${disabled ? '' : `app.updateRole('${u.id}', '${r}')`}" 
-                style="${disabled ? 'opacity:0.4; cursor:not-allowed;' : ''}">
-              ${r.toUpperCase()}
-            </div>`;
-  }).join('');
+    const optionsHtml = ROLES.map(r => {
+      const rIdx = ROLES.indexOf(r);
+      const disabled = rIdx >= currentIdx; // Can't assign same or higher role
+      return `<div class="c-option" 
+                  onclick="${disabled ? '' : `app.updateRole('${u.id}', '${r}')`}" 
+                  style="${disabled ? 'opacity:0.4; cursor:not-allowed;' : ''}">
+                ${r.toUpperCase()}
+              </div>`;
+    }).join('');
 
-  return `
-    <div class="c-select" onclick="ui.toggleSelect(this); event.stopPropagation();">
-      <div class="c-select-trigger">
-        <span>${u.role.toUpperCase()}</span> <i class="ph ph-caret-down"></i>
+    return `
+      <div class="c-select" onclick="ui.toggleSelect(this); event.stopPropagation();">
+        <div class="c-select-trigger">
+          <span>${u.role.toUpperCase()}</span> <i class="ph ph-caret-down"></i>
+        </div>
+        <div class="c-select-options bottom-up">${optionsHtml}</div>
       </div>
-      <div class="c-select-options bottom-up">${optionsHtml}</div>
-    </div>
-  `;
-},
+    `;
+  },
 
+  // Build user card
   buildCard: (u) => {
     const date = new Date(u.created_at).toLocaleDateString();
     return `
-      <div class="user-card" data-id="${u.id}">
+      <div class="user-card" data-id="${u.id}" onclick="ui.showUserModal('${u.id}')">
         <div class="uc-top">
           <img src="${u.avatar || 'https://via.placeholder.com/100/000000/FFFFFF/?text=' + u.username.charAt(0)}" class="uc-avatar">
           <div class="uc-details">
             <div class="uc-name">${u.username}</div>
-            <div class="uc-uuid" onclick="navigator.clipboard.writeText('${u.id}'); ui.toast('ID Copied')">
+            <div class="uc-uuid" onclick="event.stopPropagation(); navigator.clipboard.writeText('${u.id}'); ui.toast('ID Copied')">
               ${u.id.substring(0,12)}... <i class="ph ph-copy"></i>
             </div>
             <div class="uc-badges">
-              <span class="badge ${u.role}">${u.role}</span>
+              <span class="badge ${u.role}">${u.role.toUpperCase()}</span>
               <span class="badge user">${date}</span>
+              <span class="badge" style="border-color:#ffb703;color:#ffb703;background:rgba(255,183,3,0.1);">IN DEVELOPMENT</span>
             </div>
           </div>
         </div>
         <div class="uc-actions">
-          ${ui.buildRoleSelect(u)}
-          <button class="btn" style="padding:8px;" title="View Data" onclick="ui.showDataModal(${JSON.stringify(u).replace(/"/g,'&quot;')})">
-  <i class="ph ph-code"></i>
-</button>
+          <button class="btn" style="padding:8px;" title="View Details" onclick="event.stopPropagation(); ui.showUserModal('${u.id}')">
+            <i class="ph ph-eye"></i> View
+          </button>
         </div>
       </div>
     `;
   },
 
+  // Skeleton loading cards
   renderSkeleton: () => {
     const grid = document.getElementById('user-grid');
     let html = '';
@@ -606,14 +639,36 @@ const ui = {
       el.style.transform = 'translateX(100px)';
       setTimeout(() => el.remove(), 300);
     }, 3000);
+  },
+
+  showUserModal: (uid) => {
+    const user = STATE.users.find(u => u.id === uid);
+    if(!user) return;
+
+    STATE.ctxTargetId = uid; // Keep track for updates
+
+    document.getElementById('modal-avatar').src = user.avatar || 'https://via.placeholder.com/100/000000/FFFFFF/?text=' + user.username.charAt(0);
+    document.getElementById('modal-username').textContent = user.username;
+    document.getElementById('modal-role').textContent = user.role.toUpperCase();
+    document.getElementById('modal-bio').value = user.bio || '';
+    document.getElementById('modal-avatar-url').value = user.avatar || '';
+    document.getElementById('modal-banner-url').value = user.banner || '';
+
+    document.getElementById('user-modal').style.display = 'flex';
+  },
+
+  closeUserModal: () => {
+    document.getElementById('user-modal').style.display = 'none';
+  },
+
+  showDataModal: (obj) => {
+    document.getElementById('data-content').innerText = JSON.stringify(obj, null, 2);
+    document.getElementById('data-modal').classList.add('active');
+  },
+
+  closeModal: () => {
+    document.getElementById('data-modal').classList.remove('active');
   }
-};
-ui.showDataModal = (obj) => {
-  document.getElementById('data-content').innerText = JSON.stringify(obj, null, 2);
-  document.getElementById('data-modal').classList.add('active');
-};
-ui.closeModal = () => {
-  document.getElementById('data-modal').classList.remove('active');
 };
 
 // Start App
@@ -635,6 +690,38 @@ window.addEventListener('DOMContentLoaded', app.init);
     </div>
   </div>
 </div>
+<!-- User Modal -->
+<div id="user-modal" style="position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:10000;">
+  <div style="background:var(--bg-card); border:1px solid var(--border-glass); border-radius:16px; width:400px; max-width:90%; padding:20px; position:relative; display:flex; flex-direction:column; gap:15px;">
+    <button onclick="ui.closeUserModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:18px; color:var(--c-text); cursor:pointer;">&times;</button>
+    <div style="display:flex; align-items:center; gap:15px;">
+      <img id="modal-avatar" src="" style="width:60px; height:60px; border-radius:12px; border:2px solid rgba(255,255,255,0.1); object-fit:cover;">
+      <div>
+        <div id="modal-username" style="font-weight:700; font-size:16px;"></div>
+        <div id="modal-role" style="font-size:12px; color:var(--c-text-dim);"></div>
+      </div>
+    </div>
+    <div>
+      <label style="font-size:12px; color:var(--c-text-dim);">Bio:</label>
+      <textarea id="modal-bio" style="width:100%; border-radius:8px; padding:8px; background:var(--bg-glass); border:1px solid var(--border-glass); color:#fff;"></textarea>
+    </div>
+    <div>
+      <label style="font-size:12px; color:var(--c-text-dim);">Avatar URL:</label>
+      <input type="text" id="modal-avatar-url" style="width:100%; border-radius:8px; padding:8px; background:var(--bg-glass); border:1px solid var(--border-glass); color:#fff;">
+    </div>
+    <div>
+      <label style="font-size:12px; color:var(--c-text-dim);">Banner URL:</label>
+      <input type="text" id="modal-banner-url" style="width:100%; border-radius:8px; padding:8px; background:var(--bg-glass); border:1px solid var(--border-glass); color:#fff;">
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:5px;">
+      <button class="btn primary" onclick="app.updateUserModal()">Save Changes</button>
+      <button class="btn" onclick="app.banUserModal()">Ban User</button>
+      <button class="btn" disabled title="In Development">Warn</button>
+      <button class="btn" disabled title="In Development">Notify</button>
+    </div>
+  </div>
+</div>
+
 
 </body>
 </html>
