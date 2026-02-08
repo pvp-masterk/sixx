@@ -1,66 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Admin Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>/six Admin</title>
 
-<!-- Supabase -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<!-- Icons (Phosphor Icons for UI elements) -->
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+<!-- Icons -->
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
+/* ======================= CORE VARIABLES & RESET ======================= */
 :root {
-  --bg-body: #050507;
-  --bg-card: #0e0e12;
-  --bg-input: #18181b;
-  --border: rgba(255,255,255,0.08);
-  --primary: #7b2cbf;
-  --primary-hover: #9d4edd;
-  --text-main: #e8e6f3;
-  --text-muted: #a1a1aa;
+  --c-bg: #030005;
+  --c-bg-alt: #0a0510;
+  --c-accent: #7b2cbf;
+  --c-accent-light: #9d4edd;
+  --c-accent-glow: #e0aaff;
+  --c-text-main: #e8e6f3;
+  --c-text-dim: #8f8ba0;
+  
+  /* Glass Variables */
+  --c-glass: rgba(10, 5, 20, 0.6);
+  --c-glass-hover: rgba(20, 10, 35, 0.8);
+  --c-glass-border: rgba(255, 255, 255, 0.08);
+  --c-glass-border-hover: rgba(157, 78, 221, 0.5);
+  
+  --font-main: 'Inter', sans-serif;
+  --font-brand: 'Diecide Remain', serif;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-* { box-sizing: border-box; outline: none; }
+@font-face {
+  font-family: 'Diecide Remain';
+  src: url('fonts/DeicideRemain.otf') format('opentype');
+  font-display: swap;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; width: 100%; }
 
 body {
-  background: var(--bg-body);
-  color: var(--text-main);
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
+  font-family: var(--font-main);
+  background: var(--c-bg);
+  color: var(--c-text-main);
+  overflow-x: hidden; 
+  line-height: 1.6;
 }
 
-/* --- Header & Nav --- */
-header {
-  background: rgba(5,5,7, 0.8);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
-  padding: 15px 30px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* Texture Overlay */
+body::after {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 900;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+  background-size: 100% 4px;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 700;
-  font-size: 1.2rem;
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--c-bg); }
+::-webkit-scrollbar-thumb { background: #331050; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--c-accent); }
 
-.brand img {
-  height: 32px;
-  width: auto;
-}
+/* Brand Text */
 .brand-text {
   font-family: var(--font-brand), 'Cinzel', serif;
   background: linear-gradient(135deg, #e0aaff, #9d4edd, #7b2cbf);
@@ -71,509 +74,436 @@ header {
   font-weight: 900;
   letter-spacing: 1px;
 }
-/* --- Stats Bar --- */
-.stats-bar {
-  display: flex;
-  gap: 20px;
-  padding: 20px 30px 0 30px;
+
+/* ======================= BACKGROUND ======================= */
+.bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-blob {
+  position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3;
+  will-change: transform; animation: breath 10s infinite alternate ease-in-out;
+}
+.bg-blob.one { top: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(#4a0072, transparent 70%); }
+.bg-blob.two { bottom: -20%; right: -10%; width: 70vw; height: 70vw; background: radial-gradient(#240046, transparent 70%); animation-delay: -5s; }
+@keyframes breath { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+/* ======================= LAYOUT ======================= */
+.admin-container {
+  position: relative; z-index: 10;
+  max-width: 1400px; margin: 0 auto;
+  padding: 40px 20px;
+  display: flex; flex-direction: column; gap: 30px;
 }
 
-.stat-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 15px 20px;
-  border-radius: 12px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+/* Header */
+.admin-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.header-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; color: var(--c-accent); margin-bottom: 4px; }
+.header-brand { font-size: 32px; line-height: 1; }
+
+.user-badge {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.03); padding: 8px 16px; border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
-.stat-val { font-size: 1.5rem; font-weight: 700; }
-.stat-label { font-size: 0.85rem; color: var(--text-muted); }
+/* Search Bar */
+.search-container {
+  position: relative; width: 100%; max-width: 400px;
+}
+.search-input {
+  width: 100%; background: rgba(0,0,0,0.3);
+  border: 1px solid var(--c-glass-border);
+  padding: 12px 15px 12px 40px; color: #fff; border-radius: 8px;
+  transition: 0.3s;
+}
+.search-input:focus { border-color: var(--c-accent); box-shadow: 0 0 15px rgba(123, 44, 191, 0.2); }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--c-text-dim); }
 
-/* --- Controls --- */
-.controls {
-  padding: 20px 30px;
-  display: flex;
-  gap: 10px;
+/* ======================= CARDS (BENTO) ======================= */
+.grid-layout {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;
 }
 
-.search-wrapper {
-  position: relative;
-  flex: 1;
-  max-width: 400px;
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
 }
 
-.search-wrapper i {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
+.card {
+  background: var(--c-glass);
+  border: 1px solid var(--c-glass-border);
+  border-radius: 20px;
+  padding: 24px;
+  position: relative; overflow: hidden;
+  transition: all 0.4s var(--ease-out);
+  backdrop-filter: blur(12px);
+  display: flex; flex-direction: column;
 }
+/* Mouse Glow Logic */
+.card::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(157, 78, 221, 0.1), transparent 40%);
+  opacity: 0; transition: opacity 0.5s; pointer-events: none; z-index: 1;
+}
+.card:hover::after { opacity: 1; }
+.card:hover { border-color: var(--c-glass-border-hover); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 
-input[type="text"] {
-  width: 100%;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  color: white;
-  padding: 10px 10px 10px 38px;
-  border-radius: 8px;
-  font-family: inherit;
+/* Stat Card */
+.stat-card { align-items: flex-start; }
+.stat-value { font-size: 32px; font-weight: 800; color: #fff; margin-top: 5px; }
+.stat-label { color: var(--c-text-dim); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* User Card */
+.user-card-content { position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; }
+.uc-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+.uc-avatar { 
+  width: 50px; height: 50px; border-radius: 12px; object-fit: cover; 
+  border: 2px solid rgba(255,255,255,0.1); 
+}
+.uc-info h3 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; }
+.uc-info span { font-size: 12px; color: var(--c-text-dim); font-family: monospace; }
+
+.uc-role {
+  margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);
+  display: flex; gap: 10px; align-items: center;
+}
+.role-select {
+  background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+  color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 12px;
+  cursor: pointer; flex: 1;
+}
+.role-select:hover { border-color: var(--c-accent); }
+
+.action-btn {
+  background: transparent; border: 1px solid rgba(255,255,255,0.1);
+  color: var(--c-text-dim); padding: 5px 8px; border-radius: 6px; cursor: pointer;
   transition: 0.2s;
 }
-
-input[type="text"]:focus { border-color: var(--primary); }
-
-/* --- Grid Layout --- */
-#users-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  padding: 0 30px 40px 30px;
-}
-
-/* --- User Card --- */
-.user-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  position: relative;
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: flex;
-  flex-direction: column;
-}
-
-.user-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
-  border-color: rgba(255,255,255,0.15);
-}
-
-/* Banner */
-.card-banner {
-  height: 100px;
-  background-color: #222;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-}
-.card-banner::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, transparent, rgba(14,14,18,1));
-}
-
-/* Avatar */
-.card-avatar-wrapper {
-  margin-top: -45px;
-  padding: 0 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  position: relative;
-}
-
-.card-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 4px solid var(--bg-card);
-  background: #333;
-  object-fit: cover;
-}
-
-/* Info */
-.card-body {
-  padding: 10px 20px 20px 20px;
-  flex: 1;
-}
-
-.user-names h3 { margin: 0; font-size: 1.1rem; }
-.user-names span { color: var(--text-muted); font-size: 0.9rem; }
-
-.meta-info {
-  margin-top: 12px;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.copy-id {
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.copy-id:hover { color: var(--primary); }
+.action-btn:hover { color: #fff; background: rgba(255,255,255,0.05); border-color: #fff; }
 
 /* Badges */
-.roles-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 12px;
-}
+.badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; font-weight: 700; border: 1px solid transparent; }
+.badge.founder { color: #ffd700; border-color: rgba(255, 215, 0, 0.3); background: rgba(255, 215, 0, 0.05); }
+.badge.admin { color: #c77dff; border-color: rgba(199, 125, 255, 0.3); background: rgba(199, 125, 255, 0.05); }
+.badge.verified { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
 
-.badge {
-  font-size: 0.7rem;
-  padding: 3px 8px;
-  border-radius: 4px;
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+  z-index: 2000; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: 0.3s;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal-box {
+  width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto;
+  background: #0a0510; border: 1px solid var(--c-glass-border);
+  padding: 30px; border-radius: 20px;
+  box-shadow: 0 0 50px rgba(123, 44, 191, 0.1);
+}
+pre { background: #000; padding: 15px; border-radius: 8px; color: #0f0; overflow-x: auto; font-size: 12px; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 30px; right: 30px;
+  background: var(--c-accent); color: #fff;
+  padding: 12px 24px; border-radius: 8px;
+  transform: translateY(100px); transition: 0.3s;
+  z-index: 3000; box-shadow: 0 0 20px rgba(123, 44, 191, 0.5);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
+.toast.show { transform: translateY(0); }
 
-.badge.Verified { background: rgba(255,255,255,0.1); color: #fff; }
-.badge.Moderator { background: rgba(37, 99, 235, 0.2); color: #60a5fa; border: 1px solid rgba(37,99,235,0.3); }
-.badge.Admin { background: rgba(123, 44, 191, 0.2); color: #c77dff; border: 1px solid rgba(123, 44, 191, 0.3); }
-.badge.Founder { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-
-/* Actions */
-.card-actions {
-  padding: 15px 20px;
-  border-top: 1px solid var(--border);
-  background: rgba(255,255,255,0.01);
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-select.role-select {
-  background: var(--bg-input);
-  color: white;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 6px 10px;
-  flex: 1;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-button.raw-btn {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  padding: 6px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-button.raw-btn:hover { background: rgba(255,255,255,0.05); color: white; }
-
-/* Raw Data Modal */
-#raw-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.8);
-  z-index: 200;
-  padding: 40px;
-  align-items: center;
-  justify-content: center;
-}
-.modal-content {
-  background: var(--bg-card);
-  padding: 20px;
-  border-radius: 12px;
-  max-width: 600px;
-  width: 100%;
-  max-height: 80vh;
-  overflow: auto;
-  border: 1px solid var(--border);
-}
-pre { color: #0f0; background: #111; padding: 15px; border-radius: 8px; overflow-x: auto; }
+/* Loading State */
+.loading-pulse { animation: pulse 1.5s infinite; opacity: 0.5; }
+@keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
 </style>
 </head>
-
 <body>
 
-<header>
-  <div class="brand">
-    <span class="brand-text">/SIX</span>
-    <span>Admin Panel</span>
+  <!-- Background Ambience -->
+  <div class="bg-fixed">
+    <div class="bg-blob one"></div>
+    <div class="bg-blob two"></div>
   </div>
-  <div class="user-profile" id="current-user-display">
-    <!-- Logged in as... -->
-  </div>
-</header>
 
-<!-- Stats -->
-<div class="stats-bar">
-  <div class="stat-card">
-    <span class="stat-val" id="count-total">0</span>
-    <span class="stat-label">Total Users</span>
-  </div>
-  <div class="stat-card">
-    <span class="stat-val" id="count-staff">0</span>
-    <span class="stat-label">Staff Members</span>
-  </div>
-</div>
+  <div class="admin-container">
+    <!-- Header -->
+    <header class="admin-header">
+      <div>
+        <div class="header-title">DASHBOARD</div>
+        <div class="header-brand brand-text scramble-hover" data-text="/six Admin">/six Admin</div>
+      </div>
+      <div class="user-badge" id="admin-profile">
+        <span class="loading-pulse">Authenticating...</span>
+      </div>
+    </header>
 
-<!-- Controls -->
-<div class="controls">
-  <div class="search-wrapper">
-    <i class="ph ph-magnifying-glass"></i>
-    <input type="text" id="search-input" placeholder="Search by username, ID, or role..." onkeyup="filterUsers()">
-  </div>
-</div>
-
-<!-- Grid -->
-<div id="users-grid">
-  <!-- User Cards Generated Here -->
-</div>
-
-<!-- Modal -->
-<div id="raw-modal" onclick="closeModal(event)">
-  <div class="modal-content">
-    <h3>Raw User Data</h3>
-    <pre id="raw-json"></pre>
-    <button onclick="document.getElementById('raw-modal').style.display='none'" style="margin-top:10px; padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:6px; cursor:pointer;">Close</button>
-  </div>
-</div>
-
-<script>
-// --- CONFIGURATION ---
-const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
-
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const ROLE_LEVEL = {
-  Verified: 1,
-  Moderator: 2,
-  Admin: 3,
-  Founder: 4
-};
-
-// --- STATE ---
-let me;
-let allUsers = [];
-
-// --- INITIALIZATION ---
-(async () => {
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) return location.replace("/");
-
-  // Fetch current admin details
-  const { data, error } = await sb
-    .from("profiles")
-    .select("id, role, roles, username, avatar")
-    .eq("id", user.id)
-    .single();
-
-  if (error || !data || (ROLE_LEVEL[data.role] || 0) < ROLE_LEVEL.Admin) {
-    // Basic protection: redirect if not admin
-    alert("Unauthorized Access");
-    return location.replace("/");
-  }
-
-  me = data;
-  document.getElementById("current-user-display").innerHTML = `
-    <div style="display:flex; align-items:center; gap:10px;">
-        <span style="font-size:0.9rem; color:#ccc;">${me.username || 'Admin'}</span>
-        <img src="${me.avatar || 'https://via.placeholder.com/32'}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+    <!-- Stats Row -->
+    <div class="stats-grid">
+      <div class="card stat-card">
+        <span class="stat-label">Total Users</span>
+        <span class="stat-value brand-text" id="stat-total">0</span>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-label">Verified Staff</span>
+        <span class="stat-value brand-text" id="stat-staff">0</span>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-label">New Today</span>
+        <span class="stat-value brand-text" id="stat-new">0</span>
+      </div>
+      <div class="card stat-card" style="justify-content:center; align-items:center; cursor:pointer;" onclick="app.refresh()">
+        <i class="ph ph-arrows-clockwise" style="font-size:24px;"></i>
+        <span style="font-size:10px; margin-top:5px; opacity:0.7;">REFRESH DATA</span>
+      </div>
     </div>
-  `;
-  
-  loadUsers();
-})();
 
-// --- CORE LOGIC ---
+    <!-- Controls -->
+    <div style="display:flex; gap:15px; align-items:center;">
+      <div class="search-container">
+        <i class="ph ph-magnifying-glass search-icon"></i>
+        <input type="text" class="search-input" id="search-box" placeholder="Search UUID, Username, Role..." onkeyup="app.filter()">
+      </div>
+      <div style="font-size:12px; color:var(--c-text-dim);">
+        Showing <span id="count-display" style="color:#fff;">0</span> users
+      </div>
+    </div>
 
-async function loadUsers() {
-  const grid = document.getElementById("users-grid");
-  grid.innerHTML = '<div style="color:#888; padding:20px;">Loading users...</div>';
+    <!-- Main Grid -->
+    <div id="user-grid" class="grid-layout">
+      <!-- Generated via JS -->
+    </div>
+  </div>
 
-  // Fetch EVERYTHING (*)
-  const { data: users, error } = await sb
-    .from("profiles")
-    .select("*")
-    .order('created_at', { ascending: false });
+  <!-- JSON Modal -->
+  <div id="json-modal" class="modal-overlay" onclick="app.closeModal(event)">
+    <div class="modal-box">
+      <h3 style="margin-bottom:15px; color:#fff;">Raw User Data</h3>
+      <pre id="json-content"></pre>
+      <button onclick="app.closeModal(null, true)" style="margin-top:20px; padding:10px 20px; background:var(--c-accent); color:white; border:none; border-radius:6px; cursor:pointer;">Close</button>
+    </div>
+  </div>
 
-  if (error) {
-    grid.innerHTML = `<div style="color:red">Error loading users: ${error.message}</div>`;
-    return;
-  }
+  <!-- Toast -->
+  <div id="toast" class="toast">Action Successful</div>
 
-  allUsers = users;
-  updateStats();
-  renderUsers(allUsers);
-}
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+  // Mouse tracking for glow effect (Optimized)
+  document.addEventListener('mousemove', e => {
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.card').forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+    });
+  });
 
-function renderUsers(usersList) {
-  const grid = document.getElementById("users-grid");
-  grid.innerHTML = "";
+  // Supabase Config
+  const supabaseClient = supabase.createClient(
+    "https://tstsijdifhgmpaszqknr.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
+  );
 
-  if(usersList.length === 0) {
-    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#555;">No users found.</div>';
-    return;
-  }
+  const ROLES = {
+    founder: 4,
+    admin: 3,
+    moderator: 2,
+    verified: 1,
+    member: 0
+  };
 
-  usersList.forEach(u => {
-    // Determine hierarchy
-    const myLevel = ROLE_LEVEL[me.role] || 0;
-    const targetLevel = ROLE_LEVEL[u.role] || 0;
-    const canEdit = myLevel > targetLevel;
+  let currentUser = null;
+  let allUsers = [];
 
-    // Data parsing
-    const username = u.username || "Unknown";
-    // Check if full_name exists, else use fallback
-    const fullName = u.full_name || u.display_name || ""; 
-    const avatar = u.avatar || "https://ui-avatars.com/api/?name=" + username + "&background=random";
-    const banner = u.banner_url || null;
-    const dateCreated = u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A";
-    
-    // Process Roles Array (Ensure unique roles)
-    let displayRoles = u.roles || [];
-    if (!Array.isArray(displayRoles)) displayRoles = [u.role]; // Fallback if column isn't array
-    // Ensure main role is included if missing
-    if (u.role && !displayRoles.includes(u.role)) displayRoles.push(u.role);
-    // Sort roles by level high to low
-    displayRoles.sort((a,b) => (ROLE_LEVEL[b]||0) - (ROLE_LEVEL[a]||0));
+  const app = {
+    init: async () => {
+      app.initScramble();
+      await app.checkAuth();
+      await app.fetchUsers();
+    },
 
-    // Create Card
-    const card = document.createElement("div");
-    card.className = "user-card";
-    
-    // HTML Construction
-    card.innerHTML = `
-      <div class="card-banner" style="${banner ? `background-image: url('${banner}')` : 'background: linear-gradient(45deg, #333, #111)'}"></div>
+    initScramble: () => {
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ/<>[]#";
+      document.querySelectorAll('.scramble-hover').forEach(el => {
+        el.onmouseover = event => {
+          let iteration = 0;
+          let interval = setInterval(() => {
+            event.target.innerText = event.target.innerText
+              .split("").map((letter, index) => {
+                if(index < iteration) return event.target.dataset.text[index];
+                return letters[Math.floor(Math.random() * 26)];
+              }).join("");
+            if(iteration >= event.target.dataset.text.length) clearInterval(interval);
+            iteration += 1/3;
+          }, 30);
+        }
+      });
+    },
+
+    checkAuth: async () => {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) return window.location.href = '/'; // Redirect if no auth
+
+      // Check role
+      const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
       
-      <div class="card-avatar-wrapper">
-        <img class="card-avatar" src="${avatar}" alt="Ava">
-      </div>
+      if (!profile || (ROLES[profile.role] || 0) < ROLES.moderator) {
+        alert("ACCESS DENIED: Insufficient Clearance.");
+        return window.location.href = '/';
+      }
 
-      <div class="card-body">
-        <div class="user-names">
-          <h3>${escapeHtml(username)}</h3>
-          <span>${escapeHtml(fullName)}</span>
-        </div>
+      currentUser = profile;
+      document.getElementById('admin-profile').innerHTML = `
+        <img src="${profile.avatar}" style="width:20px; height:20px; border-radius:50%;">
+        <span style="font-size:12px; font-weight:700;">${profile.username.toUpperCase()}</span>
+      `;
+    },
 
-        <div class="roles-container">
-          ${displayRoles.map(r => `<span class="badge ${r}">${r}</span>`).join('')}
-        </div>
+    fetchUsers: async () => {
+      const grid = document.getElementById('user-grid');
+      grid.innerHTML = `<div style="color:var(--c-text-dim);">Fetching Database...</div>`;
 
-        <div class="meta-info">
-          <span class="copy-id" onclick="copyToClipboard('${u.id}')" title="Click to Copy ID">
-            <i class="ph ph-copy"></i> ${u.id.substring(0, 18)}...
-          </span>
-          <span>Joined: ${dateCreated}</span>
-        </div>
-      </div>
+      const { data, error } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
 
-      <div class="card-actions">
-        ${renderRoleSelect(u, !canEdit)}
-        <button class="raw-btn" onclick='viewRawData(${JSON.stringify(u).replace(/'/g, "&apos;")})' title="View JSON">
-          <i class="ph ph-code"></i>
-        </button>
-      </div>
-    `;
+      if (error) {
+        grid.innerHTML = `<div style="color:red;">Error: ${error.message}</div>`;
+        return;
+      }
 
-    grid.appendChild(card);
-  });
-}
+      allUsers = data;
+      app.updateStats();
+      app.render(allUsers);
+    },
 
-// --- HELPER FUNCTIONS ---
+    render: (users) => {
+      const grid = document.getElementById('user-grid');
+      grid.innerHTML = '';
+      
+      const fragment = document.createDocumentFragment();
 
-function renderRoleSelect(user, locked) {
-  if (locked) {
-    return `<button disabled style="flex:1; background:#222; border:1px solid #333; color:#666; padding:6px; border-radius:6px; cursor:not-allowed;">Locked (${user.role})</button>`;
-  }
+      users.forEach(u => {
+        const roleLevel = ROLES[u.role] || 0;
+        const myLevel = ROLES[currentUser.role] || 0;
+        const canEdit = myLevel > roleLevel;
+        
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="user-card-content">
+            <div class="uc-header">
+              <img src="${u.avatar || 'https://via.placeholder.com/50'}" class="uc-avatar">
+              <div class="uc-info">
+                <h3>${u.username} <span class="badge ${u.role}">${u.role}</span></h3>
+                <span style="cursor:pointer" onclick="app.copy('${u.id}')" title="Copy UUID">ID: ${u.id.substring(0,8)}...</span>
+              </div>
+            </div>
+            
+            <div style="font-size:12px; color:#666; margin-bottom:15px; flex:1;">
+              Joined: ${new Date(u.created_at).toLocaleDateString()}
+            </div>
 
-  // Only show roles lower than current admin
-  const options = Object.keys(ROLE_LEVEL)
-    .filter(r => ROLE_LEVEL[r] < ROLE_LEVEL[me.role])
-    .map(r => `<option value="${r}" ${user.role === r ? "selected" : ""}>${r}</option>`)
-    .join("");
+            <div class="uc-role">
+              ${app.renderRoleSelect(u, canEdit)}
+              <button class="action-btn" onclick='app.viewJson(${JSON.stringify(u).replace(/'/g, "&apos;")})'>
+                <i class="ph ph-code"></i>
+              </button>
+            </div>
+          </div>
+        `;
+        fragment.appendChild(card);
+      });
 
-  return `
-    <select class="role-select" onchange="changeRole('${user.id}', this.value)">
-      ${options}
-    </select>
-  `;
-}
+      grid.appendChild(fragment);
+      document.getElementById('count-display').innerText = users.length;
+    },
 
-async function changeRole(userId, newRole) {
-  if (ROLE_LEVEL[newRole] >= ROLE_LEVEL[me.role]) {
-    alert("You cannot assign a role equal to or higher than your own.");
-    return;
-  }
+    renderRoleSelect: (user, canEdit) => {
+      if (!canEdit) {
+        return `<div class="role-select" style="opacity:0.5; cursor:not-allowed;">LOCKED (${user.role.toUpperCase()})</div>`;
+      }
+      
+      // Only show roles lower than mine
+      const options = Object.keys(ROLES)
+        .filter(r => ROLES[r] < ROLES[currentUser.role])
+        .map(r => `<option value="${r}" ${user.role === r ? 'selected' : ''}>${r.toUpperCase()}</option>`)
+        .join('');
 
-  const confirmChange = confirm(`Change role to ${newRole}?`);
-  if (!confirmChange) return loadUsers(); // Reset UI
+      return `<select class="role-select" onchange="app.updateRole('${user.id}', this.value)">${options}</select>`;
+    },
 
-  // Update Main Role AND the roles array
-  // Assuming 'roles' is a JSONB/Array column, we usually want to keep previous roles or just set the new main one.
-  // This logic resets the array to contain just the new role (as per your previous logic), 
-  // but expands it to ensure consistency.
-  
-  const { error } = await sb
-    .from("profiles")
-    .update({ 
-      role: newRole,
-      roles: [newRole] // Or append: sb.rpc... but simplistic update here
-    })
-    .eq("id", userId);
+    updateRole: async (uid, newRole) => {
+      if (!confirm(`Confirm promotion/demotion to ${newRole.toUpperCase()}?`)) {
+        return app.refresh(); // Revert UI
+      }
 
-  if (error) alert("Failed: " + error.message);
-  loadUsers();
-}
+      const { error } = await supabaseClient.from('profiles').update({ role: newRole }).eq('id', uid);
+      
+      if (error) {
+        alert(error.message);
+      } else {
+        app.showToast(`Updated user role to ${newRole}`);
+        // Update local data to avoid full re-fetch lag
+        const uIndex = allUsers.findIndex(u => u.id === uid);
+        if(uIndex > -1) allUsers[uIndex].role = newRole;
+        app.render(allUsers); // Re-render with updated local data
+      }
+    },
 
-function filterUsers() {
-  const term = document.getElementById("search-input").value.toLowerCase();
-  
-  const filtered = allUsers.filter(u => {
-    const rStr = (u.roles || []).join(" ").toLowerCase();
-    return (
-      (u.username && u.username.toLowerCase().includes(term)) ||
-      u.id.includes(term) ||
-      (u.role && u.role.toLowerCase().includes(term)) ||
-      rStr.includes(term)
-    );
-  });
+    filter: () => {
+      const term = document.getElementById('search-box').value.toLowerCase();
+      const filtered = allUsers.filter(u => 
+        u.username.toLowerCase().includes(term) || 
+        u.id.includes(term) || 
+        u.role.includes(term)
+      );
+      app.render(filtered);
+    },
 
-  renderUsers(filtered);
-}
+    updateStats: () => {
+      document.getElementById('stat-total').innerText = allUsers.length;
+      document.getElementById('stat-staff').innerText = allUsers.filter(u => ['admin', 'moderator', 'founder'].includes(u.role)).length;
+      
+      // Calculate new today
+      const today = new Date().toDateString();
+      const newUsers = allUsers.filter(u => new Date(u.created_at).toDateString() === today).length;
+      document.getElementById('stat-new').innerText = newUsers;
+    },
 
-function updateStats() {
-  document.getElementById("count-total").innerText = allUsers.length;
-  const staff = allUsers.filter(u => (ROLE_LEVEL[u.role] || 0) >= ROLE_LEVEL.Moderator).length;
-  document.getElementById("count-staff").innerText = staff;
-}
+    refresh: () => {
+      app.fetchUsers();
+      app.showToast("Data Refreshed");
+    },
 
-function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    // Simple toast could go here
-    console.log("Copied ID");
-  });
-}
+    copy: (text) => {
+      navigator.clipboard.writeText(text);
+      app.showToast("UUID Copied");
+    },
 
-function viewRawData(userObj) {
-  document.getElementById("raw-json").innerText = JSON.stringify(userObj, null, 2);
-  document.getElementById("raw-modal").style.display = "flex";
-}
+    showToast: (msg) => {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    },
 
-function closeModal(e) {
-  if(e.target.id === 'raw-modal') {
-    document.getElementById("raw-modal").style.display = "none";
-  }
-}
+    viewJson: (obj) => {
+      document.getElementById('json-content').innerText = JSON.stringify(obj, null, 2);
+      document.getElementById('json-modal').classList.add('active');
+    },
 
-function escapeHtml(text) {
-  if (!text) return "";
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+    closeModal: (e, force) => {
+      if (force || e.target.id === 'json-modal') {
+        document.getElementById('json-modal').classList.remove('active');
+      }
+    }
+  };
+
+  window.addEventListener('DOMContentLoaded', app.init);
 </script>
-
 </body>
 </html>
