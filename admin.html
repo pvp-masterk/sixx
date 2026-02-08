@@ -93,9 +93,20 @@ console.log("Admin check:", me, error);
 })();
 
 async function loadUsers() {
-  const { data: users } = await sb
+  const { data: users, error } = await sb
     .from("profiles")
     .select("id, username, roles, is_admin, is_banned");
+
+  if (error) {
+    console.error("Failed to load users:", error);
+    alert("Failed to load users. Check console.");
+    return;
+  }
+
+  if (!Array.isArray(users)) {
+    console.error("Users is not an array:", users);
+    return;
+  }
 
   const container = document.getElementById("users");
   container.innerHTML = "";
@@ -123,6 +134,7 @@ async function loadUsers() {
     container.appendChild(card);
   });
 }
+
 
 async function toggleBan(id, banned) {
   await sb.from("profiles")
