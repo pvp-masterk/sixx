@@ -345,23 +345,40 @@ pre { background: #000; padding: 15px; border-radius: 8px; color: #0f0; overflow
     },
 
     checkAuth: async () => {
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) return window.location.href = '/'; // Redirect if no auth
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return window.location.href = '/'; // redirect if not logged in
 
-      // Check role
-      const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
-      
-      if (!profile || (ROLES[profile.role] || 0) < ROLES.moderator) {
-        alert("ACCESS DENIED: Insufficient Clearance.");
-        return window.location.href = '/';
-      }
+  // Fetch profile
+  const { data: profile, error } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
 
-      currentUser = profile;
-      document.getElementById('admin-profile').innerHTML = `
-        <img src="${profile.avatar}" style="width:20px; height:20px; border-radius:50%;">
-        <span style="font-size:12px; font-weight:700;">${profile.username.toUpperCase()}</span>
-      `;
-    },
+  if (error || !profile) {
+    console.error("Profile fetch error:", error);
+    return window.location.href = '/';
+  }
+
+  // Normalize role to lowercase for consistent checking
+  const role = (profile.role || '').toLowerCase();
+
+  // Minimum access level required
+  const minRoleLevel = ROLES['moderator'];
+
+  if ((ROLES[role] || 0) < minRoleLevel) {
+    console.warn("ACCESS DENIED: Insufficient Clearance. Role found:", profile.role);
+    return window.location.href = '/';
+  }
+
+  currentUser = profile;
+
+  // Display user badge
+  document.getElementById('admin-profile').innerHTML = `
+    <img src="${profile.avatar || 'https://via.placeholder.com/20'}" style="width:20px; height:20px; border-radius:50%;">
+    <span style="font-size:12px; font-weight:700;">${profile.username.toUpperCase()}</span>
+  `;
+},
 
     fetchUsers: async () => {
       const grid = document.getElementById('user-grid');
