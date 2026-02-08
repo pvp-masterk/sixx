@@ -1,316 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Loading Profile...</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Profile | /six</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+<!-- Phosphor Icons (for profile specific icons) -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+<style>
+/* ======================= 1. CORE VARIABLES & RESET (From Index) ======================= */
+:root {
+  --c-bg: #030005;
+  --c-bg-alt: #0a0510;
+  --c-accent: #7b2cbf;
+  --c-accent-light: #9d4edd;
+  --c-accent-glow: #e0aaff;
+  --c-text-main: #e8e6f3;
+  --c-text-dim: #8f8ba0;
   
-  <!-- Supabase -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <!-- Icons (Phosphor Icons) -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-  <style>
-    :root {
-      --bg-color: #09090b;
-      --card-bg: rgba(24, 24, 27, 0.6);
-      --border-color: rgba(255, 255, 255, 0.1);
-      --accent: #5865F2; /* Discord Blurple */
-      --accent-hover: #4752c4;
-      --text-main: #ffffff;
-      --text-muted: #a1a1aa;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background-color: var(--bg-color);
-      /* Subtle animated background */
-      background-image: 
-        radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-        radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-        radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-      color: var(--text-main);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Main Card */
-    .profile-card {
-      width: 100%;
-      max-width: 480px;
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-color);
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      margin: 20px;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 0.6s ease forwards;
-      position: relative;
-    }
-
-    @keyframes fadeInUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Banner Area */
-    .banner-container {
-      height: 160px;
-      width: 100%;
-      background-color: #27272a;
-      position: relative;
-    }
-
-    .banner {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* Profile Header Info */
-    .profile-header {
-      padding: 0 24px;
-      position: relative;
-      margin-bottom: 16px;
-    }
-
-    .header-top-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end; /* Aligns avatar bottom with button bottom */
-      margin-top: -50px; /* Pull avatar up into banner */
-      margin-bottom: 10px;
-      position: relative;
-    }
-
-    .avatar-wrapper {
-      position: relative;
-      z-index: 2;
-    }
-
-    .avatar {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid #18181b; /* Matches card bg to create cutout effect */
-      background: #27272a;
-      transition: transform 0.3s ease;
-    }
-    
-    .avatar:hover { transform: scale(1.05); }
-
-    /* Action Buttons Container */
-    .action-buttons {
-      display: flex;
-      gap: 8px;
-      padding-top: 54px; /* Push down to clear banner area visually if needed */
-      z-index: 5;
-    }
-
-    /* Button Styles */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border-radius: 20px; /* Pill shape */
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      text-decoration: none;
-      border: 1px solid transparent;
-    }
-
-    .btn-icon-only {
-      padding: 8px;
-      border-radius: 50%;
-    }
-
-    /* Edit Button (Primary) */
-    .btn-primary {
-      background-color: var(--accent);
-      color: white;
-      box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
-    }
-    
-    .btn-primary:hover {
-      background-color: var(--accent-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(88, 101, 242, 0.5);
-    }
-
-    /* Share Button (Secondary/Glass) */
-    .btn-glass {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-main);
-    }
-
-    .btn-glass:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .profile-name {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  --c-glass: rgba(10, 5, 20, 0.6);
+  --c-glass-hover: rgba(20, 10, 35, 0.8);
+  --c-glass-border: rgba(255, 255, 255, 0.08);
+  --c-glass-border-hover: rgba(157, 78, 221, 0.5);
+  
+  --font-main: 'Inter', sans-serif;
+  --font-brand: 'Diecide Remain', 'Cinzel', serif;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.username-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+@font-face {
+  font-family: 'Diecide Remain';
+  src: url('fonts/DeicideRemain.otf') format('opentype');
+  font-display: swap;
 }
 
-.verified-badge {
-  width: 16px;
-  height: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1px; /* 👈 optical alignment fix */
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; width: 100%; }
+
+body {
+  font-family: var(--font-main);
+  background: var(--c-bg);
+  color: var(--c-text-main);
+  overflow-x: hidden; 
+  line-height: 1.6;
 }
 
-.verified-badge img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+/* Texture Overlay */
+body::after {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 900;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.15),
+    rgba(0,0,0,0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  background-size: 100% 4px;
 }
 
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--c-bg); }
+::-webkit-scrollbar-thumb { background: #331050; border-radius: 4px; }
 
-.role-row {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  display: none;
+/* Brand Text */
+.brand-text {
+  font-family: var(--font-brand);
+  background: linear-gradient(135deg, #e0aaff, #9d4edd, #7b2cbf);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 25px rgba(157, 78, 221, 0.5);
+  font-weight: 900;
+  letter-spacing: 1px;
 }
 
+/* ======================= 2. BACKGROUND ======================= */
+.bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-blob {
+  position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3;
+  will-change: transform; animation: breath 10s infinite alternate ease-in-out;
+}
+.bg-blob.one { top: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(#4a0072, transparent 70%); }
+.bg-blob.two { bottom: -20%; right: -10%; width: 70vw; height: 70vw; background: radial-gradient(#240046, transparent 70%); animation-delay: -5s; }
+@keyframes breath { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
 
+/* ======================= 3. LAYOUT & SIDEBAR ======================= */
+.sidebar-trigger {
+  position: fixed; top: 30px; left: 30px; z-index: 100;
+  width: 45px; height: 45px;
+  background: rgba(10, 5, 20, 0.4);
+  border: 1px solid var(--c-glass-border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; cursor: pointer;
+  transition: all 0.4s var(--ease-out);
+  backdrop-filter: blur(8px);
+}
+.sidebar-trigger:hover { 
+  background: var(--c-accent); border-color: var(--c-accent-light); 
+  transform: rotate(90deg) scale(1.1); box-shadow: 0 0 15px rgba(123, 44, 191, 0.5);
+}
 
-    .username {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text-main);
-    }
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: 300px;
+  background: linear-gradient(90deg, #05020a, rgba(5, 2, 10, 0.9));
+  border-right: 1px solid var(--c-glass-border);
+  z-index: 99; padding: 100px 30px 40px;
+  transform: translateX(-100%); transition: transform 0.6s var(--ease-out);
+  display: flex; flex-direction: column;
+}
+.sidebar.active { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
+.nav-item {
+  display: flex; align-items: center; gap: 18px; padding: 16px 20px; margin-bottom: 12px;
+  color: var(--c-text-dim); text-decoration: none; border-radius: 12px; transition: 0.3s;
+  font-weight: 500; border: 1px solid transparent;
+}
+.nav-item:hover { background: rgba(255,255,255,0.03); color: #fff; padding-left: 25px; border-color: rgba(255,255,255,0.08); }
 
-    /* Badges */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 8px;
-      background: rgba(88, 101, 242, 0.15);
-      border: 1px solid rgba(88, 101, 242, 0.3);
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--accent);
-      margin-top: 8px;
-    }
-    
-    .badge i { font-size: 14px; }
+/* ======================= 4. PROFILE SPECIFIC STYLES ======================= */
+.app-container {
+  position: relative; z-index: 10;
+  max-width: 800px; margin: 0 auto; /* Narrower than index for profile focus */
+  padding: 100px 20px 60px;
+  opacity: 0; transform: translateY(20px);
+  animation: fadeInUp 0.8s var(--ease-out) forwards;
+}
 
-    /* Bio Section */
-    .content {
-      padding: 0 24px 32px 24px;
-    }
+@keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-    .bio {
-      margin-top: 12px;
-      color: var(--text-muted);
-      line-height: 1.6;
-      font-size: 15px;
-      white-space: pre-wrap; 
-    }
+/* Header reuse */
+.app-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 40px; padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.header-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; color: var(--c-accent); margin-bottom: 4px; }
+.header-brand { font-size: 42px; line-height: 1; text-decoration: none; }
 
-    /* States */
-    .error-state {
-      text-align: center;
-      padding: 40px;
-      color: #ef4444;
-    }
+/* Profile Card - Glassmorphism Enhanced */
+.profile-card {
+  background: var(--c-glass);
+  border: 1px solid var(--c-glass-border);
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.3s ease;
+}
+.profile-card:hover { border-color: var(--c-glass-border-hover); }
 
-    /* Skeleton Loading */
-    .skeleton {
-      background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 4px;
-    }
+/* Banner */
+.profile-banner {
+  width: 100%; height: 220px;
+  background-color: #1a1a1a;
+  position: relative;
+  overflow: hidden;
+}
+.profile-banner img {
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: 0.8; transition: transform 0.5s ease;
+}
+.profile-card:hover .profile-banner img { transform: scale(1.02); }
+.profile-banner::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 0%, var(--c-bg-alt) 100%);
+  opacity: 0.6;
+}
 
-    .sk-banner { height: 160px; width: 100%; }
-    .sk-avatar { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #18181b; margin-top: -50px; }
-    .sk-text { height: 20px; margin-bottom: 8px; }
-    .w-50 { width: 50%; }
-    .w-80 { width: 80%; }
+/* Avatar Area */
+.profile-content {
+  padding: 0 32px 40px;
+  position: relative;
+  margin-top: -60px; /* Pull up into banner */
+  z-index: 2;
+}
 
-    @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
+.avatar-row {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 24px;
+}
 
-    .role-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
-    }
+.avatar-wrapper {
+  position: relative;
+  padding: 4px;
+  background: var(--c-bg); /* Match bg to create gap */
+  border-radius: 50%;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+.profile-avatar {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
 
-    .role-badge {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      font-weight: 400;
-      text-transform: capitalize;
-      color: white;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      text-shadow: 0 0 1px rgba(0,0,0,0.15);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
+/* Action Buttons */
+.action-btn {
+  padding: 10px 24px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff; font-weight: 600; font-size: 13px;
+  cursor: pointer; transition: 0.3s;
+  display: flex; align-items: center; gap: 8px;
+  text-decoration: none;
+}
+.action-btn:hover {
+  background: rgba(255,255,255,0.1); border-color: #fff;
+}
+.action-btn.primary {
+  background: rgba(123, 44, 191, 0.2);
+  border-color: var(--c-accent);
+  color: var(--c-accent-glow);
+}
+.action-btn.primary:hover {
+  background: var(--c-accent);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(123, 44, 191, 0.4);
+}
 
-    .role-badge img {
-      width: 14px;
-      height: 14px;
-      object-fit: contain;
-      border-radius: 50%;
-    }
+/* User Info */
+.user-identity { margin-bottom: 20px; }
+.username-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+.username { 
+  font-family: var(--font-brand); 
+  font-size: 32px; 
+  color: #fff; 
+  line-height: 1.1;
+}
+.badge-verified {
+  color: #5865F2; /* Discord color */
+  font-size: 20px;
+  filter: drop-shadow(0 0 8px rgba(88, 101, 242, 0.4));
+}
 
-    .role-badge:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
-    }
-  </style>
+.bio-text {
+  color: var(--c-text-dim);
+  font-size: 15px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 25px;
+  max-width: 600px;
+}
+
+/* Roles Grid */
+.roles-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+.role-chip {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+  color: #ccc;
+  display: flex; align-items: center; gap: 6px;
+  transition: 0.2s;
+}
+.role-chip:hover {
+  border-color: var(--c-accent);
+  transform: translateY(-2px);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.role-chip img { width: 14px; height: 14px; border-radius: 50%; }
+
+/* Skeleton Loading */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* Footer */
+footer { 
+  text-align: center; padding-top: 40px; color: var(--c-text-dim); font-size: 12px; 
+  border-top: 1px solid rgba(255,255,255,0.05); margin-top: 40px;
+}
+.error-msg { text-align: center; padding: 40px; color: #ff5555; }
+</style>
 </head>
 <body>
 
-<div id="app" class="profile-card">
-  <!-- Initial Skeleton Loader -->
-  <div class="banner-container sk-banner skeleton"></div>
-  <div class="profile-header">
-    <div class="header-top-row">
-       <div class="sk-avatar skeleton"></div>
-    </div>
-    <div class="sk-text w-50 skeleton" style="margin-top: 15px;"></div>
-    <div class="sk-text w-80 skeleton"></div>
+  <!-- Background Ambience -->
+  <div class="bg-fixed">
+    <div class="bg-blob one"></div>
+    <div class="bg-blob two"></div>
   </div>
-</div>
 
+  <!-- NAVIGATION SIDEBAR -->
+  <div class="sidebar-trigger" onclick="app.toggleSidebar()">
+    <svg style="width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </div>
+
+  <nav id="sidebar" class="sidebar">
+    <div style="margin-bottom: 40px; padding-left: 10px;">
+      <div class="brand-text" style="font-size: 32px; line-height:1.2;">/SIX</div>
+      <div style="font-size: 10px; color: #666; letter-spacing: 2px;">NAVIGATION</div>
+    </div>
+    <a href="/" class="nav-item">
+      <i class="ph ph-house" style="font-size:20px;"></i> Home
+    </a>
+    <a href="/#roster" class="nav-item">
+      <i class="ph ph-users" style="font-size:20px;"></i> Roster
+    </a>
+    <a href="/#gallery" class="nav-item">
+      <i class="ph ph-image" style="font-size:20px;"></i> Gallery
+    </a>
+  </nav>
+
+  <!-- MAIN APP -->
+  <main class="app-container">
+    
+    <!-- Header -->
+    <header class="app-header">
+      <div>
+        <div class="header-title">PROFILE VIEW</div>
+        <a href="/" class="header-brand brand-text">/six</a>
+      </div>
+    </header>
+
+    <!-- PROFILE CARD (ID: app) -->
+    <div id="profile-target">
+      <!-- Loading State -->
+      <div class="profile-card">
+        <div class="profile-banner skeleton"></div>
+        <div class="profile-content">
+          <div class="avatar-row">
+            <div class="avatar-wrapper"><div class="profile-avatar skeleton"></div></div>
+          </div>
+          <div class="skeleton" style="height:30px; width:40%; margin-bottom:15px;"></div>
+          <div class="skeleton" style="height:15px; width:80%; margin-bottom:8px;"></div>
+          <div class="skeleton" style="height:15px; width:60%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      &copy; 2026 <span class="brand-text">/six</span>. Profile System.
+    </footer>
+  </main>
+
+<!-- LOGIC -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
   // -- CONFIG --
   const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
@@ -318,182 +355,196 @@
   
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // -- UTILS --
-  function escapeHtml(unsafe) {
-    if (!unsafe) return "";
-    return unsafe
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
+  const app = {
+    init: () => {
+      app.loadProfile();
+      app.initScramble();
+    },
 
-  const path = window.location.pathname;
-  const username = decodeURIComponent(
-    path.startsWith("/@") ? path.slice(2).replace(/\//g, "") : ""
-  );
+    toggleSidebar: () => {
+      document.getElementById('sidebar').classList.toggle('active');
+    },
 
-  // -- MAIN LOGIC --
+    // Text Scramble Effect from Index
+    initScramble: () => {
+      // Will apply to elements with class .scramble-hover
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ/<>[]#";
+      document.body.addEventListener('mouseover', (e) => {
+        if (e.target.classList.contains('scramble-hover')) {
+          let iteration = 0;
+          const originalText = e.target.dataset.text || e.target.innerText;
+          let interval = setInterval(() => {
+            e.target.innerText = originalText.split("")
+              .map((letter, index) => {
+                if(index < iteration) return originalText[index];
+                return letters[Math.floor(Math.random() * 26)];
+              }).join("");
+            
+            if(iteration >= originalText.length) clearInterval(interval);
+            iteration += 1/3;
+          }, 30);
+        }
+      });
+    },
 
-  async function loadProfile() {
-    console.log("Fetching profile for:", username);
+    escapeHtml: (unsafe) => {
+      if (!unsafe) return "";
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    },
 
-    if (!username) {
-      renderError("No username provided in URL.");
-      return;
-    }
+    loadProfile: async () => {
+      const path = window.location.pathname;
+      const username = decodeURIComponent(
+        path.startsWith("/@") ? path.slice(2).replace(/\//g, "") : ""
+      );
 
-    // 1. Fetch the Profile Data
-    const { data: profile, error } = await supabaseClient
-      .from("profiles")
-      .select("*")
-      .eq("username", username)
-      .eq("public", true)
-      .single();
+      console.log("Fetching:", username);
 
-    if (error || !profile) {
-      console.error(error);
-      renderError("Profile not found or is private.");
-      return;
-    }
+      if (!username) {
+        app.renderError("User identity not found in datastream.");
+        return;
+      }
 
-    // 2. Render the Profile immediately (Fast UI)
-    renderProfile(profile);
+      const { data: profile, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("username", username)
+        .eq("public", true)
+        .single();
 
-    // 3. Check for Ownership (Asynchronous/Non-blocking)
-    checkAndRenderEditButton(profile.id); // Passing the profile's UUID
-  }
+      if (error || !profile) {
+        console.error(error);
+        app.renderError("Profile restricted or non-existent.");
+        return;
+      }
 
-  function renderProfile(user) {
-    document.title = `${user.username} (@${user.username}) | Profile`;
+      app.renderProfile(profile);
+      app.checkAuth(profile);
+    },
 
-    const avatar = user.avatar || "https://cdn.discordapp.com/embed/avatars/0.png";
-    const bannerHTML = user.banner_url 
-      ? `<img class="banner" src="${escapeHtml(user.banner_url)}" alt="Banner">`
-      : `<div class="banner" style="background: linear-gradient(45deg, #4f46e5, #9333ea);"></div>`;
+    renderProfile: (user) => {
+      document.title = `${user.username} | /six Profile`;
+      
+      const avatar = user.avatar || "https://cdn.discordapp.com/embed/avatars/0.png";
+      const bannerUrl = user.banner_url || ""; // Empty string triggers gradient fallback
+      const safeBio = app.escapeHtml(user.bio);
+      
+      // Determine Banner HTML
+      let bannerHTML = `<div style="width:100%; height:100%; background: linear-gradient(45deg, #1a0b2e, #2e1065);"></div>`;
+      if (bannerUrl) {
+        bannerHTML = `<img src="${app.escapeHtml(bannerUrl)}" alt="Banner" onload="this.style.opacity=0.8">`;
+      }
 
-    const safeBio = escapeHtml(user.bio);
+      // Verification Badge Logic
+      const isVerified = Array.isArray(user.roles) && user.roles.includes("Verified");
+      const verifiedBadge = isVerified ? `<i class="ph-fill ph-seal-check badge-verified" title="Verified"></i>` : '';
 
-    document.getElementById("app").innerHTML = `
-      <div class="banner-container">
-        ${bannerHTML}
-      </div>
+      // Roles Logic
+      let rolesHTML = '';
+      if (user.roles && user.roles.length > 0) {
+        rolesHTML = user.roles.map(role => {
+          // Simple mapping for icons based on role name
+          const iconSrc = `/assets/${role.toLowerCase()}.png`;
+          // Fallback logic for images handled by onerror in the HTML string
+          return `<div class="role-chip">
+            <span>${app.escapeHtml(role)}</span>
+          </div>`;
+        }).join('');
+      } else {
+        rolesHTML = `<span style="font-size:12px; color:#555;">No designated roles</span>`;
+      }
 
-      <div class="profile-header">
-        <div class="header-top-row">
-          <div class="avatar-wrapper">
-            <img class="avatar" src="${escapeHtml(avatar)}" alt="${escapeHtml(user.username)}" />
+      const html = `
+        <div class="profile-card">
+          <div class="profile-banner">
+            ${bannerHTML}
           </div>
           
-          <!-- Action Buttons Container (Initially Empty or just Share) -->
-          <div class="action-buttons" id="actionButtons">
-             <button class="btn btn-glass btn-icon-only" onclick="copyProfileLink()" title="Copy Profile Link">
-                <i class="ph-bold ph-share-network"></i>
-             </button>
+          <div class="profile-content">
+            <div class="avatar-row">
+              <div class="avatar-wrapper">
+                <img class="profile-avatar" src="${app.escapeHtml(avatar)}" alt="${app.escapeHtml(user.username)}">
+              </div>
+              
+              <!-- Action Buttons Container -->
+              <div class="action-buttons" id="actionButtons" style="display:flex; gap:10px;">
+                <button class="action-btn" onclick="app.copyLink()">
+                  <i class="ph-bold ph-share-network"></i> Share
+                </button>
+              </div>
+            </div>
+
+            <div class="user-identity">
+              <div class="username-wrap">
+                <h1 class="username scramble-hover" data-text="${app.escapeHtml(user.username)}">${app.escapeHtml(user.username)}</h1>
+                ${verifiedBadge}
+              </div>
+              <div style="color:var(--c-accent); font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+                ${user.role ? app.escapeHtml(user.role) : 'MEMBER'}
+              </div>
+            </div>
+
+            <div class="bio-text">
+              ${safeBio ? safeBio : '<span style="opacity:0.4">No directive assigned.</span>'}
+            </div>
+
+            <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:15px;">
+              <div style="font-size:10px; color:var(--c-text-dim); letter-spacing:1px; margin-bottom:8px;">CLEARANCE & BADGES</div>
+              <div class="roles-grid">
+                ${rolesHTML}
+              </div>
+            </div>
+
           </div>
         </div>
+      `;
 
-        <div class="profile-name">
-  <div class="username-row">
-    <span class="username">${escapeHtml(user.username)}</span>
-    ${
-      Array.isArray(user.roles) && user.roles.includes("Verified")
-        ? `
-          <span class="verified-badge">
-            <img src="/assets/verified.png" alt="Verified">
-          </span>
-        `
-        : ""
-    }
-  </div>
+      document.getElementById('profile-target').innerHTML = html;
+    },
 
-  <div class="role-row">
-    ${user.role ? escapeHtml(user.role) : ""}
-  </div>
-</div>
+    checkAuth: async (profile) => {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      
+      if (session && session.user && session.user.id === profile.id) {
+        const container = document.getElementById("actionButtons");
+        if(container) {
+          const editBtn = document.createElement("a");
+          editBtn.href = `/@${encodeURIComponent(profile.username)}/edit`;
+          editBtn.className = "action-btn primary";
+          editBtn.innerHTML = `<i class="ph-bold ph-pencil-simple"></i> Edit`;
+          container.prepend(editBtn);
+        }
+      }
+    },
 
-
-
-
-        <div class="badge">
-          <i class="ph-fill ph-seal-check"></i>
-          <span>Verified via Discord</span>
-        </div>
-
-        <div id="roleContainer" class="role-container"></div>
-      </div>
-
-      <div class="content">
-        ${safeBio ? `<div class="bio">${safeBio}</div>` : `<div class="bio" style="font-style:italic; opacity:0.5">No bio available.</div>`}
-      </div>
-    `;
-
-    // Render Roles
-    const roleContainer = document.getElementById("roleContainer");
-    if (user.roles && user.roles.length > 0) {
-      user.roles.forEach(roleName => {
-        const span = document.createElement("span");
-        span.className = `role-badge role-${roleName.toLowerCase()}`;
-        
-        // Error handling for missing images
-        const img = document.createElement("img");
-        img.src = `/assets/${roleName.toLowerCase()}.png`;
-        img.onerror = function() { this.style.display = 'none'; }; // Hide icon if missing
-        
-        span.appendChild(img);
-        span.appendChild(document.createTextNode(roleName));
-        roleContainer.appendChild(span);
+    copyLink: () => {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        const btn = document.querySelector('.ph-share-network').parentElement;
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = `<i class="ph-bold ph-check"></i> Copied`;
+        setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
       });
+    },
+
+    renderError: (msg) => {
+      document.getElementById('profile-target').innerHTML = `
+        <div class="profile-card error-msg">
+          <i class="ph ph-warning-octagon" style="font-size: 48px; margin-bottom: 10px; color:var(--c-accent)"></i>
+          <h3 style="color:#fff">ACCESS DENIED</h3>
+          <p style="color:var(--c-text-dim)">${msg}</p>
+          <a href="/" class="action-btn" style="display:inline-flex; margin-top:20px;">Return Home</a>
+        </div>
+      `;
     }
-  }
+  };
 
-  // -- OWNERSHIP CHECK --
-  async function checkAndRenderEditButton(profileId) {
-    // Check local session
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    
-    // If logged in AND the user ID matches the profile ID
-    if (session && session.user && session.user.id === profileId) {
-      
-      const actionsDiv = document.getElementById("actionButtons");
-      if(!actionsDiv) return;
+  window.addEventListener('DOMContentLoaded', app.init);
 
-      // Create Edit Button
-      const editBtn = document.createElement("a");
-     editBtn.href = `/@${encodeURIComponent(username)}/edit`; // Dynamic link based on username
-      editBtn.className = "btn btn-primary";
-      editBtn.innerHTML = `<i class="ph-bold ph-pencil-simple"></i> Edit Profile`;
-      
-      // Prepend so it sits to the left of the Share button
-      actionsDiv.prepend(editBtn);
-    }
-  }
-
-  // -- EXTRA FEATURES --
-  function copyProfileLink() {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-      // Simple visual feedback
-      const btn = document.querySelector('.ph-share-network').parentElement;
-      const originalHTML = btn.innerHTML;
-      btn.innerHTML = '<i class="ph-bold ph-check"></i>';
-      setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
-    });
-  }
-
-  function renderError(msg) {
-    document.title = "Profile Not Found";
-    document.getElementById("app").innerHTML = `
-      <div class="error-state">
-        <i class="ph ph-warning-circle" style="font-size: 48px; margin-bottom: 10px;"></i>
-        <h3>Ooops!</h3>
-        <p>${msg}</p>
-      </div>
-    `;
-  }
-
-  loadProfile();
 </script>
-
 </body>
 </html>
