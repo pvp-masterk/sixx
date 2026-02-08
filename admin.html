@@ -2,77 +2,337 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Admin</title>
+<title>Admin Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+<!-- Supabase -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<!-- Icons (Phosphor Icons for UI elements) -->
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-body {
-  background:#030005;
-  color:#e8e6f3;
-  font-family:Inter, sans-serif;
-  padding:30px;
+:root {
+  --bg-body: #050507;
+  --bg-card: #0e0e12;
+  --bg-input: #18181b;
+  --border: rgba(255,255,255,0.08);
+  --primary: #7b2cbf;
+  --primary-hover: #9d4edd;
+  --text-main: #e8e6f3;
+  --text-muted: #a1a1aa;
 }
 
-h1 { margin-bottom:20px; }
+* { box-sizing: border-box; outline: none; }
 
-.user {
-  background:#0a0510;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+body {
+  background: var(--bg-body);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* --- Header & Nav --- */
+header {
+  background: rgba(5,5,7, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 15px 30px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.brand img {
+  height: 32px;
+  width: auto;
+}
+
+/* --- Stats Bar --- */
+.stats-bar {
+  display: flex;
+  gap: 20px;
+  padding: 20px 30px 0 30px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 15px 20px;
+  border-radius: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-val { font-size: 1.5rem; font-weight: 700; }
+.stat-label { font-size: 0.85rem; color: var(--text-muted); }
+
+/* --- Controls --- */
+.controls {
+  padding: 20px 30px;
+  display: flex;
+  gap: 10px;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-wrapper i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+input[type="text"] {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: white;
+  padding: 10px 10px 10px 38px;
+  border-radius: 8px;
+  font-family: inherit;
+  transition: 0.2s;
+}
+
+input[type="text"]:focus { border-color: var(--primary); }
+
+/* --- Grid Layout --- */
+#users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 0 30px 40px 30px;
+}
+
+/* --- User Card --- */
+.user-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+  border-color: rgba(255,255,255,0.15);
+}
+
+/* Banner */
+.card-banner {
+  height: 100px;
+  background-color: #222;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.card-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, rgba(14,14,18,1));
+}
+
+/* Avatar */
+.card-avatar-wrapper {
+  margin-top: -45px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  position: relative;
+}
+
+.card-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid var(--bg-card);
+  background: #333;
+  object-fit: cover;
+}
+
+/* Info */
+.card-body {
+  padding: 10px 20px 20px 20px;
+  flex: 1;
+}
+
+.user-names h3 { margin: 0; font-size: 1.1rem; }
+.user-names span { color: var(--text-muted); font-size: 0.9rem; }
+
+.meta-info {
+  margin-top: 12px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.copy-id {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.copy-id:hover { color: var(--primary); }
+
+/* Badges */
+.roles-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
 }
 
 .badge {
-  font-size:.7rem;
-  padding:4px 10px;
-  border-radius:20px;
-  margin-left:6px;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.Verified { background:#333; }
-.Moderator { background:#2563eb; }
-.Admin { background:#7b2cbf; }
-.Founder { background:#f59e0b; }
+.badge.Verified { background: rgba(255,255,255,0.1); color: #fff; }
+.badge.Moderator { background: rgba(37, 99, 235, 0.2); color: #60a5fa; border: 1px solid rgba(37,99,235,0.3); }
+.badge.Admin { background: rgba(123, 44, 191, 0.2); color: #c77dff; border: 1px solid rgba(123, 44, 191, 0.3); }
+.badge.Founder { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 
-button {
-  background:#7b2cbf;
-  border:none;
-  color:white;
-  padding:6px 12px;
-  border-radius:8px;
-  cursor:pointer;
+/* Actions */
+.card-actions {
+  padding: 15px 20px;
+  border-top: 1px solid var(--border);
+  background: rgba(255,255,255,0.01);
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-button.secondary { background:#444; }
-button.danger { background:#ef4444; }
-
-select {
-  background:#111;
-  color:white;
-  border:1px solid #333;
-  border-radius:8px;
-  padding:6px;
+select.role-select {
+  background: var(--bg-input);
+  color: white;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  flex: 1;
+  font-size: 0.85rem;
+  cursor: pointer;
 }
+
+button.raw-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button.raw-btn:hover { background: rgba(255,255,255,0.05); color: white; }
+
+/* Raw Data Modal */
+#raw-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 200;
+  padding: 40px;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: auto;
+  border: 1px solid var(--border);
+}
+pre { color: #0f0; background: #111; padding: 15px; border-radius: 8px; overflow-x: auto; }
+
 </style>
 </head>
 
 <body>
 
-<h1>Admin Panel</h1>
-<div id="users"></div>
+<header>
+  <div class="brand">
+    <img src="assets/icon.png" alt="Logo" onerror="this.src='https://via.placeholder.com/32?text=A'">
+    <span>Admin Panel</span>
+  </div>
+  <div class="user-profile" id="current-user-display">
+    <!-- Logged in as... -->
+  </div>
+</header>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stat-card">
+    <span class="stat-val" id="count-total">0</span>
+    <span class="stat-label">Total Users</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-val" id="count-staff">0</span>
+    <span class="stat-label">Staff Members</span>
+  </div>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <div class="search-wrapper">
+    <i class="ph ph-magnifying-glass"></i>
+    <input type="text" id="search-input" placeholder="Search by username, ID, or role..." onkeyup="filterUsers()">
+  </div>
+</div>
+
+<!-- Grid -->
+<div id="users-grid">
+  <!-- User Cards Generated Here -->
+</div>
+
+<!-- Modal -->
+<div id="raw-modal" onclick="closeModal(event)">
+  <div class="modal-content">
+    <h3>Raw User Data</h3>
+    <pre id="raw-json"></pre>
+    <button onclick="document.getElementById('raw-modal').style.display='none'" style="margin-top:10px; padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:6px; cursor:pointer;">Close</button>
+  </div>
+</div>
 
 <script>
-const sb = supabase.createClient(
-  "https://tstsijdifhgmpaszqknr.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
-);
+// --- CONFIGURATION ---
+const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const ROLE_LEVEL = {
   Verified: 1,
@@ -81,81 +341,228 @@ const ROLE_LEVEL = {
   Founder: 4
 };
 
+// --- STATE ---
 let me;
+let allUsers = [];
 
+// --- INITIALIZATION ---
 (async () => {
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return location.replace("/");
 
+  // Fetch current admin details
   const { data, error } = await sb
     .from("profiles")
-    .select("id, role, roles")
+    .select("id, role, roles, username, avatar")
     .eq("id", user.id)
     .single();
 
-  if (error || ROLE_LEVEL[data.role] < ROLE_LEVEL.Admin) {
+  if (error || !data || (ROLE_LEVEL[data.role] || 0) < ROLE_LEVEL.Admin) {
+    // Basic protection: redirect if not admin
+    alert("Unauthorized Access");
     return location.replace("/");
   }
 
   me = data;
+  document.getElementById("current-user-display").innerHTML = `
+    <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:0.9rem; color:#ccc;">${me.username || 'Admin'}</span>
+        <img src="${me.avatar || 'https://via.placeholder.com/32'}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+    </div>
+  `;
+  
   loadUsers();
 })();
 
+// --- CORE LOGIC ---
+
 async function loadUsers() {
-  const { data: users } = await sb
+  const grid = document.getElementById("users-grid");
+  grid.innerHTML = '<div style="color:#888; padding:20px;">Loading users...</div>';
+
+  // Fetch EVERYTHING (*)
+  const { data: users, error } = await sb
     .from("profiles")
-    .select("id, role, roles");
+    .select("*")
+    .order('created_at', { ascending: false });
 
-  const wrap = document.getElementById("users");
-  wrap.innerHTML = "";
+  if (error) {
+    grid.innerHTML = `<div style="color:red">Error loading users: ${error.message}</div>`;
+    return;
+  }
 
-  users.forEach(u => {
-    const isHigherOrEqual =
-      ROLE_LEVEL[u.role] >= ROLE_LEVEL[me.role];
+  allUsers = users;
+  updateStats();
+  renderUsers(allUsers);
+}
 
-    const div = document.createElement("div");
-    div.className = "user";
+function renderUsers(usersList) {
+  const grid = document.getElementById("users-grid");
+  grid.innerHTML = "";
 
-    div.innerHTML = `
-      <div>
-        <strong>${u.id}</strong>
-        <span class="badge ${u.role}">${u.role}</span>
+  if(usersList.length === 0) {
+    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#555;">No users found.</div>';
+    return;
+  }
+
+  usersList.forEach(u => {
+    // Determine hierarchy
+    const myLevel = ROLE_LEVEL[me.role] || 0;
+    const targetLevel = ROLE_LEVEL[u.role] || 0;
+    const canEdit = myLevel > targetLevel;
+
+    // Data parsing
+    const username = u.username || "Unknown";
+    // Check if full_name exists, else use fallback
+    const fullName = u.full_name || u.display_name || ""; 
+    const avatar = u.avatar || "https://ui-avatars.com/api/?name=" + username + "&background=random";
+    const banner = u.banner_url || null;
+    const dateCreated = u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A";
+    
+    // Process Roles Array (Ensure unique roles)
+    let displayRoles = u.roles || [];
+    if (!Array.isArray(displayRoles)) displayRoles = [u.role]; // Fallback if column isn't array
+    // Ensure main role is included if missing
+    if (u.role && !displayRoles.includes(u.role)) displayRoles.push(u.role);
+    // Sort roles by level high to low
+    displayRoles.sort((a,b) => (ROLE_LEVEL[b]||0) - (ROLE_LEVEL[a]||0));
+
+    // Create Card
+    const card = document.createElement("div");
+    card.className = "user-card";
+    
+    // HTML Construction
+    card.innerHTML = `
+      <div class="card-banner" style="${banner ? `background-image: url('${banner}')` : 'background: linear-gradient(45deg, #333, #111)'}"></div>
+      
+      <div class="card-avatar-wrapper">
+        <img class="card-avatar" src="${avatar}" alt="Ava">
       </div>
 
-      <div>
-        ${renderRoleSelect(u, isHigherOrEqual)}
+      <div class="card-body">
+        <div class="user-names">
+          <h3>${escapeHtml(username)}</h3>
+          <span>${escapeHtml(fullName)}</span>
+        </div>
+
+        <div class="roles-container">
+          ${displayRoles.map(r => `<span class="badge ${r}">${r}</span>`).join('')}
+        </div>
+
+        <div class="meta-info">
+          <span class="copy-id" onclick="copyToClipboard('${u.id}')" title="Click to Copy ID">
+            <i class="ph ph-copy"></i> ${u.id.substring(0, 18)}...
+          </span>
+          <span>Joined: ${dateCreated}</span>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        ${renderRoleSelect(u, !canEdit)}
+        <button class="raw-btn" onclick='viewRawData(${JSON.stringify(u).replace(/'/g, "&apos;")})' title="View JSON">
+          <i class="ph ph-code"></i>
+        </button>
       </div>
     `;
 
-    wrap.appendChild(div);
+    grid.appendChild(card);
   });
 }
 
-function renderRoleSelect(user, locked) {
-  if (locked) return `<button class="secondary" disabled>Locked</button>`;
+// --- HELPER FUNCTIONS ---
 
+function renderRoleSelect(user, locked) {
+  if (locked) {
+    return `<button disabled style="flex:1; background:#222; border:1px solid #333; color:#666; padding:6px; border-radius:6px; cursor:not-allowed;">Locked (${user.role})</button>`;
+  }
+
+  // Only show roles lower than current admin
   const options = Object.keys(ROLE_LEVEL)
     .filter(r => ROLE_LEVEL[r] < ROLE_LEVEL[me.role])
-    .map(r =>
-      `<option value="${r}" ${user.role === r ? "selected" : ""}>${r}</option>`
-    ).join("");
+    .map(r => `<option value="${r}" ${user.role === r ? "selected" : ""}>${r}</option>`)
+    .join("");
 
   return `
-    <select onchange="changeRole('${user.id}', this.value)">
+    <select class="role-select" onchange="changeRole('${user.id}', this.value)">
       ${options}
     </select>
   `;
 }
 
 async function changeRole(userId, newRole) {
-  if (ROLE_LEVEL[newRole] >= ROLE_LEVEL[me.role]) return;
+  if (ROLE_LEVEL[newRole] >= ROLE_LEVEL[me.role]) {
+    alert("You cannot assign a role equal to or higher than your own.");
+    return;
+  }
 
-  await sb
+  const confirmChange = confirm(`Change role to ${newRole}?`);
+  if (!confirmChange) return loadUsers(); // Reset UI
+
+  // Update Main Role AND the roles array
+  // Assuming 'roles' is a JSONB/Array column, we usually want to keep previous roles or just set the new main one.
+  // This logic resets the array to contain just the new role (as per your previous logic), 
+  // but expands it to ensure consistency.
+  
+  const { error } = await sb
     .from("profiles")
-    .update({ roles: [newRole] })
+    .update({ 
+      role: newRole,
+      roles: [newRole] // Or append: sb.rpc... but simplistic update here
+    })
     .eq("id", userId);
 
+  if (error) alert("Failed: " + error.message);
   loadUsers();
+}
+
+function filterUsers() {
+  const term = document.getElementById("search-input").value.toLowerCase();
+  
+  const filtered = allUsers.filter(u => {
+    const rStr = (u.roles || []).join(" ").toLowerCase();
+    return (
+      (u.username && u.username.toLowerCase().includes(term)) ||
+      u.id.includes(term) ||
+      (u.role && u.role.toLowerCase().includes(term)) ||
+      rStr.includes(term)
+    );
+  });
+
+  renderUsers(filtered);
+}
+
+function updateStats() {
+  document.getElementById("count-total").innerText = allUsers.length;
+  const staff = allUsers.filter(u => (ROLE_LEVEL[u.role] || 0) >= ROLE_LEVEL.Moderator).length;
+  document.getElementById("count-staff").innerText = staff;
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    // Simple toast could go here
+    console.log("Copied ID");
+  });
+}
+
+function viewRawData(userObj) {
+  document.getElementById("raw-json").innerText = JSON.stringify(userObj, null, 2);
+  document.getElementById("raw-modal").style.display = "flex";
+}
+
+function closeModal(e) {
+  if(e.target.id === 'raw-modal') {
+    document.getElementById("raw-modal").style.display = "none";
+  }
+}
+
+function escapeHtml(text) {
+  if (!text) return "";
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 </script>
 
