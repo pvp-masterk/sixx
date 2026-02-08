@@ -3,627 +3,585 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>/six Admin</title>
+<title>/six Admin // Enhanced</title>
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cinzel:wght@700&display=swap" rel="stylesheet">
-<!-- Icons -->
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
 <style>
-/* ======================= CORE VARIABLES & RESET ======================= */
+/* ======================= VARIABLES & RESET ======================= */
 :root {
-  --c-bg: #030005;
-  --c-bg-alt: #0a0510;
+  --bg-core: #050208;
+  --bg-card: rgba(20, 10, 30, 0.4);
+  --bg-glass: rgba(255, 255, 255, 0.03);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  
   --c-accent: #7b2cbf;
-  --c-accent-light: #9d4edd;
-  --c-accent-glow: #e0aaff;
-  --c-text-main: #e8e6f3;
+  --c-accent-glow: #b160fb;
+  --c-success: #00f5d4;
+  --c-danger: #ff0054;
+  --c-text: #e8e6f3;
   --c-text-dim: #8f8ba0;
-  
-  /* Glass Variables */
-  --c-glass: rgba(10, 5, 20, 0.6);
-  --c-glass-hover: rgba(20, 10, 35, 0.8);
-  --c-glass-border: rgba(255, 255, 255, 0.08);
-  --c-glass-border-hover: rgba(157, 78, 221, 0.5);
-  
-  --font-main: 'Inter', sans-serif;
-  --font-brand: 'Diecide Remain', serif;
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-@font-face {
-  font-family: 'Diecide Remain';
-  src: url('fonts/DeicideRemain.otf') format('opentype');
-  font-display: swap;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; width: 100%; }
-
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; user-select: none; }
 body {
-  font-family: var(--font-main);
-  background: var(--c-bg);
-  color: var(--c-text-main);
-  overflow-x: hidden; 
-  line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-core);
+  color: var(--c-text);
+  overflow-x: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Texture Overlay */
-body::after {
-  content: "";
-  position: fixed; inset: 0; pointer-events: none; z-index: 900;
-  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
-  background-size: 100% 4px;
+/* Background FX */
+.bg-mesh {
+  position: fixed; inset: 0; z-index: -1;
+  background: 
+    radial-gradient(circle at 15% 50%, rgba(123, 44, 191, 0.15), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(67, 97, 238, 0.1), transparent 25%);
+  filter: blur(60px);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--c-bg); }
-::-webkit-scrollbar-thumb { background: #331050; border-radius: 4px; }
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--c-accent); }
 
-/* Brand Text */
-.brand-text {
-  font-family: var(--font-brand), 'Cinzel', serif;
-  background: linear-gradient(135deg, #e0aaff, #9d4edd, #7b2cbf);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 0 0 25px rgba(157, 78, 221, 0.5);
-  font-weight: 900;
-  letter-spacing: 1px;
-}
-
-/* ======================= BACKGROUND ======================= */
-.bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-.bg-blob {
-  position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3;
-  will-change: transform; animation: breath 10s infinite alternate ease-in-out;
-}
-.bg-blob.one { top: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(#4a0072, transparent 70%); }
-.bg-blob.two { bottom: -20%; right: -10%; width: 70vw; height: 70vw; background: radial-gradient(#240046, transparent 70%); animation-delay: -5s; }
-@keyframes breath { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
-
 /* ======================= LAYOUT ======================= */
-.admin-container {
-  position: relative; z-index: 10;
-  max-width: 1400px; margin: 0 auto;
-  padding: 40px 20px;
-  display: flex; flex-direction: column; gap: 30px;
+.app-container {
+  max-width: 1600px; width: 100%; margin: 0 auto;
+  padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 20px;
+  overflow: hidden; /* Fix for internal scrolling */
 }
 
 /* Header */
-.admin-header {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.header-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; color: var(--c-accent); margin-bottom: 4px; }
-.header-brand { font-size: 32px; line-height: 1; }
-
-.user-badge {
-  display: flex; align-items: center; gap: 10px;
-  background: rgba(255,255,255,0.03); padding: 8px 16px; border-radius: 50px;
-  border: 1px solid rgba(255,255,255,0.1);
+.top-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 15px 25px;
+  background: rgba(10,5,15,0.6);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
 }
 
-/* Search Bar */
-.search-container {
-  position: relative; width: 100%; max-width: 400px;
-}
-.search-input {
-  width: 100%; background: rgba(0,0,0,0.3);
-  border: 1px solid var(--c-glass-border);
-  padding: 12px 15px 12px 40px; color: #fff; border-radius: 8px;
-  transition: 0.3s;
-}
-.search-input:focus { border-color: var(--c-accent); box-shadow: 0 0 15px rgba(123, 44, 191, 0.2); }
-.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--c-text-dim); }
-
-/* ======================= CARDS (BENTO) ======================= */
-.grid-layout {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;
+.brand { 
+  font-family: 'JetBrains Mono', monospace; 
+  font-weight: 800; font-size: 20px; 
+  background: linear-gradient(to right, #fff, var(--c-accent-glow));
+  -webkit-background-clip: text; color: transparent;
+  letter-spacing: -1px;
 }
 
-.stats-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
+/* Controls Bar */
+.controls-bar {
+  display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
 }
 
-.card {
-  background: var(--c-glass);
-  border: 1px solid var(--c-glass-border);
-  border-radius: 20px;
-  padding: 24px;
-  position: relative; overflow: hidden;
-  transition: all 0.4s var(--ease-out);
-  backdrop-filter: blur(12px);
-  display: flex; flex-direction: column;
+.input-group {
+  position: relative; flex: 1; min-width: 250px;
 }
-/* Mouse Glow Logic */
-.card::after {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(157, 78, 221, 0.1), transparent 40%);
-  opacity: 0; transition: opacity 0.5s; pointer-events: none; z-index: 1;
-}
-.card:hover::after { opacity: 1; }
-.card:hover { border-color: var(--c-glass-border-hover); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-
-/* Stat Card */
-.stat-card { align-items: flex-start; }
-.stat-value { font-size: 32px; font-weight: 800; color: #fff; margin-top: 5px; }
-.stat-label { color: var(--c-text-dim); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
-
-/* User Card */
-.user-card-content { position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; }
-.uc-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-.uc-avatar { 
-  width: 50px; height: 50px; border-radius: 12px; object-fit: cover; 
-  border: 2px solid rgba(255,255,255,0.1); 
-}
-.uc-info h3 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; }
-.uc-info span { font-size: 12px; color: var(--c-text-dim); font-family: monospace; }
-
-.uc-role {
-  margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);
-  display: flex; gap: 10px; align-items: center;
-}
-.role-select {
-  background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
-  color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 12px;
-  cursor: pointer; flex: 1;
-}
-.role-select:hover { border-color: var(--c-accent); }
-
-.action-btn {
-  background: transparent; border: 1px solid rgba(255,255,255,0.1);
-  color: var(--c-text-dim); padding: 5px 8px; border-radius: 6px; cursor: pointer;
+.input-custom {
+  width: 100%; background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  color: #fff; padding: 12px 15px 12px 40px;
+  border-radius: 10px; font-family: 'Inter'; font-size: 14px;
   transition: 0.2s;
 }
-.action-btn:hover { color: #fff; background: rgba(255,255,255,0.05); border-color: #fff; }
+.input-custom:focus { border-color: var(--c-accent); box-shadow: 0 0 15px rgba(123,44,191,0.2); }
+.input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--c-text-dim); }
 
-/* Badges */
-.badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; font-weight: 700; border: 1px solid transparent; }
-.badge.founder { color: #ffd700; border-color: rgba(255, 215, 0, 0.3); background: rgba(255, 215, 0, 0.05); }
-.badge.admin { color: #c77dff; border-color: rgba(199, 125, 255, 0.3); background: rgba(199, 125, 255, 0.05); }
-.badge.verified { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+/* Custom Button */
+.btn {
+  background: var(--bg-glass); border: 1px solid var(--border-glass);
+  color: var(--c-text); padding: 10px 16px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: 0.2s var(--ease-smooth);
+}
+.btn:hover { background: rgba(255,255,255,0.08); transform: translateY(-1px); }
+.btn.primary { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
+.btn.primary:hover { background: var(--c-accent-glow); box-shadow: 0 0 20px rgba(123,44,191,0.4); }
 
-/* Modal */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-  z-index: 2000; display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: 0.3s;
+/* ======================= GRID & CARDS ======================= */
+.content-area {
+  flex: 1; overflow-y: auto; padding-right: 5px;
 }
-.modal-overlay.active { opacity: 1; pointer-events: auto; }
-.modal-box {
-  width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto;
-  background: #0a0510; border: 1px solid var(--c-glass-border);
-  padding: 30px; border-radius: 20px;
-  box-shadow: 0 0 50px rgba(123, 44, 191, 0.1);
+
+.user-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;
+  padding-bottom: 40px;
 }
-pre { background: #000; padding: 15px; border-radius: 8px; color: #0f0; overflow-x: auto; font-size: 12px; }
+
+.user-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px; padding: 20px;
+  display: flex; flex-direction: column; gap: 12px;
+  transition: 0.2s; overflow: hidden;
+}
+
+.user-card:hover { border-color: rgba(123, 44, 191, 0.5); transform: translateY(-2px); }
+
+/* Performance Hover Glow (CSS Only) */
+.user-card::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%);
+  opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 0;
+}
+.user-card:hover::before { opacity: 1; }
+
+.uc-top { display: flex; align-items: flex-start; gap: 12px; z-index: 1; position: relative; }
+.uc-avatar { width: 44px; height: 44px; border-radius: 10px; background: #000; object-fit: cover; border: 2px solid rgba(255,255,255,0.1); }
+.uc-details { flex: 1; min-width: 0; }
+.uc-name { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+.uc-uuid { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--c-text-dim); cursor: pointer; display: flex; align-items: center; gap: 5px;}
+.uc-uuid:hover { color: var(--c-accent-glow); }
+
+.uc-badges { display: flex; gap: 5px; margin-top: 4px; flex-wrap: wrap; }
+.badge {
+  font-size: 9px; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;
+  border: 1px solid transparent;
+}
+.badge.founder { border-color: #ffd700; color: #ffd700; background: rgba(255,215,0,0.1); }
+.badge.admin { border-color: #f72585; color: #f72585; background: rgba(247,37,133,0.1); }
+.badge.moderator { border-color: #4cc9f0; color: #4cc9f0; background: rgba(76,201,240,0.1); }
+.badge.user { border-color: var(--border-glass); color: #aaa; }
+
+.uc-actions {
+  z-index: 1; position: relative;
+  display: flex; gap: 8px; margin-top: auto; padding-top: 15px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ======================= CUSTOM UI ELEMENTS ======================= */
+/* Custom Select */
+.c-select { position: relative; flex: 1; }
+.c-select-trigger {
+  width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass);
+  color: #fff; font-size: 11px; padding: 8px 10px; border-radius: 6px;
+  display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+}
+.c-select-options {
+  position: absolute; bottom: 100%; left: 0; width: 100%;
+  background: #0f0a18; border: 1px solid var(--border-glass);
+  border-radius: 6px; padding: 4px; display: none; z-index: 100;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+.c-select.active .c-select-options { display: block; animation: fadeIn 0.1s; }
+.c-option {
+  padding: 6px 10px; font-size: 11px; color: #ccc; cursor: pointer; border-radius: 4px;
+}
+.c-option:hover { background: var(--c-accent); color: #fff; }
+
+/* Context Menu */
+#context-menu {
+  position: fixed; z-index: 9999;
+  background: #0f0a18; border: 1px solid var(--border-glass);
+  border-radius: 8px; padding: 6px; width: 180px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.8);
+  opacity: 0; pointer-events: none; transition: opacity 0.1s;
+}
+#context-menu.show { opacity: 1; pointer-events: auto; }
+.ctx-item {
+  padding: 8px 12px; font-size: 12px; color: #eee; cursor: pointer;
+  border-radius: 4px; display: flex; align-items: center; gap: 8px;
+}
+.ctx-item:hover { background: rgba(255,255,255,0.1); }
+.ctx-item.danger { color: var(--c-danger); }
+.ctx-item.danger:hover { background: rgba(255,0,84,0.15); }
+
+/* Pagination */
+.pagination {
+  display: flex; justify-content: center; align-items: center; gap: 10px; padding-top: 20px;
+}
+.page-btn {
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: 6px;
+  color: #fff; cursor: pointer; transition: 0.2s;
+}
+.page-btn:hover:not(:disabled) { background: var(--c-accent); border-color: var(--c-accent); }
+.page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Skeletons */
+.skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; }
+.sk-avatar { width: 44px; height: 44px; border-radius: 10px; }
+.sk-text { height: 14px; width: 60%; margin-bottom: 6px; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 /* Toast */
+.toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
 .toast {
-  position: fixed; bottom: 30px; right: 30px;
-  background: var(--c-accent); color: #fff;
-  padding: 12px 24px; border-radius: 8px;
-  transform: translateY(100px); transition: 0.3s;
-  z-index: 3000; box-shadow: 0 0 20px rgba(123, 44, 191, 0.5);
-  font-weight: 600;
+  background: rgba(15,10,25,0.9); border: 1px solid var(--border-glass); border-left: 3px solid var(--c-accent);
+  color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 500;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+  transform: translateX(100px); opacity: 0; animation: slideIn 0.3s forwards;
 }
-.toast.show { transform: translateY(0); }
-
-/* Loading State */
-.loading-pulse { animation: pulse 1.5s infinite; opacity: 0.5; }
-@keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-/* ====== Data Showcase Modal ====== */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: 0.3s;
-  z-index: 2000;
-}
-.modal-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-.modal-box.showcase {
-  width: 90%;
-  max-width: 700px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(135deg, rgba(123,44,191,0.2), rgba(157,78,221,0.2));
-  border-radius: 20px;
-  border: 2px solid rgba(255,255,255,0.1);
-  padding: 0;
-  box-shadow: 0 0 40px rgba(123,44,191,0.5);
-  backdrop-filter: blur(12px);
-  overflow: hidden;
-  animation: modalFade 0.3s ease;
-}
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 25px;
-  background: linear-gradient(90deg, rgba(123,44,191,0.3), rgba(157,78,221,0.3));
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  font-weight: 700;
-  font-size: 18px;
-  color: #fff;
-}
-.close-btn {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 24px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.close-btn:hover {
-  color: var(--c-accent);
-  transform: scale(1.1);
-}
-.modal-content {
-  flex: 1;
-  overflow-y: auto;
-  background: rgba(10,5,20,0.6);
-  padding: 20px;
-}
-.modal-content pre {
-  background: #1b0c3b;
-  color: #e0e0ff;
-  font-size: 13px;
-  line-height: 1.4;
-  border-radius: 12px;
-  padding: 15px;
-  overflow-x: auto;
-  box-shadow: inset 0 0 15px rgba(123,44,191,0.3);
-}
-.modal-footer {
-  padding: 15px 25px;
-  background: rgba(20,10,35,0.5);
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-.action-btn {
-  background: linear-gradient(90deg, #7b2cbf, #9d4edd);
-  color: #fff;
-  padding: 8px 18px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s;
-}
-.action-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(157,78,221,0.6);
-}
-@keyframes modalFade {
-  from { transform: translateY(-30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
+@keyframes slideIn { to { transform: translateX(0); opacity: 1; } }
 
 </style>
 </head>
 <body>
 
-  <!-- Background Ambience -->
-  <div class="bg-fixed">
-    <div class="bg-blob one"></div>
-    <div class="bg-blob two"></div>
-  </div>
+<div class="bg-mesh"></div>
 
-  <div class="admin-container">
-    <!-- Header -->
-    <header class="admin-header">
-      <div>
-        <div class="header-title">DASHBOARD</div>
-        <div class="header-brand brand-text scramble-hover" data-text="/six Admin">/six Admin</div>
-      </div>
-      <div class="user-badge" id="admin-profile">
-        <span class="loading-pulse">Loading...</span>
-      </div>
-    </header>
-
-    <!-- Stats Row -->
-    <div class="stats-grid">
-      <div class="card stat-card">
-        <span class="stat-label">Total Users</span>
-        <span class="stat-value" id="stat-total">0</span>
-      </div>
-      <div class="card stat-card">
-        <span class="stat-label">Verified Staff</span>
-        <span class="stat-value" id="stat-staff">0</span>
-      </div>
-      <div class="card stat-card">
-        <span class="stat-label">New Today</span>
-        <span class="stat-value" id="stat-new">0</span>
-      </div>
-      <div class="card stat-card" style="justify-content:center; align-items:center; cursor:pointer;" onclick="app.refresh()">
-        <i class="ph ph-arrows-clockwise" style="font-size:24px;"></i>
-        <span style="font-size:10px; margin-top:5px; opacity:0.7;">REFRESH DATA</span>
-      </div>
+<div class="app-container">
+  <!-- Top Bar -->
+  <header class="top-bar">
+    <div style="display:flex; align-items:center; gap:15px;">
+      <div class="brand">/six ADMIN</div>
+      <div class="badge admin" id="connection-status">CONNECTED</div>
     </div>
-
-    <!-- Controls -->
-    <div style="display:flex; gap:15px; align-items:center;">
-      <div class="search-container">
-        <i class="ph ph-magnifying-glass search-icon"></i>
-        <input type="text" class="search-input" id="search-box" placeholder="Search UUID, Username, Role..." onkeyup="app.filter()">
+    
+    <div style="display:flex; align-items:center; gap:15px;">
+      <div style="text-align:right; line-height:1.2;">
+        <div style="font-size:12px; font-weight:700; color:#fff;" id="my-username">...</div>
+        <div style="font-size:10px; color:var(--c-text-dim);">SUPERUSER</div>
       </div>
-      <div style="font-size:12px; color:var(--c-text-dim);">
-        Showing <span id="count-display" style="color:#fff;">0</span> users
-      </div>
+      <img id="my-avatar" src="" style="width:36px; height:36px; border-radius:50%; background:#222; border:1px solid #444;">
     </div>
+  </header>
 
-    <!-- Main Grid -->
-    <div id="user-grid" class="grid-layout">
-      <!-- Generated via JS -->
+  <!-- Controls -->
+  <div class="controls-bar">
+    <div class="input-group">
+      <i class="ph ph-magnifying-glass input-icon"></i>
+      <input type="text" class="input-custom" id="search-input" placeholder="Search Users, IDs, IPs..." onkeyup="app.handleSearch()">
+    </div>
+    
+    <div style="display:flex; gap:10px;">
+      <!-- Custom Sort Dropdown -->
+      <div class="c-select" style="width: 150px;">
+        <div class="c-select-trigger" onclick="ui.toggleSelect(this)">
+          <span id="sort-label">Newest First</span> <i class="ph ph-caret-down"></i>
+        </div>
+        <div class="c-select-options">
+          <div class="c-option" onclick="app.sort('new')">Newest First</div>
+          <div class="c-option" onclick="app.sort('old')">Oldest First</div>
+          <div class="c-option" onclick="app.sort('alpha')">Username A-Z</div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="app.refreshData()"><i class="ph ph-arrows-clockwise"></i> Refresh</button>
+      <button class="btn primary"><i class="ph ph-plus"></i> Invite</button>
     </div>
   </div>
 
- <!-- Data Showcase Modal -->
-<div id="data-modal" class="modal-overlay">
-  <div class="modal-box showcase">
-    <div class="modal-header">
-      <h3>Raw User Data</h3>
-      <button class="close-btn" onclick="app.closeModal(event, true)">&times;</button>
+  <!-- Main Content -->
+  <div class="content-area">
+    <div id="user-grid" class="user-grid">
+      <!-- Cards Injected Here -->
     </div>
-    <div class="modal-content">
-      <pre id="data-content">{}</pre>
-    </div>
-    <div class="modal-footer">
-      <button class="action-btn" onclick="app.closeModal(null, true)">Close</button>
+    
+    <div class="pagination">
+      <button class="page-btn" id="prev-btn" onclick="app.changePage(-1)"><i class="ph ph-caret-left"></i></button>
+      <span style="font-size:12px; color:var(--c-text-dim);">Page <span id="curr-page" style="color:#fff;">1</span></span>
+      <button class="page-btn" id="next-btn" onclick="app.changePage(1)"><i class="ph ph-caret-right"></i></button>
     </div>
   </div>
 </div>
 
-  <!-- Toast -->
-  <div id="toast" class="toast">Action Successful</div>
+<!-- Custom Context Menu -->
+<div id="context-menu">
+  <div class="ctx-item" onclick="app.ctxAction('copy')"><i class="ph ph-copy"></i> Copy UUID</div>
+  <div class="ctx-item" onclick="app.ctxAction('json')"><i class="ph ph-code"></i> View Raw Data</div>
+  <div style="height:1px; background:rgba(255,255,255,0.1); margin:4px 0;"></div>
+  <div class="ctx-item danger" onclick="app.ctxAction('ban')"><i class="ph ph-prohibit"></i> Ban User</div>
+</div>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
 <script>
-  // Mouse tracking for glow effect (Optimized)
-  document.addEventListener('mousemove', e => {
-    requestAnimationFrame(() => {
-      document.querySelectorAll('.card').forEach(card => {
+// ==================== CONFIG & STATE ====================
+const SUPABASE_URL = "https://tstsijdifhgmpaszqknr.supabase.co"; 
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4";
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const STATE = {
+  users: [],
+  filteredUsers: [],
+  page: 1,
+  limit: 24, // Cards per page
+  currentUser: null,
+  sortMode: 'new',
+  ctxTargetId: null // ID of user right-clicked
+};
+
+const ROLES = ['founder', 'admin', 'moderator', 'verified', 'user'];
+
+// ==================== APP LOGIC ====================
+const app = {
+  init: async () => {
+    ui.renderSkeleton();
+    await app.checkAuth();
+    await app.fetchData();
+    
+    // Global Event for closing dropdowns
+    document.addEventListener('click', (e) => {
+      if(!e.target.closest('.c-select')) {
+        document.querySelectorAll('.c-select').forEach(el => el.classList.remove('active'));
+      }
+      if(!e.target.closest('#context-menu')) {
+        document.getElementById('context-menu').classList.remove('show');
+      }
+    });
+  },
+
+  checkAuth: async () => {
+    // Simple Auth Check Mockup (Replace with strict logic if needed)
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if(user) {
+      const { data } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
+      STATE.currentUser = data || { username: 'Admin', role: 'founder', avatar: null };
+    } else {
+      // Fallback for demo purposes if not logged in
+      STATE.currentUser = { username: 'System Admin', role: 'founder', avatar: null }; 
+    }
+    
+    document.getElementById('my-username').textContent = STATE.currentUser.username;
+    if(STATE.currentUser.avatar) document.getElementById('my-avatar').src = STATE.currentUser.avatar;
+  },
+
+  fetchData: async () => {
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if(error) {
+      ui.toast('Error fetching data', 'error');
+      console.error(error);
+      return;
+    }
+
+    STATE.users = data;
+    STATE.filteredUsers = data;
+    app.applySort();
+    app.renderPage();
+  },
+
+  handleSearch: () => {
+    clearTimeout(window.searchDebounce);
+    window.searchDebounce = setTimeout(() => {
+      const term = document.getElementById('search-input').value.toLowerCase();
+      STATE.filteredUsers = STATE.users.filter(u => 
+        (u.username && u.username.toLowerCase().includes(term)) || 
+        (u.id && u.id.includes(term)) ||
+        (u.role && u.role.includes(term))
+      );
+      STATE.page = 1; // Reset to page 1 on search
+      app.renderPage();
+    }, 300); // 300ms Debounce to prevent lag
+  },
+
+  sort: (mode) => {
+    STATE.sortMode = mode;
+    const map = { 'new': 'Newest First', 'old': 'Oldest First', 'alpha': 'Username A-Z' };
+    document.getElementById('sort-label').innerText = map[mode];
+    app.applySort();
+    app.renderPage();
+  },
+
+  applySort: () => {
+    if(STATE.sortMode === 'new') STATE.filteredUsers.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+    if(STATE.sortMode === 'old') STATE.filteredUsers.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+    if(STATE.sortMode === 'alpha') STATE.filteredUsers.sort((a,b) => a.username.localeCompare(b.username));
+  },
+
+  changePage: (dir) => {
+    const maxPage = Math.ceil(STATE.filteredUsers.length / STATE.limit);
+    const newPage = STATE.page + dir;
+    if(newPage > 0 && newPage <= maxPage) {
+      STATE.page = newPage;
+      app.renderPage();
+    }
+  },
+
+  refreshData: () => {
+    ui.renderSkeleton();
+    app.fetchData();
+    ui.toast('Data Refreshed');
+  },
+
+  // Role Update Logic
+  updateRole: async (uid, newRole) => {
+    // Optimistic UI Update (Update local data first for instant feel)
+    const uIndex = STATE.users.findIndex(u => u.id === uid);
+    if(uIndex > -1) STATE.users[uIndex].role = newRole;
+    app.renderPage(); 
+
+    const { error } = await supabaseClient.from('profiles').update({ role: newRole }).eq('id', uid);
+    if(error) {
+      ui.toast('Failed to update role', 'error');
+      app.refreshData(); // Revert
+    } else {
+      ui.toast(`Role updated to ${newRole.toUpperCase()}`);
+    }
+  },
+
+  // Context Menu Actions
+  ctxAction: (action) => {
+    const user = STATE.users.find(u => u.id === STATE.ctxTargetId);
+    if(!user) return;
+    
+    document.getElementById('context-menu').classList.remove('show');
+
+    if(action === 'copy') {
+      navigator.clipboard.writeText(user.id);
+      ui.toast('UUID Copied to Clipboard');
+    }
+    if(action === 'json') {
+      console.log(user);
+      alert(JSON.stringify(user, null, 2)); // Simple alert for now, could be a modal
+    }
+    if(action === 'ban') {
+      if(confirm(`Are you sure you want to BAN ${user.username}?`)) {
+        ui.toast('User Banned (Simulated)', 'error');
+      }
+    }
+  },
+
+  renderPage: () => {
+    const grid = document.getElementById('user-grid');
+    const start = (STATE.page - 1) * STATE.limit;
+    const end = start + STATE.limit;
+    const subset = STATE.filteredUsers.slice(start, end);
+
+    // Update pagination controls
+    document.getElementById('curr-page').innerText = STATE.page;
+    document.getElementById('prev-btn').disabled = STATE.page === 1;
+    document.getElementById('next-btn').disabled = end >= STATE.filteredUsers.length;
+
+    if(subset.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--c-text-dim);">No users found.</div>`;
+      return;
+    }
+
+    // Build HTML String (Faster than creating elements individually)
+    let html = '';
+    subset.forEach(u => {
+      html += ui.buildCard(u);
+    });
+    grid.innerHTML = html;
+
+    // Attach local hover events for the glow effect (Highly Optimized)
+    document.querySelectorAll('.user-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        card.style.setProperty('--mouse-x', `${x}px`);
-        card.style.setProperty('--mouse-y', `${y}px`);
+        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+      });
+      // Context Menu Attach
+      card.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        STATE.ctxTargetId = card.dataset.id;
+        const menu = document.getElementById('context-menu');
+        menu.style.top = `${e.clientY}px`;
+        menu.style.left = `${e.clientX}px`;
+        menu.classList.add('show');
       });
     });
-  });
-
-  // Supabase Config
-  const supabaseClient = supabase.createClient(
-    "https://tstsijdifhgmpaszqknr.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
-  );
-
-  const ROLES = {
-    Founder: 4,
-    Admin: 3,
-    Moderator: 2,
-    Verified: 1,
-  };
-
-  let currentUser = null;
-  let allUsers = [];
-
-  const app = {
-    init: async () => {
-      app.initScramble();
-      await app.checkAuth();
-      await app.fetchUsers();
-    },
-
-    initScramble: () => {
-      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ/<>[]#";
-      document.querySelectorAll('.scramble-hover').forEach(el => {
-        el.onmouseover = event => {
-          let iteration = 0;
-          let interval = setInterval(() => {
-            event.target.innerText = event.target.innerText
-              .split("").map((letter, index) => {
-                if(index < iteration) return event.target.dataset.text[index];
-                return letters[Math.floor(Math.random() * 26)];
-              }).join("");
-            if(iteration >= event.target.dataset.text.length) clearInterval(interval);
-            iteration += 1/3;
-          }, 30);
-        }
-      });
-    },
-
-    checkAuth: async () => {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) return window.location.href = '/'; // redirect if not logged in
-
-  // Fetch profile
-  const { data: profile, error } = await supabaseClient
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  if (error || !profile) {
-    console.error("Profile fetch error:", error);
-    return window.location.href = '/';
   }
+};
 
-  // Normalize role to lowercase for consistent checking
-  const role = (profile.role || '').toLowerCase();
+// ==================== UI HELPERS ====================
+const ui = {
+  // Generates Custom Dropdown HTML
+  buildRoleSelect: (u) => {
+    // Only allow editing if current user has higher privs (simplified logic)
+    const optionsHtml = ROLES.map(r => 
+      `<div class="c-option" onclick="app.updateRole('${u.id}', '${r}')">${r.toUpperCase()}</div>`
+    ).join('');
 
-  // Minimum access level required
-  const minRoleLevel = ROLES['moderator'];
+    return `
+      <div class="c-select" onclick="ui.toggleSelect(this); event.stopPropagation();">
+        <div class="c-select-trigger">
+          <span>${u.role.toUpperCase()}</span> <i class="ph ph-caret-down"></i>
+        </div>
+        <div class="c-select-options bottom-up">${optionsHtml}</div>
+      </div>
+    `;
+  },
 
-  if ((ROLES[role] || 0) < minRoleLevel) {
-    console.warn("ACCESS DENIED: Insufficient Clearance. Role found:", profile.role);
-    return window.location.href = '/';
-  }
-
-  currentUser = profile;
-
-  // Display user badge
-  document.getElementById('admin-profile').innerHTML = `
-    <img src="${profile.avatar || 'https://via.placeholder.com/20'}" style="width:20px; height:20px; border-radius:50%;">
-    <span style="font-size:12px; font-weight:700;">${profile.username.toUpperCase()}</span>
-  `;
-},
-
-    fetchUsers: async () => {
-      const grid = document.getElementById('user-grid');
-      grid.innerHTML = `<div style="color:var(--c-text-dim);">Fetching Database...</div>`;
-
-      const { data, error } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
-
-      if (error) {
-        grid.innerHTML = `<div style="color:red;">Error: ${error.message}</div>`;
-        return;
-      }
-
-      allUsers = data;
-      app.updateStats();
-      app.render(allUsers);
-    },
-
-    render: (users) => {
-      const grid = document.getElementById('user-grid');
-      grid.innerHTML = '';
-      
-      const fragment = document.createDocumentFragment();
-
-      users.forEach(u => {
-        const roleLevel = ROLES[u.role] || 0;
-        const myLevel = ROLES[currentUser.role] || 0;
-        const canEdit = myLevel > roleLevel;
-        
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="user-card-content">
-            <div class="uc-header">
-              <img src="${u.avatar || 'https://via.placeholder.com/50'}" class="uc-avatar">
-              <div class="uc-info">
-                <h3>${u.username} <span class="badge ${u.role}">${u.role}</span></h3>
-                <span style="cursor:pointer" onclick="app.copy('${u.id}')" title="Copy UUID">ID: ${u.id.substring(0,8)}...</span>
-              </div>
+  buildCard: (u) => {
+    const date = new Date(u.created_at).toLocaleDateString();
+    return `
+      <div class="user-card" data-id="${u.id}">
+        <div class="uc-top">
+          <img src="${u.avatar || 'https://via.placeholder.com/100/000000/FFFFFF/?text=' + u.username.charAt(0)}" class="uc-avatar">
+          <div class="uc-details">
+            <div class="uc-name">${u.username}</div>
+            <div class="uc-uuid" onclick="navigator.clipboard.writeText('${u.id}'); ui.toast('ID Copied')">
+              ${u.id.substring(0,12)}... <i class="ph ph-copy"></i>
             </div>
-            
-            <div style="font-size:12px; color:#666; margin-bottom:15px; flex:1;">
-              Joined: ${new Date(u.created_at).toLocaleDateString()}
-            </div>
-
-            <div class="uc-role">
-              ${app.renderRoleSelect(u, canEdit)}
-              <button class="action-btn" onclick='app.viewJson(${JSON.stringify(u).replace(/'/g, "&apos;")})'>
-                <i class="ph ph-code"></i>
-              </button>
+            <div class="uc-badges">
+              <span class="badge ${u.role}">${u.role}</span>
+              <span class="badge user">${date}</span>
             </div>
           </div>
-        `;
-        fragment.appendChild(card);
-      });
+        </div>
+        <div class="uc-actions">
+          ${ui.buildRoleSelect(u)}
+          <button class="btn" style="padding:8px;" title="View Data"><i class="ph ph-code"></i></button>
+        </div>
+      </div>
+    `;
+  },
 
-      grid.appendChild(fragment);
-      document.getElementById('count-display').innerText = users.length;
-    },
+  renderSkeleton: () => {
+    const grid = document.getElementById('user-grid');
+    let html = '';
+    for(let i=0; i<12; i++) {
+      html += `
+        <div class="user-card">
+          <div class="uc-top">
+            <div class="skeleton sk-avatar"></div>
+            <div class="uc-details">
+              <div class="skeleton sk-text"></div>
+              <div class="skeleton sk-text" style="width:40%"></div>
+            </div>
+          </div>
+        </div>`;
+    }
+    grid.innerHTML = html;
+  },
 
-    renderRoleSelect: (user, canEdit) => {
-      if (!canEdit) {
-        return `<div class="role-select" style="opacity:0.5; cursor:not-allowed;">LOCKED (${user.role.toUpperCase()})</div>`;
-      }
-      
-      // Only show roles lower than mine
-      const options = Object.keys(ROLES)
-        .filter(r => ROLES[r] < ROLES[currentUser.role])
-        .map(r => `<option value="${r}" ${user.role === r ? 'selected' : ''}>${r.toUpperCase()}</option>`)
-        .join('');
+  toggleSelect: (el) => {
+    // Close others
+    document.querySelectorAll('.c-select').forEach(s => {
+      if(s !== el) s.classList.remove('active');
+    });
+    el.classList.toggle('active');
+  },
 
-      return `<select class="role-select" onchange="app.updateRole('${user.id}', this.value)">${options}</select>`;
-    },
-
-    updateRole: async (uid, newRole) => {
-      if (!confirm(`Confirm promotion/demotion to ${newRole.toUpperCase()}?`)) {
-        return app.refresh(); // Revert UI
-      }
-
-      const { error } = await supabaseClient.from('profiles').update({ role: newRole }).eq('id', uid);
-      
-      if (error) {
-        alert(error.message);
-      } else {
-        app.showToast(`Updated user role to ${newRole}`);
-        // Update local data to avoid full re-fetch lag
-        const uIndex = allUsers.findIndex(u => u.id === uid);
-        if(uIndex > -1) allUsers[uIndex].role = newRole;
-        app.render(allUsers); // Re-render with updated local data
-      }
-    },
-
-    filter: () => {
-      const term = document.getElementById('search-box').value.toLowerCase();
-      const filtered = allUsers.filter(u => 
-        u.username.toLowerCase().includes(term) || 
-        u.id.includes(term) || 
-        u.role.includes(term)
-      );
-      app.render(filtered);
-    },
-
-    updateStats: () => {
-      document.getElementById('stat-total').innerText = allUsers.length;
-      document.getElementById('stat-staff').innerText = allUsers.filter(u => ['admin', 'moderator', 'founder'].includes(u.role)).length;
-      
-      // Calculate new today
-      const today = new Date().toDateString();
-      const newUsers = allUsers.filter(u => new Date(u.created_at).toDateString() === today).length;
-      document.getElementById('stat-new').innerText = newUsers;
-    },
-
-    refresh: () => {
-      app.fetchUsers();
-      app.showToast("Data Refreshed");
-    },
-
-    copy: (text) => {
-      navigator.clipboard.writeText(text);
-      app.showToast("UUID Copied");
-    },
-
-    showToast: (msg) => {
-      const t = document.getElementById('toast');
-      t.innerText = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
-    },
-
-    viewJson: (obj) => {
-  document.getElementById('data-content').innerText = JSON.stringify(obj, null, 2);
-  document.getElementById('data-modal').classList.add('active');
-},
-
-closeModal: (e, force) => {
-  if (force || (e && e.target.id === 'data-modal')) {
-    document.getElementById('data-modal').classList.remove('active');
+  toast: (msg, type = 'success') => {
+    const con = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    if(type === 'error') el.style.borderLeftColor = 'var(--c-danger)';
+    el.innerText = msg;
+    con.appendChild(el);
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(100px)';
+      setTimeout(() => el.remove(), 300);
+    }, 3000);
   }
-}
-  };
+};
 
-  window.addEventListener('DOMContentLoaded', app.init);
+// Start App
+window.addEventListener('DOMContentLoaded', app.init);
+
 </script>
 </body>
 </html>
