@@ -546,31 +546,51 @@ const app = {
 
 // ==================== UI HELPERS ====================
 const ui = {
-  // Generates Custom Dropdown HTML
-  buildRoleSelect: (u) => {
-    // Only allow editing if current user has higher privs
-    const currentIdx = ROLES.indexOf(STATE.currentUser.role.toLowerCase());
-    const targetIdx = ROLES.indexOf(u.role.toLowerCase());
+  // Generates Custom Dropdown HTML for cards (you can keep this)
+  // Custom Role Selector for Cards (matches modal style)
+buildRoleSelect: (u) => {
+  const currentIdx = ROLES.indexOf(STATE.currentUser.role.toLowerCase());
 
-    const optionsHtml = ROLES.map(r => {
-      const rIdx = ROLES.indexOf(r);
-      const disabled = rIdx >= currentIdx; // Can't assign same or higher role
-      return `<div class="c-option" 
-                  onclick="${disabled ? '' : `app.updateRole('${u.id}', '${r}')`}" 
-                  style="${disabled ? 'opacity:0.4; cursor:not-allowed;' : ''}">
-                ${r.toUpperCase()}
-              </div>`;
-    }).join('');
+  const container = document.createElement('div');
+  container.className = 'c-select';
 
-    return `
-      <div class="c-select" onclick="ui.toggleSelect(this); event.stopPropagation();">
-        <div class="c-select-trigger">
-          <span>${u.role.toUpperCase()}</span> <i class="ph ph-caret-down"></i>
-        </div>
-        <div class="c-select-options bottom-up">${optionsHtml}</div>
-      </div>
-    `;
-  },
+  // Trigger
+  const trigger = document.createElement('div');
+  trigger.className = 'c-select-trigger';
+  trigger.innerHTML = `<span>${u.role.toUpperCase()}</span> <i class="ph ph-caret-down"></i>`;
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    ui.toggleSelect(container);
+  });
+
+  // Options
+  const options = document.createElement('div');
+  options.className = 'c-select-options bottom-up';
+  
+  ROLES.forEach(r => {
+    const targetIdx = ROLES.indexOf(r);
+    const disabled = targetIdx >= currentIdx;
+    const opt = document.createElement('div');
+    opt.className = 'c-option';
+    if(disabled) opt.classList.add('disabled');
+    opt.textContent = r.toUpperCase();
+
+    opt.addEventListener('click', e => {
+      if(disabled) return;
+      app.updateRole(u.id, r); // update DB & local state
+      trigger.querySelector('span').textContent = r.toUpperCase();
+      options.classList.remove('active');
+    });
+
+    options.appendChild(opt);
+  });
+
+  container.appendChild(trigger);
+  container.appendChild(options);
+
+  return container.outerHTML; // return HTML to inject
+},
+
 
   // Build user card
   buildCard: (u) => {
@@ -600,7 +620,6 @@ const ui = {
     `;
   },
 
-  // Skeleton loading cards
   renderSkeleton: () => {
     const grid = document.getElementById('user-grid');
     let html = '';
@@ -620,56 +639,99 @@ const ui = {
   },
 
   toggleSelect: (el) => {
-    // Close others
     document.querySelectorAll('.c-select').forEach(s => {
       if(s !== el) s.classList.remove('active');
     });
     el.classList.toggle('active');
   },
 
-  toast: (msg, type = 'success') => {
+  toast: (msg, type='success') => {
     const con = document.getElementById('toast-container');
     const el = document.createElement('div');
     el.className = 'toast';
-    if(type === 'error') el.style.borderLeftColor = 'var(--c-danger)';
+    if(type==='error') el.style.borderLeftColor = 'var(--c-danger)';
     el.innerText = msg;
     con.appendChild(el);
     setTimeout(() => {
       el.style.opacity = '0';
       el.style.transform = 'translateX(100px)';
-      setTimeout(() => el.remove(), 300);
-    }, 3000);
+      setTimeout(()=>el.remove(),300);
+    },3000);
   },
 
+  // ===========================
+  // User Modal
+  // ===========================
   showUserModal: (uid) => {
-    const user = STATE.users.find(u => u.id === uid);
+    const user = STATE.users.find(u=>u.id===uid);
     if(!user) return;
+    STATE.ctxTargetId = uid;
 
-    STATE.ctxTargetId = uid; // Keep track for updates
-
-    document.getElementById('modal-avatar').src = user.avatar || 'https://via.placeholder.com/100/000000/FFFFFF/?text=' + user.username.charAt(0);
+    document.getElementById('modal-avatar').src = user.avatar || `https://via.placeholder.com/100/000000/FFFFFF/?text=${user.username.charAt(0)}`;
     document.getElementById('modal-username').textContent = user.username;
-    document.getElementById('modal-role').textContent = user.role.toUpperCase();
     document.getElementById('modal-bio').value = user.bio || '';
     document.getElementById('modal-avatar-url').value = user.avatar || '';
     document.getElementById('modal-banner-url').value = user.banner || '';
 
+    // Role Badge
+    const badge = document.getElementById('modal-role-badge');
+    badge.textContent = user.role.toUpperCase();
+    const colors = {founder:'gold', admin:'#f72585', moderator:'#4cc9f0', user:'#aaa'};
+    badge.style.border = `1px solid ${colors[user.role]||'#aaa'}`;
+    badge.style.color = colors[user.role]||'#aaa';
+    badge.style.background = colors[user.role]?colors[user.role]+'22':'rgba(255,255,255,0.1)';
+
+    // Custom Role Selector inside modal
+    const roleContainer = document.getElementById('modal-role-select');
+    roleContainer.innerHTML = '';
+    const select = document.createElement('div');
+    select.className = 'c-select';
+    select.innerHTML = `<div class="c-select-trigger"><span>${user.role.toUpperCase()}</span> <i class="ph ph-caret-down"></i></div>`;
+    const options = document.createElement('div');
+    options.className = 'c-select-options';
+
+    const currentIdx = ROLES.indexOf(STATE.currentUser.role.toLowerCase());
+    ROLES.forEach(r=>{
+      const targetIdx = ROLES.indexOf(r);
+      const disabled = targetIdx >= currentIdx;
+      const opt = document.createElement('div');
+      opt.className = 'c-option';
+      if(disabled) opt.classList.add('disabled');
+      opt.textContent = r.toUpperCase();
+      opt.addEventListener('click', e=>{
+        if(disabled) return;
+        app.updateRole(uid,r); // update DB & local state
+        select.querySelector('.c-select-trigger span').textContent = r.toUpperCase();
+        options.classList.remove('active');
+      });
+      options.appendChild(opt);
+    });
+
+    select.appendChild(options);
+    select.querySelector('.c-select-trigger').addEventListener('click', e=>{
+      e.stopPropagation();
+      ui.toggleSelect(select);
+    });
+
+    roleContainer.appendChild(select);
+
     document.getElementById('user-modal').style.display = 'flex';
   },
 
-  closeUserModal: () => {
+  closeUserModal: ()=>{
     document.getElementById('user-modal').style.display = 'none';
   },
 
-  showDataModal: (obj) => {
-    document.getElementById('data-content').innerText = JSON.stringify(obj, null, 2);
+  showDataModal: (obj)=>{
+    document.getElementById('data-content').innerText = JSON.stringify(obj,null,2);
     document.getElementById('data-modal').classList.add('active');
   },
 
-  closeModal: () => {
+  closeModal: ()=>{
     document.getElementById('data-modal').classList.remove('active');
   }
 };
+
 
 // Start App
 window.addEventListener('DOMContentLoaded', app.init);
@@ -691,36 +753,46 @@ window.addEventListener('DOMContentLoaded', app.init);
   </div>
 </div>
 <!-- User Modal -->
-<div id="user-modal" style="position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:10000;">
-  <div style="background:var(--bg-card); border:1px solid var(--border-glass); border-radius:16px; width:400px; max-width:90%; padding:20px; position:relative; display:flex; flex-direction:column; gap:15px;">
-    <button onclick="ui.closeUserModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:18px; color:var(--c-text); cursor:pointer;">&times;</button>
+<div id="user-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:3000;">
+  <div style="background:rgba(20,10,30,0.95); border:1px solid rgba(255,255,255,0.08); border-radius:16px; width:400px; max-width:90%; padding:20px; position:relative; display:flex; flex-direction:column; gap:15px;">
+    
+    <!-- Close Button -->
+    <button onclick="ui.closeUserModal()" style="position:absolute; top:12px; right:12px; background:none; border:none; color:#fff; font-size:18px; cursor:pointer;">✕</button>
+
+    <!-- User Header -->
     <div style="display:flex; align-items:center; gap:15px;">
-      <img id="modal-avatar" src="" style="width:60px; height:60px; border-radius:12px; border:2px solid rgba(255,255,255,0.1); object-fit:cover;">
-      <div>
-        <div id="modal-username" style="font-weight:700; font-size:16px;"></div>
-        <div id="modal-role" style="font-size:12px; color:var(--c-text-dim);"></div>
+      <img id="modal-avatar" src="" style="width:64px; height:64px; border-radius:12px; border:2px solid rgba(255,255,255,0.1); object-fit:cover;">
+      <div style="flex:1;">
+        <div id="modal-username" style="font-weight:700; font-size:16px; color:#fff;"></div>
+        <div id="modal-role-badge" style="font-size:12px; padding:2px 6px; border-radius:6px; display:inline-block; font-weight:700; text-transform:uppercase;"></div>
       </div>
     </div>
-    <div>
-      <label style="font-size:12px; color:var(--c-text-dim);">Bio:</label>
-      <textarea id="modal-bio" style="width:100%; border-radius:8px; padding:8px; background:var(--bg-glass); border:1px solid var(--border-glass); color:#fff;"></textarea>
+
+    <!-- User Form -->
+    <div style="display:flex; flex-direction:column; gap:10px;">
+
+      <label style="font-size:12px; color:#ccc;">Bio</label>
+      <textarea id="modal-bio" style="width:100%; padding:8px; border-radius:8px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); color:#fff;" rows="3"></textarea>
+
+      <label style="font-size:12px; color:#ccc;">Avatar URL</label>
+      <input id="modal-avatar-url" type="text" style="width:100%; padding:8px; border-radius:8px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); color:#fff;">
+
+      <label style="font-size:12px; color:#ccc;">Banner URL</label>
+      <input id="modal-banner-url" type="text" style="width:100%; padding:8px; border-radius:8px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); color:#fff;">
+
+      <label style="font-size:12px; color:#ccc;">Role</label>
+      <div id="modal-role-select"></div>
     </div>
-    <div>
-      <label style="font-size:12px; color:var(--c-text-dim);">Avatar URL:</label>
-      <input type="text" id="modal-avatar-url" style="width:100%; border-radius:8px; padding:8px; background:var(--bg-glass); border:1px solid var(--border-glass); color:#fff;">
-    </div>
-    <div>
-      <label style="font-size:12px; color:var(--c-text-dim);">Banner URL:</label>
-      <input type="text" id="modal-banner-url" style="width:100%; border-radius:8px; padding:8px; background:var(--bg-glass); border:1px solid var(--border-glass); color:#fff;">
-    </div>
-    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:5px;">
+
+    <!-- Action Buttons -->
+    <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:10px;">
       <button class="btn primary" onclick="app.updateUserModal()">Save Changes</button>
-      <button class="btn" onclick="app.banUserModal()">Ban User</button>
-      <button class="btn" disabled title="In Development">Warn</button>
-      <button class="btn" disabled title="In Development">Notify</button>
+      <button class="btn danger" onclick="app.banUserModal()">Ban User</button>
     </div>
+
   </div>
 </div>
+
 
 
 </body>
