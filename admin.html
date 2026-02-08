@@ -235,7 +235,7 @@ pre { background: #000; padding: 15px; border-radius: 8px; color: #0f0; overflow
         <div class="header-brand brand-text scramble-hover" data-text="/six Admin">/six Admin</div>
       </div>
       <div class="user-badge" id="admin-profile">
-        <span class="loading-pulse">Authenticating...</span>
+        <span class="loading-pulse">Loading...</span>
       </div>
     </header>
 
@@ -243,15 +243,15 @@ pre { background: #000; padding: 15px; border-radius: 8px; color: #0f0; overflow
     <div class="stats-grid">
       <div class="card stat-card">
         <span class="stat-label">Total Users</span>
-        <span class="stat-value brand-text" id="stat-total">0</span>
+        <span class="stat-value" id="stat-total">0</span>
       </div>
       <div class="card stat-card">
         <span class="stat-label">Verified Staff</span>
-        <span class="stat-value brand-text" id="stat-staff">0</span>
+        <span class="stat-value" id="stat-staff">0</span>
       </div>
       <div class="card stat-card">
         <span class="stat-label">New Today</span>
-        <span class="stat-value brand-text" id="stat-new">0</span>
+        <span class="stat-value" id="stat-new">0</span>
       </div>
       <div class="card stat-card" style="justify-content:center; align-items:center; cursor:pointer;" onclick="app.refresh()">
         <i class="ph ph-arrows-clockwise" style="font-size:24px;"></i>
@@ -314,7 +314,6 @@ pre { background: #000; padding: 15px; border-radius: 8px; color: #0f0; overflow
     admin: 3,
     moderator: 2,
     verified: 1,
-    member: 0
   };
 
   let currentUser = null;
