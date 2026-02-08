@@ -594,31 +594,36 @@ buildRoleSelect: (u) => {
 
   // Build user card
   buildCard: (u) => {
-    const date = new Date(u.created_at).toLocaleDateString();
-    return `
-      <div class="user-card" data-id="${u.id}" onclick="ui.showUserModal('${u.id}')">
-        <div class="uc-top">
-          <img src="${u.avatar || 'https://via.placeholder.com/100/000000/FFFFFF/?text=' + u.username.charAt(0)}" class="uc-avatar">
-          <div class="uc-details">
-            <div class="uc-name">${u.username}</div>
-            <div class="uc-uuid" onclick="event.stopPropagation(); navigator.clipboard.writeText('${u.id}'); ui.toast('ID Copied')">
-              ${u.id.substring(0,12)}... <i class="ph ph-copy"></i>
-            </div>
-            <div class="uc-badges">
-              <span class="badge ${u.role}">${u.role.toUpperCase()}</span>
-              <span class="badge user">${date}</span>
-              <span class="badge" style="border-color:#ffb703;color:#ffb703;background:rgba(255,183,3,0.1);">IN DEVELOPMENT</span>
-            </div>
+  const date = new Date(u.created_at).toLocaleDateString();
+
+  return `
+    <div class="user-card" data-id="${u.id}" onclick="ui.showUserModal('${u.id}')">
+      <div class="uc-top">
+        <img src="${u.avatar || 'https://via.placeholder.com/100/000000/FFFFFF/?text=' + u.username.charAt(0)}" class="uc-avatar">
+        <div class="uc-details">
+          <div class="uc-name">${u.username}</div>
+          <div class="uc-uuid" onclick="event.stopPropagation(); navigator.clipboard.writeText('${u.id}'); ui.toast('ID Copied')">
+            ${u.id.substring(0,12)}... <i class="ph ph-copy"></i>
+          </div>
+          <div class="uc-badges">
+            <span class="badge ${u.role}">${u.role.toUpperCase()}</span>
+            <span class="badge user">${date}</span>
+            <span class="badge" style="border-color:#ffb703;color:#ffb703;background:rgba(255,183,3,0.1);">IN DEVELOPMENT</span>
           </div>
         </div>
-        <div class="uc-actions">
-          <button class="btn" style="padding:8px;" title="View Details" onclick="event.stopPropagation(); ui.showUserModal('${u.id}')">
-            <i class="ph ph-eye"></i> View
-          </button>
-        </div>
       </div>
-    `;
-  },
+
+      <div class="uc-actions">
+        <!-- Custom Role Selector -->
+        ${ui.buildRoleSelect(u)}
+
+        <button class="btn" style="padding:8px;" title="View Details" onclick="event.stopPropagation(); ui.showUserModal('${u.id}')">
+          <i class="ph ph-eye"></i> View
+        </button>
+      </div>
+    </div>
+  `;
+},
 
   renderSkeleton: () => {
     const grid = document.getElementById('user-grid');
