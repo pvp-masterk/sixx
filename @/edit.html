@@ -267,18 +267,14 @@ textarea { min-height: 90px; resize: none; line-height: 1.5; }
     <form id="profileForm">
       
       <div class="input-group">
-        <label>Avatar URL</label>
-        <div class="input-wrapper">
-          <input type="text" id="in-avatar" placeholder="https://imgur.com/..." autocomplete="off">
-        </div>
-      </div>
+  <label>Avatar</label>
+  <input type="file" id="in-avatar-file" accept="image/*">
+</div>
 
       <div class="input-group">
-        <label>Banner URL</label>
-        <div class="input-wrapper">
-          <input type="text" id="in-banner" placeholder="https://imgur.com/..." autocomplete="off">
-        </div>
-      </div>
+  <label>Banner (Image or Video)</label>
+  <input type="file" id="in-banner-file" accept="image/*,video/mp4,video/webm">
+</div>
 
       <div class="input-group">
         <label>About You</label>
@@ -300,9 +296,10 @@ textarea { min-height: 90px; resize: none; line-height: 1.5; }
 </div>
 
 <div class="input-group">
-  <label>Background Value</label>
-  <input type="text" id="in-bg-value" placeholder="Color (#000000) or URL">
+  <label>Background Upload (Image or Video)</label>
+  <input type="file" id="in-bg-file" accept="image/*,video/mp4,video/webm">
 </div>
+
 
       <div class="input-group">
         <label>Roles</label>
@@ -351,12 +348,13 @@ let currentProfileId = null;
 
 // UI Elements
 const els = {
+  avatarFile: document.getElementById('in-avatar-file'),
+  bannerFile: document.getElementById('in-banner-file'),
+  bgFile: document.getElementById('in-bg-file'),
   themeColorIn: document.getElementById('in-theme-color'),
   bgTypeIn: document.getElementById('in-bg-type'),
   bgValueIn: document.getElementById('in-bg-value'),
   form: document.getElementById('profileForm'),
-  avatarIn: document.getElementById('in-avatar'),
-  bannerIn: document.getElementById('in-banner'),
   bioIn: document.getElementById('in-bio'),
   prevAvatar: document.getElementById('prev-avatar'),
   prevBanner: document.getElementById('prev-banner'),
@@ -372,7 +370,7 @@ const els = {
 // 1. Initialize
 (async function init() {
   renderRoles([]);
-  updatePreviews(); // Load defaults immediately
+  
 
   setLoading(true, "Authenticating...");
   
@@ -409,7 +407,7 @@ if (els.bgValueIn) {
   );
 
   renderRoles(data.roles || []);
-  updatePreviews();
+  
 } else {
     // New user fallback
     currentProfileId = user.id;
@@ -418,42 +416,86 @@ if (els.bgValueIn) {
   setLoading(false);
 })();
 
-// 2. Event Listeners (Debounced for performance)
-els.avatarIn.addEventListener('input', debounce(updatePreviews, 500));
-els.bannerIn.addEventListener('input', debounce(updatePreviews, 500));
 
 els.form.addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!currentProfileId) return;
 
-  setLoading(true, "Saving...");
+  setLoading(true, "Uploading...");
 
-  const activeRoles = Array.from(document.querySelectorAll('.role-card.active')).map(el => el.dataset.roleId);
-  
-  const updates = {
-  avatar: els.avatarIn.value.trim() || null,
-  banner_url: els.bannerIn.value.trim() || null,
-  bio: els.bioIn.value.trim() || null,
+  let avatarUrl = null;
+  let bannerUrl = null;
+  let bgType = els.bgTypeIn.value;
+  let bgValue = null;
 
-  theme_color: els.themeColorIn.value,
-  bg_type: els.bgTypeIn.value,
-  bg_value: els.bgValueIn.value.trim() || null,
+  try {
+    // AVATAR
+    if (els.avatarFile.files[0]) {
+      const file = els.avatarFile.files[0];
+      const ext = file.name.split('.').pop();
+      avatarUrl = await uploadFile(
+        'avatars',
+        file,
+        `${currentProfileId}.${ext}`
+      );
+    }
 
-  roles: activeRoles,
-  updated_at: new Date().toISOString()
-};
+    // BANNER (image or video)
+    if (els.bannerFile.files[0]) {
+      const file = els.bannerFile.files[0];
+      const ext = file.name.split('.').pop();
+      bannerUrl = await uploadFile(
+        'banners',
+        file,
+        `${currentProfileId}.${ext}`
+      );
+    }
 
-  const { error } = await sb.from("profiles").update(updates).eq("id", currentProfileId);
+    // BACKGROUND (image or video)
+    if (els.bgFile.files[0]) {
+      const file = els.bgFile.files[0];
+      const ext = file.name.split('.').pop();
+      bgValue = await uploadFile(
+        'backgrounds',
+        file,
+        `${currentProfileId}.${ext}`
+      );
+
+      bgType = file.type.startsWith('video') ? 'video' : 'image';
+    }
+
+    const activeRoles = Array.from(
+      document.querySelectorAll('.role-card.active')
+    ).map(el => el.dataset.roleId);
+
+    const updates = {
+      avatar: avatarUrl,
+      banner_url: bannerUrl,
+      theme_color: els.themeColorIn.value,
+      bg_type: bgType,
+      bg_value: bgValue,
+      bio: els.bioIn.value.trim() || null,
+      roles: activeRoles,
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await sb
+      .from("profiles")
+      .update(updates)
+      .eq("id", currentProfileId);
+
+    if (error) throw error;
+
+    showToast("Profile updated", "success");
+
+  } catch (err) {
+    console.error(err);
+    showToast("Upload failed", "error");
+  }
 
   setLoading(false);
-  
-  if (error) {
-    console.error(error);
-    showToast("Failed to save changes", "error");
-  } else {
-    showToast("Profile updated successfully", "success");
-  }
 });
+
 els.themeColorIn.addEventListener('input', e => {
   document.documentElement.style.setProperty('--c-accent', e.target.value);
 });
@@ -468,17 +510,7 @@ function debounce(func, wait) {
   };
 }
 
-function updatePreviews() {
-  const av = els.avatarIn.value.trim();
-  const bn = els.bannerIn.value.trim();
-  
-  // Only update src if changed to prevent flickering
-  if(els.prevAvatar.src !== (av || CONFIG.defaultAvatar)) 
-    els.prevAvatar.src = av || CONFIG.defaultAvatar;
-    
-  if(els.prevBanner.src !== (bn || CONFIG.defaultBanner))
-    els.prevBanner.src = bn || CONFIG.defaultBanner;
-}
+
 
 function renderRoles(selectedRoles) {
   els.rolesGrid.innerHTML = "";
@@ -518,6 +550,17 @@ function showToast(msg, type) {
   
   setTimeout(() => els.toast.classList.remove('show'), 3000);
 }
+  async function uploadFile(bucket, file, path) {
+  const { error } = await sb.storage
+    .from(bucket)
+    .upload(path, file, { upsert: true });
+
+  if (error) throw error;
+
+  const { data } = sb.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
+}
+
 </script>
 </body>
 </html>
