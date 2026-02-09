@@ -248,6 +248,77 @@ input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0
 .toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
 .toast.success i { color: #4ade80; }
 .toast.error i { color: #ef4444; }
+.font-import {
+  border: 2px dashed var(--c-glass-border);
+  background: rgba(255,255,255,0.02);
+}
+
+.font-import i {
+  font-size: 22px;
+  color: var(--c-text-dim);
+  margin-bottom: 6px;
+}
+
+.font-import:hover {
+  border-color: var(--c-accent);
+  background: rgba(123, 44, 191, 0.08);
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  z-index: 5000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 520px;
+  background: var(--c-glass);
+  border: 1px solid var(--c-glass-border);
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+}
+.modal-buffer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 50px;
+}
+
+.buffer-text {
+  font-size: 0.75rem;
+  color: var(--c-text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.font-preview-live {
+  font-size: 42px;
+  font-weight: 900;
+  text-shadow: 0 0 30px var(--c-accent-glow);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.font-helper {
+  font-size: 0.75rem;
+  color: var(--c-text-dim);
+}
 
 </style>
 </head>
@@ -285,6 +356,11 @@ input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0
       <div class="section-title">Username Font</div>
       <div class="font-grid" id="font-grid">
         <!-- Injected via JS -->
+        <div class="font-option font-import" id="import-font">
+  <i class="ph-bold ph-upload-simple"></i>
+  <div class="font-preview">Import</div>
+  <div class="font-name">Custom Font</div>
+</div>
       </div>
       <input type="hidden" id="in-font" value="Cinzel">
     </div>
@@ -353,6 +429,27 @@ const CONFIG = {
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 let currentProfileId = null;
 const staging = { avatar: null, banner: null, background: null };
+const fontBufferHTML = `
+  <div class="modal-buffer">
+    <div class="loader"></div>
+    <div class="buffer-text">Preparing font importer…</div>
+  </div>
+`;
+const fontImporterHTML = `
+  <div class="section-title">Custom Font</div>
+
+  <div class="file-drop-box" id="drop-font">
+    <div class="font-preview-live" id="font-preview">
+      ${escapeHtml(currentUsername)}
+    </div>
+    <span class="font-helper">Drop font file or click to upload</span>
+    <input type="file" id="file-font" hidden>
+  </div>
+
+  <button class="save-btn" id="confirm-font">
+    <span class="btn-text">Use This Font</span>
+  </button>
+`;
 
 // Elements
 const els = {
@@ -554,6 +651,10 @@ async function saveProfile() {
       updates.bg_value = await upload(staging.background, 'backgrounds');
       updates.bg_type = staging.background.type.startsWith('video') ? 'video' : 'image';
     }
+    if (staging.customFont) {
+  updates.custom_font_url = await upload(staging.customFont, 'fonts');
+  updates.username_font = 'custom';
+}
 
     const { error } = await sb.from("profiles").upsert({ id: currentProfileId, ...updates });
     if (error) throw error;
@@ -589,6 +690,54 @@ function showToast(msg, type) {
   document.getElementById('toast-icon').className = type === 'success' ? 'ph-bold ph-check-circle' : 'ph-bold ph-warning-circle';
   setTimeout(() => t.classList.remove('active'), 3500);
 }
+  function setupFontImporter() {
+  const drop = document.getElementById('drop-font');
+  const input = document.getElementById('file-font');
+  const preview = document.getElementById('font-preview');
+
+  drop.onclick = () => input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    // abuse guard (client-side)
+    if (file.size > 2 * 1024 * 1024) {
+      showToast("Font too large (max 2MB)", "error");
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    const font = new FontFace('PreviewFont', `url(${url})`);
+
+    font.load().then(() => {
+      document.fonts.add(font);
+      preview.style.fontFamily = 'PreviewFont';
+      drop.classList.add('drag-active');
+    }).catch(() => {
+      showToast("Invalid font file", "error");
+    });
+  };
+}
+
+  const importBtn = document.getElementById('import-font');
+const modal = document.getElementById('font-modal');
+const modalCard = document.getElementById('font-modal-card');
+
+importBtn.onclick = () => {
+  modal.classList.add('active');
+  modalCard.innerHTML = fontBufferHTML;
+
+  setTimeout(() => {
+    modalCard.innerHTML = fontImporterHTML;
+    setupFontImporter();
+  }, 1000);
+};
+
 </script>
+  <div class="modal-overlay" id="font-modal">
+  <div class="modal-card" id="font-modal-card"></div>
+</div>
+
 </body>
 </html>
