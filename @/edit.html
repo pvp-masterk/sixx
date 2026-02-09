@@ -425,15 +425,7 @@ const CONFIG = {
     { id: 'Roboto Mono', label: 'Code', family: "'Roboto Mono', monospace" },
   ]
 };
-  function escapeHtml(str = '') {
-  return str.replace(/[&<>"']/g, m => ({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#39;'
-  }[m]));
-}
+  
 let currentUsername = '/six';
 
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
@@ -532,7 +524,15 @@ function populateUI(data) {
   renderFonts(data.username_font || 'Cinzel');
   renderRoles(data.roles || []);
 }
-
+function escapeHtml(str = '') {
+  return str.replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[m]));
+}
 function renderFonts(activeId) {
   els.fontGrid.innerHTML = '';
   els.fontInput.value = activeId;
