@@ -289,6 +289,20 @@ textarea { min-height: 90px; resize: none; line-height: 1.5; }
   <label>Theme Color</label>
   <input type="color" id="in-theme-color" value="#7b2cbf">
 </div>
+<div class="input-group">
+  <label>Background Type</label>
+  <select id="in-bg-type">
+    <option value="gradient">Gradient (Default)</option>
+    <option value="color">Solid Color</option>
+    <option value="image">Image URL</option>
+    <option value="video">Video URL</option>
+  </select>
+</div>
+
+<div class="input-group">
+  <label>Background Value</label>
+  <input type="text" id="in-bg-value" placeholder="Color (#000000) or URL">
+</div>
 
       <div class="input-group">
         <label>Roles</label>
@@ -379,6 +393,8 @@ const els = {
   els.bannerIn.value = data.banner_url || "";
   els.bioIn.value = data.bio || "";
   els.themeColorIn.value = data.theme_color || "#7b2cbf";
+  els.bgTypeIn.value = data.bg_type || "gradient";
+  els.bgValueIn.value = data.bg_value || "";
 
   document.documentElement.style.setProperty(
     '--c-accent',
@@ -411,7 +427,11 @@ els.form.addEventListener('submit', async (e) => {
   avatar: els.avatarIn.value.trim() || null,
   banner_url: els.bannerIn.value.trim() || null,
   bio: els.bioIn.value.trim() || null,
+
   theme_color: els.themeColorIn.value,
+  bg_type: els.bgTypeIn.value,
+  bg_value: els.bgValueIn.value.trim() || null,
+
   roles: activeRoles,
   updated_at: new Date().toISOString()
 };
