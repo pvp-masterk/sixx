@@ -26,13 +26,18 @@
   --c-glass-border: rgba(255, 255, 255, 0.08);
   
   --font-main: 'Inter', sans-serif;
+  --font-brand: 'Diecide Remain', serif;
   --font-display: 'Cinzel', serif; /* Updated via JS */
   
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-@font-face { font-family: 'Diecide Remain'; src: url('fonts/DeicideRemain.otf') format('opentype'); font-display: swap; }
-
+@font-face {
+  font-family: 'Diecide Remain';
+  src: url('fonts/DeicideRemain.otf') format('opentype');
+  font-display: swap;
+}
+  
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
 
 body {
@@ -62,17 +67,24 @@ body::after {
 @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
 .header-brand {
-  position: absolute; top: 30px; left: 30px;
+  position: absolute;
+  top: 30px;
+  left: 30px;
+
   font-family: var(--font-brand), 'Cinzel', serif;
   background: linear-gradient(135deg, #e0aaff, #9d4edd, #7b2cbf);
+
+  -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+
   text-shadow: 0 0 25px rgba(157, 78, 221, 0.5);
   font-weight: 900;
   letter-spacing: 1px;
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+
   text-decoration: none;
 }
+
 
 /* ======================= PROFILE CARD ======================= */
 .profile-card {
