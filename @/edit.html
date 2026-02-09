@@ -352,6 +352,8 @@ let currentProfileId = null;
 // UI Elements
 const els = {
   themeColorIn: document.getElementById('in-theme-color'),
+  bgTypeIn: document.getElementById('in-bg-type'),
+  bgValueIn: document.getElementById('in-bg-value'),
   form: document.getElementById('profileForm'),
   avatarIn: document.getElementById('in-avatar'),
   bannerIn: document.getElementById('in-banner'),
@@ -393,8 +395,13 @@ const els = {
   els.bannerIn.value = data.banner_url || "";
   els.bioIn.value = data.bio || "";
   els.themeColorIn.value = data.theme_color || "#7b2cbf";
+  if (els.bgTypeIn) {
   els.bgTypeIn.value = data.bg_type || "gradient";
+}
+
+if (els.bgValueIn) {
   els.bgValueIn.value = data.bg_value || "";
+}
 
   document.documentElement.style.setProperty(
     '--c-accent',
