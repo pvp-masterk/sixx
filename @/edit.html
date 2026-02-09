@@ -341,6 +341,32 @@ const CONFIG = {
     { id: 'Verified',  label: 'Verified',  icon: 'verified.png' }
   ]
 };
+const FILE_RULES = {
+  avatar: {
+    maxSize: 2 * 1024 * 1024, // 2MB
+    types: ['image/jpeg', 'image/png', 'image/webp']
+  },
+  banner: {
+    maxSize: 10 * 1024 * 1024, // 10MB
+    types: [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'video/mp4',
+      'video/webm'
+    ]
+  },
+  background: {
+    maxSize: 15 * 1024 * 1024, // 15MB
+    types: [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'video/mp4',
+      'video/webm'
+    ]
+  }
+};
 
 /* ================= APP LOGIC ================= */
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
@@ -534,14 +560,25 @@ els.themeColorIn.addEventListener('input', e => {
 });
   els.avatarFile.addEventListener('change', () => {
   const file = els.avatarFile.files[0];
-  if (!file) return;
+  const check = validateFile(file, FILE_RULES.avatar);
 
-  const url = URL.createObjectURL(file);
-  els.prevAvatar.src = url;
+  if (!check.ok) {
+    showToast(check.msg, "error");
+    els.avatarFile.value = '';
+    return;
+  }
+
+  els.prevAvatar.src = URL.createObjectURL(file);
 });
 els.bannerFile.addEventListener('change', () => {
   const file = els.bannerFile.files[0];
-  if (!file) return;
+  const check = validateFile(file, FILE_RULES.banner);
+
+  if (!check.ok) {
+    showToast(check.msg, "error");
+    els.bannerFile.value = '';
+    return;
+  }
 
   const url = URL.createObjectURL(file);
 
@@ -555,9 +592,16 @@ els.bannerFile.addEventListener('change', () => {
     els.prevBanner.src = url;
   }
 });
+
 els.bgFile.addEventListener('change', () => {
   const file = els.bgFile.files[0];
-  if (!file) return;
+  const check = validateFile(file, FILE_RULES.background);
+
+  if (!check.ok) {
+    showToast(check.msg, "error");
+    els.bgFile.value = '';
+    return;
+  }
 
   const url = URL.createObjectURL(file);
   els.bgPreview.innerHTML = '';
@@ -575,6 +619,7 @@ els.bgFile.addEventListener('change', () => {
   }
 });
 
+
 /* ================= HELPERS ================= */
 
 // Debounce: Prevents lag by waiting until user stops typing to execute heavy tasks (like image loading)
@@ -586,6 +631,26 @@ function debounce(func, wait) {
   };
 }
 
+function validateFile(file, rules) {
+  if (!file) return { ok: false, msg: "No file selected" };
+
+  if (!rules.types.includes(file.type)) {
+    return {
+      ok: false,
+      msg: "Unsupported file type"
+    };
+  }
+
+  if (file.size > rules.maxSize) {
+    const mb = (rules.maxSize / 1024 / 1024).toFixed(0);
+    return {
+      ok: false,
+      msg: `File too large (max ${mb}MB)`
+    };
+  }
+
+  return { ok: true };
+}
 
 
 function renderRoles(selectedRoles) {
