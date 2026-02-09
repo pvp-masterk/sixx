@@ -292,6 +292,25 @@ footer {
   z-index: -1;
   opacity: 0.45;
 }
+.profile-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.profile-stats .count {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--c-accent-glow);
+}
+
+.profile-stats .label {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--c-text-dim);
+  text-transform: uppercase;
+}
 
 </style>
 </head>
@@ -343,6 +362,10 @@ footer {
         <div class="profile-content">
           <div class="avatar-row">
             <div class="avatar-wrapper"><div class="profile-avatar skeleton"></div></div>
+            <div class="profile-stats">
+  <div class="count">${user.views?.toLocaleString() || 0}</div>
+  <div class="label">Profile Views</div>
+</div>
           </div>
           <div class="skeleton" style="height:30px; width:40%; margin-bottom:15px;"></div>
           <div class="skeleton" style="height:15px; width:80%; margin-bottom:8px;"></div>
@@ -435,6 +458,7 @@ footer {
 
       app.renderProfile(profile);
       app.checkAuth(profile);
+      app.registerView(profile);
     },
 
     renderProfile: (user) => {
@@ -548,6 +572,17 @@ else {
 
       document.getElementById('profile-target').innerHTML = html;
     },
+    
+registerView: async (profile) => {
+  const key = `viewed_${profile.id}`;
+  if (localStorage.getItem(key)) return;
+
+  await supabaseClient.rpc("increment_profile_views", {
+    pid: profile.id
+  });
+
+  localStorage.setItem(key, Date.now());
+},
 
     checkAuth: async (profile) => {
       const { data: { session } } = await supabaseClient.auth.getSession();
