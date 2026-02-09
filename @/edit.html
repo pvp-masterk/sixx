@@ -245,8 +245,7 @@ textarea { min-height: 90px; resize: none; line-height: 1.5; }
 </head>
 <body>
 
-<!-- Background -->
-<div class="bg-fixed">
+<div class="bg-fixed" id="edit-bg-preview">
   <div class="bg-blob one"></div>
   <div class="bg-blob two"></div>
 </div>
@@ -256,7 +255,8 @@ textarea { min-height: 90px; resize: none; line-height: 1.5; }
 
   <!-- Preview -->
   <div class="preview-area">
-    <img id="prev-banner" class="banner-display" src="" alt="">
+    <img id="prev-banner" class="banner-display hidden" src="" alt="">
+<video id="prev-banner-video" class="banner-display hidden" autoplay muted loop playsinline></video>
     <div class="avatar-wrapper">
       <img id="prev-avatar" class="avatar-display" src="" alt="">
     </div>
@@ -348,6 +348,8 @@ let currentProfileId = null;
 
 // UI Elements
 const els = {
+  prevBannerVideo: document.getElementById('prev-banner-video'),
+  bgPreview: document.getElementById('edit-bg-preview'),
   avatarFile: document.getElementById('in-avatar-file'),
   bannerFile: document.getElementById('in-banner-file'),
   bgFile: document.getElementById('in-bg-file'),
@@ -497,6 +499,49 @@ els.form.addEventListener('submit', async (e) => {
 els.themeColorIn.addEventListener('input', e => {
   document.documentElement.style.setProperty('--c-accent', e.target.value);
 });
+  els.avatarFile.addEventListener('change', () => {
+  const file = els.avatarFile.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  els.prevAvatar.src = url;
+});
+els.bannerFile.addEventListener('change', () => {
+  const file = els.bannerFile.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+
+  if (file.type.startsWith('video')) {
+    els.prevBanner.classList.add('hidden');
+    els.prevBannerVideo.classList.remove('hidden');
+    els.prevBannerVideo.src = url;
+  } else {
+    els.prevBannerVideo.classList.add('hidden');
+    els.prevBanner.classList.remove('hidden');
+    els.prevBanner.src = url;
+  }
+});
+els.bgFile.addEventListener('change', () => {
+  const file = els.bgFile.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  els.bgPreview.innerHTML = '';
+
+  if (file.type.startsWith('video')) {
+    els.bgPreview.innerHTML = `
+      <video class="bg-media" autoplay muted loop playsinline>
+        <source src="${url}">
+      </video>
+    `;
+  } else {
+    els.bgPreview.innerHTML = `
+      <img src="${url}" class="bg-media">
+    `;
+  }
+});
+
 /* ================= HELPERS ================= */
 
 // Debounce: Prevents lag by waiting until user stops typing to execute heavy tasks (like image loading)
