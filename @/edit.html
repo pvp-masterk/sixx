@@ -425,6 +425,16 @@ const CONFIG = {
     { id: 'Roboto Mono', label: 'Code', family: "'Roboto Mono', monospace" },
   ]
 };
+  function escapeHtml(str = '') {
+  return str.replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[m]));
+}
+let currentUsername = '/six';
 
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 let currentProfileId = null;
@@ -694,33 +704,59 @@ function showToast(msg, type) {
   const drop = document.getElementById('drop-font');
   const input = document.getElementById('file-font');
   const preview = document.getElementById('font-preview');
+  const allowed = [
+  'font/ttf',
+  'font/otf',
+  'font/woff',
+  'font/woff2',
+  'application/font-woff',
+  'application/font-woff2'
+];
+
+if (!allowed.includes(file.type)) {
+  showToast("Unsupported font format", "error");
+  return;
+}
 
   drop.onclick = () => input.click();
 
   input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
+  const file = input.files[0];
+  if (!file) return;
 
-    // abuse guard (client-side)
-    if (file.size > 2 * 1024 * 1024) {
-      showToast("Font too large (max 2MB)", "error");
-      return;
-    }
+  if (file.size > 2 * 1024 * 1024) {
+    showToast("Font too large (max 2MB)", "error");
+    return;
+  }
 
-    const url = URL.createObjectURL(file);
-    const font = new FontFace('PreviewFont', `url(${url})`);
+  const url = URL.createObjectURL(file);
+  const font = new FontFace('PreviewFont', `url(${url})`);
 
-    font.load().then(() => {
-      document.fonts.add(font);
-      preview.style.fontFamily = 'PreviewFont';
-      drop.classList.add('drag-active');
-    }).catch(() => {
-      showToast("Invalid font file", "error");
-    });
-  };
+  font.load().then(() => {
+    document.fonts.add(font);
+    preview.style.fontFamily = 'PreviewFont';
+
+    staging.customFont = file;              // ✅ STORE IT
+    els.fontInput.value = 'custom';         // ✅ MARK AS CUSTOM
+
+    showToast("Font loaded", "success");
+  }).catch(() => {
+    showToast("Invalid font file", "error");
+  });
+};
 }
 
-  const importBtn = document.getElementById('import-font');
+  document.addEventListener('click', (e) => {
+  if (!e.target.closest('#import-font')) return;
+
+  modal.classList.add('active');
+  modalCard.innerHTML = fontBufferHTML;
+
+  setTimeout(() => {
+    modalCard.innerHTML = fontImporterHTML;
+    setupFontImporter();
+  }, 800);
+});
 const modal = document.getElementById('font-modal');
 const modalCard = document.getElementById('font-modal-card');
 
@@ -732,6 +768,9 @@ importBtn.onclick = () => {
     modalCard.innerHTML = fontImporterHTML;
     setupFontImporter();
   }, 1000);
+};
+modal.onclick = (e) => {
+  if (e.target === modal) modal.classList.remove('active');
 };
 
 </script>
