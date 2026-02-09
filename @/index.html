@@ -428,7 +428,11 @@ footer {
     },
 
     renderProfile: (user) => {
-      document.title = `${user.username} | /six Profile`;
+      document.title = `${user.username}`;
+      document.documentElement.style.setProperty(
+    '--c-accent',
+    user.theme_color || '#7b2cbf'
+  );
       
       const avatar = user.avatar || "https://cdn.discordapp.com/embed/avatars/0.png";
       const bannerUrl = user.banner_url || ""; // Empty string triggers gradient fallback
