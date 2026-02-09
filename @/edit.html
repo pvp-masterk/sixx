@@ -284,6 +284,11 @@ textarea { min-height: 90px; resize: none; line-height: 1.5; }
         <label>About You</label>
         <textarea id="in-bio" placeholder="Tell us about yourself..."></textarea>
       </div>
+      
+<div class="input-group">
+  <label>Theme Color</label>
+  <input type="color" id="in-theme-color" value="#7b2cbf">
+</div>
 
       <div class="input-group">
         <label>Roles</label>
@@ -332,6 +337,7 @@ let currentProfileId = null;
 
 // UI Elements
 const els = {
+  themeColorIn: document.getElementById('in-theme-color'),
   form: document.getElementById('profileForm'),
   avatarIn: document.getElementById('in-avatar'),
   bannerIn: document.getElementById('in-banner'),
@@ -368,13 +374,20 @@ const els = {
   const { data, error } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
 
   if (data) {
-    currentProfileId = data.id;
-    els.avatarIn.value = data.avatar || "";
-    els.bannerIn.value = data.banner_url || "";
-    els.bioIn.value = data.bio || "";
-    renderRoles(data.roles || []);
-    updatePreviews();
-  } else {
+  currentProfileId = data.id;
+  els.avatarIn.value = data.avatar || "";
+  els.bannerIn.value = data.banner_url || "";
+  els.bioIn.value = data.bio || "";
+  els.themeColorIn.value = data.theme_color || "#7b2cbf";
+
+  document.documentElement.style.setProperty(
+    '--c-accent',
+    els.themeColorIn.value
+  );
+
+  renderRoles(data.roles || []);
+  updatePreviews();
+} else {
     // New user fallback
     currentProfileId = user.id;
   }
@@ -395,12 +408,13 @@ els.form.addEventListener('submit', async (e) => {
   const activeRoles = Array.from(document.querySelectorAll('.role-card.active')).map(el => el.dataset.roleId);
   
   const updates = {
-    avatar: els.avatarIn.value.trim() || null,
-    banner_url: els.bannerIn.value.trim() || null,
-    bio: els.bioIn.value.trim() || null,
-    roles: activeRoles,
-    updated_at: new Date().toISOString()
-  };
+  avatar: els.avatarIn.value.trim() || null,
+  banner_url: els.bannerIn.value.trim() || null,
+  bio: els.bioIn.value.trim() || null,
+  theme_color: els.themeColorIn.value,
+  roles: activeRoles,
+  updated_at: new Date().toISOString()
+};
 
   const { error } = await sb.from("profiles").update(updates).eq("id", currentProfileId);
 
@@ -413,7 +427,9 @@ els.form.addEventListener('submit', async (e) => {
     showToast("Profile updated successfully", "success");
   }
 });
-
+els.themeColorIn.addEventListener('input', e => {
+  document.documentElement.style.setProperty('--c-accent', e.target.value);
+});
 /* ================= HELPERS ================= */
 
 // Debounce: Prevents lag by waiting until user stops typing to execute heavy tasks (like image loading)
