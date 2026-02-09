@@ -8,15 +8,18 @@
 <!-- EXTERNAL LIBRARIES -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+<!-- FONTS: Added all the options here -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@700&family=Orbitron:wght@700&family=Playfair+Display:wght@700&family=UnifrakturMaguntia&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
 
 <style>
 /* ======================= 1. CORE VARIABLES & RESET ======================= */
 :root {
   --c-bg: #030005;
   --c-bg-alt: #0a0510;
+  
+  /* Dynamic Theme Variables */
   --c-accent: #7b2cbf;
-  --c-accent-hover: #9d4edd;
+  --c-accent-dark: #4a127a; /* Calculated by JS */
   --c-accent-glow: rgba(123, 44, 191, 0.4);
   
   --c-text-main: #e8e6f3;
@@ -28,14 +31,15 @@
   
   --radius-lg: 24px;
   --radius-md: 14px;
-  --radius-sm: 8px;
   
   --font-main: 'Inter', sans-serif;
-  --font-brand: 'Cinzel', serif;
   
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Custom Font Declaration */
+@font-face { font-family: 'Diecide Remain'; src: url('fonts/DeicideRemain.otf') format('opentype'); font-display: swap; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
 
@@ -44,47 +48,42 @@ body {
   color: var(--c-text-main);
   font-family: var(--font-main);
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   padding: 20px;
   overflow-x: hidden;
 }
 
-/* Texture Overlay (Optimized) */
+/* Texture Overlay */
 body::after {
   content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 999;
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
   opacity: 0.03;
 }
 
-/* ======================= 2. BACKGROUND ANIMATION (GPU ACCELERATED) ======================= */
+/* ======================= 2. BACKGROUND ANIMATION ======================= */
 .bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 
 .bg-blob {
   position: absolute; border-radius: 50%; 
   filter: blur(90px); opacity: 0.5;
   will-change: transform; 
-  transform: translate3d(0,0,0); /* Force Hardware Acceleration */
+  transform: translate3d(0,0,0);
 }
 
 .bg-blob.one { 
   top: -10%; left: -10%; width: 50vw; height: 50vw; 
-  background: radial-gradient(circle, #4a0072 0%, transparent 70%); 
+  background: radial-gradient(circle, var(--c-accent-dark) 0%, transparent 70%); 
   animation: float 25s infinite alternate ease-in-out;
 }
 .bg-blob.two { 
   bottom: -10%; right: -10%; width: 60vw; height: 60vw; 
-  background: radial-gradient(circle, #240046 0%, transparent 70%); 
+  background: radial-gradient(circle, #000 0%, transparent 70%); 
   animation: float 30s infinite alternate-reverse ease-in-out;
 }
 
-@keyframes float { 
-  0% { transform: translate3d(0, 0, 0); } 
-  100% { transform: translate3d(50px, 30px, 0); } 
-}
+@keyframes float { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(50px, 30px, 0); } }
 
-/* ======================= 3. MAIN CONTAINER ======================= */
+/* ======================= 3. CONTAINER ======================= */
 .container {
   position: relative; z-index: 10;
   width: 100%; max-width: 520px;
@@ -98,76 +97,35 @@ body::after {
 
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-/* --- SHOWCASE AREA (Interactive) --- */
+/* --- SHOWCASE AREA --- */
 .showcase-area {
   position: relative; width: 100%; height: 200px;
   background: #05020a;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  group-hover: cursor;
 }
 
-/* Interactive Banner Drop Zone */
 .banner-wrapper {
-  width: 100%; height: 100%;
-  position: relative;
-  cursor: pointer;
-  transition: opacity 0.3s;
+  width: 100%; height: 100%; position: relative; cursor: pointer; transition: opacity 0.3s;
 }
-
 .banner-wrapper:hover::after {
-  content: "Change Banner";
-  position: absolute; inset: 0;
+  content: "Change Banner"; position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(0,0,0,0.5);
-  font-weight: 600; letter-spacing: 1px;
-  opacity: 1; transition: 0.3s;
+  background: rgba(0,0,0,0.5); font-weight: 600; letter-spacing: 1px;
 }
-.banner-wrapper::after { opacity: 0; color: white; font-size: 0.9rem; }
+.banner-display { width: 100%; height: 100%; object-fit: cover; }
 
-.banner-display {
-  width: 100%; height: 100%; object-fit: cover;
-  transition: transform 0.5s;
-}
-
-/* Interactive Avatar Drop Zone */
 .avatar-wrapper {
   position: absolute; bottom: -45px; left: 30px;
-  width: 100px; height: 100px;
-  padding: 4px;
+  width: 100px; height: 100px; padding: 4px;
   background: var(--c-bg-alt);
   border: 1px solid var(--c-glass-border);
   border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  z-index: 20;
-  cursor: pointer;
-  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20;
+  cursor: pointer; overflow: hidden;
   transition: transform 0.3s var(--ease-spring);
 }
-
 .avatar-wrapper:hover { transform: scale(1.05) translateY(-2px); border-color: var(--c-accent); }
-
-.avatar-wrapper:hover::after {
-  content: "\e99c"; /* Pencil Icon via CSS or Text */
-  font-family: "Phosphor";
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(0,0,0,0.6); color: white; font-size: 1.5rem;
-}
-
-.avatar-display {
-  width: 100%; height: 100%;
-  border-radius: 18px; object-fit: cover;
-  background-color: #1a1a1a;
-}
-
-/* Drop Zone Active States */
-.drag-active {
-  border: 2px dashed var(--c-accent) !important;
-  filter: brightness(1.2);
-}
-.banner-wrapper.drag-active::after, .avatar-wrapper.drag-active::after {
-  content: "Drop Here"; opacity: 1; background: rgba(123, 44, 191, 0.4);
-}
+.avatar-display { width: 100%; height: 100%; border-radius: 18px; object-fit: cover; background-color: #1a1a1a; }
 
 /* --- FORM SECTION --- */
 .form-area { padding: 60px 30px 30px 30px; }
@@ -179,109 +137,107 @@ body::after {
 }
 .section-title::after { content: ""; flex: 1; height: 1px; background: var(--c-glass-border); }
 
-/* Custom Inputs */
 .input-group { margin-bottom: 24px; }
 
 input[type="text"], textarea, select {
   width: 100%; padding: 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--c-glass-border);
-  background: rgba(0, 0, 0, 0.3);
-  color: var(--c-text-main);
-  font-family: inherit; font-size: 0.95rem;
-  transition: all 0.2s;
+  border-radius: var(--radius-md); border: 1px solid var(--c-glass-border);
+  background: rgba(0, 0, 0, 0.3); color: var(--c-text-main);
+  font-family: inherit; font-size: 0.95rem; transition: all 0.2s;
 }
-
-input:focus, textarea:focus, select:focus {
-  border-color: var(--c-accent);
-  background: rgba(10, 5, 16, 0.8);
+input:focus, textarea:focus {
+  border-color: var(--c-accent); background: rgba(10, 5, 16, 0.8);
   box-shadow: 0 0 0 2px var(--c-accent-glow);
 }
-
 textarea { min-height: 100px; resize: none; line-height: 1.6; }
 
-/* Custom File Drop Box (For Background) */
-.file-drop-box {
+/* --- NEW FONT PICKER GRID --- */
+.font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.font-option {
   position: relative;
-  width: 100%; height: 100px;
-  border: 2px dashed var(--c-glass-border);
+  padding: 15px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--c-glass-border);
   border-radius: var(--radius-md);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.01);
-  cursor: pointer; transition: 0.3s;
-  overflow: hidden;
+  text-align: center; cursor: pointer;
+  transition: 0.2s; overflow: hidden;
 }
-
-.file-drop-box:hover { border-color: var(--c-text-dim); background: rgba(255,255,255,0.03); }
-.file-drop-box.drag-active { border-color: var(--c-accent); background: rgba(123, 44, 191, 0.1); }
-
-.file-drop-box i { font-size: 24px; color: var(--c-text-dim); margin-bottom: 6px; }
-.file-drop-box span { font-size: 0.8rem; color: var(--c-text-dim); }
-.file-drop-box input { display: none; }
-
-/* Background Preview in Box */
-.mini-preview {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; opacity: 0.6; pointer-events: none;
+.font-option:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); }
+.font-option.active {
+  background: rgba(255,255,255,0.05);
+  border-color: var(--c-accent);
+  box-shadow: inset 0 0 20px var(--c-accent-glow);
+}
+.font-preview { font-size: 1.2rem; margin-bottom: 4px; color: #fff; }
+.font-name { font-size: 0.65rem; color: var(--c-text-dim); text-transform: uppercase; letter-spacing: 1px; }
+.featured-badge {
+  position: absolute; top: 0; right: 0;
+  background: var(--c-accent); color: #fff;
+  font-size: 0.5rem; font-weight: 700; padding: 2px 6px;
+  border-bottom-left-radius: 6px;
 }
 
 /* Color Picker */
 .color-picker-wrapper {
-  display: flex; align-items: center; gap: 15px;
-  padding: 10px; background: rgba(255,255,255,0.02);
+  display: flex; align-items: center; gap: 15px; padding: 10px;
+  background: rgba(255,255,255,0.02);
   border-radius: var(--radius-md); border: 1px solid var(--c-glass-border);
 }
 input[type="color"] {
   -webkit-appearance: none; border: none; width: 40px; height: 40px;
-  border-radius: 50%; cursor: pointer; background: none;
+  border-radius: 50%; cursor: pointer; background: none; padding: 0;
 }
-input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
 input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; }
 
-/* Roles */
-.roles-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 12px;
+/* Drop Box */
+.file-drop-box {
+  position: relative; width: 100%; height: 100px;
+  border: 2px dashed var(--c-glass-border);
+  border-radius: var(--radius-md);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.01); cursor: pointer; transition: 0.3s; overflow: hidden;
 }
+.file-drop-box:hover { border-color: var(--c-text-dim); }
+.file-drop-box.drag-active { border-color: var(--c-accent); background: rgba(123, 44, 191, 0.1); }
+#mini-bg-preview { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.4; object-fit: cover;}
+
+/* Roles */
+.roles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
 .role-badge {
-  background: var(--c-glass-highlight);
-  border: 1px solid transparent;
+  background: var(--c-glass-highlight); border: 1px solid transparent;
   padding: 10px; border-radius: var(--radius-md);
-  text-align: center; font-size: 0.75rem; color: var(--c-text-dim);
-  transition: 0.2s; cursor: pointer; user-select: none;
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  text-align: center; font-size: 0.7rem; color: var(--c-text-dim);
+  cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px;
+  transition: 0.2s;
 }
 .role-badge.active {
-  background: rgba(123, 44, 191, 0.15); border-color: var(--c-accent); color: white;
-  box-shadow: 0 4px 15px rgba(123, 44, 191, 0.1);
+  background: rgba(255,255,255,0.05); border-color: var(--c-accent); color: white;
+  box-shadow: 0 4px 15px var(--c-accent-glow);
 }
-.role-badge img { width: 20px; height: 20px; filter: grayscale(1); opacity: 0.7; }
-.role-badge.active img { filter: grayscale(0); opacity: 1; }
 
-/* Button */
+/* Save Button (Dark Version) */
 .save-btn {
   margin-top: 30px; width: 100%; padding: 18px;
-  background: linear-gradient(135deg, var(--c-accent) 0%, #5a189a 100%);
-  border: none; border-radius: var(--radius-md);
-  color: white; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;
+  /* Uses the Dark Accent variable calculated by JS */
+  background: var(--c-accent-dark);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-md);
+  color: white; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
   cursor: pointer; position: relative; overflow: hidden;
-  box-shadow: 0 10px 30px var(--c-accent-glow);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   transition: all 0.3s var(--ease-spring);
   display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-.save-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 40px var(--c-accent-glow); }
-.save-btn:active { transform: scale(0.98); }
+.save-btn:hover { 
+  background: var(--c-accent); /* Brighten on hover */
+  transform: translateY(-2px); 
+  box-shadow: 0 0 20px var(--c-accent-glow); 
+}
 .save-btn:disabled { opacity: 0.7; pointer-events: none; filter: grayscale(0.5); }
-
-/* Loading Spinner */
-.loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+.loader { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Helper */
 .hidden { display: none !important; }
-
-/* Toast Notification */
 .toast {
   position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
   background: #111; border: 1px solid var(--c-glass-border); padding: 12px 24px;
@@ -290,7 +246,6 @@ input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0
   z-index: 2000; pointer-events: none;
 }
 .toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
-.toast i { font-size: 1.2rem; }
 .toast.success i { color: #4ade80; }
 .toast.error i { color: #ef4444; }
 
@@ -298,65 +253,64 @@ input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0
 </head>
 <body>
 
-<!-- Background Layer -->
-<div class="bg-fixed" id="global-bg">
+<div class="bg-fixed">
   <div class="bg-blob one"></div>
   <div class="bg-blob two"></div>
 </div>
 
 <div class="container">
   
-  <!-- Interactive Header Showcase -->
   <div class="showcase-area">
-    <!-- Banner Drop Zone -->
     <div class="banner-wrapper" id="drop-banner">
-      <img id="prev-banner-img" class="banner-display" src="" alt="">
+      <img id="prev-banner-img" class="banner-display" src="">
       <video id="prev-banner-video" class="banner-display hidden" autoplay muted loop playsinline></video>
       <input type="file" id="file-banner" hidden accept="image/*,video/mp4,video/webm">
     </div>
 
-    <!-- Avatar Drop Zone -->
     <div class="avatar-wrapper" id="drop-avatar">
-      <img id="prev-avatar" class="avatar-display" src="" alt="">
+      <img id="prev-avatar" class="avatar-display" src="">
       <input type="file" id="file-avatar" hidden accept="image/*">
     </div>
   </div>
 
-  <!-- Edit Form -->
   <div class="form-area">
     
-    <div class="section-title">Profile Details</div>
-    
+    <div class="section-title">Identity</div>
     <div class="input-group">
       <textarea id="in-bio" placeholder="Write something epic about yourself..."></textarea>
     </div>
 
-    <div class="section-title">Visuals</div>
+    <!-- FONT PICKER -->
+    <div class="input-group">
+      <div class="section-title">Username Font</div>
+      <div class="font-grid" id="font-grid">
+        <!-- Injected via JS -->
+      </div>
+      <input type="hidden" id="in-font" value="Cinzel">
+    </div>
 
+    <div class="section-title">Aesthetics</div>
     <div class="input-group color-picker-wrapper">
       <input type="color" id="in-theme-color" value="#7b2cbf">
       <div style="display:flex; flex-direction:column;">
-        <span style="font-size:0.8rem; font-weight:600;">Theme Color</span>
-        <span style="font-size:0.7rem; color:var(--c-text-dim);">Accents & Glows</span>
+        <span style="font-size:0.8rem; font-weight:600;">System Theme</span>
+        <span style="font-size:0.7rem; color:var(--c-text-dim);">Changes UI, Glows, Buttons & Borders</span>
       </div>
     </div>
 
-    <!-- Custom Background Drop -->
     <div class="input-group">
-      <label style="font-size:0.75rem; color:var(--c-text-dim); display:block; margin-bottom:8px;">PROFILE BACKGROUND</label>
+      <label style="font-size:0.7rem; color:var(--c-text-dim); margin-bottom:8px; display:block;">PROFILE BACKGROUND</label>
       <div class="file-drop-box" id="drop-bg">
-        <i class="ph ph-upload-simple"></i>
-        <span id="bg-filename">Drop image/video or click</span>
-        <input type="file" id="file-bg" accept="image/*,video/mp4,video/webm">
+        <i class="ph ph-upload-simple" style="font-size:20px; color:var(--c-text-dim);"></i>
+        <span id="bg-filename" style="font-size:0.8rem; color:var(--c-text-dim);">Drop Image or Video</span>
+        <input type="file" id="file-bg" accept="image/*,video/mp4,video/webm" hidden>
         <div id="mini-bg-preview"></div>
       </div>
     </div>
 
     <div class="input-group">
       <div class="section-title">Roles</div>
-      <div id="roles-grid" class="roles-grid">
-        <!-- Injected via JS -->
-      </div>
+      <div id="roles-grid" class="roles-grid"></div>
     </div>
 
     <button id="save-btn" class="save-btn">
@@ -374,94 +328,73 @@ input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0
 </div>
 
 <script>
-/* ================= CONFIGURATION ================= */
+// --- CONFIGURATION ---
 const CONFIG = {
-  // KEEPING YOUR CREDENTIALS
   supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co", 
   supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
-  
   defaultAvatar: "https://cdn.discordapp.com/embed/avatars/0.png",
   defaultBanner: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3R6cW55eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26BRy67X26yX1eLhm/giphy.gif",
-  
   roles: [
-    { id: 'Founder', label: 'Founder', icon: 'crown.png' },
-    { id: 'Admin',   label: 'Admin',   icon: 'shield-check.png' },
-    { id: 'Mod',     label: 'Mod',     icon: 'gavel.png' },
-    { id: 'VIP',     label: 'VIP',     icon: 'star.png' }
+    { id: 'Founder', label: 'Founder', icon: 'crown' },
+    { id: 'Admin',   label: 'Admin',   icon: 'shield-check' },
+    { id: 'Mod',     label: 'Mod',     icon: 'gavel' },
+    { id: 'VIP',     label: 'VIP',     icon: 'star' }
+  ],
+  fonts: [
+    { id: 'Diecide Remain', label: 'Signature', family: "'Diecide Remain', serif", featured: true },
+    { id: 'Cinzel', label: 'Cinzel', family: "'Cinzel', serif" },
+    { id: 'Orbitron', label: 'Cyber', family: "'Orbitron', sans-serif" },
+    { id: 'UnifrakturMaguntia', label: 'Gothic', family: "'UnifrakturMaguntia', cursive" },
+    { id: 'Playfair Display', label: 'Classy', family: "'Playfair Display', serif" },
+    { id: 'Roboto Mono', label: 'Code', family: "'Roboto Mono', monospace" },
   ]
 };
 
-const MAX_SIZES = {
-  img: 5 * 1024 * 1024, // 5MB
-  vid: 15 * 1024 * 1024 // 15MB
-};
-
-/* ================= INIT ================= */
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 let currentProfileId = null;
-
-// File Staging (We store files here before upload)
-const staging = {
-  avatar: null,
-  banner: null,
-  background: null
-};
+const staging = { avatar: null, banner: null, background: null };
 
 // Elements
 const els = {
   dropBanner: document.getElementById('drop-banner'),
   dropAvatar: document.getElementById('drop-avatar'),
   dropBg: document.getElementById('drop-bg'),
-  
   fileBanner: document.getElementById('file-banner'),
   fileAvatar: document.getElementById('file-avatar'),
   fileBg: document.getElementById('file-bg'),
-
   prevBannerImg: document.getElementById('prev-banner-img'),
   prevBannerVid: document.getElementById('prev-banner-video'),
   prevAvatar: document.getElementById('prev-avatar'),
   miniBgPreview: document.getElementById('mini-bg-preview'),
-  bgFilename: document.getElementById('bg-filename'),
-  
   bio: document.getElementById('in-bio'),
   color: document.getElementById('in-theme-color'),
+  fontGrid: document.getElementById('font-grid'),
+  fontInput: document.getElementById('in-font'),
   roles: document.getElementById('roles-grid'),
-  
   btn: document.getElementById('save-btn'),
   loader: document.querySelector('.loader'),
-  btnText: document.querySelector('.btn-text'),
-  
-  toast: document.getElementById('toast'),
-  toastMsg: document.getElementById('toast-msg'),
-  toastIcon: document.getElementById('toast-icon')
+  btnText: document.querySelector('.btn-text')
 };
 
 /* ================= LOGIC ================= */
 
 (async function init() {
   setLoading(true, "Loading...");
-  
-  // 1. Auth
   const { data: { user } } = await sb.auth.getUser();
-  if (!user) {
-    showToast("Please login first", "error");
-    setLoading(false, "Login Required");
-    return;
-  }
+  if (!user) return showToast("Login required", "error");
 
-  // 2. Fetch Data
   const { data } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
-  
   if (data) {
     currentProfileId = data.id;
     populateUI(data);
   } else {
     currentProfileId = user.id;
-    // Set Defaults
     els.prevAvatar.src = CONFIG.defaultAvatar;
     els.prevBannerImg.src = CONFIG.defaultBanner;
+    renderFonts('Cinzel');
+    renderRoles([]);
   }
-
+  
   setupInteractions();
   setLoading(false);
 })();
@@ -469,123 +402,48 @@ const els = {
 function populateUI(data) {
   els.bio.value = data.bio || "";
   els.color.value = data.theme_color || "#7b2cbf";
-  updateTheme(els.color.value);
+  updateThemeEngine(els.color.value);
 
-  // Avatar
+  // Images
   els.prevAvatar.src = data.avatar || CONFIG.defaultAvatar;
-
-  // Banner
   if (data.banner_url && data.banner_url.match(/\.(mp4|webm)$/)) {
-    showVideoBanner(data.banner_url);
+    els.prevBannerImg.classList.add('hidden');
+    els.prevBannerVid.classList.remove('hidden');
+    els.prevBannerVid.src = data.banner_url;
   } else {
-    showImgBanner(data.banner_url || CONFIG.defaultBanner);
+    els.prevBannerImg.src = data.banner_url || CONFIG.defaultBanner;
   }
 
-  // Background Preview (Mini)
+  // Background Preview
   if (data.bg_value) {
-    updateMiniBgPreview(data.bg_value, data.bg_type);
+    els.miniBgPreview.innerHTML = data.bg_type === 'video' 
+      ? `<video src="${data.bg_value}" autoplay muted loop style="width:100%;height:100%;object-fit:cover"></video>` 
+      : `<img src="${data.bg_value}" style="width:100%;height:100%;object-fit:cover">`;
   }
 
-  // Roles
+  // Fonts & Roles
+  renderFonts(data.username_font || 'Cinzel');
   renderRoles(data.roles || []);
 }
 
-/* ================= INTERACTION HANDLERS ================= */
-
-function setupInteractions() {
-  // Color Picker Real-time
-  els.color.addEventListener('input', (e) => updateTheme(e.target.value));
-
-  // --- DRAG & DROP LOGIC ---
-  setupDropZone(els.dropBanner, els.fileBanner, (file, url) => {
-    staging.banner = file;
-    if (file.type.startsWith('video')) showVideoBanner(url);
-    else showImgBanner(url);
+function renderFonts(activeId) {
+  els.fontGrid.innerHTML = '';
+  els.fontInput.value = activeId;
+  CONFIG.fonts.forEach(f => {
+    const el = document.createElement('div');
+    el.className = `font-option ${f.id === activeId ? 'active' : ''}`;
+    el.innerHTML = `
+      ${f.featured ? '<div class="featured-badge">HOT</div>' : ''}
+      <div class="font-preview" style="font-family:${f.family}">/six</div>
+      <div class="font-name">${f.label}</div>
+    `;
+    el.onclick = () => {
+      document.querySelectorAll('.font-option').forEach(d => d.classList.remove('active'));
+      el.classList.add('active');
+      els.fontInput.value = f.id;
+    };
+    els.fontGrid.appendChild(el);
   });
-
-  setupDropZone(els.dropAvatar, els.fileAvatar, (file, url) => {
-    staging.avatar = file;
-    els.prevAvatar.src = url;
-  });
-
-  setupDropZone(els.dropBg, els.fileBg, (file, url) => {
-    staging.background = file;
-    els.bgFilename.innerText = file.name;
-    const type = file.type.startsWith('video') ? 'video' : 'image';
-    updateMiniBgPreview(url, type);
-  });
-
-  // Save Button
-  els.btn.addEventListener('click', saveProfile);
-}
-
-function setupDropZone(zone, input, callback) {
-  // Click to open
-  zone.addEventListener('click', () => input.click());
-  
-  // File Input Change
-  input.addEventListener('change', () => handleFile(input.files[0], callback));
-
-  // Drag Events
-  zone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    zone.classList.add('drag-active');
-  });
-  
-  zone.addEventListener('dragleave', () => {
-    zone.classList.remove('drag-active');
-  });
-  
-  zone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    zone.classList.remove('drag-active');
-    if (e.dataTransfer.files.length) {
-      handleFile(e.dataTransfer.files[0], callback);
-    }
-  });
-}
-
-function handleFile(file, callback) {
-  if (!file) return;
-  
-  // Validation
-  const limit = file.type.startsWith('video') ? MAX_SIZES.vid : MAX_SIZES.img;
-  if (file.size > limit) {
-    showToast(`File too large (Max ${limit/1024/1024}MB)`, "error");
-    return;
-  }
-
-  // Preview immediately (Lag-free feeling)
-  const url = URL.createObjectURL(file);
-  callback(file, url);
-}
-
-/* ================= PREVIEW HELPERS ================= */
-
-function showImgBanner(url) {
-  els.prevBannerVid.classList.add('hidden');
-  els.prevBannerImg.classList.remove('hidden');
-  els.prevBannerImg.src = url;
-}
-
-function showVideoBanner(url) {
-  els.prevBannerImg.classList.add('hidden');
-  els.prevBannerVid.classList.remove('hidden');
-  els.prevBannerVid.src = url;
-}
-
-function updateMiniBgPreview(url, type) {
-  els.miniBgPreview.innerHTML = '';
-  if (type === 'video') {
-    els.miniBgPreview.innerHTML = `<video src="${url}" autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;"></video>`;
-  } else {
-    els.miniBgPreview.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:cover;">`;
-  }
-}
-
-function updateTheme(hex) {
-  document.documentElement.style.setProperty('--c-accent', hex);
-  document.documentElement.style.setProperty('--c-accent-glow', hex + '66');
 }
 
 function renderRoles(activeRoles) {
@@ -594,16 +452,85 @@ function renderRoles(activeRoles) {
     const isActive = activeRoles.includes(role.id);
     const div = document.createElement('div');
     div.className = `role-badge ${isActive ? 'active' : ''}`;
-    div.innerHTML = `
-      <i class="ph-fill ph-${role.icon.includes('crown') ? 'crown' : 'shield-check'}"></i>
-      <span>${role.label}</span>
-    `;
-    div.onclick = () => {
-      div.classList.toggle('active');
-    };
+    div.innerHTML = `<i class="ph-fill ph-${role.icon}" style="font-size:1.2rem"></i><span>${role.label}</span>`;
+    div.onclick = () => div.classList.toggle('active');
     div.dataset.roleId = role.id;
     els.roles.appendChild(div);
   });
+}
+
+/* ================= INTERACTION ================= */
+
+function setupInteractions() {
+  els.color.addEventListener('input', (e) => updateThemeEngine(e.target.value));
+
+  // Drag & Drop Helpers
+  const setupDD = (zone, input, cb) => {
+    zone.onclick = () => input.click();
+    input.onchange = () => handleFile(input.files[0], cb);
+    zone.ondragover = (e) => { e.preventDefault(); zone.classList.add('drag-active'); };
+    zone.ondragleave = () => zone.classList.remove('drag-active');
+    zone.ondrop = (e) => {
+      e.preventDefault(); zone.classList.remove('drag-active');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0], cb);
+    };
+  };
+
+  setupDD(els.dropBanner, els.fileBanner, (f, url) => {
+    staging.banner = f;
+    if (f.type.startsWith('video')) {
+       els.prevBannerImg.classList.add('hidden');
+       els.prevBannerVid.classList.remove('hidden');
+       els.prevBannerVid.src = url;
+    } else {
+       els.prevBannerVid.classList.add('hidden');
+       els.prevBannerImg.classList.remove('hidden');
+       els.prevBannerImg.src = url;
+    }
+  });
+
+  setupDD(els.dropAvatar, els.fileAvatar, (f, url) => {
+    staging.avatar = f; els.prevAvatar.src = url;
+  });
+
+  setupDD(els.dropBg, els.fileBg, (f, url) => {
+    staging.background = f;
+    document.getElementById('bg-filename').innerText = f.name;
+    els.miniBgPreview.innerHTML = f.type.startsWith('video') 
+      ? `<video src="${url}" autoplay muted loop style="width:100%;height:100%;object-fit:cover"></video>` 
+      : `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+  });
+
+  els.btn.addEventListener('click', saveProfile);
+}
+
+function handleFile(file, cb) {
+  if (!file) return;
+  if (file.size > 15 * 1024 * 1024) return showToast("File too large (Max 15MB)", "error");
+  cb(file, URL.createObjectURL(file));
+}
+
+// Advanced Theme Engine
+function updateThemeEngine(hex) {
+  document.documentElement.style.setProperty('--c-accent', hex);
+  document.documentElement.style.setProperty('--c-accent-glow', hex + '66');
+  
+  // Calculate Dark Variant for Button Background
+  const darkHex = adjustBrightness(hex, -60); 
+  document.documentElement.style.setProperty('--c-accent-dark', darkHex);
+}
+
+function adjustBrightness(col, amt) {
+    var usePound = false;
+    if (col[0] == "#") { col = col.slice(1); usePound = true; }
+    var num = parseInt(col,16);
+    var r = (num >> 16) + amt;
+    var b = ((num >> 8) & 0x00FF) + amt;
+    var g = (num & 0x0000FF) + amt;
+    if (r > 255) r = 255; else if  (r < 0) r = 0;
+    if (b > 255) b = 255; else if  (b < 0) b = 0;
+    if (g > 255) g = 255; else if (g < 0) g = 0;
+    return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
 }
 
 /* ================= SAVING ================= */
@@ -617,16 +544,12 @@ async function saveProfile() {
       updated_at: new Date(),
       bio: els.bio.value,
       theme_color: els.color.value,
+      username_font: els.fontInput.value,
       roles: Array.from(document.querySelectorAll('.role-badge.active')).map(el => el.dataset.roleId)
     };
 
-    // Upload Files if Changed
-    if (staging.avatar) {
-      updates.avatar = await upload(staging.avatar, 'avatars');
-    }
-    if (staging.banner) {
-      updates.banner_url = await upload(staging.banner, 'banners');
-    }
+    if (staging.avatar) updates.avatar = await upload(staging.avatar, 'avatars');
+    if (staging.banner) updates.banner_url = await upload(staging.banner, 'banners');
     if (staging.background) {
       updates.bg_value = await upload(staging.background, 'backgrounds');
       updates.bg_type = staging.background.type.startsWith('video') ? 'video' : 'image';
@@ -635,45 +558,37 @@ async function saveProfile() {
     const { error } = await sb.from("profiles").upsert({ id: currentProfileId, ...updates });
     if (error) throw error;
 
-    showToast("Profile Updated Successfully!", "success");
-    
-    // Clear Staging
+    showToast("Profile Updated!", "success");
     staging.avatar = null; staging.banner = null; staging.background = null;
-
   } catch (err) {
     console.error(err);
-    showToast("Update Failed: " + err.message, "error");
+    showToast(err.message, "error");
   }
-
   setLoading(false);
 }
 
 async function upload(file, bucket) {
   const ext = file.name.split('.').pop();
   const path = `${currentProfileId}/${Date.now()}.${ext}`;
-  
   const { error } = await sb.storage.from(bucket).upload(path, file);
   if (error) throw error;
-  
   const { data } = sb.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
 }
 
-/* ================= UI UTILS ================= */
-
-function setLoading(isLoading, text = "Save Changes") {
+function setLoading(isLoading, text) {
   els.btn.disabled = isLoading;
   els.btnText.textContent = text;
   els.loader.style.display = isLoading ? "block" : "none";
 }
 
 function showToast(msg, type) {
-  els.toastMsg.innerText = msg;
-  els.toast.className = `toast active ${type}`;
-  els.toastIcon.className = type === 'success' ? 'ph-bold ph-check-circle' : 'ph-bold ph-warning-circle';
-  setTimeout(() => els.toast.classList.remove('active'), 3500);
+  document.getElementById('toast-msg').innerText = msg;
+  const t = document.getElementById('toast');
+  t.className = `toast active ${type}`;
+  document.getElementById('toast-icon').className = type === 'success' ? 'ph-bold ph-check-circle' : 'ph-bold ph-warning-circle';
+  setTimeout(() => t.classList.remove('active'), 3500);
 }
-
 </script>
 </body>
 </html>
