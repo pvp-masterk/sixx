@@ -618,6 +618,20 @@ els.bgFile.addEventListener('change', () => {
     `;
   }
 });
+if (els.avatarFile.files[0]) {
+  const check = validateFile(els.avatarFile.files[0], FILE_RULES.avatar);
+  if (!check.ok) throw new Error(check.msg);
+}
+
+if (els.bannerFile.files[0]) {
+  const check = validateFile(els.bannerFile.files[0], FILE_RULES.banner);
+  if (!check.ok) throw new Error(check.msg);
+}
+
+if (els.bgFile.files[0]) {
+  const check = validateFile(els.bgFile.files[0], FILE_RULES.background);
+  if (!check.ok) throw new Error(check.msg);
+}
 
 
 /* ================= HELPERS ================= */
