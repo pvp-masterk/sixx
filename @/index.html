@@ -306,6 +306,21 @@ body::after {
       const userFont = CONFIG.fonts[user.username_font] || CONFIG.fonts['Cinzel'];
       document.documentElement.style.setProperty('--font-display', userFont);
 
+        if (user.username_font === 'custom' && user.custom_font_url) {
+  const font = new FontFace(
+    'UserCustomFont',
+    `url(${user.custom_font_url})`
+  );
+
+  font.load().then(() => {
+    document.fonts.add(font);
+    document.documentElement.style.setProperty(
+      '--font-display',
+      "'UserCustomFont', serif"
+    );
+  });
+}
+
       // 3. Background Setup
       const bgEl = document.getElementById('profile-bg');
       if(user.bg_type === 'image' && user.bg_value) bgEl.innerHTML = `<img src="${user.bg_value}" class="bg-media">`;
