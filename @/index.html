@@ -45,10 +45,14 @@ body {
   background: var(--c-bg);
   color: var(--c-text-main);
   min-height: 100vh;
+
+  display: flex;
+  justify-content: center;   /* horizontal */
+  align-items: center;       /* vertical */
+
   overflow-x: hidden;
   line-height: 1.6;
 }
-
 /* Background Texture */
 body::after {
   content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 900;
@@ -58,12 +62,19 @@ body::after {
 
 /* ======================= LAYOUT ======================= */
 .app-container {
-  position: relative; z-index: 10;
-  max-width: 650px; margin: 0 auto;
-  padding: 80px 20px 40px;
-  opacity: 0; transform: translateY(20px);
+  position: relative;
+  z-index: 10;
+
+  max-width: 650px;
+  width: 100%;
+
+  padding: 20px;
+  
+  opacity: 0;
+  transform: translateY(20px);
   animation: fadeInUp 0.8s var(--ease-out) forwards;
 }
+
 @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
 .header-brand {
