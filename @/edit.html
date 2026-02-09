@@ -667,7 +667,13 @@ async function saveProfile() {
 }
 
     const { error } = await sb.from("profiles").upsert({ id: currentProfileId, ...updates });
-    if (error) throw error;
+   if (error) {
+  console.error("Supabase upload error:", error);
+  throw new Error(
+    error.message || "Upload failed (network or size limit)"
+  );
+}
+
 
     showToast("Profile Updated!", "success");
     staging.avatar = null; staging.banner = null; staging.background = null;
@@ -681,11 +687,25 @@ async function saveProfile() {
 async function upload(file, bucket) {
   const ext = file.name.split('.').pop();
   const path = `${currentProfileId}/${Date.now()}.${ext}`;
-  const { error } = await sb.storage.from(bucket).upload(path, file);
-  if (error) throw error;
+
+  const { error } = await sb
+    .storage
+    .from(bucket)
+    .upload(path, file, {
+      upsert: true,
+      contentType: file.type,   // 🔥 REQUIRED for videos
+      cacheControl: '3600'
+    });
+
+  if (error) {
+    console.error('UPLOAD ERROR:', error);
+    throw error;
+  }
+
   const { data } = sb.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
 }
+
 
 function setLoading(isLoading, text) {
   els.btn.disabled = isLoading;
