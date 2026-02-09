@@ -5,7 +5,7 @@
 <title>/six - Edit Profile</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-<!-- 1. EXTERNAL LIBRARIES -->
+<!-- EXTERNAL LIBRARIES -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
@@ -17,23 +17,24 @@
   --c-bg-alt: #0a0510;
   --c-accent: #7b2cbf;
   --c-accent-hover: #9d4edd;
-  --c-accent-glow: rgba(123, 44, 191, 0.5);
+  --c-accent-glow: rgba(123, 44, 191, 0.4);
   
   --c-text-main: #e8e6f3;
   --c-text-dim: #8f8ba0;
   
-  --c-glass: rgba(10, 5, 20, 0.75); /* Slightly darker for better contrast */
+  --c-glass: rgba(15, 10, 25, 0.6);
   --c-glass-border: rgba(255, 255, 255, 0.08);
   --c-glass-highlight: rgba(255, 255, 255, 0.03);
   
   --radius-lg: 24px;
-  --radius-md: 12px;
+  --radius-md: 14px;
   --radius-sm: 8px;
   
   --font-main: 'Inter', sans-serif;
   --font-brand: 'Cinzel', serif;
   
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -50,657 +51,628 @@ body {
   overflow-x: hidden;
 }
 
-/* Optimized Scanline Texture */
+/* Texture Overlay (Optimized) */
 body::after {
-  content: "";
-  position: fixed; inset: 0; pointer-events: none; z-index: 999;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-  background-size: 100% 3px, 3px 100%;
-  opacity: 0.6;
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 999;
+  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
+  opacity: 0.03;
 }
 
-/* ======================= 2. BACKGROUND ANIMATION ======================= */
+/* ======================= 2. BACKGROUND ANIMATION (GPU ACCELERATED) ======================= */
 .bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 
 .bg-blob {
   position: absolute; border-radius: 50%; 
-  filter: blur(80px); opacity: 0.4;
-  will-change: transform; /* Performance Boost */
-  animation: float 20s infinite alternate ease-in-out;
+  filter: blur(90px); opacity: 0.5;
+  will-change: transform; 
+  transform: translate3d(0,0,0); /* Force Hardware Acceleration */
 }
-.bg-blob.one { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #4a0072 0%, transparent 70%); }
-.bg-blob.two { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, #240046 0%, transparent 70%); animation-delay: -5s; }
 
-@keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(20px, -20px) scale(1.1); } }
+.bg-blob.one { 
+  top: -10%; left: -10%; width: 50vw; height: 50vw; 
+  background: radial-gradient(circle, #4a0072 0%, transparent 70%); 
+  animation: float 25s infinite alternate ease-in-out;
+}
+.bg-blob.two { 
+  bottom: -10%; right: -10%; width: 60vw; height: 60vw; 
+  background: radial-gradient(circle, #240046 0%, transparent 70%); 
+  animation: float 30s infinite alternate-reverse ease-in-out;
+}
+
+@keyframes float { 
+  0% { transform: translate3d(0, 0, 0); } 
+  100% { transform: translate3d(50px, 30px, 0); } 
+}
 
 /* ======================= 3. MAIN CONTAINER ======================= */
 .container {
   position: relative; z-index: 10;
   width: 100%; max-width: 520px;
   background: var(--c-glass);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
   border: 1px solid var(--c-glass-border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-  overflow: hidden;
-  transform: translateZ(0); /* GPU Promotion */
-  opacity: 0; animation: fadeIn 0.8s var(--ease-spring) forwards;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  animation: slideUp 0.6s var(--ease-smooth) forwards;
 }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-/* --- HEADER --- */
-.header-area {
-  padding: 25px 30px;
-  display: flex; justify-content: space-between; align-items: center;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-}
-
-h2 {
-  font-family: var(--font-brand); font-size: 1.5rem; font-weight: 700;
-  background: linear-gradient(135deg, #e0aaff 0%, #7b2cbf 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  letter-spacing: 1px;
-}
-
-/* --- PREVIEW SECTION --- */
-.preview-area {
-  position: relative; width: 100%; height: 180px;
+/* --- SHOWCASE AREA (Interactive) --- */
+.showcase-area {
+  position: relative; width: 100%; height: 200px;
   background: #05020a;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow: hidden;
+  group-hover: cursor;
 }
+
+/* Interactive Banner Drop Zone */
+.banner-wrapper {
+  width: 100%; height: 100%;
+  position: relative;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.banner-wrapper:hover::after {
+  content: "Change Banner";
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.5);
+  font-weight: 600; letter-spacing: 1px;
+  opacity: 1; transition: 0.3s;
+}
+.banner-wrapper::after { opacity: 0; color: white; font-size: 0.9rem; }
 
 .banner-display {
   width: 100%; height: 100%; object-fit: cover;
-  opacity: 0.8; transition: opacity 0.3s;
+  transition: transform 0.5s;
 }
 
+/* Interactive Avatar Drop Zone */
 .avatar-wrapper {
-  position: absolute; bottom: -40px; left: 30px;
-  width: 90px; height: 90px;
+  position: absolute; bottom: -45px; left: 30px;
+  width: 100px; height: 100px;
   padding: 4px;
   background: var(--c-bg-alt);
   border: 1px solid var(--c-glass-border);
-  border-radius: 20px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-  z-index: 2;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  z-index: 20;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.avatar-wrapper:hover { transform: scale(1.05) translateY(-2px); border-color: var(--c-accent); }
+
+.avatar-wrapper:hover::after {
+  content: "\e99c"; /* Pencil Icon via CSS or Text */
+  font-family: "Phosphor";
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.6); color: white; font-size: 1.5rem;
 }
 
 .avatar-display {
   width: 100%; height: 100%;
-  border-radius: 14px; object-fit: cover;
+  border-radius: 18px; object-fit: cover;
   background-color: #1a1a1a;
 }
 
-/* --- FORM SECTION --- */
-.form-area { padding: 50px 30px 30px 30px; }
-
-.input-group { margin-bottom: 20px; }
-.input-group label {
-  display: block; margin-bottom: 8px;
-  font-size: 0.75rem; font-weight: 600;
-  color: var(--c-text-dim); text-transform: uppercase; letter-spacing: 1.5px;
+/* Drop Zone Active States */
+.drag-active {
+  border: 2px dashed var(--c-accent) !important;
+  filter: brightness(1.2);
+}
+.banner-wrapper.drag-active::after, .avatar-wrapper.drag-active::after {
+  content: "Drop Here"; opacity: 1; background: rgba(123, 44, 191, 0.4);
 }
 
-/* Inputs */
-.input-wrapper { position: relative; }
-input[type="text"], textarea {
-  width: 100%; padding: 14px 16px;
+/* --- FORM SECTION --- */
+.form-area { padding: 60px 30px 30px 30px; }
+
+.section-title {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--c-text-dim); margin-bottom: 12px; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title::after { content: ""; flex: 1; height: 1px; background: var(--c-glass-border); }
+
+/* Custom Inputs */
+.input-group { margin-bottom: 24px; }
+
+input[type="text"], textarea, select {
+  width: 100%; padding: 16px;
   border-radius: var(--radius-md);
   border: 1px solid var(--c-glass-border);
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.3);
   color: var(--c-text-main);
-  font-family: inherit; font-size: 0.9rem;
-  transition: all 0.2s ease;
+  font-family: inherit; font-size: 0.95rem;
+  transition: all 0.2s;
 }
 
-input:focus, textarea:focus {
+input:focus, textarea:focus, select:focus {
   border-color: var(--c-accent);
-  background: rgba(123, 44, 191, 0.05);
-  box-shadow: 0 0 0 4px rgba(123, 44, 191, 0.1);
+  background: rgba(10, 5, 16, 0.8);
+  box-shadow: 0 0 0 2px var(--c-accent-glow);
 }
 
-textarea { min-height: 90px; resize: none; line-height: 1.5; }
+textarea { min-height: 100px; resize: none; line-height: 1.6; }
 
-/* Roles Grid */
-.roles-container {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 10px; margin-top: 5px;
+/* Custom File Drop Box (For Background) */
+.file-drop-box {
+  position: relative;
+  width: 100%; height: 100px;
+  border: 2px dashed var(--c-glass-border);
+  border-radius: var(--radius-md);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.01);
+  cursor: pointer; transition: 0.3s;
+  overflow: hidden;
 }
 
-.role-card {
+.file-drop-box:hover { border-color: var(--c-text-dim); background: rgba(255,255,255,0.03); }
+.file-drop-box.drag-active { border-color: var(--c-accent); background: rgba(123, 44, 191, 0.1); }
+
+.file-drop-box i { font-size: 24px; color: var(--c-text-dim); margin-bottom: 6px; }
+.file-drop-box span { font-size: 0.8rem; color: var(--c-text-dim); }
+.file-drop-box input { display: none; }
+
+/* Background Preview in Box */
+.mini-preview {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0.6; pointer-events: none;
+}
+
+/* Color Picker */
+.color-picker-wrapper {
+  display: flex; align-items: center; gap: 15px;
+  padding: 10px; background: rgba(255,255,255,0.02);
+  border-radius: var(--radius-md); border: 1px solid var(--c-glass-border);
+}
+input[type="color"] {
+  -webkit-appearance: none; border: none; width: 40px; height: 40px;
+  border-radius: 50%; cursor: pointer; background: none;
+}
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; }
+
+/* Roles */
+.roles-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 12px;
+}
+.role-badge {
   background: var(--c-glass-highlight);
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  padding: 10px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
-  cursor: pointer; transition: all 0.2s ease;
+  padding: 10px; border-radius: var(--radius-md);
+  text-align: center; font-size: 0.75rem; color: var(--c-text-dim);
+  transition: 0.2s; cursor: pointer; user-select: none;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
 }
-
-.role-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
-
-.role-card.active {
-  background: rgba(123, 44, 191, 0.2);
-  border-color: var(--c-accent);
-  box-shadow: 0 4px 12px rgba(123, 44, 191, 0.15);
+.role-badge.active {
+  background: rgba(123, 44, 191, 0.15); border-color: var(--c-accent); color: white;
+  box-shadow: 0 4px 15px rgba(123, 44, 191, 0.1);
 }
-
-.role-icon-img {
-  width: 24px; height: 24px; object-fit: contain;
-  opacity: 0.6; filter: grayscale(100%); transition: 0.3s;
-}
-
-.role-card.active .role-icon-img { opacity: 1; filter: grayscale(0%); transform: scale(1.1); }
-.role-name { font-size: 0.75rem; color: var(--c-text-dim); font-weight: 500; }
-.role-card.active .role-name { color: #fff; }
+.role-badge img { width: 20px; height: 20px; filter: grayscale(1); opacity: 0.7; }
+.role-badge.active img { filter: grayscale(0); opacity: 1; }
 
 /* Button */
-.action-btn {
-  width: 100%; margin-top: 25px; padding: 15px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
-  border: 1px solid var(--c-glass-border);
-  color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem;
-  border-radius: var(--radius-md);
-  cursor: pointer; transition: all 0.3s var(--ease-spring);
-  position: relative; overflow: hidden;
-  display: flex; justify-content: center; align-items: center; gap: 10px;
+.save-btn {
+  margin-top: 30px; width: 100%; padding: 18px;
+  background: linear-gradient(135deg, var(--c-accent) 0%, #5a189a 100%);
+  border: none; border-radius: var(--radius-md);
+  color: white; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;
+  cursor: pointer; position: relative; overflow: hidden;
+  box-shadow: 0 10px 30px var(--c-accent-glow);
+  transition: all 0.3s var(--ease-spring);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-
-.action-btn:hover { 
-  background: var(--c-accent); border-color: var(--c-accent);
-  box-shadow: 0 0 25px var(--c-accent-glow);
-  transform: translateY(-2px);
-}
-.action-btn:active { transform: scale(0.98); }
-.action-btn:disabled { opacity: 0.6; cursor: wait; pointer-events: none; }
+.save-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 40px var(--c-accent-glow); }
+.save-btn:active { transform: scale(0.98); }
+.save-btn:disabled { opacity: 0.7; pointer-events: none; filter: grayscale(0.5); }
 
 /* Loading Spinner */
-.spinner {
-  width: 18px; height: 18px;
-  border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
-  border-radius: 50%; animation: spin 0.8s linear infinite;
-  display: none;
-}
+.loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Toast */
-.toast {
-  position: fixed; bottom: 30px; left: 50%;
-  transform: translate(-50%, 50px); opacity: 0;
-  background: #0f0518; border: 1px solid var(--c-glass-border);
-  padding: 12px 24px; border-radius: 50px;
-  display: flex; align-items: center; gap: 10px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  transition: all 0.4s var(--ease-spring);
-  z-index: 1000; pointer-events: none;
-}
-.toast.show { transform: translate(-50%, 0); opacity: 1; }
-.toast span { font-size: 0.9rem; font-weight: 500; }
-.toast.success { border-color: #4ade80; color: #4ade80; }
-.toast.error { border-color: #ef4444; color: #ef4444; }
-
-/* Helper classes */
+/* Helper */
 .hidden { display: none !important; }
+
+/* Toast Notification */
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+  background: #111; border: 1px solid var(--c-glass-border); padding: 12px 24px;
+  border-radius: 50px; display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8); opacity: 0; transition: all 0.5s var(--ease-spring);
+  z-index: 2000; pointer-events: none;
+}
+.toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast i { font-size: 1.2rem; }
+.toast.success i { color: #4ade80; }
+.toast.error i { color: #ef4444; }
 
 </style>
 </head>
 <body>
 
-<div class="bg-fixed" id="edit-bg-preview">
+<!-- Background Layer -->
+<div class="bg-fixed" id="global-bg">
   <div class="bg-blob one"></div>
   <div class="bg-blob two"></div>
 </div>
 
 <div class="container">
   
+  <!-- Interactive Header Showcase -->
+  <div class="showcase-area">
+    <!-- Banner Drop Zone -->
+    <div class="banner-wrapper" id="drop-banner">
+      <img id="prev-banner-img" class="banner-display" src="" alt="">
+      <video id="prev-banner-video" class="banner-display hidden" autoplay muted loop playsinline></video>
+      <input type="file" id="file-banner" hidden accept="image/*,video/mp4,video/webm">
+    </div>
 
-  <!-- Preview -->
-  <div class="preview-area">
-    <img id="prev-banner" class="banner-display hidden" src="" alt="">
-<video id="prev-banner-video" class="banner-display hidden" autoplay muted loop playsinline></video>
-    <div class="avatar-wrapper">
+    <!-- Avatar Drop Zone -->
+    <div class="avatar-wrapper" id="drop-avatar">
       <img id="prev-avatar" class="avatar-display" src="" alt="">
+      <input type="file" id="file-avatar" hidden accept="image/*">
     </div>
   </div>
 
-  <!-- Form -->
+  <!-- Edit Form -->
   <div class="form-area">
-    <form id="profileForm">
-      
-      <div class="input-group">
-  <label>Avatar</label>
-  <input type="file" id="in-avatar-file" accept="image/*">
-</div>
+    
+    <div class="section-title">Profile Details</div>
+    
+    <div class="input-group">
+      <textarea id="in-bio" placeholder="Write something epic about yourself..."></textarea>
+    </div>
 
-      <div class="input-group">
-  <label>Banner (Image or Video)</label>
-  <input type="file" id="in-banner-file" accept="image/*,video/mp4,video/webm">
-</div>
+    <div class="section-title">Visuals</div>
 
-      <div class="input-group">
-        <label>About You</label>
-        <textarea id="in-bio" placeholder="Tell us about yourself..."></textarea>
+    <div class="input-group color-picker-wrapper">
+      <input type="color" id="in-theme-color" value="#7b2cbf">
+      <div style="display:flex; flex-direction:column;">
+        <span style="font-size:0.8rem; font-weight:600;">Theme Color</span>
+        <span style="font-size:0.7rem; color:var(--c-text-dim);">Accents & Glows</span>
       </div>
-      
-<div class="input-group">
-  <label>Theme Color</label>
-  <input type="color" id="in-theme-color" value="#7b2cbf">
-</div>
-<div class="input-group">
-  <label>Background Type</label>
-  <select id="in-bg-type">
-    <option value="gradient">Gradient (Default)</option>
-    <option value="color">Solid Color</option>
-    <option value="image">Image URL</option>
-    <option value="video">Video URL</option>
-  </select>
-</div>
+    </div>
 
-<div class="input-group">
-  <label>Background Upload (Image or Video)</label>
-  <input type="file" id="in-bg-file" accept="image/*,video/mp4,video/webm">
-</div>
-
-
-      <div class="input-group">
-        <label>Roles</label>
-        <div id="roles-grid" class="roles-container">
-          <!-- JS Injected -->
-        </div>
+    <!-- Custom Background Drop -->
+    <div class="input-group">
+      <label style="font-size:0.75rem; color:var(--c-text-dim); display:block; margin-bottom:8px;">PROFILE BACKGROUND</label>
+      <div class="file-drop-box" id="drop-bg">
+        <i class="ph ph-upload-simple"></i>
+        <span id="bg-filename">Drop image/video or click</span>
+        <input type="file" id="file-bg" accept="image/*,video/mp4,video/webm">
+        <div id="mini-bg-preview"></div>
       </div>
+    </div>
 
-      <button type="submit" id="save-btn" class="action-btn">
-        <div class="spinner"></div>
-        <span class="btn-text">Save Changes</span>
-      </button>
+    <div class="input-group">
+      <div class="section-title">Roles</div>
+      <div id="roles-grid" class="roles-grid">
+        <!-- Injected via JS -->
+      </div>
+    </div>
 
-    </form>
+    <button id="save-btn" class="save-btn">
+      <div class="loader"></div>
+      <span class="btn-text">Save Changes</span>
+    </button>
   </div>
+
 </div>
 
 <!-- Toast -->
 <div id="toast" class="toast">
   <i class="ph-bold" id="toast-icon"></i>
-  <span id="toast-msg"></span>
+  <span id="toast-msg">Notification</span>
 </div>
 
 <script>
 /* ================= CONFIGURATION ================= */
-// REPLACE with your actual Project URL & Public Key
 const CONFIG = {
+  // KEEPING YOUR CREDENTIALS
   supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co", 
   supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
   
   defaultAvatar: "https://cdn.discordapp.com/embed/avatars/0.png",
-  defaultBanner: "https://i.pinimg.com/originals/2b/2b/28/2b2b287959954e38e6840d0497557457.gif", // Dark aesthetic fallback
-
-  // Roles available for selection
+  defaultBanner: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3R6cW55eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26BRy67X26yX1eLhm/giphy.gif",
+  
   roles: [
-    { id: 'Founder',   label: 'Founder',   icon: 'founder.png' },
-    { id: 'Admin',     label: 'Admin',     icon: 'admin.png' },
-    { id: 'Moderator', label: 'Mod',       icon: 'moderator.png' },
-    { id: 'Verified',  label: 'Verified',  icon: 'verified.png' }
+    { id: 'Founder', label: 'Founder', icon: 'crown.png' },
+    { id: 'Admin',   label: 'Admin',   icon: 'shield-check.png' },
+    { id: 'Mod',     label: 'Mod',     icon: 'gavel.png' },
+    { id: 'VIP',     label: 'VIP',     icon: 'star.png' }
   ]
 };
-const FILE_RULES = {
-  avatar: {
-    maxSize: 2 * 1024 * 1024, // 2MB
-    types: ['image/jpeg', 'image/png', 'image/webp']
-  },
-  banner: {
-    maxSize: 10 * 1024 * 1024, // 10MB
-    types: [
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-      'video/mp4',
-      'video/webm'
-    ]
-  },
-  background: {
-    maxSize: 15 * 1024 * 1024, // 15MB
-    types: [
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-      'video/mp4',
-      'video/webm'
-    ]
-  }
+
+const MAX_SIZES = {
+  img: 5 * 1024 * 1024, // 5MB
+  vid: 15 * 1024 * 1024 // 15MB
 };
 
-/* ================= APP LOGIC ================= */
+/* ================= INIT ================= */
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 let currentProfileId = null;
 
-// UI Elements
+// File Staging (We store files here before upload)
+const staging = {
+  avatar: null,
+  banner: null,
+  background: null
+};
+
+// Elements
 const els = {
-  prevBannerVideo: document.getElementById('prev-banner-video'),
-  bgPreview: document.getElementById('edit-bg-preview'),
-  avatarFile: document.getElementById('in-avatar-file'),
-  bannerFile: document.getElementById('in-banner-file'),
-  bgFile: document.getElementById('in-bg-file'),
-  themeColorIn: document.getElementById('in-theme-color'),
-  bgTypeIn: document.getElementById('in-bg-type'),
-  bgValueIn: document.getElementById('in-bg-value'),
-  form: document.getElementById('profileForm'),
-  bioIn: document.getElementById('in-bio'),
+  dropBanner: document.getElementById('drop-banner'),
+  dropAvatar: document.getElementById('drop-avatar'),
+  dropBg: document.getElementById('drop-bg'),
+  
+  fileBanner: document.getElementById('file-banner'),
+  fileAvatar: document.getElementById('file-avatar'),
+  fileBg: document.getElementById('file-bg'),
+
+  prevBannerImg: document.getElementById('prev-banner-img'),
+  prevBannerVid: document.getElementById('prev-banner-video'),
   prevAvatar: document.getElementById('prev-avatar'),
-  prevBanner: document.getElementById('prev-banner'),
-  rolesGrid: document.getElementById('roles-grid'),
+  miniBgPreview: document.getElementById('mini-bg-preview'),
+  bgFilename: document.getElementById('bg-filename'),
+  
+  bio: document.getElementById('in-bio'),
+  color: document.getElementById('in-theme-color'),
+  roles: document.getElementById('roles-grid'),
+  
   btn: document.getElementById('save-btn'),
-  spinner: document.querySelector('.spinner'),
+  loader: document.querySelector('.loader'),
   btnText: document.querySelector('.btn-text'),
+  
   toast: document.getElementById('toast'),
   toastMsg: document.getElementById('toast-msg'),
   toastIcon: document.getElementById('toast-icon')
 };
 
-// 1. Initialize
-(async function init() {
-  renderRoles([]);
-  
+/* ================= LOGIC ================= */
 
-  setLoading(true, "Authenticating...");
+(async function init() {
+  setLoading(true, "Loading...");
   
-  // Auth Check
-  const { data: { user }, error: authErr } = await sb.auth.getUser();
-  if (authErr || !user) {
-    showToast("Not logged in", "error");
+  // 1. Auth
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) {
+    showToast("Please login first", "error");
     setLoading(false, "Login Required");
-    els.btn.disabled = true;
     return;
   }
 
-  // Fetch Profile
-  setLoading(true, "Loading Profile...");
-  const { data, error } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
-
+  // 2. Fetch Data
+  const { data } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
+  
   if (data) {
-  currentProfileId = data.id;
-  els.bioIn.value = data.bio || "";
-  els.themeColorIn.value = data.theme_color || "#7b2cbf";
-  if (els.bgTypeIn) {
-  els.bgTypeIn.value = data.bg_type || "gradient";
-}
-
-if (els.bgValueIn) {
-  els.bgValueIn.value = data.bg_value || "";
-}
-
-  document.documentElement.style.setProperty(
-    '--c-accent',
-    els.themeColorIn.value
-  );
-// Existing avatar preview
-if (data.avatar) {
-  els.prevAvatar.src = data.avatar;
-}
-
-// Existing banner preview (image or video)
-if (data.banner_url) {
-  if (data.banner_url.match(/\.(mp4|webm)$/)) {
-    els.prevBanner.classList.add('hidden');
-    els.prevBannerVideo.classList.remove('hidden');
-    els.prevBannerVideo.src = data.banner_url;
+    currentProfileId = data.id;
+    populateUI(data);
   } else {
-    els.prevBannerVideo.classList.add('hidden');
-    els.prevBanner.classList.remove('hidden');
-    els.prevBanner.src = data.banner_url;
-  }
-}
-// Existing background preview
-if (data.bg_value) {
-  els.bgPreview.innerHTML = '';
-
-  if (data.bg_type === 'video') {
-    els.bgPreview.innerHTML = `
-      <video class="bg-media" autoplay muted loop playsinline>
-        <source src="${data.bg_value}">
-      </video>
-    `;
-  } else if (data.bg_type === 'image') {
-    els.bgPreview.innerHTML = `
-      <img src="${data.bg_value}" class="bg-media">
-    `;
-  }
-}
-
-  renderRoles(data.roles || []);
-  
-} else {
-    // New user fallback
     currentProfileId = user.id;
+    // Set Defaults
+    els.prevAvatar.src = CONFIG.defaultAvatar;
+    els.prevBannerImg.src = CONFIG.defaultBanner;
   }
-  
+
+  setupInteractions();
   setLoading(false);
 })();
 
+function populateUI(data) {
+  els.bio.value = data.bio || "";
+  els.color.value = data.theme_color || "#7b2cbf";
+  updateTheme(els.color.value);
 
-els.form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+  // Avatar
+  els.prevAvatar.src = data.avatar || CONFIG.defaultAvatar;
+
+  // Banner
+  if (data.banner_url && data.banner_url.match(/\.(mp4|webm)$/)) {
+    showVideoBanner(data.banner_url);
+  } else {
+    showImgBanner(data.banner_url || CONFIG.defaultBanner);
+  }
+
+  // Background Preview (Mini)
+  if (data.bg_value) {
+    updateMiniBgPreview(data.bg_value, data.bg_type);
+  }
+
+  // Roles
+  renderRoles(data.roles || []);
+}
+
+/* ================= INTERACTION HANDLERS ================= */
+
+function setupInteractions() {
+  // Color Picker Real-time
+  els.color.addEventListener('input', (e) => updateTheme(e.target.value));
+
+  // --- DRAG & DROP LOGIC ---
+  setupDropZone(els.dropBanner, els.fileBanner, (file, url) => {
+    staging.banner = file;
+    if (file.type.startsWith('video')) showVideoBanner(url);
+    else showImgBanner(url);
+  });
+
+  setupDropZone(els.dropAvatar, els.fileAvatar, (file, url) => {
+    staging.avatar = file;
+    els.prevAvatar.src = url;
+  });
+
+  setupDropZone(els.dropBg, els.fileBg, (file, url) => {
+    staging.background = file;
+    els.bgFilename.innerText = file.name;
+    const type = file.type.startsWith('video') ? 'video' : 'image';
+    updateMiniBgPreview(url, type);
+  });
+
+  // Save Button
+  els.btn.addEventListener('click', saveProfile);
+}
+
+function setupDropZone(zone, input, callback) {
+  // Click to open
+  zone.addEventListener('click', () => input.click());
+  
+  // File Input Change
+  input.addEventListener('change', () => handleFile(input.files[0], callback));
+
+  // Drag Events
+  zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    zone.classList.add('drag-active');
+  });
+  
+  zone.addEventListener('dragleave', () => {
+    zone.classList.remove('drag-active');
+  });
+  
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.classList.remove('drag-active');
+    if (e.dataTransfer.files.length) {
+      handleFile(e.dataTransfer.files[0], callback);
+    }
+  });
+}
+
+function handleFile(file, callback) {
+  if (!file) return;
+  
+  // Validation
+  const limit = file.type.startsWith('video') ? MAX_SIZES.vid : MAX_SIZES.img;
+  if (file.size > limit) {
+    showToast(`File too large (Max ${limit/1024/1024}MB)`, "error");
+    return;
+  }
+
+  // Preview immediately (Lag-free feeling)
+  const url = URL.createObjectURL(file);
+  callback(file, url);
+}
+
+/* ================= PREVIEW HELPERS ================= */
+
+function showImgBanner(url) {
+  els.prevBannerVid.classList.add('hidden');
+  els.prevBannerImg.classList.remove('hidden');
+  els.prevBannerImg.src = url;
+}
+
+function showVideoBanner(url) {
+  els.prevBannerImg.classList.add('hidden');
+  els.prevBannerVid.classList.remove('hidden');
+  els.prevBannerVid.src = url;
+}
+
+function updateMiniBgPreview(url, type) {
+  els.miniBgPreview.innerHTML = '';
+  if (type === 'video') {
+    els.miniBgPreview.innerHTML = `<video src="${url}" autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;"></video>`;
+  } else {
+    els.miniBgPreview.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:cover;">`;
+  }
+}
+
+function updateTheme(hex) {
+  document.documentElement.style.setProperty('--c-accent', hex);
+  document.documentElement.style.setProperty('--c-accent-glow', hex + '66');
+}
+
+function renderRoles(activeRoles) {
+  els.roles.innerHTML = "";
+  CONFIG.roles.forEach(role => {
+    const isActive = activeRoles.includes(role.id);
+    const div = document.createElement('div');
+    div.className = `role-badge ${isActive ? 'active' : ''}`;
+    div.innerHTML = `
+      <i class="ph-fill ph-${role.icon.includes('crown') ? 'crown' : 'shield-check'}"></i>
+      <span>${role.label}</span>
+    `;
+    div.onclick = () => {
+      div.classList.toggle('active');
+    };
+    div.dataset.roleId = role.id;
+    els.roles.appendChild(div);
+  });
+}
+
+/* ================= SAVING ================= */
+
+async function saveProfile() {
   if (!currentProfileId) return;
-
   setLoading(true, "Uploading...");
 
-  let avatarUrl = null;
-  let bannerUrl = null;
-  let bgType = els.bgTypeIn.value;
-  let bgValue = null;
-
   try {
-    // AVATAR
-    if (els.avatarFile.files[0]) {
-      const file = els.avatarFile.files[0];
-      const ext = file.name.split('.').pop();
-      avatarUrl = await uploadFile(
-        'avatars',
-        file,
-        `${currentProfileId}.${ext}`
-      );
-    }
-
-    // BANNER (image or video)
-    if (els.bannerFile.files[0]) {
-      const file = els.bannerFile.files[0];
-      const ext = file.name.split('.').pop();
-      bannerUrl = await uploadFile(
-        'banners',
-        file,
-        `${currentProfileId}.${ext}`
-      );
-    }
-
-    // BACKGROUND (image or video)
-    if (els.bgFile.files[0]) {
-      const file = els.bgFile.files[0];
-      const ext = file.name.split('.').pop();
-      bgValue = await uploadFile(
-        'backgrounds',
-        file,
-        `${currentProfileId}.${ext}`
-      );
-
-      bgType = file.type.startsWith('video') ? 'video' : 'image';
-    }
-
-    const activeRoles = Array.from(
-      document.querySelectorAll('.role-card.active')
-    ).map(el => el.dataset.roleId);
-
     const updates = {
-      avatar: avatarUrl,
-      banner_url: bannerUrl,
-      theme_color: els.themeColorIn.value,
-      bg_type: bgType,
-      bg_value: bgValue,
-      bio: els.bioIn.value.trim() || null,
-      roles: activeRoles,
-      updated_at: new Date().toISOString()
+      updated_at: new Date(),
+      bio: els.bio.value,
+      theme_color: els.color.value,
+      roles: Array.from(document.querySelectorAll('.role-badge.active')).map(el => el.dataset.roleId)
     };
 
-    const { error } = await sb
-      .from("profiles")
-      .update(updates)
-      .eq("id", currentProfileId);
+    // Upload Files if Changed
+    if (staging.avatar) {
+      updates.avatar = await upload(staging.avatar, 'avatars');
+    }
+    if (staging.banner) {
+      updates.banner_url = await upload(staging.banner, 'banners');
+    }
+    if (staging.background) {
+      updates.bg_value = await upload(staging.background, 'backgrounds');
+      updates.bg_type = staging.background.type.startsWith('video') ? 'video' : 'image';
+    }
 
+    const { error } = await sb.from("profiles").upsert({ id: currentProfileId, ...updates });
     if (error) throw error;
 
-    showToast("Profile updated", "success");
+    showToast("Profile Updated Successfully!", "success");
+    
+    // Clear Staging
+    staging.avatar = null; staging.banner = null; staging.background = null;
 
   } catch (err) {
     console.error(err);
-    showToast("Upload failed", "error");
+    showToast("Update Failed: " + err.message, "error");
   }
 
   setLoading(false);
-});
-
-els.themeColorIn.addEventListener('input', e => {
-  document.documentElement.style.setProperty('--c-accent', e.target.value);
-});
-  els.avatarFile.addEventListener('change', () => {
-  const file = els.avatarFile.files[0];
-  const check = validateFile(file, FILE_RULES.avatar);
-
-  if (!check.ok) {
-    showToast(check.msg, "error");
-    els.avatarFile.value = '';
-    return;
-  }
-
-  els.prevAvatar.src = URL.createObjectURL(file);
-});
-els.bannerFile.addEventListener('change', () => {
-  const file = els.bannerFile.files[0];
-  const check = validateFile(file, FILE_RULES.banner);
-
-  if (!check.ok) {
-    showToast(check.msg, "error");
-    els.bannerFile.value = '';
-    return;
-  }
-
-  const url = URL.createObjectURL(file);
-
-  if (file.type.startsWith('video')) {
-    els.prevBanner.classList.add('hidden');
-    els.prevBannerVideo.classList.remove('hidden');
-    els.prevBannerVideo.src = url;
-  } else {
-    els.prevBannerVideo.classList.add('hidden');
-    els.prevBanner.classList.remove('hidden');
-    els.prevBanner.src = url;
-  }
-});
-
-els.bgFile.addEventListener('change', () => {
-  const file = els.bgFile.files[0];
-  const check = validateFile(file, FILE_RULES.background);
-
-  if (!check.ok) {
-    showToast(check.msg, "error");
-    els.bgFile.value = '';
-    return;
-  }
-
-  const url = URL.createObjectURL(file);
-  els.bgPreview.innerHTML = '';
-
-  if (file.type.startsWith('video')) {
-    els.bgPreview.innerHTML = `
-      <video class="bg-media" autoplay muted loop playsinline>
-        <source src="${url}">
-      </video>
-    `;
-  } else {
-    els.bgPreview.innerHTML = `
-      <img src="${url}" class="bg-media">
-    `;
-  }
-});
-
-
-
-/* ================= HELPERS ================= */
-
-// Debounce: Prevents lag by waiting until user stops typing to execute heavy tasks (like image loading)
-function debounce(func, wait) {
-  let timeout;
-  return function(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
 }
 
-function validateFile(file, rules) {
-  if (!file) return { ok: false, msg: "No file selected" };
-
-  if (!rules.types.includes(file.type)) {
-    return {
-      ok: false,
-      msg: "Unsupported file type"
-    };
-  }
-
-  if (file.size > rules.maxSize) {
-    const mb = (rules.maxSize / 1024 / 1024).toFixed(0);
-    return {
-      ok: false,
-      msg: `File too large (max ${mb}MB)`
-    };
-  }
-
-  return { ok: true };
+async function upload(file, bucket) {
+  const ext = file.name.split('.').pop();
+  const path = `${currentProfileId}/${Date.now()}.${ext}`;
+  
+  const { error } = await sb.storage.from(bucket).upload(path, file);
+  if (error) throw error;
+  
+  const { data } = sb.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
 }
 
-
-function renderRoles(selectedRoles) {
-  els.rolesGrid.innerHTML = "";
-
-  // Only render roles that the user currently has
-  CONFIG.roles
-    .filter(role => selectedRoles.includes(role.id))
-    .forEach(role => {
-      const card = document.createElement('div');
-      card.className = `role-card active`; // Always active because user has it
-      card.dataset.roleId = role.id;
-
-      // Create role inner HTML
-      card.innerHTML = `
-        <img src="../assets/${role.icon}" class="role-icon-img" onerror="this.style.display='none'">
-        <span class="role-name">${role.label}</span>
-      `;
-
-      // Optional: clicking can still toggle active if you want editing
-      card.addEventListener('click', () => card.classList.toggle('active'));
-
-      els.rolesGrid.appendChild(card);
-    });
-}
-
+/* ================= UI UTILS ================= */
 
 function setLoading(isLoading, text = "Save Changes") {
   els.btn.disabled = isLoading;
   els.btnText.textContent = text;
-  els.spinner.style.display = isLoading ? "block" : "none";
+  els.loader.style.display = isLoading ? "block" : "none";
 }
 
 function showToast(msg, type) {
   els.toastMsg.innerText = msg;
-  els.toast.className = `toast show ${type}`;
+  els.toast.className = `toast active ${type}`;
   els.toastIcon.className = type === 'success' ? 'ph-bold ph-check-circle' : 'ph-bold ph-warning-circle';
-  
-  setTimeout(() => els.toast.classList.remove('show'), 3000);
-}
-  async function uploadFile(bucket, file, path) {
-  const { error } = await sb.storage
-    .from(bucket)
-    .upload(path, file, { upsert: true });
-
-  if (error) throw error;
-
-  const { data } = sb.storage.from(bucket).getPublicUrl(path);
-  return data.publicUrl;
+  setTimeout(() => els.toast.classList.remove('active'), 3500);
 }
 
 </script>
