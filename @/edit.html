@@ -405,6 +405,39 @@ if (els.bgValueIn) {
     '--c-accent',
     els.themeColorIn.value
   );
+// Existing avatar preview
+if (data.avatar) {
+  els.prevAvatar.src = data.avatar;
+}
+
+// Existing banner preview (image or video)
+if (data.banner_url) {
+  if (data.banner_url.match(/\.(mp4|webm)$/)) {
+    els.prevBanner.classList.add('hidden');
+    els.prevBannerVideo.classList.remove('hidden');
+    els.prevBannerVideo.src = data.banner_url;
+  } else {
+    els.prevBannerVideo.classList.add('hidden');
+    els.prevBanner.classList.remove('hidden');
+    els.prevBanner.src = data.banner_url;
+  }
+}
+// Existing background preview
+if (data.bg_value) {
+  els.bgPreview.innerHTML = '';
+
+  if (data.bg_type === 'video') {
+    els.bgPreview.innerHTML = `
+      <video class="bg-media" autoplay muted loop playsinline>
+        <source src="${data.bg_value}">
+      </video>
+    `;
+  } else if (data.bg_type === 'image') {
+    els.bgPreview.innerHTML = `
+      <img src="${data.bg_value}" class="bg-media">
+    `;
+  }
+}
 
   renderRoles(data.roles || []);
   
