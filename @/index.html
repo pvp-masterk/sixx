@@ -477,11 +477,12 @@ body::after {
                   ${app.escapeHtml(user.username)}
                 </h1>
 
-                ${highestRole ? `
-                  <div class="role-badge" data-role="${highestRole.name}">
-                     <img src="${highestRole.icon}" alt="${highestRole.name}">
-                  </div>
-                ` : ''}
+                /* Only show if role exists AND show_role_icon is true (or undefined/null defaulting to true) */
+${highestRole && user.show_role_icon !== false ? `
+  <div class="role-badge" data-role="${highestRole.name}">
+     <img src="${highestRole.icon}" alt="${highestRole.name}">
+  </div>
+` : ''}
 
                 ${isVerified ? `<i class="ph-fill ph-seal-check badge-verified"></i>` : ''}
               </div>
