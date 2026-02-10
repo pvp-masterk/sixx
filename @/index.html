@@ -374,6 +374,25 @@ body::after {
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+/* ===============================
+   EFFECT: AURA
+   =============================== */
+
+.effect-aura {
+  text-shadow:
+    0 0 12px color-mix(in srgb, var(--accent) 40%, transparent),
+    0 0 28px color-mix(in srgb, var(--accent) 20%, transparent);
+  animation: aura-breath 4s ease-in-out infinite;
+}
+
+@keyframes aura-breath {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px var(--accent));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px var(--accent));
+  }
+}
 
 </style>
 </head>
@@ -621,7 +640,8 @@ function applyUsernameEffect(effectName) {
 }
 
   window.addEventListener('DOMContentLoaded', app.init);
-  applyUsernameEffect("spectral");
+  applyUsernameEffect("aura");
+
 
 </script>
 </body>
