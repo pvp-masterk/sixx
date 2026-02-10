@@ -387,7 +387,7 @@
         // --- 1. SUPABASE CONFIGURATION ---
         const SUPABASE_URL = 'https://tstsijdifhgmpaszqknr.supabase.co'; // REPLACE ME
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4'; // REPLACE ME
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // --- 2. STATE MANAGEMENT ---
         let currentStep = 1;
@@ -425,7 +425,7 @@
         // --- 4. INITIALIZATION ---
         async function init() {
             // Check Auth
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await sb.auth.getSession();
             if (!session) {
                 // Redirect to login if not authenticated
                 // window.location.href = '/login.html'; 
@@ -618,13 +618,13 @@
                     const ext = userData.avatarFile.name.split('.').pop();
                     const fileName = `${userData.id}/avatar.${ext}`;
                     
-                    const { data, error } = await supabase.storage
+                    const { data, error } = await sb.storage
                         .from('avatars')
                         .upload(fileName, userData.avatarFile, { upsert: true });
 
                     if (!error) {
                         avatarPath = data.path;
-                        const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
+                        const { data: { publicUrl } } = sb.storage.from('avatars').getPublicUrl(fileName);
                         avatarUrl = publicUrl;
                     }
                 }
@@ -634,13 +634,13 @@
                     const ext = userData.bannerFile.name.split('.').pop();
                     const fileName = `${userData.id}/banner.${ext}`;
                     
-                    const { data, error } = await supabase.storage
+                    const { data, error } = await sb.storage
                         .from('banners')
                         .upload(fileName, userData.bannerFile, { upsert: true });
 
                     if (!error) {
                         bannerPath = data.path;
-                        const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(fileName);
+                        const { data: { publicUrl } } = sb.storage.from('banners').getPublicUrl(fileName);
                         bannerUrl = publicUrl;
                     }
                 }
