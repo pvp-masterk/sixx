@@ -222,6 +222,21 @@ body::after {
 /* Loading */
 .skeleton { background: rgba(255,255,255,0.03); border-radius: 8px; animation: pulse 2s infinite; }
 @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+  /* USERNAME EFFECTS */
+.effect-glow {
+  text-shadow: 0 0 25px var(--c-accent-glow);
+}
+
+.effect-rgb {
+  animation: rgbShift 3s linear infinite;
+}
+
+.effect-gradient {
+  background: linear-gradient(90deg, #7dd3fc, #c084fc, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 </style>
 </head>
 <body>
@@ -359,7 +374,9 @@ body::after {
 
             <div class="user-identity">
               <div style="display:flex; align-items:center;">
-                <h1 class="username">${app.escapeHtml(user.username)}</h1>
+                <h1 class="username effect-${user.username_effect || 'none'}">
+  ${app.escapeHtml(user.username)}
+</h1>
                 ${isVerified ? `<i class="ph-fill ph-seal-check badge-verified"></i>` : ''}
               </div>
               <div style="color:var(--c-accent); font-size:11px; font-weight:800; letter-spacing:2px; text-transform:uppercase; margin-top:5px;">
