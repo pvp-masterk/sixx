@@ -721,7 +721,7 @@ const els = {
     els.prevBannerImg.src = CONFIG.defaultBanner;
     renderFonts('Cinzel');
   }
-
+const { data: profile } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
 const roleInput = document.getElementById('input-show-role');
 if(roleInput) {
     roleInput.checked = profile.show_role_icon !== false; 
