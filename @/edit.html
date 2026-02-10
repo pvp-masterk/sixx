@@ -370,6 +370,56 @@ textarea::placeholder { color: #444; }
   .avatar-wrapper { width: 90px; height: 90px; }
   .font-grid { grid-template-columns: 1fr; }
 }
+  /* ================= USERNAME EFFECTS ================= */
+
+.effect-card {
+  padding: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: center;
+}
+
+.effect-card:hover {
+  background: rgba(255,255,255,0.07);
+  transform: translateY(-2px);
+}
+
+.effect-card.active {
+  background: rgba(123,44,191,0.15);
+  border-color: var(--c-accent);
+  box-shadow: 0 0 20px var(--c-accent-glow);
+}
+
+.effect-preview {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+/* previews */
+.preview-glow {
+  text-shadow: 0 0 15px var(--c-accent-glow);
+}
+
+.preview-rgb {
+  animation: rgbShift 3s linear infinite;
+}
+
+@keyframes rgbShift {
+  0% { text-shadow: 0 0 10px #ff3c3c; }
+  33% { text-shadow: 0 0 10px #3cffb3; }
+  66% { text-shadow: 0 0 10px #3c7bff; }
+  100% { text-shadow: 0 0 10px #ff3c3c; }
+}
+
+.preview-gradient {
+  background: linear-gradient(90deg, #7dd3fc, #c084fc, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 </style>
 </head>
 <body>
@@ -424,6 +474,26 @@ textarea::placeholder { color: #444; }
       <div class="section-header">
         <div class="section-label"><i class="ph-bold ph-text-aa"></i> Typography</div>
       </div>
+      <!-- USERNAME EFFECT -->
+<div class="card-panel">
+  <div class="section-header">
+    <div class="section-label">
+      <i class="ph-bold ph-sparkle"></i> Username Effect
+    </div>
+  </div>
+
+  <div class="font-trigger-card">
+    <div class="current-font-preview" id="effect-preview-label">
+      /six
+    </div>
+    <button type="button" class="change-font-btn" id="btn-open-effect-modal">
+      Change Effect
+    </button>
+  </div>
+
+  <input type="hidden" id="in-username-effect" value="none">
+</div>
+
       <div class="font-trigger-card">
         <div class="current-font-preview" id="font-preview-label" style="font-family: 'Cinzel', serif;">
           /six
@@ -508,6 +578,21 @@ textarea::placeholder { color: #444; }
     </div>
   </div>
 </div>
+<!-- USERNAME EFFECT MODAL -->
+<div class="modal-overlay" id="effect-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-title">Username Effects</span>
+      <button class="modal-close" id="btn-close-effect-modal">
+        <i class="ph-bold ph-x"></i>
+      </button>
+    </div>
+
+    <div class="modal-content">
+      <div class="font-grid" id="effect-grid"></div>
+    </div>
+  </div>
+</div>
 
 <script>
 // --- CONFIGURATION ---
@@ -529,9 +614,16 @@ const CONFIG = {
     { id: 'UnifrakturMaguntia', label: 'Gothic', family: "'UnifrakturMaguntia', cursive" },
     { id: 'Playfair Display', label: 'Classy', family: "'Playfair Display', serif" },
     { id: 'Roboto Mono', label: 'Code', family: "'Roboto Mono', monospace" },
-  ]
+  ],
+  effects: [
+  { id: 'none', label: 'None' },
+  { id: 'glow', label: 'Glow' },
+  { id: 'rgb', label: 'RGB' },
+  { id: 'gradient', label: 'Gradient' }
+]
+
 };
-  
+ 
 let currentUsername = '/six';
 
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
@@ -687,6 +779,30 @@ function renderFonts(activeId) {
   `;
   els.fontGrid.appendChild(importBtn);
 }
+function renderEffects(active) {
+  const grid = document.getElementById('effect-grid');
+  grid.innerHTML = '';
+
+  CONFIG.effects.forEach(e => {
+    const div = document.createElement('div');
+    div.className = `effect-card ${e.id === active ? 'active' : ''}`;
+    div.innerHTML = `
+      <div class="effect-preview preview-${e.id}">
+        ${escapeHtml(currentUsername)}
+      </div>
+      <div class="font-name">${e.label}</div>
+    `;
+
+    div.onclick = () => {
+      document.querySelectorAll('.effect-card').forEach(c => c.classList.remove('active'));
+      div.classList.add('active');
+      document.getElementById('in-username-effect').value = e.id;
+      document.getElementById('effect-preview-label').className = `current-font-preview preview-${e.id}`;
+    };
+
+    grid.appendChild(div);
+  });
+}
 
 function renderRoles(activeRoles) {
   els.roles.innerHTML = "";
@@ -705,6 +821,14 @@ function renderRoles(activeRoles) {
 
 function setupInteractions() {
   els.color.addEventListener('input', (e) => updateThemeEngine(e.target.value));
+document.getElementById('btn-open-effect-modal').onclick = () => {
+  renderEffects(document.getElementById('in-username-effect').value);
+  document.getElementById('effect-modal').classList.add('active');
+};
+
+document.getElementById('btn-close-effect-modal').onclick = () => {
+  document.getElementById('effect-modal').classList.remove('active');
+};
 
   // Drag & Drop Helpers
   const setupDD = (zone, input, cb) => {
@@ -796,6 +920,7 @@ async function saveProfile() {
 
   try {
     const updates = {
+      username_effect: document.getElementById('in-username-effect').value,
       updated_at: new Date(),
       bio: els.bio.value,
       theme_color: els.color.value,
