@@ -180,6 +180,13 @@ body::after {
   font-size: 38px; line-height: 1.1; margin-right: 8px;
   
 }
+  /* Username + role alignment (font-safe) */
+.identity-row {
+  display: inline-flex;
+  align-items: baseline; /* IMPORTANT */
+  gap: 10px;
+}
+
 .badge-verified {
   color: var(--c-accent); font-size: 22px;
   filter: drop-shadow(0 0 8px var(--c-accent-glow));
@@ -264,20 +271,23 @@ body::after {
 /* ================= ROLE BADGE ================= */
 
 .role-badge {
-  width: 26px;
-  height: 26px;
-  margin-left: 10px;
+  width: 0.9em;
+  height: 0.9em;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+
+  /* font-aware vertical alignment */
+  transform: translateY(0.08em);
 }
+
 
 .role-badge img {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 0 10px var(--c-accent-glow));
+  object-fit: contain;
 }
 
 /* Tooltip */
@@ -476,23 +486,22 @@ function getHighestRole(userRoles = []) {
             </div>
 
             <div class="user-identity">
-              <div style="display:flex; align-items:center;">
-                <div style="display:flex; align-items:center;">
-  <h1 class="username effect-${user.username_effect || 'none'}">
-    ${app.escapeHtml(user.username)}
-  </h1>
+  <div class="identity-row">
+    <h1 class="username effect-${user.username_effect || 'none'}">
+      ${app.escapeHtml(user.username)}
+    </h1>
 
-  ${
-    highestRole
-      ? `<div class="role-badge" data-role="${highestRole.name}">
-           <img src="${highestRole.icon}">
-         </div>`
-      : ''
-  }
+    ${
+      highestRole
+        ? `<span class="role-badge" data-role="${highestRole.name}">
+             <img src="${highestRole.icon}">
+           </span>`
+        : ''
+    }
+
+    ${isVerified ? `<i class="ph-fill ph-seal-check badge-verified"></i>` : ''}
+  </div>
 </div>
-                ${isVerified ? `<i class="ph-fill ph-seal-check badge-verified"></i>` : ''}
-              </div>
-            </div>
 
             <div class="bio-text">${app.escapeHtml(user.bio || "No bio provided.")}</div>
 
