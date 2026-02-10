@@ -8,34 +8,33 @@
 <!-- EXTERNAL LIBRARIES -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
-<!-- FONTS: Added all the options here -->
+<!-- FONTS -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@700&family=Orbitron:wght@700&family=Playfair+Display:wght@700&family=UnifrakturMaguntia&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
 
 <style>
 /* ======================= 1. CORE VARIABLES & RESET ======================= */
 :root {
-  --c-bg: #030005;
-  --c-bg-alt: #0a0510;
+  --c-bg: #050505;
+  --c-surface: #0a0a0a;
+  --c-surface-hover: #111111;
   
   /* Dynamic Theme Variables */
   --c-accent: #7b2cbf;
-  --c-accent-dark: #4a127a; /* Calculated by JS */
+  --c-accent-dark: #4a127a;
   --c-accent-glow: rgba(123, 44, 191, 0.4);
   
-  --c-text-main: #e8e6f3;
-  --c-text-dim: #8f8ba0;
+  --c-text-main: #ffffff;
+  --c-text-sec: #888888;
   
-  --c-glass: rgba(15, 10, 25, 0.6);
-  --c-glass-border: rgba(255, 255, 255, 0.08);
-  --c-glass-highlight: rgba(255, 255, 255, 0.03);
+  --border-light: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
   
-  --radius-lg: 24px;
-  --radius-md: 14px;
+  --radius-xl: 32px;
+  --radius-lg: 16px;
+  --radius-sm: 8px;
   
   --font-main: 'Inter', sans-serif;
-  
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Custom Font Declaration */
@@ -48,8 +47,9 @@ body {
   color: var(--c-text-main);
   font-family: var(--font-main);
   min-height: 100vh;
-  display: flex; align-items: center; justify-content: center;
-  padding: 20px;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
   overflow-x: hidden;
 }
 
@@ -57,7 +57,7 @@ body {
 body::after {
   content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 999;
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
-  opacity: 0.03;
+  opacity: 0.04;
 }
 
 /* ======================= 2. BACKGROUND ANIMATION ======================= */
@@ -65,261 +65,311 @@ body::after {
 
 .bg-blob {
   position: absolute; border-radius: 50%; 
-  filter: blur(90px); opacity: 0.5;
+  filter: blur(100px); opacity: 0.4;
   will-change: transform; 
-  transform: translate3d(0,0,0);
 }
 
 .bg-blob.one { 
-  top: -10%; left: -10%; width: 50vw; height: 50vw; 
-  background: radial-gradient(circle, var(--c-accent-dark) 0%, transparent 70%); 
+  top: -20%; left: -10%; width: 60vw; height: 60vw; 
+  background: radial-gradient(circle, var(--c-accent-dark) 0%, transparent 60%); 
   animation: float 25s infinite alternate ease-in-out;
 }
 .bg-blob.two { 
-  bottom: -10%; right: -10%; width: 60vw; height: 60vw; 
-  background: radial-gradient(circle, #000 0%, transparent 70%); 
+  bottom: -20%; right: -10%; width: 70vw; height: 70vw; 
+  background: radial-gradient(circle, #1a0b2e 0%, transparent 60%); 
   animation: float 30s infinite alternate-reverse ease-in-out;
 }
 
 @keyframes float { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(50px, 30px, 0); } }
 
-/* ======================= 3. CONTAINER ======================= */
+/* ======================= 3. MAIN LAYOUT ======================= */
 .container {
   position: relative; z-index: 10;
-  width: 100%; max-width: 520px;
-  background: var(--c-glass);
-  backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-  border: 1px solid var(--c-glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-  animation: slideUp 0.6s var(--ease-smooth) forwards;
+  width: 100%; max-width: 600px;
+  display: flex; flex-direction: column; gap: 24px;
 }
 
-@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-/* --- SHOWCASE AREA --- */
-.showcase-area {
-  position: relative; width: 100%; height: 200px;
-  background: #05020a;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+/* --- SECTION: HEADER / PREVIEW --- */
+.header-card {
+  position: relative;
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
 .banner-wrapper {
-  width: 100%; height: 100%; position: relative; cursor: pointer; transition: opacity 0.3s;
+  width: 100%; height: 220px;
+  background: #000;
+  position: relative; cursor: pointer;
+  overflow: hidden;
+  group: hover;
 }
-.banner-wrapper:hover::after {
-  content: "Change Banner"; position: absolute; inset: 0;
+.banner-display { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; transition: transform 0.5s ease; }
+.banner-wrapper:hover .banner-display { transform: scale(1.02); opacity: 0.6; }
+
+/* Edit Overlay for Banner */
+.banner-edit-overlay {
+  position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(0,0,0,0.5); font-weight: 600; letter-spacing: 1px;
+  gap: 8px;
+  opacity: 0; transition: 0.3s;
+  background: rgba(0,0,0,0.3);
 }
-.banner-display { width: 100%; height: 100%; object-fit: cover; }
+.banner-wrapper:hover .banner-edit-overlay { opacity: 1; }
+.edit-badge {
+  padding: 8px 16px; background: rgba(0,0,0,0.7); 
+  border-radius: 20px; font-size: 0.75rem; font-weight: 600; 
+  backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.profile-bar {
+  padding: 0 24px 24px 24px;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-top: -50px; position: relative; z-index: 2;
+}
 
 .avatar-wrapper {
-  position: absolute; bottom: -45px; left: 30px;
-  width: 100px; height: 100px; padding: 4px;
-  background: var(--c-bg-alt);
-  border: 1px solid var(--c-glass-border);
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 20;
-  cursor: pointer; overflow: hidden;
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  padding: 4px;
+  background: #000; /* Matches body bg to look like cutout */
+  position: relative; cursor: pointer;
   transition: transform 0.3s var(--ease-spring);
 }
-.avatar-wrapper:hover { transform: scale(1.05) translateY(-2px); border-color: var(--c-accent); }
-.avatar-display { width: 100%; height: 100%; border-radius: 18px; object-fit: cover; background-color: #1a1a1a; }
-
-/* --- FORM SECTION --- */
-.form-area { padding: 60px 30px 30px 30px; }
-
-.section-title {
-  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;
-  color: var(--c-text-dim); margin-bottom: 12px; font-weight: 700;
-  display: flex; align-items: center; gap: 8px;
+.avatar-wrapper:hover { transform: scale(1.05); }
+.avatar-display {
+  width: 100%; height: 100%; border-radius: 50%;
+  object-fit: cover; background: #151515;
+  border: 2px solid var(--border-light);
 }
-.section-title::after { content: ""; flex: 1; height: 1px; background: var(--c-glass-border); }
-
-.input-group { margin-bottom: 24px; }
-
-input[type="text"], textarea, select {
-  width: 100%; padding: 16px;
-  border-radius: var(--radius-md); border: 1px solid var(--c-glass-border);
-  background: rgba(0, 0, 0, 0.3); color: var(--c-text-main);
-  font-family: inherit; font-size: 0.95rem; transition: all 0.2s;
+.avatar-edit-icon {
+  position: absolute; inset: 0; 
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.5); border-radius: 50%;
+  opacity: 0; transition: 0.2s; font-size: 24px;
 }
-input:focus, textarea:focus {
-  border-color: var(--c-accent); background: rgba(10, 5, 16, 0.8);
-  box-shadow: 0 0 0 2px var(--c-accent-glow);
-}
-textarea { min-height: 100px; resize: none; line-height: 1.6; }
+.avatar-wrapper:hover .avatar-edit-icon { opacity: 1; }
 
-/* --- NEW FONT PICKER GRID --- */
-.font-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* --- SECTION: SETTINGS --- */
+.settings-group {
+  display: flex; flex-direction: column; gap: 16px;
+  animation: slideUp 0.6s 0.1s var(--ease-spring) backwards;
+}
+
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.card-panel {
+  background: rgba(15, 15, 15, 0.4);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  transition: border-color 0.2s;
+}
+.card-panel:hover { border-color: var(--border-hover); }
+
+.section-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+}
+.section-label {
+  font-size: 0.75rem; font-weight: 700; 
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--c-text-sec); display: flex; align-items: center; gap: 8px;
+}
+.section-label i { color: var(--c-accent); font-size: 1rem; }
+
+/* Inputs */
+.input-wrap { position: relative; }
+textarea {
+  width: 100%; min-height: 100px; padding: 16px;
+  background: rgba(0,0,0,0.2); border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm); color: #fff;
+  font-family: inherit; font-size: 0.95rem; resize: none;
+  transition: 0.2s;
+}
+textarea:focus { border-color: var(--c-accent); background: rgba(0,0,0,0.4); }
+textarea::placeholder { color: #444; }
+
+/* Typography Select (New Trigger) */
+.font-trigger-card {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px; background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+}
+.current-font-preview {
+  font-size: 1.5rem; line-height: 1;
+  background: linear-gradient(90deg, #fff, #aaa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.change-font-btn {
+  padding: 8px 16px; font-size: 0.8rem; font-weight: 600;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border-light);
+  border-radius: 20px; color: var(--c-text-main); cursor: pointer;
+  transition: 0.2s;
+}
+.change-font-btn:hover { background: var(--c-accent); border-color: var(--c-accent); }
+
+/* Color & Aesthetic */
+.split-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.aesthetic-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px; border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm); background: rgba(255,255,255,0.01);
+}
+.color-swatch-display {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: var(--c-accent); /* Updated via JS */
+  box-shadow: 0 0 10px var(--c-accent-glow);
+}
+.aesthetic-info h4 { font-size: 0.85rem; font-weight: 500; margin-bottom: 2px; }
+.aesthetic-info p { font-size: 0.65rem; color: var(--c-text-sec); }
+
+/* Hidden input hack for color picker */
+.color-input-wrapper { position: relative; overflow: hidden; width: 0; height: 0; }
+
+/* Background Upload */
+.bg-upload-zone {
+  position: relative; height: 120px;
+  border: 1px dashed var(--border-light);
+  border-radius: var(--radius-sm);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; cursor: pointer; transition: 0.3s; overflow: hidden;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent 70%);
+}
+.bg-upload-zone:hover { border-color: var(--c-text-sec); background: rgba(255,255,255,0.02); }
+.bg-upload-zone.drag-active { border-color: var(--c-accent); background: rgba(123,44,191,0.1); }
+#mini-bg-preview { 
+  position: absolute; inset: 0; width: 100%; height: 100%; 
+  opacity: 0.3; object-fit: cover; pointer-events: none; filter: grayscale(0.5);
+}
+
+/* Roles */
+.roles-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.role-badge {
+  padding: 8px 14px; background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-light); border-radius: 6px;
+  font-size: 0.75rem; color: var(--c-text-sec); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: 0.2s;
+  user-select: none;
+}
+.role-badge i { font-size: 1rem; }
+.role-badge:hover { background: rgba(255,255,255,0.07); transform: translateY(-1px); }
+.role-badge.active {
+  background: var(--c-accent); border-color: var(--c-accent); color: #fff;
+  box-shadow: 0 4px 12px var(--c-accent-glow);
+}
+
+/* Save Button */
+.save-btn {
+  margin-top: 8px; width: 100%; padding: 20px;
+  background: linear-gradient(135deg, var(--c-accent-dark), var(--c-accent));
+  border: none; border-radius: var(--radius-lg);
+  color: #fff; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;
+  cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.save-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px var(--c-accent-glow); }
+.save-btn:disabled { opacity: 0.6; pointer-events: none; filter: grayscale(1); }
+
+/* Loader */
+.loader { 
+  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); 
+  border-top-color: #fff; border-radius: 50%; 
+  animation: spin 0.8s linear infinite; display: none; 
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- MODAL SYSTEM --- */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 5000;
+  background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+.modal-card {
+  width: 100%; max-width: 480px;
+  background: #0a0a0a; border: 1px solid var(--border-light);
+  border-radius: 24px; padding: 0;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+  display: flex; flex-direction: column;
+  max-height: 85vh;
+  transform: scale(0.95); transition: transform 0.3s var(--ease-spring);
+}
+.modal-overlay.active .modal-card { transform: scale(1); }
+
+.modal-header {
+  padding: 20px; border-bottom: 1px solid var(--border-light);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.modal-title { font-weight: 700; font-size: 1rem; color: #fff; }
+.modal-close {
+  background: transparent; border: none; color: var(--c-text-sec);
+  font-size: 1.2rem; cursor: pointer; padding: 5px;
+}
+.modal-close:hover { color: #fff; }
+
+.modal-content { padding: 20px; overflow-y: auto; }
+
+/* Font Grid (Moved Inside Modal) */
+.font-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .font-option {
-  position: relative;
-  padding: 15px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--c-glass-border);
-  border-radius: var(--radius-md);
-  text-align: center; cursor: pointer;
-  transition: 0.2s; overflow: hidden;
+  position: relative; padding: 20px 10px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  text-align: center; cursor: pointer; transition: 0.2s;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
 .font-option:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); }
 .font-option.active {
-  background: rgba(255,255,255,0.05);
-  border-color: var(--c-accent);
-  box-shadow: inset 0 0 20px var(--c-accent-glow);
+  background: rgba(123, 44, 191, 0.15); border-color: var(--c-accent);
 }
-.font-preview { font-size: 1.2rem; margin-bottom: 4px; color: #fff; }
-.font-name { font-size: 0.65rem; color: var(--c-text-dim); text-transform: uppercase; letter-spacing: 1px; }
-.featured-badge {
-  position: absolute; top: 0; right: 0;
-  background: var(--c-accent); color: #fff;
-  font-size: 0.5rem; font-weight: 700; padding: 2px 6px;
-  border-bottom-left-radius: 6px;
-}
+.font-preview { font-size: 1.3rem; margin-bottom: 6px; color: #fff; }
+.font-name { font-size: 0.6rem; color: var(--c-text-sec); text-transform: uppercase; letter-spacing: 1px; }
 
-/* Color Picker */
-.color-picker-wrapper {
-  display: flex; align-items: center; gap: 15px; padding: 10px;
-  background: rgba(255,255,255,0.02);
-  border-radius: var(--radius-md); border: 1px solid var(--c-glass-border);
-}
-input[type="color"] {
-  -webkit-appearance: none; border: none; width: 40px; height: 40px;
-  border-radius: 50%; cursor: pointer; background: none; padding: 0;
-}
-input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; }
+/* Font Import (Specific Style) */
+.font-import { border: 1px dashed var(--border-light); background: transparent; }
+.font-import:hover { border-color: var(--c-accent); background: rgba(123,44,191,0.05); }
 
-/* Drop Box */
-.file-drop-box {
-  position: relative; width: 100%; height: 100px;
-  border: 2px dashed var(--c-glass-border);
-  border-radius: var(--radius-md);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.01); cursor: pointer; transition: 0.3s; overflow: hidden;
+/* Import Font Uploader (Dynamic content) */
+.modal-buffer { padding: 40px; text-align: center; }
+.file-drop-box { 
+  border: 2px dashed var(--border-light); padding: 40px; text-align: center;
+  border-radius: var(--radius-lg); cursor: pointer; transition: 0.2s;
 }
 .file-drop-box:hover { border-color: var(--c-text-dim); }
-.file-drop-box.drag-active { border-color: var(--c-accent); background: rgba(123, 44, 191, 0.1); }
-#mini-bg-preview { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.4; object-fit: cover;}
+.font-preview-live { font-size: 32px; font-weight: 700; margin-bottom: 10px; }
 
-/* Roles */
-.roles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
-.role-badge {
-  background: var(--c-glass-highlight); border: 1px solid transparent;
-  padding: 10px; border-radius: var(--radius-md);
-  text-align: center; font-size: 0.7rem; color: var(--c-text-dim);
-  cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px;
-  transition: 0.2s;
-}
-.role-badge.active {
-  background: rgba(255,255,255,0.05); border-color: var(--c-accent); color: white;
-  box-shadow: 0 4px 15px var(--c-accent-glow);
-}
-
-/* Save Button (Dark Version) */
-.save-btn {
-  margin-top: 30px; width: 100%; padding: 18px;
-  /* Uses the Dark Accent variable calculated by JS */
-  background: var(--c-accent-dark);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--radius-md);
-  color: white; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
-  cursor: pointer; position: relative; overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  transition: all 0.3s var(--ease-spring);
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-}
-.save-btn:hover { 
-  background: var(--c-accent); /* Brighten on hover */
-  transform: translateY(-2px); 
-  box-shadow: 0 0 20px var(--c-accent-glow); 
-}
-.save-btn:disabled { opacity: 0.7; pointer-events: none; filter: grayscale(0.5); }
-.loader { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.hidden { display: none !important; }
+/* Toast */
 .toast {
   position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
-  background: #111; border: 1px solid var(--c-glass-border); padding: 12px 24px;
+  background: #111; border: 1px solid var(--border-light); padding: 12px 24px;
   border-radius: 50px; display: flex; align-items: center; gap: 10px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.8); opacity: 0; transition: all 0.5s var(--ease-spring);
-  z-index: 2000; pointer-events: none;
+  z-index: 6000; pointer-events: none;
 }
 .toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast i { font-size: 1.2rem; }
 .toast.success i { color: #4ade80; }
 .toast.error i { color: #ef4444; }
-.font-import {
-  border: 2px dashed var(--c-glass-border);
-  background: rgba(255,255,255,0.02);
-}
 
-.font-import i {
-  font-size: 22px;
-  color: var(--c-text-dim);
-  margin-bottom: 6px;
-}
+.hidden { display: none !important; }
 
-.font-import:hover {
-  border-color: var(--c-accent);
-  background: rgba(123, 44, 191, 0.08);
+/* Responsive */
+@media (max-width: 480px) {
+  .banner-wrapper { height: 160px; }
+  .profile-bar { padding: 0 16px 16px 16px; margin-top: -40px; }
+  .avatar-wrapper { width: 90px; height: 90px; }
+  .font-grid { grid-template-columns: 1fr; }
 }
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(8px);
-  z-index: 5000;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.modal-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal-card {
-  width: 100%;
-  max-width: 520px;
-  background: var(--c-glass);
-  border: 1px solid var(--c-glass-border);
-  border-radius: 24px;
-  padding: 30px;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.7);
-}
-.modal-buffer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 50px;
-}
-
-.buffer-text {
-  font-size: 0.75rem;
-  color: var(--c-text-dim);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-.font-preview-live {
-  font-size: 42px;
-  font-weight: 900;
-  text-shadow: 0 0 30px var(--c-accent-glow);
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.font-helper {
-  font-size: 0.75rem;
-  color: var(--c-text-dim);
-}
-
 </style>
 </head>
 <body>
@@ -331,64 +381,99 @@ input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0
 
 <div class="container">
   
-  <div class="showcase-area">
+  <!-- VISUAL IDENTITY HEADER -->
+  <div class="header-card">
     <div class="banner-wrapper" id="drop-banner">
       <img id="prev-banner-img" class="banner-display" src="">
       <video id="prev-banner-video" class="banner-display hidden" autoplay muted loop playsinline></video>
       <input type="file" id="file-banner" hidden accept="image/*,video/mp4,video/webm">
+      
+      <div class="banner-edit-overlay">
+        <div class="edit-badge"><i class="ph-bold ph-pencil-simple"></i> Edit Banner</div>
+      </div>
     </div>
 
-    <div class="avatar-wrapper" id="drop-avatar">
-      <img id="prev-avatar" class="avatar-display" src="">
-      <input type="file" id="file-avatar" hidden accept="image/*">
+    <div class="profile-bar">
+      <div class="avatar-wrapper" id="drop-avatar">
+        <img id="prev-avatar" class="avatar-display" src="">
+        <div class="avatar-edit-icon"><i class="ph-bold ph-camera"></i></div>
+        <input type="file" id="file-avatar" hidden accept="image/*">
+      </div>
+      <!-- Decorative Profile Actions (Non-functional, for aesthetic balance) -->
+      <div style="display:flex; gap:8px;">
+        <!-- Placeholder for potential future links -->
+      </div>
     </div>
   </div>
 
-  <div class="form-area">
+  <!-- CONTROL CENTER -->
+  <div class="settings-group">
     
-    <div class="section-title">Identity</div>
-    <div class="input-group">
-      <textarea id="in-bio" placeholder="Write something epic about yourself..."></textarea>
+    <!-- BIO SECTION -->
+    <div class="card-panel">
+      <div class="section-header">
+        <div class="section-label"><i class="ph-bold ph-user-focus"></i> Biography</div>
+      </div>
+      <div class="input-wrap">
+        <textarea id="in-bio" placeholder="Tell the world who you are..."></textarea>
+      </div>
     </div>
 
-    <!-- FONT PICKER -->
-    <div class="input-group">
-      <div class="section-title">Username Font</div>
-      <div class="font-grid" id="font-grid">
-        <!-- Injected via JS -->
-        <div class="font-option font-import" id="import-font">
-  <i class="ph-bold ph-upload-simple"></i>
-  <div class="font-preview">Import</div>
-  <div class="font-name">Custom Font</div>
-</div>
+    <!-- TYPOGRAPHY SECTION (Replaced Grid with Trigger) -->
+    <div class="card-panel">
+      <div class="section-header">
+        <div class="section-label"><i class="ph-bold ph-text-aa"></i> Typography</div>
       </div>
+      <div class="font-trigger-card">
+        <div class="current-font-preview" id="font-preview-label" style="font-family: 'Cinzel', serif;">
+          /six
+        </div>
+        <button type="button" class="change-font-btn" id="btn-open-font-modal">Change Font</button>
+      </div>
+      <!-- Hidden Input for Logic -->
       <input type="hidden" id="in-font" value="Cinzel">
     </div>
 
-    <div class="section-title">Aesthetics</div>
-    <div class="input-group color-picker-wrapper">
-      <input type="color" id="in-theme-color" value="#7b2cbf">
-      <div style="display:flex; flex-direction:column;">
-        <span style="font-size:0.8rem; font-weight:600;">System Theme</span>
-        <span style="font-size:0.7rem; color:var(--c-text-dim);">Changes UI, Glows, Buttons & Borders</span>
+    <!-- AESTHETICS SECTION -->
+    <div class="card-panel">
+      <div class="section-header">
+        <div class="section-label"><i class="ph-bold ph-palette"></i> Aesthetics</div>
+      </div>
+      
+      <div class="split-row">
+        <!-- Color Picker Trigger -->
+        <label class="aesthetic-card" style="cursor: pointer;">
+          <div class="color-swatch-display" id="theme-swatch"></div>
+          <div class="aesthetic-info">
+            <h4>Accent Color</h4>
+            <p>UI & Glows</p>
+          </div>
+          <div class="color-input-wrapper">
+            <input type="color" id="in-theme-color" value="#7b2cbf">
+          </div>
+        </label>
+
+        <!-- Profile Background -->
+        <div class="bg-upload-zone" id="drop-bg">
+          <i class="ph ph-image" style="font-size: 24px; color: var(--c-text-sec);"></i>
+          <span id="bg-filename" style="font-size: 0.75rem; color: var(--c-text-sec);">Profile BG</span>
+          <input type="file" id="file-bg" accept="image/*,video/mp4,video/webm" hidden>
+          <div id="mini-bg-preview"></div>
+        </div>
       </div>
     </div>
 
-    <div class="input-group">
-      <label style="font-size:0.7rem; color:var(--c-text-dim); margin-bottom:8px; display:block;">PROFILE BACKGROUND</label>
-      <div class="file-drop-box" id="drop-bg">
-        <i class="ph ph-upload-simple" style="font-size:20px; color:var(--c-text-dim);"></i>
-        <span id="bg-filename" style="font-size:0.8rem; color:var(--c-text-dim);">Drop Image or Video</span>
-        <input type="file" id="file-bg" accept="image/*,video/mp4,video/webm" hidden>
-        <div id="mini-bg-preview"></div>
+    <!-- ROLES SECTION -->
+    <div class="card-panel">
+      <div class="section-header">
+        <div class="section-label"><i class="ph-bold ph-shield-star"></i> Roles</div>
+      </div>
+      <div id="roles-grid" class="roles-grid">
+        <!-- Injected via JS -->
       </div>
     </div>
 
-    <div class="input-group">
-      <div class="section-title">Roles</div>
-      <div id="roles-grid" class="roles-grid"></div>
-    </div>
-
+    <!-- SAVE BUTTON -->
     <button id="save-btn" class="save-btn">
       <div class="loader"></div>
       <span class="btn-text">Save Changes</span>
@@ -397,14 +482,33 @@ input[type="color"]::-webkit-color-swatch { border: 2px solid rgba(255,255,255,0
 
 </div>
 
-<!-- Toast -->
+<!-- TOAST -->
 <div id="toast" class="toast">
   <i class="ph-bold" id="toast-icon"></i>
   <span id="toast-msg">Notification</span>
 </div>
+
+<!-- FONT MODAL (Restructured) -->
 <div class="modal-overlay" id="font-modal">
-  <div class="modal-card" id="font-modal-card"></div>
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-title">Select Typography</span>
+      <button class="modal-close" id="btn-close-font-modal"><i class="ph-bold ph-x"></i></button>
+    </div>
+    
+    <div class="modal-content" id="font-modal-card">
+      <!-- The JS will look for #font-grid to render items. We place it here. -->
+      <div class="font-grid" id="font-grid">
+        <!-- Items injected by JS -->
+        <div class="font-option font-import" id="import-font">
+          <i class="ph-bold ph-upload-simple" style="font-size: 24px; margin-bottom: 4px;"></i>
+          <div class="font-name">Custom Import</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
 <script>
 // --- CONFIGURATION ---
 const CONFIG = {
@@ -435,24 +539,24 @@ let currentProfileId = null;
 const staging = { avatar: null, banner: null, background: null };
 const fontBufferHTML = `
   <div class="modal-buffer">
-    <div class="loader"></div>
-    <div class="buffer-text">Preparing font importer…</div>
+    <div class="loader" style="display:block; margin:0 auto;"></div>
+    <div class="buffer-text" style="margin-top:10px; color:#888;">Preparing font importer…</div>
   </div>
 `;
 const fontImporterHTML = `
-  <div class="section-title">Custom Font</div>
-
-  <div class="file-drop-box" id="drop-font">
+  <div class="modal-buffer">
     <div class="font-preview-live" id="font-preview">
       ${escapeHtml(currentUsername)}
     </div>
-    <span class="font-helper">Drop font file or click to upload</span>
-    <input type="file" id="file-font" hidden>
+    <div class="file-drop-box" id="drop-font">
+      <i class="ph ph-file-arrow-up" style="font-size:32px; color:#888;"></i>
+      <div style="margin-top:10px; color:#888;">Drop font file (TTF/OTF)</div>
+      <input type="file" id="file-font" hidden>
+    </div>
+    <button class="save-btn" id="confirm-font" style="margin-top:20px;">
+      <span class="btn-text">Use This Font</span>
+    </button>
   </div>
-
-  <button class="save-btn" id="confirm-font">
-    <span class="btn-text">Use This Font</span>
-  </button>
 `;
 
 // Elements
@@ -469,18 +573,24 @@ const els = {
   miniBgPreview: document.getElementById('mini-bg-preview'),
   bio: document.getElementById('in-bio'),
   color: document.getElementById('in-theme-color'),
+  themeSwatch: document.getElementById('theme-swatch'),
   fontGrid: document.getElementById('font-grid'),
   fontInput: document.getElementById('in-font'),
+  fontPreviewLabel: document.getElementById('font-preview-label'), // New Element
   roles: document.getElementById('roles-grid'),
   btn: document.getElementById('save-btn'),
   loader: document.querySelector('.loader'),
-  btnText: document.querySelector('.btn-text')
+  btnText: document.querySelector('.btn-text'),
+  // Modal Elements
+  fontModal: document.getElementById('font-modal'),
+  btnOpenFont: document.getElementById('btn-open-font-modal'),
+  btnCloseFont: document.getElementById('btn-close-font-modal')
 };
 
 /* ================= LOGIC ================= */
 
 (async function init() {
-  setLoading(true, "Loading...");
+  setLoading(true, "Loading Profile...");
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return showToast("Login required", "error");
 
@@ -536,23 +646,46 @@ function escapeHtml(str = '') {
   }[m]));
 }
 function renderFonts(activeId) {
-  els.fontGrid.innerHTML = '';
+  // Clear but keep the Import button logic
+  els.fontGrid.innerHTML = ''; 
+  
+  // Re-add import button functionality requires structure; 
+  // We'll rebuild the grid entirely based on CONFIG
+  
+  // Update the hidden input and visual label
   els.fontInput.value = activeId;
+  const activeFontObj = CONFIG.fonts.find(f => f.id === activeId);
+  if (activeFontObj) {
+    els.fontPreviewLabel.style.fontFamily = activeFontObj.family;
+  } else if (activeId === 'custom') {
+    els.fontPreviewLabel.style.fontFamily = 'PreviewFont, sans-serif'; // Fallback for custom
+  }
+
   CONFIG.fonts.forEach(f => {
     const el = document.createElement('div');
     el.className = `font-option ${f.id === activeId ? 'active' : ''}`;
     el.innerHTML = `
-      ${f.featured ? '<div class="featured-badge">HOT</div>' : ''}
-      <div class="font-preview" style="font-family:${f.family}">/six</div>
+      <div class="font-preview" style="font-family:${f.family}">Aa</div>
       <div class="font-name">${f.label}</div>
     `;
     el.onclick = () => {
       document.querySelectorAll('.font-option').forEach(d => d.classList.remove('active'));
       el.classList.add('active');
       els.fontInput.value = f.id;
+      els.fontPreviewLabel.style.fontFamily = f.family;
     };
     els.fontGrid.appendChild(el);
   });
+  
+  // Append Import Button at the end
+  const importBtn = document.createElement('div');
+  importBtn.className = 'font-option font-import';
+  importBtn.id = 'import-font';
+  importBtn.innerHTML = `
+      <i class="ph-bold ph-upload-simple" style="font-size: 20px; margin-bottom: 4px;"></i>
+      <div class="font-name">Import</div>
+  `;
+  els.fontGrid.appendChild(importBtn);
 }
 
 function renderRoles(activeRoles) {
@@ -561,7 +694,7 @@ function renderRoles(activeRoles) {
     const isActive = activeRoles.includes(role.id);
     const div = document.createElement('div');
     div.className = `role-badge ${isActive ? 'active' : ''}`;
-    div.innerHTML = `<i class="ph-fill ph-${role.icon}" style="font-size:1.2rem"></i><span>${role.label}</span>`;
+    div.innerHTML = `<i class="ph-fill ph-${role.icon}"></i><span>${role.label}</span>`;
     div.onclick = () => div.classList.toggle('active');
     div.dataset.roleId = role.id;
     els.roles.appendChild(div);
@@ -604,13 +737,23 @@ function setupInteractions() {
 
   setupDD(els.dropBg, els.fileBg, (f, url) => {
     staging.background = f;
-    document.getElementById('bg-filename').innerText = f.name;
+    document.getElementById('bg-filename').innerText = f.name.substring(0, 15) + (f.name.length > 15 ? "..." : "");
     els.miniBgPreview.innerHTML = f.type.startsWith('video') 
       ? `<video src="${url}" autoplay muted loop style="width:100%;height:100%;object-fit:cover"></video>` 
       : `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
   });
 
   els.btn.addEventListener('click', saveProfile);
+  
+  // Font Modal Toggles
+  els.btnOpenFont.addEventListener('click', () => {
+    els.fontModal.classList.add('active');
+  });
+  els.btnCloseFont.addEventListener('click', () => {
+    els.fontModal.classList.remove('active');
+    // If user was in import mode, reset to grid on close? 
+    // For now, simple close is fine.
+  });
 }
 
 function handleFile(file, cb) {
@@ -621,10 +764,13 @@ function handleFile(file, cb) {
 
 // Advanced Theme Engine
 function updateThemeEngine(hex) {
+  // Update CSS Vars
   document.documentElement.style.setProperty('--c-accent', hex);
   document.documentElement.style.setProperty('--c-accent-glow', hex + '66');
   
-  // Calculate Dark Variant for Button Background
+  // Update Visual Swatch
+  if(els.themeSwatch) els.themeSwatch.style.background = hex;
+  
   const darkHex = adjustBrightness(hex, -60); 
   document.documentElement.style.setProperty('--c-accent-dark', darkHex);
 }
@@ -664,18 +810,12 @@ async function saveProfile() {
       updates.bg_type = staging.background.type.startsWith('video') ? 'video' : 'image';
     }
     if (staging.customFont) {
-  updates.custom_font_url = await upload(staging.customFont, 'fonts');
-  updates.username_font = 'custom';
-}
+      updates.custom_font_url = await upload(staging.customFont, 'fonts');
+      updates.username_font = 'custom';
+    }
 
     const { error } = await sb.from("profiles").upsert({ id: currentProfileId, ...updates });
-   if (error) {
-  console.error("Supabase upload error:", error);
-  throw new Error(
-    error.message || "Upload failed (network or size limit)"
-  );
-}
-
+    if (error) throw new Error(error.message || "Upload failed");
 
     showToast("Profile Updated!", "success");
     staging.avatar = null; staging.banner = null; staging.background = null;
@@ -695,7 +835,7 @@ async function upload(file, bucket) {
     .from(bucket)
     .upload(path, file, {
       upsert: true,
-      contentType: file.type,   // 🔥 REQUIRED for videos
+      contentType: file.type, 
       cacheControl: '3600'
     });
 
@@ -710,6 +850,7 @@ async function upload(file, bucket) {
 
 
 function setLoading(isLoading, text) {
+  if(!text) text = "Save Changes";
   els.btn.disabled = isLoading;
   els.btnText.textContent = text;
   els.loader.style.display = isLoading ? "block" : "none";
@@ -722,15 +863,15 @@ function showToast(msg, type) {
   document.getElementById('toast-icon').className = type === 'success' ? 'ph-bold ph-check-circle' : 'ph-bold ph-warning-circle';
   setTimeout(() => t.classList.remove('active'), 3500);
 }
-  function setupFontImporter() {
+
+// ============ FONT IMPORT LOGIC (Preserved & Adapted) ============
+
+function setupFontImporter() {
   const drop = document.getElementById('drop-font');
   const input = document.getElementById('file-font');
   const preview = document.getElementById('font-preview');
 
-  if (!drop || !input || !preview) {
-    console.warn('Font importer DOM not ready yet');
-    return;
-  }
+  if (!drop || !input || !preview) return;
 
   drop.onclick = () => input.click();
 
@@ -738,20 +879,11 @@ function showToast(msg, type) {
     const file = input.files[0];
     if (!file) return;
 
-    const allowed = [
-      'font/ttf',
-      'font/otf',
-      'font/woff',
-      'font/woff2',
-      'application/font-woff',
-      'application/font-woff2'
-    ];
-
-    if (!allowed.includes(file.type)) {
+    const allowed = ['font/ttf','font/otf','font/woff','font/woff2','application/font-woff','application/font-woff2'];
+    if (!allowed.includes(file.type) && !file.name.match(/\.(ttf|otf|woff2?)$/i)) {
       showToast("Unsupported font format", "error");
       return;
     }
-
     if (file.size > 2 * 1024 * 1024) {
       showToast("Font too large (max 2MB)", "error");
       return;
@@ -766,36 +898,44 @@ function showToast(msg, type) {
 
       staging.customFont = file;
       els.fontInput.value = 'custom';
-
+      
+      // Update the main preview label too
+      els.fontPreviewLabel.style.fontFamily = 'PreviewFont';
       showToast("Font loaded", "success");
-    }).catch(() => {
+    }).catch((e) => {
+      console.error(e);
       showToast("Invalid font file", "error");
     });
   };
+  
+  // Handle Confirmation within Import Modal
+  document.getElementById('confirm-font')?.addEventListener('click', () => {
+     els.fontModal.classList.remove('active');
+     // Re-render grid to show "Custom" state? 
+     // For now, we rely on the main "Save" button to commit the file.
+  });
 }
 
-
-  document.addEventListener('click', (e) => {
+document.addEventListener('click', (e) => {
+  // Check if we clicked the Import card inside the modal
   if (!e.target.closest('#import-font')) return;
-
-  modal.classList.add('active');
+  
+  // We are already inside the modal, so we just swap the content of modal-card
+  const modalCard = document.getElementById('font-modal-card');
   modalCard.innerHTML = fontBufferHTML;
 
   setTimeout(() => {
     modalCard.innerHTML = fontImporterHTML;
     setupFontImporter();
-  }, 800);
+  }, 500);
 });
+
+// Modal Overlay Click to Close
 const modal = document.getElementById('font-modal');
-const modalCard = document.getElementById('font-modal-card');
-
-
 modal.onclick = (e) => {
   if (e.target === modal) modal.classList.remove('active');
 };
 
 </script>
-  
-
 </body>
 </html>
