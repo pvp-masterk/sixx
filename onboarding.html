@@ -447,11 +447,11 @@
             }
 
             // Check if profile already exists
-            const { data: profile } = await supabase
-  .from('profiles')
-  .select('username')
-  .eq('id', userData.id)
-  .maybeSingle();
+            const { data: profile } = await sb
+                .from('profiles')
+                .select('username')
+                .eq('id', userData.id)
+                .maybeSingle();
 
             if (profile) {
                 // Redirect to existing profile
@@ -494,7 +494,7 @@
 
         async function checkAvailability(username) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await sb
                     .from('profiles')
                     .select('username')
                     .eq('username', username)
@@ -646,7 +646,7 @@
                 }
 
                 // INSERT Profile
-                const { error: insertError } = await supabase
+                const { error: insertError } = await sb
                     .from('profiles')
                     .insert({
                         id: userData.id, // Matches auth.uid()
