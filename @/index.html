@@ -326,6 +326,54 @@ body::after {
   animation: shimmer 1.5s infinite;
 }
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+/* ===============================
+   EFFECT SYSTEM — BASE
+   =============================== */
+
+.effect {
+  position: relative;
+  display: inline-block;
+  --intensity: 0.6;
+  --speed: 6s;
+}
+/* ===============================
+   SIGNATURE EFFECT: SPECTRAL DRIFT
+   =============================== */
+
+.effect-spectral {
+  color: inherit;
+}
+
+.effect-spectral::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: linear-gradient(
+    120deg,
+    transparent 35%,
+    color-mix(
+      in srgb,
+      var(--accent) calc(var(--intensity) * 100%),
+      transparent
+    ),
+    transparent 65%
+  );
+
+  background-size: 200% 200%;
+  animation: spectral-drift var(--speed) ease-in-out infinite;
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes spectral-drift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
 </style>
 </head>
@@ -376,7 +424,6 @@ body::after {
       Verified: { name: "Verified", icon: "/assets/verified.png", priority: 40 }
     }
   };
-
   const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
   const app = {
@@ -473,9 +520,13 @@ body::after {
 
             <div class="user-identity">
               <div class="identity-row">
-                <h1 class="username effect-${user.username_effect || 'none'}">
-                  ${app.escapeHtml(user.username)}
-                </h1>
+                <h1
+  class="username effect effect-spectral"
+  data-text="psx"
+  style="--accent: #7c7cff;"
+>
+  psx
+</h1>
 
                 
 ${highestRole && user.show_role_icon !== false ? `
@@ -542,8 +593,36 @@ ${highestRole && user.show_role_icon !== false ? `
         </div>`;
     }
   };
+const EFFECT_REGISTRY = {
+  none: {
+    class: null
+  },
+
+  spectral: {
+    class: "effect-spectral"
+  },
+
+  aura: {
+    class: "effect-aura"
+  }
+};
+function applyUsernameEffect(effectName) {
+  const el = document.querySelector(".username");
+
+  if (!el) return;
+
+  // Reset safely
+  el.className = "username effect";
+
+  const effect = EFFECT_REGISTRY[effectName];
+  if (!effect || !effect.class) return;
+
+  el.classList.add(effect.class);
+}
 
   window.addEventListener('DOMContentLoaded', app.init);
+  applyUsernameEffect("spectral");
+
 </script>
 </body>
 </html>
