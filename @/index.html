@@ -1,3 +1,4 @@
+<!-- START OF FILE view.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,644 +6,289 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Profile | /six</title>
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Cinzel:wght@700&family=Orbitron:wght@700&family=Playfair+Display:wght@700&family=UnifrakturMaguntia&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+<!-- PRELOAD CRITICAL ASSETS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Cinzel:wght@700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
 <style>
-/* ======================= VARIABLES ======================= */
+/* --- SHARED THEME ENGINE --- */
 :root {
-  --c-bg: #030005;
-  --c-accent: #7b2cbf;
-  --c-accent-glow: rgba(123, 44, 191, 0.5);
-  --c-text-main: #ffffff;
-  --c-text-dim: #9ca3af;
+  --bg: #050505;
+  --accent: #7b2cbf; /* Dynamic */
+  --accent-glow: rgba(123, 44, 191, 0.4);
+  --text-main: #ffffff;
+  --text-dim: #a1a1aa;
   
-  /* Premium Glass Variables */
-  --glass-bg: rgba(15, 15, 25, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.03);
-  --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-  
-  --font-main: 'Inter', sans-serif;
-  --font-display: 'Inter', sans-serif; /* Updated via JS */
+  --card-bg: rgba(10, 10, 12, 0.6);
+  --card-border: rgba(255, 255, 255, 0.06);
+  --glass-blur: blur(20px);
   
   --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --ease-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-@font-face {
-  font-family: 'Diecide Remain';
-  src: url('/fonts/DeicideRemain.otf') format('opentype');
-  font-display: swap;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-  font-family: var(--font-main);
-  background: var(--c-bg);
-  color: var(--c-text-main);
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: grid; place-items: center;
   overflow-x: hidden;
-  line-height: 1.5;
 }
 
-/* Texture Overlay */
-body::after {
-  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 900;
+/* Background Layer */
+.scene-layer { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+.noise-overlay {
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
-  opacity: 0.07;
+  opacity: 0.05;
 }
-
-/* ======================= LAYOUT ======================= */
-.app-container {
-  position: relative;
-  z-index: 10;
-  max-width: 600px;
-  width: 95%;
-  padding: 20px 0;
-  
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.8s var(--ease-smooth) forwards;
-  will-change: transform, opacity;
+.blob {
+  position: absolute; width: 60vw; height: 60vw;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  opacity: 0.15; filter: blur(80px);
+  top: -20%; left: -10%;
+  animation: float 20s infinite alternate ease-in-out;
 }
+@keyframes float { to { transform: translate(50px, 30px); } }
 
-@keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+.bg-media { width: 100%; height: 100%; object-fit: cover; opacity: 0.3; }
 
-.header-brand {
-  position: absolute;
-  top: 30px;
-  left: 30px;
-  font-family: 'Cinzel', serif;
-  font-size: 1.8rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, #fff, #9d4edd);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-decoration: none;
-  z-index: 50;
-  filter: drop-shadow(0 0 15px rgba(123, 44, 191, 0.3));
-}
-
-/* ======================= PROFILE CARD ======================= */
+/* --- PROFILE CARD --- */
 .profile-card {
-  background: var(--glass-bg);
-  /* The Secret Sauce for Premium Glass: */
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  
-  border: 1px solid var(--glass-border);
-  border-top: 1px solid rgba(255,255,255,0.15); /* Top light highlight */
+  width: 90%; max-width: 550px;
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
   border-radius: 24px;
   overflow: hidden;
   position: relative;
-  box-shadow: var(--glass-shadow), inset 0 0 0 1px rgba(255,255,255,0.02);
-  transition: transform 0.4s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth), border-color 0.4s;
-  will-change: transform;
+  transform: translateY(20px); opacity: 0;
+  animation: entrance 0.8s var(--ease-elastic) forwards;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
 }
 
-.profile-card:hover {
-  border-color: rgba(255,255,255,0.2);
-  box-shadow: 0 40px 80px -20px rgba(0,0,0,0.9), 0 0 30px var(--c-accent-glow);
-  transform: translateY(-2px);
-}
+@keyframes entrance { to { transform: translateY(0); opacity: 1; } }
 
-/* Banner */
-.profile-banner {
-  width: 100%; height: 240px;
-  background-color: #0f0f0f;
-  position: relative;
-  /* Smoother fade to glass */
+/* Visuals */
+.banner {
+  height: 220px; background: #111; position: relative;
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 }
+.banner img, .banner video { width: 100%; height: 100%; object-fit: cover; }
 
-.profile-banner img, .profile-banner video {
-  width: 100%; height: 100%; object-fit: cover;
-  transition: transform 1.5s var(--ease-smooth);
-  will-change: transform;
+.content { padding: 0 30px 40px; position: relative; margin-top: -60px; }
+
+/* Avatar Row */
+.header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+
+.avatar-container {
+  padding: 4px; background: rgba(20,20,20,0.8);
+  border: 1px solid var(--card-border);
+  border-radius: 24px; backdrop-filter: blur(10px);
 }
+.avatar { width: 100px; height: 100px; border-radius: 20px; object-fit: cover; display: block; background: #000; }
 
-.profile-card:hover .profile-banner img { transform: scale(1.05); }
-
-/* Content Wrapper */
-.profile-content {
-  padding: 0 32px 36px;
-  margin-top: -65px;
-  position: relative;
-  z-index: 2;
-}
-
-/* Avatar */
-.avatar-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
-.avatar-wrapper {
-  padding: 4px;
-  background: rgba(20, 20, 30, 0.6);
-  backdrop-filter: blur(10px);
-  border-radius: 26px;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-}
-.profile-avatar {
-  width: 100px; height: 100px;
-  border-radius: 22px; 
-  object-fit: cover; 
-  display: block;
-  background: #111;
-}
-
-/* Action Buttons */
 .action-btn {
-  padding: 8px 16px; border-radius: 10px;
-  font-size: 13px; font-weight: 600; text-decoration: none;
-  display: flex; align-items: center; gap: 8px;
-  transition: all 0.2s var(--ease-smooth); 
-  cursor: pointer;
+  padding: 8px 16px; border-radius: 12px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
+  color: #fff; text-decoration: none; font-size: 13px; font-weight: 600;
+  transition: 0.2s; cursor: pointer; display: flex; align-items: center; gap: 6px;
 }
+.action-btn:hover { background: var(--accent); border-color: var(--accent); }
 
-.action-btn.secondary {
-  background: rgba(255,255,255,0.05); 
-  border: 1px solid rgba(255,255,255,0.1); 
-  color: #ddd;
-}
-.action-btn.secondary:hover { 
-  background: rgba(255,255,255,0.1); 
-  border-color: #fff; 
-  color: #fff;
-}
+/* Identity */
+.username-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
 
-.action-btn.primary {
-  background: var(--c-accent); 
-  color: #fff; border: 1px solid transparent;
-  box-shadow: 0 0 20px var(--c-accent-glow);
-}
-.action-btn.primary:hover { 
-  filter: brightness(1.15); 
-  transform: translateY(-1px); 
-}
-
-/* ======================= IDENTITY & ALIGNMENT ======================= */
-/* This is the critical section for alignment */
-
-.user-identity {
-  margin-bottom: 12px;
-}
-
-.identity-row {
-  display: flex;             /* Enable Flexbox */
-  align-items: center;       /* Vertical Center: The most important line */
-  justify-content: flex-start;
-  gap: 12px;                 /* Space between name and icons */
-  flex-wrap: wrap;           /* Allow wrapping on tiny screens */
-}
-
-.username { 
-  font-family: var(--font-display); 
-  font-size: 32px; 
-  line-height: 1.1;          /* Tight line height prevents weird gaps */
-  font-weight: 700;
-  margin: 0;
+/* --- EFFECTS ENGINE --- */
+/* The Signature Effect: Ethereal */
+.fx-ethereal {
+  font-family: 'Cinzel', serif;
+  font-size: 36px; font-weight: 700;
+  background: linear-gradient(135deg, #fff 40%, var(--accent) 50%, #fff 60%);
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: shimmer 4s infinite linear;
   letter-spacing: -0.5px;
 }
+@keyframes shimmer { to { background-position: 200% center; } }
 
-/* Role Icon Container - Perfectly Centered */
+.fx-glitch { 
+  font-family: 'Space Grotesk', sans-serif; font-size: 32px;
+  text-shadow: 2px 0 var(--accent), -2px 0 #00ffff; 
+}
+.fx-glow { 
+  font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 800;
+  text-shadow: 0 0 20px var(--accent); 
+}
+.fx-none { font-size: 32px; font-weight: 700; }
+
+/* Role Badge */
 .role-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  
-  /* Size relative to text */
-  height: 28px; 
-  width: 28px; 
-  
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  
-  position: relative;
-  cursor: help;
-  transition: transform 0.2s;
+  display: flex; align-items: center; height: 28px; padding: 0 10px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--card-border);
+  border-radius: 8px; font-size: 11px; font-weight: 600; color: var(--text-dim);
+  gap: 6px;
 }
-
-.role-badge:hover { transform: scale(1.1); border-color: var(--c-accent); }
-
-.role-badge img {
-  width: 18px; 
-  height: 18px; 
-  object-fit: contain;
-  /* Drop shadow for icon visibility */
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-}
-
-/* Verified Check */
-.badge-verified {
-  color: var(--c-accent); 
-  font-size: 22px;
-  display: flex;
-  filter: drop-shadow(0 0 10px var(--c-accent-glow));
-}
-
-/* Role Tooltip */
-.role-badge::after {
-  content: attr(data-role);
-  position: absolute;
-  bottom: 110%; left: 50%; transform: translateX(-50%) translateY(5px);
-  background: #000; border: 1px solid #333;
-  color: white; padding: 5px 10px; border-radius: 6px;
-  font-size: 11px; font-weight: 700; white-space: nowrap;
-  opacity: 0; pointer-events: none; transition: 0.2s ease;
-  z-index: 100;
-}
-.role-badge:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
-
+.role-badge img { width: 14px; height: 14px; }
 
 /* Bio & Stats */
-.bio-text {
-  color: var(--c-text-dim); 
-  font-size: 14px; 
-  line-height: 1.6;
-  white-space: pre-wrap;
-  font-weight: 400;
-  max-width: 95%;
-}
+.bio { color: var(--text-dim); line-height: 1.6; font-size: 14px; white-space: pre-wrap; margin-bottom: 24px; }
 
-.stats-bar {
-  display: flex; gap: 24px; margin-top: 24px; padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+.stats {
+  display: flex; gap: 20px; padding-top: 20px;
+  border-top: 1px solid var(--card-border);
 }
-.stat-item {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 11px; color: var(--c-text-dim); 
-  font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-}
-.stat-item i { font-size: 16px; color: var(--c-accent); }
+.stat { font-size: 12px; color: var(--text-dim); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.stat i { color: var(--accent); font-size: 16px; }
 
-/* ======================= BACKGROUNDS & EFFECTS ======================= */
-.bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-.bg-media { width: 100%; height: 100%; object-fit: cover; opacity: 0.3; }
-
-/* Optimized Blob */
-.bg-blob { 
-  position: absolute; 
-  border-radius: 50%; 
-  opacity: 0.4;
-  /* Use radial gradient instead of box-shadow blur for better performance */
-  background: radial-gradient(circle, var(--c-accent) 0%, transparent 70%);
-  filter: blur(60px); 
-  will-change: transform;
-}
-.bg-blob.one { 
-  top: -10%; left: -10%; 
-  width: 600px; height: 600px; 
-  opacity: 0.25;
-}
-
-/* Username Effects */
-.effect-none { color: #fff; }
-.effect-glow { text-shadow: 0 0 15px var(--c-accent-glow), 0 0 30px var(--c-accent-glow); }
-.effect-rgb { animation: rgbGlow 4s linear infinite; }
-@keyframes rgbGlow {
-  0% { color: #ff3c3c; text-shadow: 0 0 10px rgba(255,60,60,0.5); }
-  33% { color: #3cffb3; text-shadow: 0 0 10px rgba(60,255,179,0.5); }
-  66% { color: #3c7bff; text-shadow: 0 0 10px rgba(60,123,255,0.5); }
-  100% { color: #ff3c3c; text-shadow: 0 0 10px rgba(255,60,60,0.5); }
-}
-.effect-gradient {
-  background: linear-gradient(to right, #7dd3fc, #c084fc, #f472b6);
-  -webkit-background-clip: text; color: transparent;
-  background-size: 200% auto; animation: gradientMove 3s linear infinite;
-}
-@keyframes gradientMove { to { background-position: 200% center; } }
-
-/* Loading Skeletons */
-.skeleton { 
-  background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-  background-size: 200% 100%;
-  border-radius: 8px; 
-  animation: shimmer 1.5s infinite;
-}
-@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-/* ===============================
-   EFFECT SYSTEM — BASE
-   =============================== */
-
-.effect {
-  position: relative;
-  display: inline-block;
-  --intensity: 0.6;
-  --speed: 6s;
-}
-/* ===============================
-   SIGNATURE EFFECT: SPECTRAL DRIFT
-   =============================== */
-
-.effect-spectral {
-  color: inherit;
-}
-
-.effect-spectral::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-
-  background: linear-gradient(
-    120deg,
-    transparent 35%,
-    color-mix(
-      in srgb,
-      var(--accent) calc(var(--intensity) * 100%),
-      transparent
-    ),
-    transparent 65%
-  );
-
-  background-size: 200% 200%;
-  animation: spectral-drift var(--speed) ease-in-out infinite;
-
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-@keyframes spectral-drift {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-/* ===============================
-   EFFECT: AURA
-   =============================== */
-
-.effect-aura {
-  text-shadow:
-    0 0 12px color-mix(in srgb, var(--accent) 40%, transparent),
-    0 0 28px color-mix(in srgb, var(--accent) 20%, transparent);
-  animation: aura-breath 4s ease-in-out infinite;
-}
-
-@keyframes aura-breath {
-  0%, 100% {
-    filter: drop-shadow(0 0 6px var(--accent));
-  }
-  50% {
-    filter: drop-shadow(0 0 14px var(--accent));
-  }
-}
+/* Loading State */
+.loading-skel { animation: pulse 1.5s infinite; background: rgba(255,255,255,0.05); border-radius: 8px; }
+@keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
 </style>
 </head>
 <body>
 
-  <div class="bg-fixed" id="profile-bg">
-    <div class="bg-blob one"></div>
-  </div>
+<div class="scene-layer noise-overlay"></div>
+<div class="scene-layer" id="scene-bg"><div class="blob"></div></div>
 
-  <a href="/" class="header-brand">/six</a>
-
-  <main class="app-container">
-    <div id="profile-target">
-      <!-- Premium Loading State -->
-      <div class="profile-card">
-        <div class="profile-banner skeleton"></div>
-        <div class="profile-content">
-          <div class="avatar-row">
-            <div class="avatar-wrapper"><div class="profile-avatar skeleton"></div></div>
-          </div>
-          <div class="skeleton" style="height:32px; width:40%; margin-bottom:15px"></div>
-          <div class="skeleton" style="height:14px; width:90%; margin-bottom:8px"></div>
-          <div class="skeleton" style="height:14px; width:70%"></div>
-        </div>
+<main id="app">
+  <!-- SKELETON LOADER -->
+  <div class="profile-card">
+    <div class="banner loading-skel"></div>
+    <div class="content">
+      <div class="header-row">
+        <div class="avatar-container"><div class="avatar loading-skel"></div></div>
       </div>
+      <div class="loading-skel" style="height:40px; width:50%; margin-bottom:15px"></div>
+      <div class="loading-skel" style="height:15px; width:80%; margin-bottom:10px"></div>
+      <div class="loading-skel" style="height:15px; width:60%"></div>
     </div>
-  </main>
+  </div>
+</main>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  // CONFIGURATION
-  const CONFIG = {
-    supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co",
-    supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
-    fonts: {
-      'Default': "'Inter', sans-serif",
-      'Cinzel': "'Cinzel', serif",
-      'Orbitron': "'Orbitron', sans-serif",
-      'UnifrakturMaguntia': "'UnifrakturMaguntia', cursive",
-      'Playfair': "'Playfair Display', serif",
-      'Diecide Remain': "'Diecide Remain', 'Cinzel', serif",
-      'Mono': "'Roboto Mono', monospace"
-    },
-    roles: {
-      Founder: { name: "Founder", icon: "/assets/owner.png", priority: 100 },
-      Admin: { name: "Admin", icon: "/assets/admin.png", priority: 80 },
-      Moderator: { name: "Moderator", icon: "/assets/moderator.png", priority: 60 },
-      Verified: { name: "Verified", icon: "/assets/verified.png", priority: 40 }
-    }
-  };
-  const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
-
-  const app = {
-    init: () => app.loadProfile(),
-    escapeHtml: (str) => str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : "",
-
-    getHighestRole: (userRoles = []) => {
-      let highest = null;
-      userRoles.forEach(r => {
-        const role = CONFIG.roles[r];
-        if (role && (!highest || role.priority > highest.priority)) highest = role;
-      });
-      return highest;
-    },
-
-    loadProfile: async () => {
-      const path = window.location.pathname;
-      const username = decodeURIComponent(path.startsWith("/@") ? path.slice(2).replace(/\//g, "") : "");
-      
-      if (!username) return app.renderError("User identity not found.");
-
-      const { data: profile, error } = await sb.from("profiles").select("*").eq("username", username).single();
-      if (error || !profile) return app.renderError("Profile restricted or non-existent.");
-
-      sb.rpc('increment_views', { row_id: profile.id });
-      
-      // Load fonts first, then render to prevent jumping
-      await app.applyTheme(profile);
-      app.renderProfile(profile);
-      app.checkAuth(profile);
-    },
-
-    applyTheme: async (user) => {
-      // 1. Colors
-      const themeColor = user.theme_color || '#7b2cbf';
-      const root = document.documentElement;
-      root.style.setProperty('--c-accent', themeColor);
-      root.style.setProperty('--c-accent-glow', themeColor + '66'); // 40% opacity hex
-      
-      // 2. Fonts
-      let fontName = CONFIG.fonts[user.username_font] || CONFIG.fonts['Default'];
-      
-      if (user.username_font === 'custom' && user.custom_font_url) {
-        try {
-          const font = new FontFace('CustomUserFont', `url(${user.custom_font_url})`);
-          await font.load();
-          document.fonts.add(font);
-          fontName = "'CustomUserFont', sans-serif";
-        } catch (e) {
-          console.error("Font load failed", e);
-        }
-      }
-      root.style.setProperty('--font-display', fontName);
-
-      // 3. Background
-      const bgEl = document.getElementById('profile-bg');
-      if(user.bg_type === 'image' && user.bg_value) {
-        bgEl.innerHTML = `<img src="${app.escapeHtml(user.bg_value)}" class="bg-media" alt="">`;
-      } else if(user.bg_type === 'video' && user.bg_value) {
-        bgEl.innerHTML = `<video src="${app.escapeHtml(user.bg_value)}" autoplay muted loop playsinline class="bg-media"></video>`;
-      } else {
-        // Dynamic blob color
-        bgEl.innerHTML = `<div class="bg-blob one"></div>`;
-      }
-    },
-
-    renderProfile: (user) => {
-      const avatar = user.avatar || "https://cdn.discordapp.com/embed/avatars/0.png";
-      const banner = user.banner_url 
-        ? (user.banner_url.match(/\.(mp4|webm)$/) 
-            ? `<video src="${user.banner_url}" autoplay loop muted playsinline></video>` 
-            : `<img src="${user.banner_url}">`)
-        : `<div style="width:100%;height:100%;background:${user.theme_color || '#111'}"></div>`;
-
-      const highestRole = app.getHighestRole(user.roles || []);
-      const isVerified = user.roles && user.roles.includes("Verified");
-
-      // THE HTML
-      const html = `
-        <div class="profile-card">
-          <div class="profile-banner">${banner}</div>
-          
-          <div class="profile-content">
-            <div class="avatar-row">
-              <div class="avatar-wrapper">
-                <img class="profile-avatar" src="${app.escapeHtml(avatar)}" alt="Avatar">
-              </div>
-              <div id="action-buttons" style="display:flex; gap:10px;">
-                <button class="action-btn secondary" onclick="app.copyLink()">
-                  <i class="ph-bold ph-share-network"></i> Share
-                </button>
-              </div>
-            </div>
-
-            <div class="user-identity">
-              <div class="identity-row">
-                <h1
-  class="username effect effect-spectral"
-  data-text="psx"
-  style="--accent: #7c7cff;"
->
-  psx
-</h1>
-
-                
-${highestRole && user.show_role_icon !== false ? `
-  <div class="role-badge" data-role="${highestRole.name}">
-     <img src="${highestRole.icon}" alt="${highestRole.name}">
-  </div>
-` : ''}
-
-                ${isVerified ? `<i class="ph-fill ph-seal-check badge-verified"></i>` : ''}
-              </div>
-            </div>
-
-            <div class="bio-text">${app.escapeHtml(user.bio || "No bio provided.")}</div>
-
-            <div class="stats-bar">
-               <div class="stat-item">
-                 <i class="ph-bold ph-eye"></i>
-                 <span>${(user.views || 0).toLocaleString()} Views</span>
-               </div>
-               <div class="stat-item">
-                 <i class="ph-bold ph-calendar-blank"></i>
-                 <span>Joined ${new Date(user.created_at || Date.now()).getFullYear()}</span>
-               </div>
-            </div>
-
-          </div>
-        </div>
-      `;
-
-      document.getElementById('profile-target').innerHTML = html;
-      document.title = `${user.username} | /six`;
-    },
-
-    checkAuth: async (profile) => {
-      const { data: { session } } = await sb.auth.getSession();
-      if (session?.user?.id === profile.id) {
-        const btn = document.createElement('a');
-        btn.href = `/@${encodeURIComponent(profile.username)}/edit`;
-        btn.className = 'action-btn primary';
-        btn.innerHTML = `<i class="ph-bold ph-pencil-simple"></i> Edit`;
-        document.getElementById('action-buttons').prepend(btn);
-      }
-    },
-
-    copyLink: () => {
-      navigator.clipboard.writeText(window.location.href);
-      const btn = document.querySelector('.ph-share-network').parentElement;
-      const original = btn.innerHTML;
-      btn.innerHTML = `<i class="ph-bold ph-check"></i> Copied`;
-      btn.style.borderColor = "#4ade80";
-      btn.style.color = "#4ade80";
-      setTimeout(() => {
-        btn.innerHTML = original;
-        btn.style.borderColor = "";
-        btn.style.color = "";
-      }, 2000);
-    },
-
-    renderError: (msg) => {
-      document.getElementById('profile-target').innerHTML = `
-        <div style="background:rgba(255,50,50,0.1); border:1px solid rgba(255,50,50,0.2); padding:20px; border-radius:12px; text-align:center; color:#ff8888; backdrop-filter:blur(10px);">
-          <i class="ph-bold ph-warning" style="font-size:32px; margin-bottom:10px; display:block;"></i>
-          ${msg}
-        </div>`;
-    }
-  };
-const EFFECT_REGISTRY = {
-  none: {
-    class: null
-  },
-
-  spectral: {
-    class: "effect-spectral"
-  },
-
-  aura: {
-    class: "effect-aura"
+const CONFIG = {
+  supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co",
+  supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
+  roles: {
+    Founder: { icon: "https://img.icons8.com/ios-filled/50/ffffff/crown.png" },
+    Verified: { icon: "https://img.icons8.com/ios-filled/50/ffffff/verified-badge.png" }
   }
 };
-function applyUsernameEffect(effectName) {
-  const el = document.querySelector(".username");
 
-  if (!el) return;
+const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
-  // Reset safely
-  el.className = "username effect";
+const app = {
+  escape: (str) => str ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])) : "",
 
-  const effect = EFFECT_REGISTRY[effectName];
-  if (!effect || !effect.class) return;
+  async init() {
+    const path = window.location.pathname;
+    const username = decodeURIComponent(path.startsWith("/@") ? path.slice(2) : ""); // Extract after /@
+    
+    if(!username) return document.body.innerHTML = "<h2 style='text-align:center'>User Not Found</h2>";
 
-  el.classList.add(effect.class);
-}
+    const { data: profile } = await sb.from("profiles").select("*").eq("username", username).maybeSingle();
+    
+    if(!profile) return document.body.innerHTML = "<h2 style='text-align:center'>404 Profile</h2>";
+    
+    // Increment View (Fire & Forget)
+    sb.rpc('increment_views', { row_id: profile.id });
+    
+    // Load Custom Font if exists
+    if(profile.username_font === 'custom' && profile.custom_font_url) {
+        const font = new FontFace('CustomFont', `url(${profile.custom_font_url})`);
+        await font.load();
+        document.fonts.add(font);
+    }
 
-  window.addEventListener('DOMContentLoaded', app.init);
-  applyUsernameEffect("aura");
+    this.render(profile);
+    this.checkOwner(profile.id, profile.username);
+  },
 
+  render(user) {
+    // 1. Apply Theme Variables
+    const root = document.documentElement;
+    const color = user.theme_color || '#7b2cbf';
+    root.style.setProperty('--accent', color);
+    
+    // 2. Background Logic
+    const bgEl = document.getElementById('scene-bg');
+    if(user.bg_type === 'video' && user.bg_value) {
+      bgEl.innerHTML = `<video src="${user.bg_value}" autoplay muted loop class="bg-media"></video>`;
+    } else if (user.bg_type === 'image' && user.bg_value) {
+      bgEl.innerHTML = `<img src="${user.bg_value}" class="bg-media">`;
+    } else {
+      bgEl.innerHTML = `<div class="blob"></div>`; // Default Blob
+    }
 
+    // 3. Media Logic
+    const avatar = user.avatar || "https://cdn.discordapp.com/embed/avatars/0.png";
+    const banner = user.banner_url 
+      ? (user.banner_url.match(/\.(mp4|webm)$/) 
+          ? `<video src="${user.banner_url}" autoplay muted loop playsinline></video>` 
+          : `<img src="${user.banner_url}">`) 
+      : `<div style="width:100%;height:100%;background:#111"></div>`;
+
+    // 4. Role Logic
+    let roleHtml = '';
+    if(user.show_role_icon !== false && user.roles && user.roles.length > 0) {
+      // Simple logic: take first role or specific priority
+      const roleName = user.roles[0]; 
+      const roleData = CONFIG.roles[roleName] || { icon: null };
+      if(roleData.icon) {
+         roleHtml = `<div class="role-badge"><img src="${roleData.icon}"> ${roleName}</div>`;
+      }
+    }
+
+    // 5. Build HTML
+    const html = `
+      <div class="profile-card">
+        <div class="banner">${banner}</div>
+        <div class="content">
+          <div class="header-row">
+            <div class="avatar-container">
+              <img src="${avatar}" class="avatar">
+            </div>
+            <div id="owner-actions"></div>
+          </div>
+
+          <div class="username-row">
+            <h1 class="fx-${user.username_effect || 'none'}" 
+                style="${user.username_font === 'custom' ? 'font-family:CustomFont, sans-serif' : ''}">
+              ${this.escape(user.username)}
+            </h1>
+            ${roleHtml}
+          </div>
+
+          <div class="bio">${this.escape(user.bio || "No biography set.")}</div>
+
+          <div class="stats">
+            <div class="stat"><i class="ph-bold ph-eye"></i> ${user.views || 0} Views</div>
+            <div class="stat"><i class="ph-bold ph-calendar"></i> ${new Date(user.created_at).getFullYear()}</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('app').innerHTML = html;
+    document.title = `${user.username} | /six`;
+  },
+
+  async checkOwner(profileId, username) {
+    const { data: { session } } = await sb.auth.getSession();
+    if(session && session.user.id === profileId) {
+      const btn = `<a href="/@${username}/edit" class="action-btn"><i class="ph-bold ph-pencil-simple"></i> Edit Profile</a>`;
+      document.getElementById('owner-actions').innerHTML = btn;
+    }
+  }
+};
+
+window.addEventListener('DOMContentLoaded', () => app.init());
 </script>
 </body>
 </html>
