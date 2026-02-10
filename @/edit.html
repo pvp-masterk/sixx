@@ -532,17 +532,7 @@ textarea::placeholder { color: #444; }
         </div>
       </div>
     </div>
-
-    <!-- ROLES SECTION -->
-    <div class="card-panel">
-      <div class="section-header">
-        <div class="section-label"><i class="ph-bold ph-shield-star"></i> Roles</div>
-      </div>
-      <div id="roles-grid" class="roles-grid">
-        <!-- Injected via JS -->
-      </div>
-    </div>
-
+   
     <!-- SAVE BUTTON -->
     <button id="save-btn" class="save-btn">
       <div class="loader"></div>
@@ -601,12 +591,6 @@ const CONFIG = {
   supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
   defaultAvatar: "https://cdn.discordapp.com/embed/avatars/0.png",
   defaultBanner: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3R6cW55eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26BRy67X26yX1eLhm/giphy.gif",
-  roles: [
-    { id: 'Founder', label: 'Founder', icon: 'crown' },
-    { id: 'Admin',   label: 'Admin',   icon: 'shield-check' },
-    { id: 'Mod',     label: 'Mod',     icon: 'gavel' },
-    { id: 'VIP',     label: 'VIP',     icon: 'star' }
-  ],
   fonts: [
     { id: 'Diecide Remain', label: 'Signature', family: "'Diecide Remain', serif", featured: true },
     { id: 'Cinzel', label: 'Cinzel', family: "'Cinzel', serif" },
@@ -669,7 +653,6 @@ const els = {
   fontGrid: document.getElementById('font-grid'),
   fontInput: document.getElementById('in-font'),
   fontPreviewLabel: document.getElementById('font-preview-label'), // New Element
-  roles: document.getElementById('roles-grid'),
   btn: document.getElementById('save-btn'),
   loader: document.querySelector('.loader'),
   btnText: document.querySelector('.btn-text'),
@@ -695,7 +678,6 @@ const els = {
     els.prevAvatar.src = CONFIG.defaultAvatar;
     els.prevBannerImg.src = CONFIG.defaultBanner;
     renderFonts('Cinzel');
-    renderRoles([]);
   }
   
   setupInteractions();
@@ -726,7 +708,6 @@ function populateUI(data) {
 
   // Fonts & Roles
   renderFonts(data.username_font || 'Cinzel');
-  renderRoles(data.roles || []);
 }
 function escapeHtml(str = '') {
   return str.replace(/[&<>"']/g, m => ({
@@ -801,19 +782,6 @@ function renderEffects(active) {
     };
 
     grid.appendChild(div);
-  });
-}
-
-function renderRoles(activeRoles) {
-  els.roles.innerHTML = "";
-  CONFIG.roles.forEach(role => {
-    const isActive = activeRoles.includes(role.id);
-    const div = document.createElement('div');
-    div.className = `role-badge ${isActive ? 'active' : ''}`;
-    div.innerHTML = `<i class="ph-fill ph-${role.icon}"></i><span>${role.label}</span>`;
-    div.onclick = () => div.classList.toggle('active');
-    div.dataset.roleId = role.id;
-    els.roles.appendChild(div);
   });
 }
 
@@ -925,7 +893,6 @@ async function saveProfile() {
       bio: els.bio.value,
       theme_color: els.color.value,
       username_font: els.fontInput.value,
-      roles: Array.from(document.querySelectorAll('.role-badge.active')).map(el => el.dataset.roleId)
     };
 
     if (staging.avatar) updates.avatar = await upload(staging.avatar, 'avatars');
