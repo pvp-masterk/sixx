@@ -1,4 +1,3 @@
-<!-- START OF FILE edit.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,594 +8,698 @@
 <!-- LIBS -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Cinzel:wght@500;700&family=Outfit:wght@700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Cinzel:wght@500;700&family=Outfit:wght@500;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
 
 <style>
-/* --- CORE THEME --- */
+/* --- VARIABLES & RESET --- */
 :root {
-  --bg: #050505;
-  --surface: #0f0f11;
-  --surface-highlight: #1a1a1e;
-  --border: rgba(255,255,255,0.08);
+  --bg-core: #030303;
+  --bg-panel: #0a0a0a;
+  --bg-card: #111111;
+  --bg-input: #161616;
+  
+  --border-subtle: rgba(255,255,255,0.06);
+  --border-active: rgba(255,255,255,0.15);
   
   --accent: #7b2cbf;
-  --accent-glow: rgba(123, 44, 191, 0.4);
+  --accent-glow: rgba(123, 44, 191, 0.25);
+  --text-primary: #ffffff;
+  --text-secondary: #888888;
+  --text-tertiary: #555555;
   
-  --text-main: #ffffff;
-  --text-dim: #888888;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
   
-  --radius: 16px;
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-smooth: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
 
 body {
-  background: var(--bg); color: var(--text-main);
+  background: var(--bg-core);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
-  height: 100vh; overflow: hidden; /* App-like feel */
+  height: 100vh;
   display: flex;
+  overflow: hidden;
 }
 
-/* Texture */
-body::before {
-  content:""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
-  opacity: 0.03;
-}
+/* Scrollbar Polish */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #444; }
 
-/* --- LAYOUT --- */
+/* --- APP SHELL --- */
 .app-shell {
-  display: flex; width: 100%; height: 100%; z-index: 1;
-  max-width: 1400px; margin: 0 auto;
+  display: flex;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
-/* Sidebar */
+/* --- SIDEBAR --- */
 .sidebar {
-  width: 280px; padding: 30px; border-right: 1px solid var(--border);
-  display: flex; flex-direction: column; gap: 40px;
-  background: rgba(5,5,5,0.8); backdrop-filter: blur(20px);
+  width: 260px;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 32px;
+  z-index: 10;
 }
 
-.brand { font-family: 'Cinzel', serif; font-size: 24px; font-weight: 700; letter-spacing: -1px; }
+.brand {
+  font-family: 'Cinzel', serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #fff;
+  padding-left: 8px;
+}
 
-.nav-menu { display: flex; flex-direction: column; gap: 8px; }
+.nav-menu { display: flex; flex-direction: column; gap: 4px; }
 
 .nav-item {
-  padding: 12px 16px; border-radius: 10px;
-  color: var(--text-dim); cursor: pointer;
   display: flex; align-items: center; gap: 12px;
-  font-weight: 500; font-size: 14px;
-  transition: 0.2s var(--ease);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px; font-weight: 500;
+  transition: all 0.2s var(--ease-smooth);
+  border: 1px solid transparent;
 }
-.nav-item:hover { color: #fff; background: var(--surface-highlight); }
-.nav-item.active { background: var(--surface-highlight); color: #fff; border-left: 3px solid var(--accent); }
+.nav-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
+.nav-item.active {
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  border-color: var(--border-subtle);
+}
 .nav-item i { font-size: 18px; }
 
-/* Main Area */
-.main-content {
-  flex: 1; padding: 40px; overflow-y: auto;
-  display: grid; grid-template-columns: 1fr 380px; gap: 40px;
+.action-area { margin-top: auto; }
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: var(--text-primary);
+  color: #000;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform 0.1s;
+}
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* --- MAIN EDITOR --- */
+.main-area {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 420px; /* Editor | Preview */
+  height: 100%;
 }
 
-.editor-panel { display: none; flex-direction: column; gap: 24px; animation: fadeIn 0.4s var(--ease); }
-.editor-panel.active { display: flex; }
+.editor-scroll {
+  padding: 40px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.panel-header { margin-bottom: 20px; animation: fadeIn 0.4s var(--ease-smooth); }
+.panel-header h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 6px; }
+.panel-header p { color: var(--text-secondary); font-size: 14px; }
 
-.panel-header h2 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
-.panel-header p { color: var(--text-dim); font-size: 14px; }
+/* Form Components */
+.section { display: flex; flex-direction: column; gap: 24px; animation: slideUp 0.3s var(--ease-smooth); }
+.section.hidden { display: none; }
 
-/* Preview Column (Sticky) */
-.preview-column { position: relative; }
-.preview-sticky { position: sticky; top: 0; }
-
-/* --- COMPONENTS --- */
 .card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 24px;
 }
 
-.input-group { display: flex; flex-direction: column; gap: 10px; }
-.label { font-size: 12px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+.input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.input-group:last-child { margin-bottom: 0; }
+.label { font-size: 11px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; }
 
 input[type="text"], textarea {
-  width: 100%; background: #000; border: 1px solid var(--border);
-  padding: 14px; border-radius: 8px; color: #fff; font-family: inherit;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 14px;
+  transition: 0.2s; width: 100%;
+  resize: none;
+}
+input[type="text"]:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* File Upload Enhanced */
+.file-drop {
+  position: relative;
+  background: var(--bg-input);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  height: 160px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px;
+  cursor: pointer; overflow: hidden;
   transition: 0.2s;
 }
-input:focus, textarea:focus { border-color: var(--accent); }
-
-/* File Drop */
-.file-drop {
-  height: 140px; border: 1px dashed var(--border); border-radius: var(--radius);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 10px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
+.file-drop:hover { border-color: var(--text-secondary); background: rgba(255,255,255,0.03); }
+.file-drop.drag-over { border-color: var(--accent); background: var(--accent-glow); }
+.file-drop img, .file-drop video {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0.5; z-index: 0; transition: 0.3s;
 }
-.file-drop:hover { background: rgba(255,255,255,0.02); border-color: var(--text-dim); }
-.file-drop img, .file-drop video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.4; }
+.file-drop:hover img { opacity: 0.3; transform: scale(1.05); }
+.drop-content { z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+.drop-tag { font-size: 12px; color: var(--text-secondary); background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 4px; backdrop-filter: blur(4px); }
 
-/* Effect Grid */
+/* Color Picker Custom */
+.color-picker-wrapper {
+  display: flex; align-items: center; gap: 16px;
+  padding: 8px; border: 1px solid var(--border-subtle); border-radius: var(--radius-md);
+  background: var(--bg-input); width: fit-content;
+}
+.color-swatch {
+  width: 32px; height: 32px; border-radius: 6px;
+  border: none; padding: 0; cursor: pointer;
+}
+.hex-display { font-family: 'Space Grotesk', monospace; font-size: 14px; color: var(--text-secondary); }
+
+/* Effects Grid */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.selection-card {
-  padding: 15px; background: var(--surface-highlight);
-  border: 1px solid transparent; border-radius: 8px; cursor: pointer;
-  text-align: center; transition: 0.2s;
+.fx-card {
+  padding: 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 12px;
+  transition: 0.2s;
 }
-.selection-card:hover { transform: translateY(-2px); border-color: var(--border); }
-.selection-card.active { border-color: var(--accent); background: rgba(123,44,191,0.1); }
+.fx-card:hover { border-color: var(--text-secondary); }
+.fx-card.active {
+  background: rgba(123, 44, 191, 0.1);
+  border-color: var(--accent);
+}
+.fx-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
-/* --- EFFECTS PREVIEW --- */
-/* The Signature "Ethereal" Effect */
+/* --- PREVIEW PANE (Sticky) --- */
+.preview-pane {
+  border-left: 1px solid var(--border-subtle);
+  background: var(--bg-core);
+  padding: 40px;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+.preview-container {
+  position: sticky; top: 40px;
+  width: 100%;
+}
+
+.preview-label {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+}
+.badge-live {
+  background: rgba(0, 255, 136, 0.1); color: #00ff88;
+  font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 100px;
+  text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(0,255,136,0.2);
+}
+
+.mockup {
+  width: 100%; aspect-ratio: 9/15;
+  border-radius: 24px;
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  position: relative;
+  background: #000;
+  box-shadow: 0 40px 80px -20px rgba(0,0,0,0.8);
+  transition: border-color 0.3s;
+}
+
+.m-banner { height: 35%; background: #222; position: relative; overflow: hidden; }
+.m-banner img, .m-banner video { width: 100%; height: 100%; object-fit: cover; }
+
+.m-avatar-container {
+  position: absolute; top: 35%; left: 24px; transform: translateY(-50%);
+  width: 96px; height: 96px; border-radius: 50%;
+  padding: 4px; background: var(--bg-card); /* Cutout effect */
+}
+.m-avatar {
+  width: 100%; height: 100%; border-radius: 50%;
+  background: #1a1a1a; overflow: hidden;
+}
+.m-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.m-content {
+  margin-top: 50px; padding: 0 24px;
+}
+
+.m-username {
+  font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 8px;
+}
+.m-bio {
+  font-size: 13px; line-height: 1.6; color: var(--text-secondary);
+  white-space: pre-wrap; font-weight: 400;
+}
+
+/* --- TOAST --- */
+.toast-container {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  z-index: 100; display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  background: #1a1a1a; border: 1px solid var(--border-subtle);
+  color: #fff; padding: 12px 20px; border-radius: 50px;
+  font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+  animation: slideUpFade 0.3s var(--ease-spring);
+}
+.toast.success i { color: #00ff88; }
+.toast.error i { color: #ff4444; }
+
+/* --- ANIMATIONS --- */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Effect Classes */
 .fx-ethereal {
   font-family: 'Cinzel', serif;
-  background: linear-gradient(120deg, #fff 30%, var(--accent) 50%, #fff 70%);
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, #fff 100%);
   background-size: 200% auto;
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  animation: shine 4s linear infinite;
-  letter-spacing: 1px; font-weight: 700;
+  animation: shine 5s linear infinite;
 }
-@keyframes shine { to { background-position: 200% center; } }
-
-.fx-glitch { font-family: 'Space Grotesk', sans-serif; text-shadow: 2px 0 #ff00ea, -2px 0 #00d0ff; }
-.fx-glow { text-shadow: 0 0 15px var(--accent); }
+.fx-glitch { font-family: 'Space Grotesk', sans-serif; text-shadow: 2px 0 var(--accent), -2px 0 #fff; letter-spacing: -1px; }
+.fx-neon { text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent); }
 .fx-none { color: #fff; }
 
-/* --- PREVIEW CARD --- */
-.preview-card {
-  width: 100%; aspect-ratio: 9/13;
-  border-radius: 24px; overflow: hidden; position: relative;
-  box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
-  border: 1px solid var(--border);
-}
-.p-banner { height: 35%; background: #222; position: relative; }
-.p-banner img, .p-banner video { width: 100%; height: 100%; object-fit: cover; }
-.p-avatar {
-  width: 90px; height: 90px; border-radius: 50%;
-  background: #000; padding: 4px;
-  position: absolute; bottom: -45px; left: 20px;
-}
-.p-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-.p-body { padding: 50px 20px 20px; background: rgba(15,15,15,0.9); height: 65%; backdrop-filter: blur(20px); }
-
-/* --- MODAL --- */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 999;
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: 0.3s;
-}
-.modal-overlay.open { opacity: 1; pointer-events: auto; }
-.modal-box {
-  width: 400px; background: var(--surface); border: 1px solid var(--border);
-  border-radius: 20px; padding: 24px; transform: scale(0.95); transition: 0.3s var(--ease);
-}
-.modal-overlay.open .modal-box { transform: scale(1); }
-
-/* Save Button */
-.save-float {
-  margin-top: auto; width: 100%; padding: 16px;
-  background: var(--accent); border: none; border-radius: 12px;
-  color: #fff; font-weight: 600; cursor: pointer;
-  display: flex; justify-content: center; align-items: center; gap: 8px;
-  transition: 0.2s;
-}
-.save-float:hover { filter: brightness(1.1); transform: translateY(-1px); }
-.save-float:disabled { opacity: 0.5; cursor: wait; }
+@keyframes shine { to { background-position: 200% center; } }
 
 /* Responsive */
-@media (max-width: 900px) {
-  .app-shell { flex-direction: column; overflow-y: auto; }
-  .sidebar { width: 100%; padding: 15px; border-right: none; border-bottom: 1px solid var(--border); }
-  .nav-menu { flex-direction: row; overflow-x: auto; }
-  .nav-item { white-space: nowrap; }
-  .main-content { grid-template-columns: 1fr; padding: 20px; overflow: visible; }
-  .preview-column { display: none; } /* Hide live preview on mobile to save space */
+@media (max-width: 1000px) {
+  .sidebar { width: 80px; padding: 20px 10px; align-items: center; }
+  .brand, .nav-item span, .btn-primary span { display: none; }
+  .nav-item { justify-content: center; padding: 16px; }
+  .btn-primary { width: 48px; height: 48px; padding: 0; border-radius: 50%; }
+  .preview-pane { display: none; }
+  .main-area { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .app-shell { flex-direction: column; height: 100vh; }
+  .sidebar {
+    width: 100%; height: auto; flex-direction: row; justify-content: space-between;
+    padding: 10px 20px; border-right: none; border-bottom: 1px solid var(--border-subtle);
+  }
+  .nav-menu { flex-direction: row; }
+  .btn-primary { display: none; } /* Add a mobile save header instead if needed */
+  .editor-scroll { padding: 20px; }
 }
 </style>
 </head>
 <body>
 
-<!-- MODAL CONTAINER -->
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal-box" id="modal-content"></div>
-</div>
+<div class="toast-container" id="toast-area"></div>
 
 <div class="app-shell">
-  
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="brand">/six</div>
+    
     <nav class="nav-menu">
-      <div class="nav-item active" onclick="tabs.switch('identity')">
-        <i class="ph ph-fingerprint"></i> Identity
+      <div class="nav-item active" onclick="switchTab('identity', this)">
+        <i class="ph ph-fingerprint"></i> <span>Identity</span>
       </div>
-      <div class="nav-item" onclick="tabs.switch('visuals')">
-        <i class="ph ph-image"></i> Visuals
+      <div class="nav-item" onclick="switchTab('visuals', this)">
+        <i class="ph ph-image"></i> <span>Visuals</span>
       </div>
-      <div class="nav-item" onclick="tabs.switch('style')">
-        <i class="ph ph-palette"></i> Style
+      <div class="nav-item" onclick="switchTab('style', this)">
+        <i class="ph ph-palette"></i> <span>Aesthetics</span>
       </div>
     </nav>
     
-    <button id="btn-save" class="save-float">
-      <i class="ph-bold ph-floppy-disk"></i> Save Profile
-    </button>
+    <div class="action-area">
+      <button id="btn-save" class="btn-primary">
+        <i class="ph-bold ph-floppy-disk"></i>
+        <span>Save Changes</span>
+      </button>
+    </div>
   </aside>
 
-  <!-- CONTENT -->
-  <main class="main-content">
-    
-    <!-- 1. IDENTITY TAB -->
-    <div id="tab-identity" class="editor-panel active">
-      <div class="panel-header">
-        <h2>Who are you?</h2>
-        <p>Set your core details and bio.</p>
-      </div>
-
-      <div class="card">
-        <div class="input-group">
-          <span class="label">Biography</span>
-          <textarea id="in-bio" rows="4" placeholder="Write something iconic..."></textarea>
-        </div>
-      </div>
+  <main class="main-area">
+    <!-- EDITOR COLUMN -->
+    <div class="editor-scroll">
       
-      <div class="card">
-        <span class="label" style="margin-bottom:12px; display:block;">Role Badge</span>
+      <!-- 1. IDENTITY -->
+      <section id="tab-identity" class="section">
+        <div class="panel-header">
+          <h2>Identity</h2>
+          <p>Define how you appear to others.</p>
+        </div>
+
+        <div class="card">
+          <div class="input-group">
+            <span class="label">Biography</span>
+            <textarea id="in-bio" rows="4" placeholder="Tell your story..."></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. VISUALS -->
+      <section id="tab-visuals" class="section hidden">
+        <div class="panel-header">
+          <h2>Visuals</h2>
+          <p>Upload your media assets.</p>
+        </div>
+
         <div class="grid-2">
-           <label class="selection-card" style="display:flex;align-items:center;gap:10px;justify-content:center;">
-             <input type="checkbox" id="in-show-role"> Show Highest Rank
-           </label>
-        </div>
-      </div>
-    </div>
+          <div class="card" style="padding:16px;">
+            <div class="input-group">
+              <span class="label">Avatar</span>
+              <div class="file-drop" id="drop-avatar">
+                <div class="drop-content">
+                  <i class="ph ph-upload-simple" style="font-size:24px;"></i>
+                  <span class="drop-tag">Max 5MB</span>
+                </div>
+                <input type="file" id="file-avatar" hidden accept="image/*">
+                <img id="prev-avatar-img" style="opacity:0; z-index:-1">
+              </div>
+            </div>
+          </div>
 
-    <!-- 2. VISUALS TAB -->
-    <div id="tab-visuals" class="editor-panel">
-      <div class="panel-header">
-        <h2>Visuals</h2>
-        <p>Your avatar, banner, and background.</p>
-      </div>
-
-      <div class="grid-2">
-        <div class="input-group">
-          <span class="label">Avatar</span>
-          <div class="file-drop" id="drop-avatar">
-            <i class="ph ph-user-circle" style="font-size:32px;"></i>
-            <span style="font-size:12px">Upload Image</span>
-            <input type="file" id="file-avatar" hidden accept="image/*">
-            <img id="prev-avatar-img" class="hidden">
+          <div class="card" style="padding:16px;">
+            <div class="input-group">
+              <span class="label">Banner</span>
+              <div class="file-drop" id="drop-banner">
+                <div class="drop-content">
+                  <i class="ph ph-image" style="font-size:24px;"></i>
+                  <span class="drop-tag">Img / Video</span>
+                </div>
+                <input type="file" id="file-banner" hidden accept="image/*,video/*">
+                <img id="prev-banner-img" style="opacity:0; z-index:-1">
+                <video id="prev-banner-vid" muted loop autoplay style="opacity:0; z-index:-1"></video>
+              </div>
+            </div>
           </div>
         </div>
-        
-        <div class="input-group">
-          <span class="label">Banner</span>
-          <div class="file-drop" id="drop-banner">
-            <i class="ph ph-rectangle" style="font-size:32px;"></i>
-            <span style="font-size:12px">Img / Video</span>
-            <input type="file" id="file-banner" hidden accept="image/*,video/*">
-            <img id="prev-banner-img" class="hidden">
-            <video id="prev-banner-vid" class="hidden" muted loop autoplay></video>
+      </section>
+
+      <!-- 3. STYLE -->
+      <section id="tab-style" class="section hidden">
+        <div class="panel-header">
+          <h2>Aesthetics</h2>
+          <p>Customize your theme and effects.</p>
+        </div>
+
+        <div class="card">
+          <span class="label" style="display:block; margin-bottom:12px">Accent Color</span>
+          <div class="color-picker-wrapper">
+            <input type="color" id="in-color" class="color-swatch" value="#7b2cbf">
+            <span id="hex-display" class="hex-display">#7B2CBF</span>
           </div>
         </div>
-      </div>
 
-      <div class="input-group">
-        <span class="label">Page Background</span>
-        <div class="file-drop" id="drop-bg" style="height:100px">
-           <i class="ph ph-monitor-play"></i>
-           <span id="bg-name" style="font-size:12px">Upload Wallpaper / Loop</span>
-           <input type="file" id="file-bg" hidden accept="image/*,video/*">
+        <div class="card">
+          <span class="label" style="display:block; margin-bottom:12px">Username Effect</span>
+          <div class="grid-2" id="effect-grid">
+            <!-- JS Populated -->
+          </div>
         </div>
-      </div>
-    </div>
-
-    <!-- 3. STYLE TAB -->
-    <div id="tab-style" class="editor-panel">
-      <div class="panel-header">
-        <h2>Aesthetics</h2>
-        <p>Define your signature look.</p>
-      </div>
-
-      <div class="card">
-        <span class="label">Accent Color</span>
-        <div style="display:flex; align-items:center; gap:15px; margin-top:10px;">
-          <input type="color" id="in-color" value="#7b2cbf" style="width:50px; height:50px; padding:0; border:none; border-radius:50%; overflow:hidden; cursor:pointer;">
-          <span id="hex-val" style="font-family:monospace; color:var(--text-dim);">#7b2cbf</span>
-        </div>
-      </div>
-
-      <div class="card">
-        <span class="label" style="margin-bottom:12px; display:block;">Username Effect</span>
-        <div class="grid-2" id="effect-grid">
-          <!-- Populated by JS -->
-        </div>
-        <input type="hidden" id="in-effect" value="none">
-      </div>
-      
-      <div class="card">
-         <span class="label">Custom Font</span>
-         <button class="selection-card" style="width:100%; margin-top:8px" id="btn-import-font">
-           Upload .OTF / .TTF
-         </button>
-      </div>
+      </section>
     </div>
 
     <!-- PREVIEW COLUMN -->
-    <aside class="preview-column">
-      <div class="preview-sticky">
-        <span class="label" style="margin-bottom:10px; display:block;">Live Preview</span>
-        <div class="preview-card" id="live-card">
-          <div class="p-banner" id="p-banner-area"></div>
-          <div class="p-avatar">
-            <img id="p-avatar-img" src="https://cdn.discordapp.com/embed/avatars/0.png">
+    <aside class="preview-pane">
+      <div class="preview-container">
+        <div class="preview-label">
+          <span class="label">Live Preview</span>
+          <span class="badge-live">Live</span>
+        </div>
+        
+        <div class="mockup" id="mockup-card">
+          <div class="m-banner" id="m-banner-area"></div>
+          <div class="m-avatar-container">
+            <div class="m-avatar">
+              <img id="m-avatar-img" src="https://cdn.discordapp.com/embed/avatars/0.png">
+            </div>
           </div>
-          <div class="p-body">
-            <h1 id="p-username" style="font-size:24px; margin-bottom:4px; margin-top:10px;">User</h1>
-            <div style="font-size:12px; color:var(--text-dim); line-height:1.5; white-space:pre-wrap;" id="p-bio">...</div>
+          <div class="m-content">
+            <h1 id="m-username" class="m-username">Username</h1>
+            <div id="m-bio" class="m-bio">...</div>
           </div>
         </div>
       </div>
     </aside>
-
   </main>
 </div>
 
 <script>
-// --- CONFIG & STATE ---
+// --- CONFIGURATION ---
 const CONFIG = {
   supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co",
   supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
   effects: [
-    { id: 'ethereal', name: 'Ethereal', icon: 'ph-sparkle' }, /* Signature Effect */
-    { id: 'glitch', name: 'Cyber', icon: 'ph-lightning' },
-    { id: 'glow', name: 'Neon', icon: 'ph-lightbulb' },
-    { id: 'none', name: 'Classic', icon: 'ph-circle' }
+    { id: 'ethereal', name: 'Ethereal', icon: 'ph-sparkle' },
+    { id: 'glitch', name: 'Glitch', icon: 'ph-lightning' },
+    { id: 'neon', name: 'Neon', icon: 'ph-lightbulb' },
+    { id: 'none', name: 'Clean', icon: 'ph-circle' }
   ]
 };
 
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 let userSession = null;
-let currentProfile = {};
-const staging = { avatar: null, banner: null, bg: null, font: null };
+let staging = { avatar: null, banner: null, effect: 'none' };
 
-// --- UI SYSTEMS ---
+// --- UTILITIES ---
 
-// 1. Modal Manager
-const Modal = {
-  el: document.getElementById('modal-overlay'),
-  content: document.getElementById('modal-content'),
-  open(html) {
-    this.content.innerHTML = html;
-    this.el.classList.add('open');
-  },
-  close() {
-    this.el.classList.remove('open');
-  }
-};
-document.getElementById('modal-overlay').onclick = (e) => {
-  if(e.target.id === 'modal-overlay') Modal.close();
-}
-
-// 2. Tab Manager
-const tabs = {
-  switch(id) {
-    document.querySelectorAll('.editor-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById(`tab-${id}`).classList.add('active');
-    
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-  }
-};
-
-// 3. Effects Manager
-function renderEffects(activeId) {
-  const grid = document.getElementById('effect-grid');
-  grid.innerHTML = CONFIG.effects.map(fx => `
-    <div class="selection-card ${fx.id === activeId ? 'active' : ''}" 
-         onclick="setEffect('${fx.id}')">
-      <i class="ph ${fx.icon}" style="font-size:24px; margin-bottom:8px; display:block;"></i>
-      <div class="fx-${fx.id}" style="font-size:14px;">${fx.name}</div>
-    </div>
-  `).join('');
-  
-  // Update Live Preview
-  const pName = document.getElementById('p-username');
-  pName.className = `fx-${activeId}`;
-  document.getElementById('in-effect').value = activeId;
-}
-
-window.setEffect = (id) => renderEffects(id);
-
-// --- INIT ---
-(async function init() {
-  const { data: { user } } = await sb.auth.getUser();
-  if(!user) return window.location.href = '/login'; // Redirect if no auth
-  
-  userSession = user;
-  
-  // Fetch Profile
-  const { data } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
-  if(data) {
-    currentProfile = data;
-    populate(data);
-  } else {
-    // New Profile Logic
-    document.getElementById('p-username').innerText = user.email.split('@')[0];
-  }
-  
-  setupListeners();
-})();
-
-// --- DATA HANDLING ---
-
-function populate(data) {
-  // Text
-  document.getElementById('in-bio').value = data.bio || '';
-  document.getElementById('p-bio').innerText = data.bio || '';
-  document.getElementById('p-username').innerText = data.username || 'User';
-  document.getElementById('in-show-role').checked = data.show_role_icon !== false;
-  
-  // Color
-  const color = data.theme_color || '#7b2cbf';
-  document.getElementById('in-color').value = color;
-  document.getElementById('hex-val').innerText = color;
-  updateTheme(color);
-
-  // Effects
-  renderEffects(data.username_effect || 'none');
-  
-  // Images
-  if(data.avatar) {
-    document.getElementById('p-avatar-img').src = data.avatar;
-    document.querySelector('#drop-avatar img').src = data.avatar;
-    document.querySelector('#drop-avatar img').classList.remove('hidden');
-  }
-  
-  if(data.banner_url) {
-    const isVid = data.banner_url.match(/\.(mp4|webm)$/);
-    updateBannerPreview(data.banner_url, isVid);
-  }
-}
-
-function updateTheme(hex) {
-  document.documentElement.style.setProperty('--accent', hex);
-  document.documentElement.style.setProperty('--accent-glow', hex + '44');
-  // Update preview card styles
-  document.getElementById('live-card').style.borderColor = hex;
-}
-
-function updateBannerPreview(url, isVideo) {
-  const area = document.getElementById('p-banner-area');
-  area.innerHTML = isVideo 
-    ? `<video src="${url}" autoplay muted loop style="width:100%;height:100%;object-fit:cover"></video>` 
-    : `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
-    
-  // Update Dropzone visual
-  const dImg = document.getElementById('prev-banner-img');
-  const dVid = document.getElementById('prev-banner-vid');
-  
-  if(isVideo) {
-    dImg.classList.add('hidden');
-    dVid.src = url; dVid.classList.remove('hidden');
-  } else {
-    dVid.classList.add('hidden');
-    dImg.src = url; dImg.classList.remove('hidden');
-  }
-}
-
-// --- INTERACTIONS ---
-
-function setupListeners() {
-  // Live Bio
-  document.getElementById('in-bio').addEventListener('input', (e) => {
-    document.getElementById('p-bio').innerText = e.target.value;
-  });
-
-  // Theme Color (Debounced)
-  document.getElementById('in-color').addEventListener('input', (e) => {
-    document.getElementById('hex-val').innerText = e.target.value;
-    updateTheme(e.target.value);
-  });
-
-  // File Uploads
-  setupDrop('drop-avatar', 'file-avatar', (f, u) => {
-    staging.avatar = f;
-    document.getElementById('p-avatar-img').src = u;
-    const img = document.getElementById('prev-avatar-img');
-    img.src = u; img.classList.remove('hidden');
-  });
-
-  setupDrop('drop-banner', 'file-banner', (f, u) => {
-    staging.banner = f;
-    updateBannerPreview(u, f.type.startsWith('video'));
-  });
-
-  setupDrop('drop-bg', 'file-bg', (f, u) => {
-    staging.bg = f;
-    document.getElementById('bg-name').innerText = f.name;
-    document.getElementById('bg-name').style.color = 'var(--accent)';
-  });
-  
-  // Font Import
-  document.getElementById('btn-import-font').onclick = () => {
-      const input = document.createElement('input');
-      input.type = 'file'; input.accept = '.ttf,.otf';
-      input.onchange = e => {
-          const file = e.target.files[0];
-          if(file) {
-              staging.font = file;
-              document.getElementById('btn-import-font').innerText = "Font Selected: " + file.name;
-              document.getElementById('btn-import-font').classList.add('active');
-          }
-      };
-      input.click();
-  }
-
-  // Save
-  document.getElementById('btn-save').addEventListener('click', saveProfile);
-}
-
-function setupDrop(zoneId, inputId, callback) {
-  const zone = document.getElementById(zoneId);
-  const input = document.getElementById(inputId);
-  
-  zone.onclick = () => input.click();
-  input.onchange = () => { if(input.files[0]) callback(input.files[0], URL.createObjectURL(input.files[0])); };
-  zone.ondragover = e => { e.preventDefault(); zone.style.borderColor = 'var(--accent)'; };
-  zone.ondragleave = () => { zone.style.borderColor = 'var(--border)'; };
-  zone.ondrop = e => {
-    e.preventDefault(); zone.style.borderColor = 'var(--border)';
-    if(e.dataTransfer.files[0]) callback(e.dataTransfer.files[0], URL.createObjectURL(e.dataTransfer.files[0]));
+// 1. Debounce (Prevent Lag)
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
   };
 }
 
-// --- SAVING LOGIC ---
+// 2. Toast Notification
+function showToast(msg, type = 'success') {
+  const area = document.getElementById('toast-area');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="ph-bold ${type === 'success' ? 'ph-check-circle' : 'ph-warning-circle'}"></i> ${msg}`;
+  area.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(10px)';
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
+}
+
+// 3. Tab Switcher
+window.switchTab = (id, btn) => {
+  document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
+  document.getElementById(`tab-${id}`).classList.remove('hidden');
+  
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
+};
+
+// --- CORE LOGIC ---
+
+(async function init() {
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user) return window.location.href = '/login'; 
+  
+  userSession = user;
+  
+  // Load Effects Grid
+  const grid = document.getElementById('effect-grid');
+  grid.innerHTML = CONFIG.effects.map(fx => `
+    <div class="fx-card" onclick="applyEffect('${fx.id}')" id="fx-btn-${fx.id}">
+      <div class="fx-icon"><i class="ph ${fx.icon}"></i></div>
+      <span style="font-size:13px; font-weight:500;">${fx.name}</span>
+    </div>
+  `).join('');
+
+  // Fetch Data
+  const { data } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+  if(data) loadProfile(data);
+  else document.getElementById('m-username').innerText = user.email.split('@')[0];
+
+  setupListeners();
+})();
+
+function loadProfile(data) {
+  // Text
+  document.getElementById('in-bio').value = data.bio || '';
+  document.getElementById('m-bio').innerText = data.bio || '';
+  document.getElementById('m-username').innerText = data.username || 'User';
+  
+  // Visuals
+  if(data.avatar) {
+    document.getElementById('m-avatar-img').src = data.avatar;
+    document.getElementById('prev-avatar-img').src = data.avatar;
+    document.getElementById('prev-avatar-img').style.opacity = '0.5';
+  }
+  if(data.banner_url) updateBannerPreview(data.banner_url, data.banner_url.match(/\.(mp4|webm)$/));
+
+  // Style
+  const color = data.theme_color || '#7b2cbf';
+  updateColor(color);
+  applyEffect(data.username_effect || 'none');
+}
+
+function updateColor(hex) {
+  document.documentElement.style.setProperty('--accent', hex);
+  document.documentElement.style.setProperty('--accent-glow', hex + '40'); // 25% opacity
+  document.getElementById('in-color').value = hex;
+  document.getElementById('hex-display').innerText = hex.toUpperCase();
+  document.getElementById('mockup-card').style.borderColor = hex;
+}
+
+function applyEffect(id) {
+  staging.effect = id;
+  // UI Update
+  document.querySelectorAll('.fx-card').forEach(c => c.classList.remove('active'));
+  const btn = document.getElementById(`fx-btn-${id}`);
+  if(btn) btn.classList.add('active');
+  
+  // Live Preview Update
+  const nameEl = document.getElementById('m-username');
+  nameEl.className = `m-username fx-${id}`;
+}
+
+function updateBannerPreview(url, isVideo) {
+  const area = document.getElementById('m-banner-area');
+  const dropImg = document.getElementById('prev-banner-img');
+  const dropVid = document.getElementById('prev-banner-vid');
+
+  // Update Mockup
+  area.innerHTML = isVideo 
+    ? `<video src="${url}" autoplay muted loop style="width:100%;height:100%;object-fit:cover"></video>`
+    : `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+
+  // Update Dropzone
+  if(isVideo) {
+    dropImg.style.opacity = 0;
+    dropVid.src = url; dropVid.style.opacity = 0.5;
+  } else {
+    dropVid.style.opacity = 0; dropVid.pause();
+    dropImg.src = url; dropImg.style.opacity = 0.5;
+  }
+}
+
+// --- EVENT LISTENERS ---
+
+function setupListeners() {
+  // Bio (Debounced)
+  document.getElementById('in-bio').addEventListener('input', debounce((e) => {
+    document.getElementById('m-bio').innerText = e.target.value;
+  }, 50));
+
+  // Color
+  document.getElementById('in-color').addEventListener('input', debounce((e) => {
+    updateColor(e.target.value);
+  }, 10)); // Color needs to be snappy but optimized
+
+  // File Upload Logic
+  setupUpload('drop-avatar', 'file-avatar', (file, url) => {
+    staging.avatar = file;
+    document.getElementById('m-avatar-img').src = url;
+    const prev = document.getElementById('prev-avatar-img');
+    prev.src = url; prev.style.opacity = 0.5;
+  });
+
+  setupUpload('drop-banner', 'file-banner', (file, url) => {
+    staging.banner = file;
+    updateBannerPreview(url, file.type.startsWith('video'));
+  });
+
+  // Save Button
+  document.getElementById('btn-save').addEventListener('click', saveProfile);
+}
+
+function setupUpload(zoneId, inputId, cb) {
+  const zone = document.getElementById(zoneId);
+  const input = document.getElementById(inputId);
+
+  zone.onclick = () => input.click();
+  
+  zone.ondragover = (e) => { e.preventDefault(); zone.classList.add('drag-over'); };
+  zone.ondragleave = () => zone.classList.remove('drag-over');
+  
+  const handleFile = (file) => {
+    zone.classList.remove('drag-over');
+    const url = URL.createObjectURL(file);
+    cb(file, url);
+  };
+
+  zone.ondrop = (e) => { e.preventDefault(); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); };
+  input.onchange = () => { if(input.files[0]) handleFile(input.files[0]); };
+}
+
+// --- SAVE LOGIC ---
 
 async function saveProfile() {
   const btn = document.getElementById('btn-save');
-  btn.disabled = true; btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Saving...';
-  
+  const originalText = btn.innerHTML;
+  btn.disabled = true; 
+  btn.innerHTML = `<i class="ph ph-spinner ph-spin"></i> <span>Saving...</span>`;
+
   try {
     const updates = {
       updated_at: new Date(),
       bio: document.getElementById('in-bio').value,
       theme_color: document.getElementById('in-color').value,
-      username_effect: document.getElementById('in-effect').value,
-      show_role_icon: document.getElementById('in-show-role').checked
+      username_effect: staging.effect
     };
 
-    // Upload Helper
-    const uploadFile = async (file, bucket) => {
+    // Helper for Storage
+    const upload = async (file, bucket) => {
       const ext = file.name.split('.').pop();
       const path = `${userSession.id}/${Date.now()}.${ext}`;
-      const { error } = await sb.storage.from(bucket).upload(path, file, { upsert:true });
+      const { error } = await sb.storage.from(bucket).upload(path, file);
       if(error) throw error;
       return sb.storage.from(bucket).getPublicUrl(path).data.publicUrl;
     };
 
-    if(staging.avatar) updates.avatar = await uploadFile(staging.avatar, 'avatars');
-    if(staging.banner) updates.banner_url = await uploadFile(staging.banner, 'banners');
-    if(staging.bg) {
-      updates.bg_value = await uploadFile(staging.bg, 'backgrounds');
-      updates.bg_type = staging.bg.type.startsWith('video') ? 'video' : 'image';
-    }
-    if(staging.font) {
-        updates.custom_font_url = await uploadFile(staging.font, 'fonts');
-        updates.username_font = 'custom';
-    }
+    if(staging.avatar) updates.avatar = await upload(staging.avatar, 'avatars');
+    if(staging.banner) updates.banner_url = await upload(staging.banner, 'banners');
 
     const { error } = await sb.from('profiles').upsert({ id: userSession.id, ...updates });
     if(error) throw error;
 
-    btn.innerHTML = '<i class="ph-bold ph-check"></i> Saved';
-    setTimeout(() => { btn.innerHTML = '<i class="ph-bold ph-floppy-disk"></i> Save Profile'; btn.disabled = false; }, 2000);
-
+    showToast('Profile updated successfully');
+    
   } catch (err) {
     console.error(err);
-    alert('Error saving profile');
+    showToast('Failed to save changes', 'error');
+  } finally {
+    btn.innerHTML = originalText;
     btn.disabled = false;
-    btn.innerText = 'Try Again';
   }
 }
 </script>
