@@ -2,619 +2,957 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Edit Profile | /six</title>
+<title>/six - Edit Profile</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-<!-- ICONS & FONTS -->
+<!-- EXTERNAL LIBRARIES -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syncopate:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- FONTS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;700&family=Orbitron:wght@500&family=Playfair+Display:ital,wght@0,600;1,600&family=UnifrakturMaguntia&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+
+<!-- CUSTOM FONT (Placeholder for import logic) -->
+<style>
+  @font-face { font-family: 'Diecide Remain'; src: url('fonts/DeicideRemain.otf') format('opentype'); font-display: swap; }
+</style>
 
 <style>
-/* --- 1. LUXURY THEME VARIABLES --- */
+/* =========================================
+   1. LUXURY GLASS THEME VARIABLES
+   ========================================= */
 :root {
-    --bg-deep: #030304;
-    --glass-surface: rgba(20, 20, 23, 0.4);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-highlight: rgba(255, 255, 255, 0.03);
-    
-    --accent: #d4af37; /* Default Gold */
-    --accent-glow: rgba(212, 175, 55, 0.3);
-    
-    --text-main: #ffffff;
-    --text-muted: #8a8a93;
-    
-    --radius-lg: 24px;
-    --radius-md: 16px;
-    --radius-sm: 8px;
-    
-    --anim-fast: 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-    --anim-smooth: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  /* Colors */
+  --bg-deep: #030303;
+  --glass-surface: rgba(20, 20, 20, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-highlight: rgba(255, 255, 255, 0.1);
+  
+  --text-main: #ffffff;
+  --text-muted: #8a8a8a;
+  
+  /* Dynamic Accent (Default Purple) */
+  --accent: #7b2cbf;
+  --accent-glow: rgba(123, 44, 191, 0.5);
+  
+  /* Geometry */
+  --radius-card: 24px;
+  --radius-btn: 12px;
+  --radius-input: 12px;
+  
+  /* Animations */
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1); /* Snappy but smooth */
 }
 
-/* --- 2. GLOBAL RESET & BASE --- */
+/* =========================================
+   2. RESET & BASE STYLES
+   ========================================= */
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
 
 body {
-    background-color: var(--bg-deep);
-    color: var(--text-main);
-    font-family: 'Inter', sans-serif;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-color: var(--bg-deep);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow-x: hidden;
+  font-weight: 400;
 }
 
-/* Animated Background Mesh */
+/* Noise Texture for Realism */
 body::before {
-    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at 50% 50%, rgba(30,30,40,0.4), transparent 60%);
-    animation: pulse 15s infinite ease-in-out; z-index: -2;
-}
-body::after {
-    content: ''; position: absolute; inset: 0;
-    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
-    opacity: 0.05; pointer-events: none; z-index: -1;
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 900;
+  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
+  opacity: 0.05;
 }
 
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+/* =========================================
+   3. ANIMATED BACKGROUND
+   ========================================= */
+.bg-scene { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+.orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(120px); opacity: 0.3;
+  will-change: transform;
+}
+.orb-1 {
+  top: -10%; left: -10%; width: 50vw; height: 50vw;
+  background: var(--accent);
+  animation: float 20s infinite alternate ease-in-out;
+}
+.orb-2 {
+  bottom: -10%; right: -10%; width: 60vw; height: 60vw;
+  background: #1a0b2e;
+  animation: float 25s infinite alternate-reverse ease-in-out;
+}
+@keyframes float { from { transform: translate(0,0); } to { transform: translate(40px, 40px); } }
 
-/* --- 3. APP SHELL LAYOUT --- */
-.app-container {
-    width: 95vw; height: 92vh; max-width: 1600px;
-    display: grid; grid-template-columns: 260px 1fr 420px;
-    gap: 24px;
+/* =========================================
+   4. LAYOUT & GLASS CARDS
+   ========================================= */
+.main-container {
+  position: relative; z-index: 10;
+  width: 100%; max-width: 580px;
+  display: flex; flex-direction: column; gap: 32px;
 }
 
-/* --- 4. GLASSMORPHISM UTILS --- */
 .glass-panel {
-    background: var(--glass-surface);
-    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    display: flex; flex-direction: column;
-    overflow: hidden; transition: var(--anim-smooth);
+  background: var(--glass-surface);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+  overflow: hidden;
+  transition: border-color 0.3s var(--ease-lux);
+}
+.glass-panel:hover { border-color: var(--glass-highlight); }
+
+/* =========================================
+   5. HEADER IDENTITY SECTION
+   ========================================= */
+.identity-header { position: relative; }
+
+.banner-zone {
+  width: 100%; height: 200px;
+  background: #000; position: relative;
+  cursor: pointer; overflow: hidden;
+}
+.banner-media { 
+  width: 100%; height: 100%; object-fit: cover; 
+  opacity: 0.8; transition: transform 0.6s var(--ease-lux), opacity 0.3s; 
+}
+.banner-zone:hover .banner-media { transform: scale(1.05); opacity: 0.5; }
+
+.edit-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s;
+}
+.banner-zone:hover .edit-overlay { opacity: 1; }
+.avatar-zone:hover .edit-overlay { opacity: 1; border-radius: 50%; }
+
+.pill-badge {
+  padding: 8px 16px; background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 30px; backdrop-filter: blur(8px);
+  color: #fff; font-size: 0.75rem; font-weight: 500;
+  display: flex; gap: 6px; align-items: center;
 }
 
-/* --- 5. SIDEBAR --- */
-.sidebar { padding: 32px; justify-content: space-between; }
-.logo { font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 2px; margin-bottom: 40px; color: var(--text-main); }
-.logo span { color: var(--accent); }
-
-.nav-menu { display: flex; flex-direction: column; gap: 8px; }
-.nav-btn {
-    padding: 14px 16px; border-radius: var(--radius-md);
-    color: var(--text-muted); cursor: pointer;
-    display: flex; align-items: center; gap: 14px;
-    font-weight: 500; font-size: 14px; transition: var(--anim-fast);
-    border: 1px solid transparent; background: transparent;
+.profile-bar {
+  padding: 0 24px 24px; margin-top: -55px;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  position: relative; pointer-events: none;
 }
-.nav-btn:hover { color: #fff; background: var(--glass-highlight); }
-.nav-btn.active { 
-    background: rgba(255,255,255,0.05); color: #fff; 
-    border-color: var(--glass-border); box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+.avatar-zone {
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  background: var(--bg-deep); /* Cutout effect */
+  padding: 4px; pointer-events: auto; cursor: pointer;
+  position: relative;
 }
-.nav-btn i { font-size: 20px; }
-
-.save-area { border-top: 1px solid var(--glass-border); padding-top: 24px; }
-.btn-primary {
-    width: 100%; padding: 16px;
-    background: var(--text-main); color: #000;
-    border: none; border-radius: var(--radius-md);
-    font-weight: 600; cursor: pointer;
-    display: flex; justify-content: center; align-items: center; gap: 8px;
-    transition: var(--anim-fast);
+.avatar-img {
+  width: 100%; height: 100%; border-radius: 50%;
+  object-fit: cover; background: #111;
+  border: 2px solid rgba(255,255,255,0.1);
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 20px var(--accent-glow); background: var(--accent); }
 
-/* --- 6. EDITOR CONTENT --- */
-.editor-wrapper { position: relative; overflow: hidden; }
-.scroll-container { 
-    height: 100%; overflow-y: auto; padding: 40px; 
-    scrollbar-width: none; /* Firefox */
+/* =========================================
+   6. FORM CONTROLS & SECTIONS
+   ========================================= */
+.section-title {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--text-muted); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
 }
-.scroll-container::-webkit-scrollbar { display: none; }
+.section-title i { color: var(--accent); font-size: 1rem; }
 
-.tab-content { display: none; flex-direction: column; gap: 32px; animation: slideUp 0.4s var(--anim-smooth); }
-.tab-content.active { display: flex; }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.control-group { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
 
-.section-header h2 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
-.section-header p { color: var(--text-muted); font-size: 14px; }
-
-/* Form Elements */
-.input-group { position: relative; margin-bottom: 4px; }
-.input-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; display: block; font-weight: 600; }
-
-input[type="text"], textarea {
-    width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-    padding: 16px; border-radius: var(--radius-md); color: #fff;
-    font-family: 'Inter', sans-serif; font-size: 15px; transition: var(--anim-fast);
+/* Textarea */
+textarea {
+  width: 100%; min-height: 100px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-input);
+  padding: 16px;
+  color: #fff; font-family: inherit; font-size: 0.95rem; line-height: 1.5;
+  resize: none; transition: 0.3s var(--ease-lux);
 }
-input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); background: rgba(0,0,0,0.5); }
-
-/* File Uploaders */
-.upload-grid { display: grid; grid-template-columns: 100px 1fr; gap: 16px; align-items: center; }
-.avatar-upload {
-    width: 100px; height: 100px; border-radius: 50%;
-    background: rgba(255,255,255,0.05); border: 1px dashed var(--glass-border);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; overflow: hidden; position: relative; transition: var(--anim-fast);
+textarea:focus {
+  background: rgba(0,0,0,0.4);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(123, 44, 191, 0.1);
 }
-.avatar-upload:hover { border-color: var(--text-muted); }
-.avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
-.banner-upload {
-    height: 120px; border-radius: var(--radius-md);
-    background: rgba(255,255,255,0.02); border: 1px dashed var(--glass-border);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: pointer; position: relative; overflow: hidden; transition: var(--anim-fast);
-}
-.banner-upload:hover { border-color: var(--text-muted); background: rgba(255,255,255,0.04); }
+textarea::placeholder { color: rgba(255,255,255,0.2); }
 
-/* Style Options */
-.color-grid { display: flex; gap: 12px; }
-.color-swatch {
-    width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
-    border: 2px solid transparent; transition: var(--anim-fast);
+/* Custom Select Cards */
+.trigger-card {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-input);
+  cursor: pointer; transition: 0.2s;
 }
-.color-swatch:hover { transform: scale(1.1); }
-.color-swatch.active { border-color: #fff; transform: scale(1.15); }
+.trigger-card:hover { background: rgba(255,255,255,0.04); border-color: var(--glass-highlight); }
 
-.layout-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.preview-text { font-size: 1.4rem; color: #fff; line-height: 1; }
+.action-text { 
+  font-size: 0.75rem; color: var(--text-muted); font-weight: 500; 
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* Aesthetics Grid */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* Color Picker */
+.color-trigger {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px; background: rgba(255,255,255,0.02);
+  border: 1px solid var(--glass-border); border-radius: var(--radius-input);
+  cursor: pointer; position: relative; overflow: hidden;
+}
+.color-dot {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+  border: 2px solid rgba(255,255,255,0.2);
+}
+.color-label h4 { font-size: 0.85rem; font-weight: 500; color: #fff; }
+.color-label p { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+input[type="color"] { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+
+/* File Drop Zone */
+.drop-zone {
+  position: relative; height: 80px;
+  border: 1px dashed var(--glass-border);
+  border-radius: var(--radius-input);
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; cursor: pointer; transition: 0.3s;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.02), transparent);
+}
+.drop-zone:hover, .drop-zone.drag-active { 
+  border-color: var(--accent); background: rgba(123,44,191,0.05); 
+}
+.drop-zone-content { text-align: center; display: flex; flex-direction: column; align-items: center; }
+.mini-preview { 
+  position: absolute; inset: 0; width: 100%; height: 100%; 
+  object-fit: cover; opacity: 0.4; pointer-events: none; border-radius: var(--radius-input);
+}
+
+/* Toggle Switch */
+.toggle-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+}
+.toggle-text { font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+.toggle-switch {
+  position: relative; width: 44px; height: 24px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background-color: rgba(255,255,255,0.1); border-radius: 34px;
+  transition: .4s var(--ease-lux);
+}
+.slider:before {
+  position: absolute; content: ""; height: 18px; width: 18px;
+  left: 3px; bottom: 3px; background-color: #fff;
+  border-radius: 50%; transition: .4s var(--ease-lux);
+}
+input:checked + .slider { background-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+input:checked + .slider:before { transform: translateX(20px); }
+
+/* =========================================
+   7. MAIN ACTION BUTTON
+   ========================================= */
+.save-btn {
+  width: 100%; padding: 22px;
+  background: linear-gradient(135deg, var(--bg-deep), #111);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  color: #fff; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;
+  cursor: pointer; position: relative; overflow: hidden;
+  transition: all 0.3s var(--ease-lux);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+}
+.save-btn::before {
+  content:""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: translateX(-100%); transition: 0.5s;
+}
+.save-btn:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+  transform: translateY(-2px);
+}
+.save-btn:hover::before { transform: translateX(100%); }
+.save-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+.loader {
+  width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin 0.8s linear infinite; display: none; margin: 0 auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* =========================================
+   8. MODALS & OVERLAYS
+   ========================================= */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(16px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: 0.3s;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+.modal-content {
+  width: 90%; max-width: 420px;
+  background: #0a0a0a; border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  padding: 0; display: flex; flex-direction: column;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+  transform: scale(0.9) translateY(20px); transition: 0.4s var(--ease-lux);
+  max-height: 80vh;
+}
+.modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+
+.modal-header {
+  padding: 20px 24px; border-bottom: 1px solid var(--glass-border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.modal-title { font-weight: 600; font-size: 1rem; color: #fff; }
+.modal-close {
+  background: transparent; border: none; color: var(--text-muted);
+  font-size: 1.2rem; cursor: pointer; transition: 0.2s;
+}
+.modal-close:hover { color: #fff; transform: rotate(90deg); }
+
+.modal-body { padding: 20px; overflow-y: auto; }
+
+/* Grid for Fonts/Effects */
+.selection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
 .option-card {
-    padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid transparent;
-    border-radius: var(--radius-md); cursor: pointer; text-align: center;
-    transition: var(--anim-fast);
+  background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+  border-radius: 12px; padding: 20px 10px;
+  text-align: center; cursor: pointer; transition: 0.2s;
 }
-.option-card:hover { background: rgba(255,255,255,0.06); }
-.option-card.active { border-color: var(--accent); background: var(--accent-glow); }
+.option-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); }
+.option-card.active {
+  background: rgba(123, 44, 191, 0.15); border-color: var(--accent);
+  box-shadow: 0 0 15px var(--accent-glow) inset;
+}
+.option-preview { font-size: 1.2rem; margin-bottom: 8px; color: #fff; }
+.option-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
 
-/* --- 7. PREVIEW COLUMN (3D PHONE) --- */
-.preview-col { display: flex; align-items: center; justify-content: center; perspective: 1500px; }
-
-.phone-mockup {
-    width: 340px; height: 700px;
-    background: #000;
-    border-radius: 45px;
-    border: 6px solid #1a1a1a;
-    box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7), inset 0 0 0 2px #333;
-    position: relative; overflow: hidden;
-    transform-style: preserve-3d;
-    transition: transform 0.1s; /* JS handles smoothness */
+/* Username Effects CSS */
+.effect-glow { text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent); }
+.effect-rgb { animation: rgbShift 3s linear infinite; }
+.effect-gradient { 
+  background: linear-gradient(135deg, #fff, var(--accent)); 
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+}
+@keyframes rgbShift {
+  0% { text-shadow: 2px 2px 0 #f00, -2px -2px 0 #00f; }
+  50% { text-shadow: 2px 2px 0 #00f, -2px -2px 0 #0f0; }
+  100% { text-shadow: 2px 2px 0 #f00, -2px -2px 0 #00f; }
 }
 
-/* Phone Screen Content */
-.screen-content {
-    width: 100%; height: 100%;
-    background: #0a0a0a; overflow-y: auto;
-    position: relative;
-    scrollbar-width: none;
-}
-.screen-content::-webkit-scrollbar { display: none; }
-
-/* Live Preview Components */
-.pv-banner { height: 200px; width: 100%; background: #222; position: relative; }
-.pv-banner img { width: 100%; height: 100%; object-fit: cover; }
-.pv-profile-container { 
-    padding: 0 24px; transform: translateY(-50px); 
-    display: flex; flex-direction: column; gap: 12px;
-}
-.pv-profile-container.centered { align-items: center; text-align: center; }
-
-.pv-avatar {
-    width: 100px; height: 100px; border-radius: 50%;
-    border: 4px solid #0a0a0a; background: #151515; overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-.pv-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-.pv-details { margin-top: 8px; }
-.pv-name { 
-    font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; 
-    display: flex; align-items: center; gap: 6px;
-}
-.pv-badges { display: inline-flex; gap: 4px; }
-.pv-badge { font-size: 16px; color: var(--accent); }
-
-.pv-bio { font-size: 13px; color: #bbb; line-height: 1.5; margin-bottom: 20px; white-space: pre-wrap; }
-
-/* Effect Styles */
-.fx-glow { text-shadow: 0 0 15px var(--accent); }
-.fx-sparkle { 
-    background: linear-gradient(120deg, #fff, var(--accent), #fff); 
-    background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-    animation: textShine 3s linear infinite;
-}
-@keyframes textShine { to { background-position: 200% center; } }
-
-/* Toast */
-.toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 100; display: flex; flex-direction: column; gap: 10px; }
+/* Toast Notification */
 .toast {
-    background: rgba(20, 20, 23, 0.9); backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border); color: #fff;
-    padding: 12px 20px; border-radius: 12px; font-size: 14px;
-    display: flex; align-items: center; gap: 10px;
-    animation: toastIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(40px);
+  background: rgba(15,15,15,0.95); backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border); padding: 12px 24px;
+  border-radius: 50px; display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6); opacity: 0; pointer-events: none;
+  transition: all 0.5s var(--ease-lux); z-index: 5000;
 }
-@keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast i { font-size: 1.2rem; }
+.toast.success i { color: #4ade80; }
+.toast.error i { color: #ef4444; }
 
-/* Responsive */
-@media (max-width: 1200px) {
-    .app-container { grid-template-columns: 240px 1fr; }
-    .preview-col { display: none; } /* Hide 3D preview on tablet/mobile */
-}
-@media (max-width: 800px) {
-    .app-container { display: flex; flex-direction: column; height: 100%; overflow-y: auto; }
-    .sidebar { width: 100%; flex-direction: row; padding: 20px; height: auto; border-radius: 0; }
-    .nav-menu { flex-direction: row; }
-    .nav-btn span { display: none; }
-    .editor-wrapper { overflow: visible; padding-bottom: 80px; }
-    .scroll-container { padding: 20px; overflow: visible; }
+/* Utilities */
+.hidden { display: none !important; }
+
+/* Mobile Adjustments */
+@media (max-width: 480px) {
+  .banner-zone { height: 160px; }
+  .profile-bar { margin-top: -45px; }
+  .avatar-zone { width: 90px; height: 90px; }
+  .selection-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<div class="app-container">
+<!-- Background Animation -->
+<div class="bg-scene">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<main class="main-container">
+
+  <!-- HEADER: BANNER & AVATAR -->
+  <section class="glass-panel identity-header">
     
-    <!-- 1. SIDEBAR -->
-    <aside class="glass-panel sidebar">
+    <!-- Banner -->
+    <div class="banner-zone" id="zone-banner">
+      <img id="view-banner-img" class="banner-media" src="" alt="Banner">
+      <video id="view-banner-vid" class="banner-media hidden" autoplay muted loop playsinline></video>
+      <input type="file" id="file-banner" hidden accept="image/*,video/mp4,video/webm">
+      <div class="edit-overlay">
+        <div class="pill-badge"><i class="ph-bold ph-pencil-simple"></i> Change Banner</div>
+      </div>
+    </div>
+
+    <!-- Avatar -->
+    <div class="profile-bar">
+      <div class="avatar-zone" id="zone-avatar">
+        <img id="view-avatar" class="avatar-img" src="" alt="Avatar">
+        <div class="edit-overlay">
+          <i class="ph-fill ph-camera" style="color:#fff; font-size:24px;"></i>
+        </div>
+        <input type="file" id="file-avatar" hidden accept="image/*">
+      </div>
+      <!-- Decorative rank display would go here if not editable -->
+    </div>
+  </section>
+
+  <!-- FORM CONTROLS -->
+  <section class="glass-panel">
+    
+    <!-- Bio -->
+    <div class="control-group">
+      <div class="section-title"><i class="ph-bold ph-user-focus"></i> Biography</div>
+      <textarea id="inp-bio" placeholder="Write something about yourself..."></textarea>
+    </div>
+
+    <!-- Typography & Effects -->
+    <div class="control-group" style="padding-top:0;">
+      <div class="section-title"><i class="ph-bold ph-text-aa"></i> Visual Identity</div>
+      
+      <!-- Font Trigger -->
+      <div class="trigger-card" id="btn-font-modal">
         <div>
-            <div class="logo">/SIX<span>.IO</span></div>
-            <nav class="nav-menu">
-                <button class="nav-btn active" onclick="app.switchTab('identity', this)">
-                    <i class="ph ph-fingerprint"></i> <span>Identity</span>
-                </button>
-                <button class="nav-btn" onclick="app.switchTab('visuals', this)">
-                    <i class="ph ph-image"></i> <span>Visuals</span>
-                </button>
-                <button class="nav-btn" onclick="app.switchTab('style', this)">
-                    <i class="ph ph-paint-brush-broad"></i> <span>Aesthetics</span>
-                </button>
-                <button class="nav-btn" onclick="app.switchTab('media', this)">
-                    <i class="ph ph-music-notes"></i> <span>Media</span>
-                </button>
-            </nav>
+          <div class="preview-text" id="lbl-font-preview">/six</div>
+          <div class="action-text">Typography</div>
         </div>
-        
-        <div class="save-area">
-            <button class="btn-primary" onclick="app.saveProfile()">
-                <i class="ph-bold ph-floppy-disk"></i> Save Changes
-            </button>
+        <i class="ph-bold ph-caret-right" style="color:var(--text-muted)"></i>
+      </div>
+      <input type="hidden" id="inp-font" value="Cinzel">
+
+      <!-- Effect Trigger -->
+      <div class="trigger-card" id="btn-effect-modal">
+        <div>
+          <div class="preview-text" id="lbl-effect-preview">/six</div>
+          <div class="action-text">Username Effect</div>
         </div>
-    </aside>
+        <i class="ph-bold ph-caret-right" style="color:var(--text-muted)"></i>
+      </div>
+      <input type="hidden" id="inp-effect" value="none">
+    </div>
 
-    <!-- 2. EDITOR MAIN -->
-    <main class="glass-panel editor-wrapper">
-        <div class="scroll-container">
-            
-            <!-- IDENTITY TAB -->
-            <div id="tab-identity" class="tab-content active">
-                <div class="section-header">
-                    <h2>Identity</h2>
-                    <p>Establish your digital presence.</p>
-                </div>
+    <!-- Aesthetics -->
+    <div class="control-group" style="padding-top:0;">
+      <div class="section-title"><i class="ph-bold ph-palette"></i> Theme & Background</div>
+      
+      <div class="grid-2">
+        <!-- Color Picker -->
+        <label class="color-trigger">
+          <div class="color-dot" id="view-swatch"></div>
+          <div class="color-label">
+            <h4>Accent</h4>
+            <p>System Color</p>
+          </div>
+          <input type="color" id="inp-color" value="#7b2cbf">
+        </label>
 
-                <div class="input-group">
-                    <span class="input-label">Username</span>
-                    <input type="text" id="in-username" placeholder="e.g. Ghost" value="Ghost">
-                </div>
-
-                <div class="input-group">
-                    <span class="input-label">Bio</span>
-                    <textarea id="in-bio" rows="4" placeholder="Tell your story...">Digital explorer and visual artist.</textarea>
-                </div>
-
-                <div class="input-group">
-                    <span class="input-label">Badges</span>
-                    <div class="layout-options">
-                        <div class="option-card" id="badge-ver" onclick="app.toggleBadge('verified', this)">
-                            <i class="ph-fill ph-seal-check" style="font-size:24px; color:#3b82f6"></i>
-                            <div style="font-size:12px; margin-top:5px">Verified</div>
-                        </div>
-                        <div class="option-card" id="badge-dev" onclick="app.toggleBadge('dev', this)">
-                            <i class="ph-fill ph-code" style="font-size:24px; color:#a855f7"></i>
-                            <div style="font-size:12px; margin-top:5px">Developer</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- VISUALS TAB -->
-            <div id="tab-visuals" class="tab-content">
-                <div class="section-header">
-                    <h2>Visuals</h2>
-                    <p>Customize your avatar and environment.</p>
-                </div>
-
-                <div class="upload-grid">
-                    <div class="avatar-upload" onclick="document.getElementById('file-avatar').click()">
-                        <img id="prev-avatar-ui" src="https://cdn.discordapp.com/embed/avatars/0.png">
-                        <input type="file" id="file-avatar" hidden accept="image/*" onchange="app.handleFile(this, 'avatar')">
-                    </div>
-                    <div>
-                        <span class="input-label">Avatar</span>
-                        <p style="font-size:12px; color:var(--text-muted)">Click circle to upload.<br>Rec: 400x400px</p>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <span class="input-label">Banner Image</span>
-                    <div class="banner-upload" onclick="document.getElementById('file-banner').click()">
-                        <img id="prev-banner-ui" src="" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0;">
-                        <i class="ph ph-image-square" style="font-size:32px; margin-bottom:8px"></i>
-                        <span style="font-size:12px">Upload Header</span>
-                        <input type="file" id="file-banner" hidden accept="image/*" onchange="app.handleFile(this, 'banner')">
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <span class="input-label">Profile Layout</span>
-                    <div class="layout-options">
-                        <div class="option-card" onclick="app.setLayout('standard', this)" class="active">
-                            <i class="ph ph-article" style="font-size:24px"></i>
-                            <div style="font-size:12px; margin-top:5px">Standard</div>
-                        </div>
-                        <div class="option-card" onclick="app.setLayout('centered', this)">
-                            <i class="ph ph-align-center-horizontal" style="font-size:24px"></i>
-                            <div style="font-size:12px; margin-top:5px">Centered</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STYLE TAB -->
-            <div id="tab-style" class="tab-content">
-                <div class="section-header">
-                    <h2>Aesthetics</h2>
-                    <p>Define your color palette and effects.</p>
-                </div>
-
-                <div class="input-group">
-                    <span class="input-label">Theme Color</span>
-                    <div class="color-grid">
-                        <div class="color-swatch active" style="background:#d4af37" onclick="app.setColor('#d4af37', this)"></div> <!-- Gold -->
-                        <div class="color-swatch" style="background:#ef4444" onclick="app.setColor('#ef4444', this)"></div> <!-- Red -->
-                        <div class="color-swatch" style="background:#3b82f6" onclick="app.setColor('#3b82f6', this)"></div> <!-- Blue -->
-                        <div class="color-swatch" style="background:#a855f7" onclick="app.setColor('#a855f7', this)"></div> <!-- Purple -->
-                        <div class="color-swatch" style="background:#10b981" onclick="app.setColor('#10b981', this)"></div> <!-- Green -->
-                        <div class="color-swatch" style="background:#ffffff" onclick="app.setColor('#ffffff', this)"></div> <!-- White -->
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <span class="input-label">Name Effect</span>
-                    <div class="layout-options">
-                        <div class="option-card" onclick="app.setEffect('none', this)">None</div>
-                        <div class="option-card" onclick="app.setEffect('glow', this)">Neon Glow</div>
-                        <div class="option-card" onclick="app.setEffect('sparkle', this)">Ethereal</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MEDIA TAB -->
-            <div id="tab-media" class="tab-content">
-                <div class="section-header">
-                    <h2>Media</h2>
-                    <p>Links and music.</p>
-                </div>
-                
-                <div class="input-group">
-                    <span class="input-label">Music (SoundCloud / Spotify URL)</span>
-                    <input type="text" placeholder="https://..." oninput="app.showToast('Music link updated')">
-                </div>
-                
-                 <div class="input-group">
-                    <span class="input-label">Discord ID</span>
-                    <input type="text" placeholder="username">
-                </div>
-            </div>
-
+        <!-- BG Upload -->
+        <div class="drop-zone" id="zone-bg">
+          <div class="drop-zone-content">
+            <i class="ph ph-image-square" style="font-size:20px; color:var(--text-muted);"></i>
+            <span style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;" id="lbl-bg-filename">Profile BG</span>
+          </div>
+          <div class="mini-preview" id="view-bg-mini"></div> <!-- Preview overlay -->
+          <input type="file" id="file-bg" hidden accept="image/*,video/mp4,video/webm">
         </div>
-    </main>
+      </div>
 
-    <!-- 3. PREVIEW COLUMN -->
-    <aside class="preview-col" id="tilt-zone">
-        <div class="phone-mockup" id="phone">
-            <!-- Simulated Screen -->
-            <div class="screen-content">
-                <div class="pv-banner">
-                    <img id="pv-banner-img" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop">
-                </div>
-                
-                <div id="pv-container" class="pv-profile-container">
-                    <div class="pv-avatar">
-                        <img id="pv-avatar-img" src="https://cdn.discordapp.com/embed/avatars/0.png">
-                    </div>
-                    
-                    <div class="pv-details">
-                        <div class="pv-name">
-                            <span id="pv-username">Ghost</span>
-                            <div class="pv-badges" id="pv-badges-area"></div>
-                        </div>
-                        <div class="pv-bio" id="pv-bio">Digital explorer and visual artist.</div>
-                    </div>
-                    
-                    <!-- Fake Links for Visuals -->
-                    <div style="display:flex; gap:10px; flex-wrap:wrap">
-                        <div style="flex:1; background:#222; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; border:1px solid #333;">
-                            <i class="ph-fill ph-play-circle" style="margin-right:8px; font-size:20px;"></i> Play Music
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </aside>
+      <!-- Rank Toggle -->
+      <div style="margin-top: 10px; padding: 0 4px;">
+        <label class="toggle-row">
+          <div class="toggle-text">
+            <i class="ph-bold ph-shield-star" style="color:var(--accent)"></i>
+            <span>Display Rank Icon</span>
+          </div>
+          <div class="toggle-switch">
+            <input type="checkbox" id="inp-role">
+            <span class="slider"></span>
+          </div>
+        </label>
+      </div>
 
-    <div class="toast-container" id="toast-area"></div>
+    </div>
+
+    <!-- Actions -->
+    <div style="padding: 24px;">
+      <button id="btn-save" class="save-btn">
+        <span class="btn-content">Save Changes</span>
+        <div class="loader"></div>
+      </button>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- TOAST NOTIFICATION -->
+<div id="toast" class="toast">
+  <i class="ph-bold" id="toast-icon"></i>
+  <span id="toast-msg">Message</span>
+</div>
+
+<!-- MODAL: FONTS -->
+<div class="modal-overlay" id="modal-font">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="modal-title">Select Typography</span>
+      <button class="modal-close" data-close="modal-font"><i class="ph-bold ph-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="selection-grid" id="grid-fonts">
+        <!-- JS Injected -->
+      </div>
+      <!-- Import Option -->
+      <div class="option-card" id="btn-import-font" style="margin-top:12px; border-style:dashed;">
+        <i class="ph-bold ph-upload-simple" style="font-size:24px; color:var(--text-muted)"></i>
+        <div class="option-label" style="margin-top:5px;">Import Custom Font</div>
+        <input type="file" id="file-custom-font" hidden accept=".ttf,.otf,.woff,.woff2">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EFFECTS -->
+<div class="modal-overlay" id="modal-effect">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="modal-title">Username Effects</span>
+      <button class="modal-close" data-close="modal-effect"><i class="ph-bold ph-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="selection-grid" id="grid-effects">
+        <!-- JS Injected -->
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 /**
- * APP LOGIC
- * Designed to be modular, readable, and simulate a real app without a backend.
+ * ==========================================
+ * PROFILE EDITOR ENGINE
+ * Modern, Class-based, Documented
+ * ==========================================
  */
-const app = {
-    state: {
-        badges: { verified: false, dev: false },
-        layout: 'standard',
-        effect: 'none'
-    },
 
-    init() {
-        this.setupListeners();
-        this.setupTiltEffect();
-    },
-
-    // --- 1. Navigation & UI ---
-    switchTab(tabId, btn) {
-        // Remove active class from buttons and tabs
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        
-        // Activate target
-        btn.classList.add('active');
-        document.getElementById(`tab-${tabId}`).classList.add('active');
-    },
-
-    // --- 2. Live Preview Updates ---
-    setupListeners() {
-        // Username Sync
-        document.getElementById('in-username').addEventListener('input', (e) => {
-            document.getElementById('pv-username').innerText = e.target.value || 'User';
-        });
-
-        // Bio Sync
-        document.getElementById('in-bio').addEventListener('input', (e) => {
-            document.getElementById('pv-bio').innerText = e.target.value;
-        });
-    },
-
-    toggleBadge(type, el) {
-        this.state.badges[type] = !this.state.badges[type];
-        el.classList.toggle('active');
-        this.renderBadges();
-    },
-
-    renderBadges() {
-        const area = document.getElementById('pv-badges-area');
-        area.innerHTML = '';
-        if(this.state.badges.verified) area.innerHTML += `<i class="ph-fill ph-seal-check pv-badge" style="color:#3b82f6"></i>`;
-        if(this.state.badges.dev) area.innerHTML += `<i class="ph-fill ph-code pv-badge" style="color:#a855f7"></i>`;
-    },
-
-    setLayout(type, el) {
-        // Update UI state for buttons
-        const parent = el.parentElement;
-        parent.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-
-        // Update Preview
-        const container = document.getElementById('pv-container');
-        if(type === 'centered') container.classList.add('centered');
-        else container.classList.remove('centered');
-    },
-
-    setColor(hex, el) {
-        // Update CSS Variable
-        document.documentElement.style.setProperty('--accent', hex);
-        document.documentElement.style.setProperty('--accent-glow', hex + '44');
-        
-        // UI Feedback
-        document.querySelectorAll('.color-swatch').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-    },
-
-    setEffect(type, el) {
-        const parent = el.parentElement;
-        parent.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-
-        const nameEl = document.getElementById('pv-username');
-        nameEl.className = 'pv-name'; // reset
-        if(type !== 'none') nameEl.classList.add(`fx-${type}`);
-    },
-
-    // --- 3. File Handling (Local Only) ---
-    handleFile(input, type) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const url = e.target.result;
-                if(type === 'avatar') {
-                    document.getElementById('prev-avatar-ui').src = url;
-                    document.getElementById('pv-avatar-img').src = url;
-                } else {
-                    document.getElementById('prev-banner-ui').src = url;
-                    document.getElementById('prev-banner-ui').style.opacity = 1;
-                    document.getElementById('pv-banner-img').src = url;
-                }
-                this.showToast('Image updated successfully');
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    },
-
-    // --- 4. 3D Tilt Effect Logic ---
-    setupTiltEffect() {
-        const zone = document.getElementById('tilt-zone');
-        const phone = document.getElementById('phone');
-
-        zone.addEventListener('mousemove', (e) => {
-            const rect = zone.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const xPct = x / rect.width;
-            const yPct = y / rect.height;
-
-            // Calculate rotation (-15deg to 15deg)
-            const rX = (0.5 - yPct) * 30;
-            const rY = (xPct - 0.5) * 30;
-
-            phone.style.transform = `rotateX(${rX}deg) rotateY(${rY}deg)`;
-        });
-
-        zone.addEventListener('mouseleave', () => {
-            phone.style.transform = `rotateX(0deg) rotateY(0deg)`;
-        });
-    },
-
-    // --- 5. Utilities ---
-    saveProfile() {
-        const btn = document.querySelector('.btn-primary');
-        const originalContent = btn.innerHTML;
-        
-        // Simulating network request
-        btn.disabled = true;
-        btn.innerHTML = `<i class="ph ph-spinner ph-spin"></i> Saving...`;
-        
-        setTimeout(() => {
-            btn.innerHTML = `<i class="ph-bold ph-check"></i> Saved!`;
-            this.showToast('Profile saved successfully');
-            
-            setTimeout(() => {
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
-            }, 2000);
-        }, 1500);
-    },
-
-    showToast(msg) {
-        const container = document.getElementById('toast-area');
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `<i class="ph-fill ph-info"></i> ${msg}`;
-        container.appendChild(toast);
-        
-        // Remove after 3 seconds
-        setTimeout(() => toast.remove(), 3000);
-    }
+// --- CONFIGURATION ---
+const CONFIG = {
+  supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co", 
+  supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
+  defaults: {
+    avatar: "https://cdn.discordapp.com/embed/avatars/0.png",
+    banner: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3R6cW55eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eGZ6eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26BRy67X26yX1eLhm/giphy.gif"
+  },
+  fonts: [
+    { id: 'Cinzel', label: 'Cinzel', family: "'Cinzel', serif" },
+    { id: 'Diecide Remain', label: 'Signature', family: "'Diecide Remain', serif" },
+    { id: 'Orbitron', label: 'Cyber', family: "'Orbitron', sans-serif" },
+    { id: 'UnifrakturMaguntia', label: 'Gothic', family: "'UnifrakturMaguntia', cursive" },
+    { id: 'Playfair Display', label: 'Luxury', family: "'Playfair Display', serif" },
+    { id: 'Roboto Mono', label: 'Code', family: "'Roboto Mono', monospace" },
+  ],
+  effects: [
+    { id: 'none', label: 'None' },
+    { id: 'glow', label: 'Neon Glow' },
+    { id: 'rgb', label: 'RGB Shift' },
+    { id: 'gradient', label: 'Gradient' }
+  ]
 };
 
-// Start the app
-app.init();
+// Initialize Supabase
+const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+
+class ProfileEditor {
+  constructor() {
+    this.userId = null;
+    this.profileId = null;
+    this.staging = { avatar: null, banner: null, bg: null, customFont: null };
+    
+    // DOM Cache
+    this.dom = {
+      // Inputs
+      bio: document.getElementById('inp-bio'),
+      color: document.getElementById('inp-color'),
+      role: document.getElementById('inp-role'),
+      font: document.getElementById('inp-font'),
+      effect: document.getElementById('inp-effect'),
+      
+      // Visuals
+      bannerImg: document.getElementById('view-banner-img'),
+      bannerVid: document.getElementById('view-banner-vid'),
+      avatar: document.getElementById('view-avatar'),
+      swatch: document.getElementById('view-swatch'),
+      fontPreview: document.getElementById('lbl-font-preview'),
+      effectPreview: document.getElementById('lbl-effect-preview'),
+      bgPreview: document.getElementById('view-bg-mini'),
+      bgLabel: document.getElementById('lbl-bg-filename'),
+      
+      // Buttons & Modals
+      saveBtn: document.getElementById('btn-save'),
+      saveText: document.querySelector('.btn-content'),
+      loader: document.querySelector('.loader'),
+      
+      // Zones
+      zones: {
+        banner: document.getElementById('zone-banner'),
+        avatar: document.getElementById('zone-avatar'),
+        bg: document.getElementById('zone-bg')
+      },
+      files: {
+        banner: document.getElementById('file-banner'),
+        avatar: document.getElementById('file-avatar'),
+        bg: document.getElementById('file-bg'),
+        font: document.getElementById('file-custom-font')
+      }
+    };
+
+    this.init();
+  }
+
+  async init() {
+    this.setLoading(true, "Loading Profile...");
+    
+    // Auth Check
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) {
+      this.toast("Please log in to edit profile", "error");
+      this.setLoading(false);
+      return;
+    }
+    this.userId = user.id;
+
+    // Fetch Profile Data
+    const { data } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
+    
+    if (data) {
+      this.profileId = data.id;
+      this.populateUI(data);
+    } else {
+      // New Profile Fallback
+      this.profileId = user.id;
+      this.dom.avatar.src = CONFIG.defaults.avatar;
+      this.dom.bannerImg.src = CONFIG.defaults.banner;
+      this.updateFont('Cinzel');
+    }
+
+    this.setupEventListeners();
+    this.setLoading(false);
+  }
+
+  // --- UI POPULATION ---
+  populateUI(data) {
+    this.dom.bio.value = data.bio || "";
+    this.dom.role.checked = data.show_role_icon !== false;
+    
+    // Color
+    const themeColor = data.theme_color || CONFIG.defaults.accent;
+    this.dom.color.value = themeColor;
+    this.updateTheme(themeColor);
+
+    // Images
+    this.dom.avatar.src = data.avatar || CONFIG.defaults.avatar;
+    
+    if (data.banner_url && data.banner_url.match(/\.(mp4|webm)$/)) {
+      this.dom.bannerImg.classList.add('hidden');
+      this.dom.bannerVid.classList.remove('hidden');
+      this.dom.bannerVid.src = data.banner_url;
+    } else {
+      this.dom.bannerImg.src = data.banner_url || CONFIG.defaults.banner;
+    }
+
+    // BG Preview
+    if (data.bg_value) {
+      this.updateBgPreview(data.bg_value, data.bg_type);
+    }
+
+    // Typography & Effects
+    this.updateFont(data.username_font || 'Cinzel');
+    this.updateEffect(data.username_effect || 'none');
+  }
+
+  // --- INTERACTIVITY ---
+  setupEventListeners() {
+    // 1. Color Picker
+    this.dom.color.addEventListener('input', (e) => this.updateTheme(e.target.value));
+
+    // 2. Drag & Drop Uploads
+    const setupDD = (zone, input, type) => {
+      zone.addEventListener('click', (e) => {
+        // Prevent triggering file input if clicking edit overlay specifically
+        input.click();
+      });
+      input.addEventListener('change', () => this.handleFileSelect(input.files[0], type));
+      
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault(); zone.classList.add('drag-active');
+      });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag-active'));
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault(); zone.classList.remove('drag-active');
+        if (e.dataTransfer.files.length) this.handleFileSelect(e.dataTransfer.files[0], type);
+      });
+    };
+
+    setupDD(this.dom.zones.banner, this.dom.files.banner, 'banner');
+    setupDD(this.dom.zones.avatar, this.dom.files.avatar, 'avatar');
+    setupDD(this.dom.zones.bg, this.dom.files.bg, 'bg');
+
+    // 3. Modals
+    document.getElementById('btn-font-modal').onclick = () => this.openModal('modal-font', 'font');
+    document.getElementById('btn-effect-modal').onclick = () => this.openModal('modal-effect', 'effect');
+    
+    document.querySelectorAll('.modal-close, .modal-overlay').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (e.target === el || e.target.closest('.modal-close')) {
+          const id = el.getAttribute('data-close') || el.id;
+          document.getElementById(id).classList.remove('active');
+        }
+      });
+    });
+
+    // 4. Custom Font Import
+    document.getElementById('btn-import-font').onclick = () => this.dom.files.font.click();
+    this.dom.files.font.onchange = (e) => this.handleFontImport(e.target.files[0]);
+
+    // 5. Save
+    this.dom.saveBtn.addEventListener('click', () => this.save());
+  }
+
+  // --- FILE HANDLING ---
+  handleFileSelect(file, type) {
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) return this.toast("File too large (Max 15MB)", "error");
+
+    const url = URL.createObjectURL(file);
+    this.staging[type] = file;
+
+    if (type === 'avatar') {
+      this.dom.avatar.src = url;
+    } else if (type === 'banner') {
+      if (file.type.startsWith('video')) {
+        this.dom.bannerImg.classList.add('hidden');
+        this.dom.bannerVid.classList.remove('hidden');
+        this.dom.bannerVid.src = url;
+      } else {
+        this.dom.bannerVid.classList.add('hidden');
+        this.dom.bannerImg.classList.remove('hidden');
+        this.dom.bannerImg.src = url;
+      }
+    } else if (type === 'bg') {
+      this.dom.bgLabel.innerText = file.name;
+      this.updateBgPreview(url, file.type.startsWith('video') ? 'video' : 'image');
+    }
+  }
+
+  handleFontImport(file) {
+    if (!file) return;
+    if (!file.name.match(/\.(ttf|otf|woff2?)$/i)) return this.toast("Invalid font format", "error");
+
+    const url = URL.createObjectURL(file);
+    const fontName = 'CustomFont_' + Date.now();
+    const font = new FontFace(fontName, `url(${url})`);
+
+    font.load().then((loadedFace) => {
+      document.fonts.add(loadedFace);
+      this.staging.customFont = file;
+      this.updateFont('custom', fontName);
+      document.getElementById('modal-font').classList.remove('active');
+      this.toast("Custom font loaded", "success");
+    }).catch(() => this.toast("Failed to load font", "error"));
+  }
+
+  // --- VISUAL UPDATES ---
+  updateTheme(hex) {
+    document.documentElement.style.setProperty('--accent', hex);
+    document.documentElement.style.setProperty('--accent-glow', hex + '66');
+    this.dom.swatch.style.background = hex;
+  }
+
+  updateBgPreview(url, type) {
+    this.dom.bgPreview.innerHTML = type === 'video' 
+      ? `<video src="${url}" autoplay muted loop style="width:100%;height:100%;object-fit:cover"></video>` 
+      : `<img src="${url}" style="width:100%;height:100%;object-fit:cover">`;
+  }
+
+  updateFont(id, customFamily = null) {
+    this.dom.font.value = id;
+    let family = 'inherit';
+    
+    // Clear grid active states
+    document.querySelectorAll('#grid-fonts .option-card').forEach(c => c.classList.remove('active'));
+
+    if (id === 'custom' && customFamily) {
+      family = customFamily;
+      // No specific card to highlight for custom yet, or highlight import button
+    } else {
+      const fontObj = CONFIG.fonts.find(f => f.id === id);
+      if (fontObj) {
+        family = fontObj.family;
+        // Highlight logic handled in render
+      }
+    }
+    
+    this.dom.fontPreview.style.fontFamily = family;
+    this.renderFontGrid(id); // Re-render to show active state
+  }
+
+  updateEffect(id) {
+    this.dom.effect.value = id;
+    // Reset classes
+    this.dom.effectPreview.className = 'preview-text'; 
+    if(id !== 'none') this.dom.effectPreview.classList.add(`effect-${id}`);
+    
+    this.renderEffectGrid(id);
+  }
+
+  // --- MODAL RENDERING ---
+  openModal(modalId, type) {
+    if (type === 'font') this.renderFontGrid(this.dom.font.value);
+    if (type === 'effect') this.renderEffectGrid(this.dom.effect.value);
+    document.getElementById(modalId).classList.add('active');
+  }
+
+  renderFontGrid(activeId) {
+    const grid = document.getElementById('grid-fonts');
+    grid.innerHTML = '';
+    CONFIG.fonts.forEach(f => {
+      const card = document.createElement('div');
+      card.className = `option-card ${f.id === activeId ? 'active' : ''}`;
+      card.innerHTML = `
+        <div class="option-preview" style="font-family:${f.family}">Aa</div>
+        <div class="option-label">${f.label}</div>
+      `;
+      card.onclick = () => this.updateFont(f.id);
+      grid.appendChild(card);
+    });
+  }
+
+  renderEffectGrid(activeId) {
+    const grid = document.getElementById('grid-effects');
+    grid.innerHTML = '';
+    CONFIG.effects.forEach(e => {
+      const card = document.createElement('div');
+      card.className = `option-card ${e.id === activeId ? 'active' : ''}`;
+      // Preview logic
+      let previewClass = '';
+      if(e.id !== 'none') previewClass = `effect-${e.id}`;
+      
+      card.innerHTML = `
+        <div class="option-preview ${previewClass}" style="font-size:1rem; font-weight:700;">/six</div>
+        <div class="option-label">${e.label}</div>
+      `;
+      card.onclick = () => this.updateEffect(e.id);
+      grid.appendChild(card);
+    });
+  }
+
+  // --- SAVE LOGIC ---
+  async save() {
+    this.setLoading(true, "Saving...");
+    try {
+      const updates = {
+        updated_at: new Date(),
+        bio: this.dom.bio.value,
+        theme_color: this.dom.color.value,
+        username_font: this.dom.font.value,
+        username_effect: this.dom.effect.value,
+        show_role_icon: this.dom.role.checked
+      };
+
+      // Uploads
+      if (this.staging.avatar) updates.avatar = await this.upload(this.staging.avatar, 'avatars');
+      if (this.staging.banner) updates.banner_url = await this.upload(this.staging.banner, 'banners');
+      if (this.staging.bg) {
+        updates.bg_value = await this.upload(this.staging.bg, 'backgrounds');
+        updates.bg_type = this.staging.bg.type.startsWith('video') ? 'video' : 'image';
+      }
+      if (this.staging.customFont) {
+        updates.custom_font_url = await this.upload(this.staging.customFont, 'fonts');
+        updates.username_font = 'custom';
+      }
+
+      const { error } = await sb.from("profiles").upsert({ id: this.profileId, ...updates });
+      if (error) throw error;
+
+      this.toast("Profile updated successfully", "success");
+      // Clear staging
+      this.staging = { avatar: null, banner: null, bg: null, customFont: null };
+      
+    } catch (err) {
+      console.error(err);
+      this.toast("Save failed: " + err.message, "error");
+    }
+    this.setLoading(false);
+  }
+
+  async upload(file, bucket) {
+    const ext = file.name.split('.').pop();
+    const path = `${this.userId}/${Date.now()}.${ext}`;
+    
+    const { error } = await sb.storage.from(bucket).upload(path, file, {
+      upsert: true, contentType: file.type
+    });
+    
+    if (error) throw error;
+    
+    const { data } = sb.storage.from(bucket).getPublicUrl(path);
+    return data.publicUrl;
+  }
+
+  // --- HELPERS ---
+  setLoading(isLoading, text) {
+    this.dom.saveBtn.disabled = isLoading;
+    this.dom.saveText.textContent = isLoading ? "" : (text || "Save Changes");
+    this.dom.loader.style.display = isLoading ? "block" : "none";
+  }
+
+  toast(msg, type) {
+    const t = document.getElementById('toast');
+    const i = document.getElementById('toast-icon');
+    document.getElementById('toast-msg').innerText = msg;
+    
+    t.className = `toast active ${type}`;
+    i.className = type === 'success' ? 'ph-bold ph-check-circle' : 'ph-bold ph-warning-circle';
+    
+    setTimeout(() => t.classList.remove('active'), 3000);
+  }
+}
+
+// Start Engine
+document.addEventListener('DOMContentLoaded', () => {
+  new ProfileEditor();
+});
+
 </script>
 </body>
 </html>
