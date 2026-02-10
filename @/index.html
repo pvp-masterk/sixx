@@ -499,7 +499,7 @@ class ProfileViewer {
   async checkOwnership(profileId, username) {
     const { data: { session } } = await sb.auth.getSession();
     if (session && session.user.id === profileId) {
-      this.dom.editBtn.href = `/edit`; // Adjust link as needed
+      this.dom.editBtn.href = ``data.username`/edit`; // Adjust link as needed
       this.dom.editBtn.classList.add('visible');
     }
   }
