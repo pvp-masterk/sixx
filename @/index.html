@@ -177,7 +177,7 @@ body::after {
 /* Identity */
 .username { 
   font-family: var(--font-display); 
-  font-size: 38px; color: #fff; line-height: 1.1; margin-right: 8px;
+  font-size: 38px; line-height: 1.1; margin-right: 8px;
   
 }
 .badge-verified {
@@ -261,6 +261,47 @@ body::after {
   0% { background-position: 0% 50%; }
   100% { background-position: 100% 50%; }
 }
+/* ================= ROLE BADGE ================= */
+
+.role-badge {
+  width: 26px;
+  height: 26px;
+  margin-left: 10px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.role-badge img {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 10px var(--c-accent-glow));
+}
+
+/* Tooltip */
+.role-badge::after {
+  content: attr(data-role);
+  position: absolute;
+  bottom: -38px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s ease;
+}
+
+.role-badge:hover::after {
+  opacity: 1;
+}
 
 
 </style>
@@ -301,9 +342,46 @@ body::after {
       'UnifrakturMaguntia': "'UnifrakturMaguntia', cursive",
       'Playfair Display': "'Playfair Display', serif",
       'Roboto Mono': "'Roboto Mono', monospace"
-    }
-  };
+    },
+    roles: {
+  Founder: {
+    name: "Founder",
+    icon: "/assets/founder.png",
+    priority: 100
+  },
+  Admin: {
+    name: "Admin",
+    icon: "/assets/admin.png",
+    priority: 80
+  },
+  Moderator: {
+    name: "Moderator",
+    icon: "/assets/moderator.png",
+    priority: 60
+  },
+  Verified: {
+    name: "Verified",
+    icon: "/assets/verified.png",
+    priority: 40
+  }
+}
 
+  };
+  
+function getHighestRole(userRoles = []) {
+  let highest = null;
+
+  userRoles.forEach(r => {
+    const role = CONFIG.roles[r];
+    if (!role) return;
+
+    if (!highest || role.priority > highest.priority) {
+      highest = role;
+    }
+  });
+
+  return highest;
+}
   const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
   const app = {
@@ -336,6 +414,7 @@ body::after {
       app.renderProfile(profile);
       app.checkAuth(profile);
     },
+
 
     renderProfile: (user) => {
       // 1. Theme Engine Application
@@ -377,10 +456,8 @@ body::after {
         : `<div style="width:100%;height:100%;background:${themeColor}"></div>`;
 
       const isVerified = user.roles && user.roles.includes("Verified");
-      
-      let rolesHTML = (user.roles || []).map(r => `
-        <div class="role-chip"><i class="ph-fill ph-seal-check"></i> ${app.escapeHtml(r)}</div>
-      `).join('');
+    
+      const highestRole = getHighestRole(user.roles || []);
 
       const html = `
         <div class="profile-card">
@@ -400,19 +477,24 @@ body::after {
 
             <div class="user-identity">
               <div style="display:flex; align-items:center;">
-                <h1 class="username effect-${user.username_effect || 'none'}">
-  ${app.escapeHtml(user.username)}
-</h1>
+                <div style="display:flex; align-items:center;">
+  <h1 class="username effect-${user.username_effect || 'none'}">
+    ${app.escapeHtml(user.username)}
+  </h1>
+
+  ${
+    highestRole
+      ? `<div class="role-badge" data-role="${highestRole.name}">
+           <img src="${highestRole.icon}">
+         </div>`
+      : ''
+  }
+</div>
                 ${isVerified ? `<i class="ph-fill ph-seal-check badge-verified"></i>` : ''}
-              </div>
-              <div style="color:var(--c-accent); font-size:11px; font-weight:800; letter-spacing:2px; text-transform:uppercase; margin-top:5px;">
-                ${app.escapeHtml(user.role || 'Member')}
               </div>
             </div>
 
             <div class="bio-text">${app.escapeHtml(user.bio || "No bio provided.")}</div>
-
-            <div class="roles-grid">${rolesHTML}</div>
 
             <div class="stats-bar">
                <div class="stat-item">
