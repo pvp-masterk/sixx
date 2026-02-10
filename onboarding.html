@@ -448,10 +448,10 @@
 
             // Check if profile already exists
             const { data: profile } = await supabase
-                .from('profiles')
-                .select('username')
-                .eq('id', userData.id)
-                .single();
+  .from('profiles')
+  .select('username')
+  .eq('id', userData.id)
+  .maybeSingle();
 
             if (profile) {
                 // Redirect to existing profile
