@@ -724,47 +724,54 @@ function showToast(msg, type) {
   const drop = document.getElementById('drop-font');
   const input = document.getElementById('file-font');
   const preview = document.getElementById('font-preview');
-  const allowed = [
-  'font/ttf',
-  'font/otf',
-  'font/woff',
-  'font/woff2',
-  'application/font-woff',
-  'application/font-woff2'
-];
 
-if (!allowed.includes(file.type)) {
-  showToast("Unsupported font format", "error");
-  return;
-}
+  if (!drop || !input || !preview) {
+    console.warn('Font importer DOM not ready yet');
+    return;
+  }
 
   drop.onclick = () => input.click();
 
   input.onchange = () => {
-  const file = input.files[0];
-  if (!file) return;
+    const file = input.files[0];
+    if (!file) return;
 
-  if (file.size > 2 * 1024 * 1024) {
-    showToast("Font too large (max 2MB)", "error");
-    return;
-  }
+    const allowed = [
+      'font/ttf',
+      'font/otf',
+      'font/woff',
+      'font/woff2',
+      'application/font-woff',
+      'application/font-woff2'
+    ];
 
-  const url = URL.createObjectURL(file);
-  const font = new FontFace('PreviewFont', `url(${url})`);
+    if (!allowed.includes(file.type)) {
+      showToast("Unsupported font format", "error");
+      return;
+    }
 
-  font.load().then(() => {
-    document.fonts.add(font);
-    preview.style.fontFamily = 'PreviewFont';
+    if (file.size > 2 * 1024 * 1024) {
+      showToast("Font too large (max 2MB)", "error");
+      return;
+    }
 
-    staging.customFont = file;              // ✅ STORE IT
-    els.fontInput.value = 'custom';         // ✅ MARK AS CUSTOM
+    const url = URL.createObjectURL(file);
+    const font = new FontFace('PreviewFont', `url(${url})`);
 
-    showToast("Font loaded", "success");
-  }).catch(() => {
-    showToast("Invalid font file", "error");
-  });
-};
+    font.load().then(() => {
+      document.fonts.add(font);
+      preview.style.fontFamily = 'PreviewFont';
+
+      staging.customFont = file;
+      els.fontInput.value = 'custom';
+
+      showToast("Font loaded", "success");
+    }).catch(() => {
+      showToast("Invalid font file", "error");
+    });
+  };
 }
+
 
   document.addEventListener('click', (e) => {
   if (!e.target.closest('#import-font')) return;
