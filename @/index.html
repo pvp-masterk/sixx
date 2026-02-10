@@ -13,31 +13,24 @@
 /* ======================= VARIABLES ======================= */
 :root {
   --c-bg: #030005;
-  --c-bg-alt: #0a0510;
-  
-  /* Defaults (Updated via JS) */
   --c-accent: #7b2cbf;
-  --c-accent-glow: rgba(123, 44, 191, 0.4);
+  --c-accent-glow: rgba(123, 44, 191, 0.5);
+  --c-text-main: #ffffff;
+  --c-text-dim: #9ca3af;
   
-  --c-text-main: #e8e6f3;
-  --c-text-dim: #8f8ba0;
-  
-  --c-glass: rgba(10, 5, 20, 0.7);
-  --c-glass-border: rgba(255, 255, 255, 0.08);
+  /* Premium Glass Variables */
+  --glass-bg: rgba(15, 15, 25, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.03);
+  --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
   
   --font-main: 'Inter', sans-serif;
-  --font-brand: 'Diecide Remain', serif;
-  --font-display: 'Cinzel', serif; /* Updated via JS */
+  --font-display: 'Inter', sans-serif; /* Updated via JS */
   
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-smooth: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-@font-face {
-  font-family: 'Diecide Remain';
-  src: url('fonts/DeicideRemain.otf') format('opentype');
-  font-display: swap;
-}
-  
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
 
 body {
@@ -45,34 +38,32 @@ body {
   background: var(--c-bg);
   color: var(--c-text-main);
   min-height: 100vh;
-
   display: flex;
-  justify-content: center;   /* horizontal */
-  align-items: center;       /* vertical */
-
+  justify-content: center;
+  align-items: center;
   overflow-x: hidden;
-  line-height: 1.6;
+  line-height: 1.5;
 }
-/* Background Texture */
+
+/* Texture Overlay */
 body::after {
   content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 900;
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
-  opacity: 0.05;
+  opacity: 0.07;
 }
 
 /* ======================= LAYOUT ======================= */
 .app-container {
   position: relative;
   z-index: 10;
-
-  max-width: 650px;
-  width: 100%;
-
-  padding: 20px;
+  max-width: 600px;
+  width: 95%;
+  padding: 20px 0;
   
   opacity: 0;
   transform: translateY(20px);
-  animation: fadeInUp 0.8s var(--ease-out) forwards;
+  animation: fadeInUp 0.8s var(--ease-smooth) forwards;
+  will-change: transform, opacity;
 }
 
 @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
@@ -81,238 +72,256 @@ body::after {
   position: absolute;
   top: 30px;
   left: 30px;
-
-  font-family: var(--font-brand), 'Cinzel', serif;
-  font-size: 2.5rem;      /* ← make it header-sized */
-  line-height: 1.1;
-
-  background: linear-gradient(135deg, #e0aaff, #9d4edd, #7b2cbf);
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #fff, #9d4edd);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-
-  text-shadow: 0 0 25px rgba(157, 78, 221, 0.5);
-  font-weight: 900;
-  letter-spacing: 1px;
-
   text-decoration: none;
+  z-index: 50;
+  filter: drop-shadow(0 0 15px rgba(123, 44, 191, 0.3));
 }
-
-
 
 /* ======================= PROFILE CARD ======================= */
 .profile-card {
-  background: var(--c-glass);
-  border: 1px solid var(--c-glass-border);
+  background: var(--glass-bg);
+  /* The Secret Sauce for Premium Glass: */
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  
+  border: 1px solid var(--glass-border);
+  border-top: 1px solid rgba(255,255,255,0.15); /* Top light highlight */
   border-radius: 24px;
   overflow: hidden;
   position: relative;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--glass-shadow), inset 0 0 0 1px rgba(255,255,255,0.02);
+  transition: transform 0.4s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth), border-color 0.4s;
+  will-change: transform;
 }
 
-/* Theme Hover Effect */
-.profile-card:hover { 
-  border-color: var(--c-accent); 
-  box-shadow: 0 0 40px var(--c-accent-glow);
+.profile-card:hover {
+  border-color: rgba(255,255,255,0.2);
+  box-shadow: 0 40px 80px -20px rgba(0,0,0,0.9), 0 0 30px var(--c-accent-glow);
+  transform: translateY(-2px);
 }
 
-/* Banner Fade Effect */
+/* Banner */
 .profile-banner {
-  width: 100%; height: 250px;
+  width: 100%; height: 240px;
+  background-color: #0f0f0f;
   position: relative;
-  background-color: #1a1a1a;
-  /* This creates the seamless fade into the card body */
-  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  /* Smoother fade to glass */
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 }
+
 .profile-banner img, .profile-banner video {
   width: 100%; height: 100%; object-fit: cover;
-  transition: transform 0.6s ease;
+  transition: transform 1.5s var(--ease-smooth);
+  will-change: transform;
 }
-.profile-card:hover .profile-banner img { transform: scale(1.03); }
 
-/* Content Area */
+.profile-card:hover .profile-banner img { transform: scale(1.05); }
+
+/* Content Wrapper */
 .profile-content {
-  padding: 0 35px 40px;
+  padding: 0 32px 36px;
+  margin-top: -65px;
   position: relative;
-  margin-top: -70px; /* Pulls content up into the faded banner */
   z-index: 2;
 }
 
 /* Avatar */
-.avatar-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+.avatar-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; }
 .avatar-wrapper {
-  padding: 5px;
-  background: var(--c-glass); /* Glass border around avatar */
+  padding: 4px;
+  background: rgba(20, 20, 30, 0.6);
   backdrop-filter: blur(10px);
-  border-radius: 28px;
-  border: 1px solid var(--c-glass-border);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border-radius: 26px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
 }
 .profile-avatar {
-  width: 110px; height: 110px;
-  border-radius: 24px; object-fit: cover; display: block;
+  width: 100px; height: 100px;
+  border-radius: 22px; 
+  object-fit: cover; 
+  display: block;
+  background: #111;
 }
 
 /* Action Buttons */
 .action-btn {
-  padding: 8px 18px; border-radius: 10px;
+  padding: 8px 16px; border-radius: 10px;
   font-size: 13px; font-weight: 600; text-decoration: none;
   display: flex; align-items: center; gap: 8px;
-  transition: 0.2s; cursor: pointer;
+  transition: all 0.2s var(--ease-smooth); 
+  cursor: pointer;
 }
+
 .action-btn.secondary {
-  background: rgba(255,255,255,0.03); border: 1px solid var(--c-glass-border); color: #ccc;
+  background: rgba(255,255,255,0.05); 
+  border: 1px solid rgba(255,255,255,0.1); 
+  color: #ddd;
 }
-.action-btn.secondary:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: #fff; }
+.action-btn.secondary:hover { 
+  background: rgba(255,255,255,0.1); 
+  border-color: #fff; 
+  color: #fff;
+}
 
 .action-btn.primary {
-  background: var(--c-accent); color: #fff; border: none;
-  box-shadow: 0 4px 15px var(--c-accent-glow);
+  background: var(--c-accent); 
+  color: #fff; border: 1px solid transparent;
+  box-shadow: 0 0 20px var(--c-accent-glow);
 }
-.action-btn.primary:hover { transform: translateY(-2px); filter: brightness(1.2); }
+.action-btn.primary:hover { 
+  filter: brightness(1.15); 
+  transform: translateY(-1px); 
+}
 
-/* Identity */
+/* ======================= IDENTITY & ALIGNMENT ======================= */
+/* This is the critical section for alignment */
+
+.user-identity {
+  margin-bottom: 12px;
+}
+
+.identity-row {
+  display: flex;             /* Enable Flexbox */
+  align-items: center;       /* Vertical Center: The most important line */
+  justify-content: flex-start;
+  gap: 12px;                 /* Space between name and icons */
+  flex-wrap: wrap;           /* Allow wrapping on tiny screens */
+}
+
 .username { 
   font-family: var(--font-display); 
-  font-size: 38px; line-height: 1.1; margin-right: 8px;
-  
-}
-  /* Username + role alignment (font-safe) */
-.identity-row {
-  display: inline-flex;
-  align-items: baseline; /* IMPORTANT */
-  gap: 10px;
+  font-size: 32px; 
+  line-height: 1.1;          /* Tight line height prevents weird gaps */
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.5px;
 }
 
-.badge-verified {
-  color: var(--c-accent); font-size: 22px;
-  filter: drop-shadow(0 0 8px var(--c-accent-glow));
-}
-
-.bio-text {
-  color: var(--c-text-dim); font-size: 15px; margin-top: 15px;
-  white-space: pre-wrap;
-}
-
-/* Roles */
-.roles-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
-.role-chip {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-  padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; color: #aaa;
-  display: flex; align-items: center; gap: 6px; transition: 0.2s;
-}
-.role-chip:hover { 
-  border-color: var(--c-accent); color: #fff; 
-  box-shadow: 0 0 10px var(--c-accent-glow); 
-}
-
-/* Stats Footer */
-.stats-bar {
-  display: flex; gap: 20px; margin-top: 25px; padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-.stat-item {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 11px; color: var(--c-text-dim); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-}
-.stat-item i { font-size: 16px; color: var(--c-accent); }
-
-/* Backgrounds */
-.bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-.bg-media { width: 100%; height: 100%; object-fit: cover; opacity: 0.4; }
-.bg-blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3; }
-.bg-blob.one { top:-20%; left:-10%; width:70vw; height:70vw; background: radial-gradient(var(--c-accent), transparent 70%); }
-
-/* Loading */
-.skeleton { background: rgba(255,255,255,0.03); border-radius: 8px; animation: pulse 2s infinite; }
-@keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-  /* USERNAME EFFECTS */
-/* ================= USERNAME EFFECTS ================= */
-
-.effect-none {
-  color: #fff;
-  text-shadow: none;
-}
-
-.effect-glow {
-  color: #fff;
-  text-shadow:
-    0 0 10px var(--c-accent-glow),
-    0 0 30px var(--c-accent-glow);
-}
-
-.effect-rgb {
-  color: #fff;
-  animation: rgbGlow 3s linear infinite;
-}
-
-@keyframes rgbGlow {
-  0% { text-shadow: 0 0 10px #ff3c3c; }
-  33% { text-shadow: 0 0 10px #3cffb3; }
-  66% { text-shadow: 0 0 10px #3c7bff; }
-  100% { text-shadow: 0 0 10px #ff3c3c; }
-}
-
-.effect-gradient {
-  background: linear-gradient(90deg, #7dd3fc, #c084fc, #f472b6);
-  background-size: 200% 200%;
-  animation: gradientMove 4s ease infinite;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
-/* ================= ROLE BADGE ================= */
-
+/* Role Icon Container - Perfectly Centered */
 .role-badge {
-  width: 0.9em;
-  height: 0.9em;
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-
-  /* font-aware vertical alignment */
-  transform: translateY(0.08em);
+  
+  /* Size relative to text */
+  height: 28px; 
+  width: 28px; 
+  
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  
+  position: relative;
+  cursor: help;
+  transition: transform 0.2s;
 }
 
+.role-badge:hover { transform: scale(1.1); border-color: var(--c-accent); }
 
 .role-badge img {
-  width: 100%;
-  height: 100%;
+  width: 18px; 
+  height: 18px; 
   object-fit: contain;
+  /* Drop shadow for icon visibility */
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
-/* Tooltip */
+/* Verified Check */
+.badge-verified {
+  color: var(--c-accent); 
+  font-size: 22px;
+  display: flex;
+  filter: drop-shadow(0 0 10px var(--c-accent-glow));
+}
+
+/* Role Tooltip */
 .role-badge::after {
   content: attr(data-role);
   position: absolute;
-  bottom: -38px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.8);
-  color: white;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: 0.2s ease;
+  bottom: 110%; left: 50%; transform: translateX(-50%) translateY(5px);
+  background: #000; border: 1px solid #333;
+  color: white; padding: 5px 10px; border-radius: 6px;
+  font-size: 11px; font-weight: 700; white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: 0.2s ease;
+  z-index: 100;
+}
+.role-badge:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+
+/* Bio & Stats */
+.bio-text {
+  color: var(--c-text-dim); 
+  font-size: 14px; 
+  line-height: 1.6;
+  white-space: pre-wrap;
+  font-weight: 400;
+  max-width: 95%;
 }
 
-.role-badge:hover::after {
-  opacity: 1;
+.stats-bar {
+  display: flex; gap: 24px; margin-top: 24px; padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.stat-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--c-text-dim); 
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.stat-item i { font-size: 16px; color: var(--c-accent); }
+
+/* ======================= BACKGROUNDS & EFFECTS ======================= */
+.bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-media { width: 100%; height: 100%; object-fit: cover; opacity: 0.3; }
+
+/* Optimized Blob */
+.bg-blob { 
+  position: absolute; 
+  border-radius: 50%; 
+  opacity: 0.4;
+  /* Use radial gradient instead of box-shadow blur for better performance */
+  background: radial-gradient(circle, var(--c-accent) 0%, transparent 70%);
+  filter: blur(60px); 
+  will-change: transform;
+}
+.bg-blob.one { 
+  top: -10%; left: -10%; 
+  width: 600px; height: 600px; 
+  opacity: 0.25;
 }
 
+/* Username Effects */
+.effect-none { color: #fff; }
+.effect-glow { text-shadow: 0 0 15px var(--c-accent-glow), 0 0 30px var(--c-accent-glow); }
+.effect-rgb { animation: rgbGlow 4s linear infinite; }
+@keyframes rgbGlow {
+  0% { color: #ff3c3c; text-shadow: 0 0 10px rgba(255,60,60,0.5); }
+  33% { color: #3cffb3; text-shadow: 0 0 10px rgba(60,255,179,0.5); }
+  66% { color: #3c7bff; text-shadow: 0 0 10px rgba(60,123,255,0.5); }
+  100% { color: #ff3c3c; text-shadow: 0 0 10px rgba(255,60,60,0.5); }
+}
+.effect-gradient {
+  background: linear-gradient(to right, #7dd3fc, #c084fc, #f472b6);
+  -webkit-background-clip: text; color: transparent;
+  background-size: 200% auto; animation: gradientMove 3s linear infinite;
+}
+@keyframes gradientMove { to { background-position: 200% center; } }
+
+/* Loading Skeletons */
+.skeleton { 
+  background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  background-size: 200% 100%;
+  border-radius: 8px; 
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
 </style>
 </head>
@@ -326,15 +335,16 @@ body::after {
 
   <main class="app-container">
     <div id="profile-target">
-      <!-- Loading State -->
+      <!-- Premium Loading State -->
       <div class="profile-card">
         <div class="profile-banner skeleton"></div>
         <div class="profile-content">
           <div class="avatar-row">
             <div class="avatar-wrapper"><div class="profile-avatar skeleton"></div></div>
           </div>
-          <div class="skeleton" style="height:40px; width:50%; margin-bottom:15px"></div>
-          <div class="skeleton" style="height:15px; width:80%"></div>
+          <div class="skeleton" style="height:32px; width:40%; margin-bottom:15px"></div>
+          <div class="skeleton" style="height:14px; width:90%; margin-bottom:8px"></div>
+          <div class="skeleton" style="height:14px; width:70%"></div>
         </div>
       </div>
     </div>
@@ -342,66 +352,39 @@ body::after {
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
+  // CONFIGURATION
   const CONFIG = {
     supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co",
     supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
     fonts: {
-      'Diecide Remain': "'Diecide Remain', 'Cinzel', serif",
+      'Default': "'Inter', sans-serif",
       'Cinzel': "'Cinzel', serif",
       'Orbitron': "'Orbitron', sans-serif",
       'UnifrakturMaguntia': "'UnifrakturMaguntia', cursive",
-      'Playfair Display': "'Playfair Display', serif",
-      'Roboto Mono': "'Roboto Mono', monospace"
+      'Playfair': "'Playfair Display', serif",
+      'Mono': "'Roboto Mono', monospace"
     },
     roles: {
-  Founder: {
-    name: "Founder",
-    icon: "/assets/founder.png",
-    priority: 100
-  },
-  Admin: {
-    name: "Admin",
-    icon: "/assets/admin.png",
-    priority: 80
-  },
-  Moderator: {
-    name: "Moderator",
-    icon: "/assets/moderator.png",
-    priority: 60
-  },
-  Verified: {
-    name: "Verified",
-    icon: "/assets/verified.png",
-    priority: 40
-  }
-}
-
-  };
-  
-function getHighestRole(userRoles = []) {
-  let highest = null;
-
-  userRoles.forEach(r => {
-    const role = CONFIG.roles[r];
-    if (!role) return;
-
-    if (!highest || role.priority > highest.priority) {
-      highest = role;
+      Founder: { name: "Founder", icon: "https://cdn-icons-png.flaticon.com/512/5556/5556468.png", priority: 100 },
+      Admin: { name: "Admin", icon: "https://cdn-icons-png.flaticon.com/512/2329/2329865.png", priority: 80 },
+      Moderator: { name: "Moderator", icon: "https://cdn-icons-png.flaticon.com/512/10629/10629607.png", priority: 60 },
+      Verified: { name: "Verified", icon: "https://cdn-icons-png.flaticon.com/512/7641/7641727.png", priority: 40 }
     }
-  });
+  };
 
-  return highest;
-}
   const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
   const app = {
-    init: () => {
-      app.loadProfile();
-    },
+    init: () => app.loadProfile(),
+    escapeHtml: (str) => str ? str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : "",
 
-    escapeHtml: (str) => {
-      if(!str) return "";
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    getHighestRole: (userRoles = []) => {
+      let highest = null;
+      userRoles.forEach(r => {
+        const role = CONFIG.roles[r];
+        if (role && (!highest || role.priority > highest.priority)) highest = role;
+      });
+      return highest;
     },
 
     loadProfile: async () => {
@@ -410,98 +393,94 @@ function getHighestRole(userRoles = []) {
       
       if (!username) return app.renderError("User identity not found.");
 
-      const { data: profile, error } = await sb
-        .from("profiles")
-        .select("*")
-        .eq("username", username)
-        .single();
-
+      const { data: profile, error } = await sb.from("profiles").select("*").eq("username", username).single();
       if (error || !profile) return app.renderError("Profile restricted or non-existent.");
 
-      // Increment Views (Optimistic UI - don't wait for result)
       sb.rpc('increment_views', { row_id: profile.id });
-
+      
+      // Load fonts first, then render to prevent jumping
+      await app.applyTheme(profile);
       app.renderProfile(profile);
       app.checkAuth(profile);
     },
 
+    applyTheme: async (user) => {
+      // 1. Colors
+      const themeColor = user.theme_color || '#7b2cbf';
+      const root = document.documentElement;
+      root.style.setProperty('--c-accent', themeColor);
+      root.style.setProperty('--c-accent-glow', themeColor + '66'); // 40% opacity hex
+      
+      // 2. Fonts
+      let fontName = CONFIG.fonts[user.username_font] || CONFIG.fonts['Default'];
+      
+      if (user.username_font === 'custom' && user.custom_font_url) {
+        try {
+          const font = new FontFace('CustomUserFont', `url(${user.custom_font_url})`);
+          await font.load();
+          document.fonts.add(font);
+          fontName = "'CustomUserFont', sans-serif";
+        } catch (e) {
+          console.error("Font load failed", e);
+        }
+      }
+      root.style.setProperty('--font-display', fontName);
+
+      // 3. Background
+      const bgEl = document.getElementById('profile-bg');
+      if(user.bg_type === 'image' && user.bg_value) {
+        bgEl.innerHTML = `<img src="${app.escapeHtml(user.bg_value)}" class="bg-media" alt="">`;
+      } else if(user.bg_type === 'video' && user.bg_value) {
+        bgEl.innerHTML = `<video src="${app.escapeHtml(user.bg_value)}" autoplay muted loop playsinline class="bg-media"></video>`;
+      } else {
+        // Dynamic blob color
+        bgEl.innerHTML = `<div class="bg-blob one"></div>`;
+      }
+    },
 
     renderProfile: (user) => {
-      // 1. Theme Engine Application
-      const themeColor = user.theme_color || '#7b2cbf';
-      document.documentElement.style.setProperty('--c-accent', themeColor);
-      document.documentElement.style.setProperty('--c-accent-glow', themeColor + '66');
-      
-      // 2. Font Application
-      const userFont = CONFIG.fonts[user.username_font] || CONFIG.fonts['Cinzel'];
-      document.documentElement.style.setProperty('--font-display', userFont);
-
-        if (user.username_font === 'custom' && user.custom_font_url) {
-  const font = new FontFace(
-    'UserCustomFont',
-    `url(${user.custom_font_url})`
-  );
-
-  font.load().then(() => {
-    document.fonts.add(font);
-    document.documentElement.style.setProperty(
-      '--font-display',
-      "'UserCustomFont', serif"
-    );
-  });
-}
-
-      // 3. Background Setup
-      const bgEl = document.getElementById('profile-bg');
-      if(user.bg_type === 'image' && user.bg_value) bgEl.innerHTML = `<img src="${user.bg_value}" class="bg-media">`;
-      else if(user.bg_type === 'video' && user.bg_value) bgEl.innerHTML = `<video src="${user.bg_value}" autoplay muted loop playsinline class="bg-media"></video>`;
-      else bgEl.innerHTML = `<div class="bg-blob one"></div>`; // Fallback blob
-
-      // 4. HTML Generation
       const avatar = user.avatar || "https://cdn.discordapp.com/embed/avatars/0.png";
       const banner = user.banner_url 
         ? (user.banner_url.match(/\.(mp4|webm)$/) 
             ? `<video src="${user.banner_url}" autoplay loop muted playsinline></video>` 
             : `<img src="${user.banner_url}">`)
-        : `<div style="width:100%;height:100%;background:${themeColor}"></div>`;
+        : `<div style="width:100%;height:100%;background:${user.theme_color || '#111'}"></div>`;
 
+      const highestRole = app.getHighestRole(user.roles || []);
       const isVerified = user.roles && user.roles.includes("Verified");
-    
-      const highestRole = getHighestRole(user.roles || []);
 
+      // THE HTML
       const html = `
         <div class="profile-card">
-          <div class="profile-banner">
-            ${banner}
-          </div>
+          <div class="profile-banner">${banner}</div>
           
           <div class="profile-content">
             <div class="avatar-row">
               <div class="avatar-wrapper">
-                <img class="profile-avatar" src="${app.escapeHtml(avatar)}">
+                <img class="profile-avatar" src="${app.escapeHtml(avatar)}" alt="Avatar">
               </div>
               <div id="action-buttons" style="display:flex; gap:10px;">
-                <button class="action-btn secondary" onclick="app.copyLink()"><i class="ph-bold ph-share-network"></i> Share</button>
+                <button class="action-btn secondary" onclick="app.copyLink()">
+                  <i class="ph-bold ph-share-network"></i> Share
+                </button>
               </div>
             </div>
 
             <div class="user-identity">
-  <div class="identity-row">
-    <h1 class="username effect-${user.username_effect || 'none'}">
-      ${app.escapeHtml(user.username)}
-    </h1>
+              <div class="identity-row">
+                <h1 class="username effect-${user.username_effect || 'none'}">
+                  ${app.escapeHtml(user.username)}
+                </h1>
 
-    ${
-      highestRole
-        ? `<span class="role-badge" data-role="${highestRole.name}">
-             <img src="${highestRole.icon}">
-           </span>`
-        : ''
-    }
+                ${highestRole ? `
+                  <div class="role-badge" data-role="${highestRole.name}">
+                     <img src="${highestRole.icon}" alt="${highestRole.name}">
+                  </div>
+                ` : ''}
 
-    ${isVerified ? `<i class="ph-fill ph-seal-check badge-verified"></i>` : ''}
-  </div>
-</div>
+                ${isVerified ? `<i class="ph-fill ph-seal-check badge-verified"></i>` : ''}
+              </div>
+            </div>
 
             <div class="bio-text">${app.escapeHtml(user.bio || "No bio provided.")}</div>
 
@@ -526,11 +505,11 @@ function getHighestRole(userRoles = []) {
 
     checkAuth: async (profile) => {
       const { data: { session } } = await sb.auth.getSession();
-      if (session && session.user && session.user.id === profile.id) {
+      if (session?.user?.id === profile.id) {
         const btn = document.createElement('a');
         btn.href = `/@${encodeURIComponent(profile.username)}/edit`;
         btn.className = 'action-btn primary';
-        btn.innerHTML = `<i class="ph-bold ph-pencil-simple"></i> Edit Profile`;
+        btn.innerHTML = `<i class="ph-bold ph-pencil-simple"></i> Edit`;
         document.getElementById('action-buttons').prepend(btn);
       }
     },
@@ -538,13 +517,23 @@ function getHighestRole(userRoles = []) {
     copyLink: () => {
       navigator.clipboard.writeText(window.location.href);
       const btn = document.querySelector('.ph-share-network').parentElement;
-      const old = btn.innerHTML;
+      const original = btn.innerHTML;
       btn.innerHTML = `<i class="ph-bold ph-check"></i> Copied`;
-      setTimeout(() => btn.innerHTML = old, 2000);
+      btn.style.borderColor = "#4ade80";
+      btn.style.color = "#4ade80";
+      setTimeout(() => {
+        btn.innerHTML = original;
+        btn.style.borderColor = "";
+        btn.style.color = "";
+      }, 2000);
     },
 
     renderError: (msg) => {
-      document.getElementById('profile-target').innerHTML = `<div style="text-align:center; padding:50px; color:#ff5555">${msg}</div>`;
+      document.getElementById('profile-target').innerHTML = `
+        <div style="background:rgba(255,50,50,0.1); border:1px solid rgba(255,50,50,0.2); padding:20px; border-radius:12px; text-align:center; color:#ff8888; backdrop-filter:blur(10px);">
+          <i class="ph-bold ph-warning" style="font-size:32px; margin-bottom:10px; display:block;"></i>
+          ${msg}
+        </div>`;
     }
   };
 
