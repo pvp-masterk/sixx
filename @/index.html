@@ -449,15 +449,16 @@ class ProfileViewer {
         if (data.bg_type === 'video') {
   this.dom.bgContainer.innerHTML = `
     <video
-      src="${data.bg_value}"
-      class="user-bg-media"
-      autoplay
-      loop
-      playsinline
-      muted
-      preload="auto"
-      id="bg-video">
-    </video>
+  src="${data.bg_value}"
+  class="user-bg-media"
+  autoplay
+  loop
+  playsinline
+  muted
+  preload="auto"
+  crossorigin="anonymous"
+  id="bg-video">
+</video>
   `;
 
   const bgVideo = document.getElementById("bg-video");
