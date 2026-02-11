@@ -2,306 +2,362 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Loading... | /six</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>Loading Profile... | /six</title>
 
 <!-- EXTERNAL ASSETS -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;700&family=Orbitron:wght@600&family=Playfair+Display:ital,wght@0,600;1,600&family=UnifrakturMaguntia&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
 
 <style>
 /* =========================================
-   1. CORE VARIABLES & RESET
+   1. CORE VARIABLES & THEME
    ========================================= */
 :root {
-  --bg-deep: #050505;
-  --glass-surface: rgba(10, 10, 10, 0.75);
+  --bg-deep: #030303;
+  --glass-surface: rgba(15, 15, 15, 0.65);
   --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.03);
+  --glass-highlight: rgba(255, 255, 255, 0.05);
   
   --text-main: #ffffff;
-  --text-muted: #a1a1aa;
+  --text-muted: #9ca3af;
   
-  --accent: #9333ea; /* Default Purple */
-  --accent-glow: rgba(147, 51, 234, 0.4);
+  /* Dynamic Accent (Set by JS) */
+  --accent: #7b2cbf;
+  --accent-glow: rgba(123, 44, 191, 0.5);
   
-  --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --ease-smooth: cubic-bezier(0.23, 1, 0.32, 1);
+  --radius-card: 24px;
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   background-color: var(--bg-deep);
   color: var(--text-main);
   font-family: 'Inter', sans-serif;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden; /* Prevent scroll */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  /* REMOVE THESE */
+  display: block;
+  padding: 0;
 }
 
 /* =========================================
-   2. IMMERSIVE BACKGROUND
+   2. IMMERSIVE BACKGROUND SYSTEM
    ========================================= */
 .bg-layer {
-  position: fixed; inset: 0; z-index: -1;
-  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
 }
 
+
+/* Dynamic Background (User Image/Video) */
 .user-bg-media {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 1.5s ease;
-  will-change: opacity;
-}
-.user-bg-media.loaded { opacity: 1; }
+  position: absolute;
+  inset: 0;
 
-/* Vignette & Noise */
-.overlay-vignette {
-  position: absolute; inset: 0;
-  background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
-}
-.overlay-noise {
-  position: absolute; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-  pointer-events: none; mix-blend-mode: overlay;
-}
-
-/* =========================================
-   3. ENTER SCREEN (Click to Start)
-   ========================================= */
-#enter-screen {
-  position: fixed; inset: 0; z-index: 999;
-  background: #000;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  cursor: pointer;
-  transition: opacity 0.8s var(--ease-smooth), visibility 0.8s;
-}
-#enter-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
-.enter-text {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1rem; letter-spacing: 0.2em; text-transform: uppercase;
-  color: #fff;
-  animation: pulse-text 2s infinite;
-}
-@keyframes pulse-text { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-
-/* =========================================
-   4. GLASS CARD (3D TILT)
-   ========================================= */
-.scene {
-  perspective: 1000px;
-  width: 100%; max-width: 500px; padding: 20px;
-}
-
-.profile-card {
-  position: relative;
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  transition:
+    filter 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s ease,
+    transform 0.6s ease;
+
+  will-change: filter, transform;
+}
+
+/* BLURRED MODE (default / guns.lol style) */
+.bg-blurred .user-bg-media {
+  filter: blur(32px) brightness(0.7);
+  transform: scale(1.08);
+  opacity: 0.9;
+}
+
+/* CLEAN CINEMATIC MODE */
+.bg-clean .user-bg-media {
+  filter: none;
+  transform: scale(1);
+  opacity: 1;
+}
+
+
+/* Noise Overlay */
+.noise-overlay {
+  position: absolute; inset: 0; pointer-events: none;
+  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
+  opacity: 0.12;
+   mix-blend-mode: overlay;
+}
+
+/* Vignette */
+.vignette {
+  background: radial-gradient(circle at center,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0.6) 80%,
+    rgba(0,0,0,0.9) 100%
+  );
+}
+
+
+/* =========================================
+   3. THE GLASS CARD
+   ========================================= */
+.profile-card {
+  width: 100%; max-width: 550px;
   background: var(--glass-surface);
   border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  backdrop-filter: blur(40px) saturate(120%);
-  -webkit-backdrop-filter: blur(40px) saturate(120%);
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.05) inset, 0 20px 50px rgba(0,0,0,0.5);
-  
-  transform-style: preserve-3d;
-  transform: rotateX(0) rotateY(0);
-  transition: transform 0.1s linear, opacity 0.5s ease;
-  
-  opacity: 0; /* Hidden until entered */
+  border-radius: var(--radius-card);
+  box-shadow: 0 40px 100px -20px rgba(0,0,0,0.7);
+  overflow: hidden;
+  position: relative;
+  opacity: 0; transform: translateY(30px) scale(0.95);
+  animation: entrance 1s var(--ease-lux) forwards 0.2s;
 }
-.profile-card.visible { opacity: 1; animation: card-float 6s ease-in-out infinite; }
 
-/* Disable float on hover to prevent conflict with tilt */
-.profile-card:hover { animation: none; }
+@keyframes entrance {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 
-@keyframes card-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+/* Glossy Shine Reflection */
+.profile-card::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: linear-gradient(125deg, transparent 0%, rgba(255,255,255,0.03) 40%, transparent 60%);
 }
 
 /* =========================================
-   5. CONTENT STYLING
+   4. PROFILE CONTENT
    ========================================= */
-.banner-container {
-  height: 180px; width: 100%;
-  border-radius: 24px 24px 0 0;
-  overflow: hidden;
-  position: relative;
-  border-bottom: 1px solid var(--glass-border);
-}
+.card-header { position: relative; width: 100%; height: 200px; overflow: hidden; background: #000; }
 
+/* Banner */
 .banner-media {
   width: 100%; height: 100%; object-fit: cover;
-  transition: transform 0.5s var(--ease-smooth);
+  mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
+  transition: transform 10s ease;
 }
 .profile-card:hover .banner-media { transform: scale(1.05); }
 
-.card-content {
-  padding: 0 30px 35px;
-  text-align: center;
-  position: relative;
+/* Edit Button (Floating) */
+.edit-btn {
+  position: absolute; top: 20px; right: 20px; z-index: 10;
+  background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  color: #fff; padding: 8px 16px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 600; text-decoration: none;
+  display: flex; align-items: center; gap: 6px;
+  transition: 0.2s; opacity: 0; transform: translateY(-10px);
+}
+.edit-btn.visible { opacity: 1; transform: translateY(0); }
+.edit-btn:hover { background: var(--accent); border-color: var(--accent); }
+
+.card-body {
+  padding: 0 32px 40px; margin-top: -60px; position: relative; z-index: 3;
 }
 
-.avatar-container {
-  width: 110px; height: 110px; margin: -55px auto 15px;
-  position: relative; z-index: 2;
+/* Avatar */
+.avatar-wrapper {
+  width: 120px; height: 120px;
+  border-radius: 50%; padding: 4px;
+  background: rgba(20,20,20,0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  margin-bottom: 16px;
 }
 .avatar-img {
   width: 100%; height: 100%; border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #101010; /* Dark ring to blend with glass */
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-}
-.status-indicator {
-  position: absolute; bottom: 5px; right: 5px;
-  width: 18px; height: 18px;
-  background: #10b981; border: 3px solid #101010; border-radius: 50%;
+  object-fit: cover; background: #111;
+  display: block;
 }
 
-/* Typography */
+/* Username & Identity */
+.identity-row { margin-bottom: 12px; }
+
+/* --- USERNAME EFFECTS --- */
 .username {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.8rem; font-weight: 700;
-  color: #fff; margin-bottom: 8px;
-  display: inline-flex; align-items: center; gap: 8px;
-  text-shadow: 0 0 20px var(--accent-glow);
+  font-size: 2rem; line-height: 1.1; margin-bottom: 6px;
+  display: inline-block;
 }
 
-/* Effects */
-.fx-glow { text-shadow: 0 0 15px var(--accent); }
-.fx-sparkle { 
-  background: linear-gradient(135deg, #fff 40%, var(--accent) 50%, #fff 60%); 
-  background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  animation: shine 3s linear infinite;
+/* 1. Neon Glow */
+.fx-glow {
+  color: #fff;
+  text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent), 0 0 40px var(--accent);
+}
+
+/* 2. RGB Glitch */
+.fx-rgb {
+  position: relative; color: #fff;
+  text-shadow: 2px 0 var(--accent), -2px 0 #00ffff;
+  animation: glitch-skew 3s infinite linear alternate-reverse;
+}
+@keyframes glitch-skew {
+  0% { transform: skew(0deg); }
+  20% { transform: skew(-2deg); }
+  40% { transform: skew(1deg); }
+  60% { transform: skew(-1deg); }
+  80% { transform: skew(2deg); }
+  100% { transform: skew(0deg); }
+}
+
+/* 3. Luxury Gradient */
+.fx-gradient {
+  background: linear-gradient(135deg, #fff 20%, var(--accent) 50%, #fff 80%);
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: shine 5s linear infinite;
 }
 @keyframes shine { to { background-position: 200% center; } }
 
-.bio {
-  font-size: 0.95rem; color: var(--text-muted);
-  line-height: 1.6; min-height: 1.6em; margin-bottom: 25px;
-  white-space: pre-wrap;
+/* Role Badges */
+.badges-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.role-pill {
+  height: 24px; padding: 0 10px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-muted); display: flex; align-items: center; gap: 6px;
+  transition: 0.2s;
+}
+.role-pill:hover { border-color: var(--accent); color: #fff; background: rgba(255,255,255,0.08); }
+.role-pill i { color: var(--accent); font-size: 0.8rem; }
+
+/* Bio */
+.bio-text {
+  font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.8);
+  margin: 20px 0; white-space: pre-wrap; font-weight: 300;
 }
 
-/* Stats Row */
-.stats-row {
-  display: flex; justify-content: center; gap: 20px;
-  margin-top: 20px; padding-top: 20px;
+/* Footer Stats */
+.card-footer {
   border-top: 1px solid var(--glass-border);
+  padding-top: 20px; margin-top: 20px;
+  display: flex; gap: 24px;
 }
-.stat {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 0.8rem; color: #71717a; font-family: 'JetBrains Mono', monospace;
+.stat-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.8rem; color: var(--text-muted); font-weight: 500;
 }
-.stat i { color: var(--accent); }
+.stat-item i { color: var(--accent); font-size: 1rem; }
 
-/* Edit Button */
-.edit-btn {
-  position: absolute; top: 15px; right: 15px;
-  background: rgba(0,0,0,0.5); color: #fff;
-  padding: 8px 12px; border-radius: 12px;
-  font-size: 0.75rem; text-decoration: none;
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255,255,255,0.1);
-  opacity: 0; pointer-events: none; transform: translateY(-10px);
-  transition: 0.3s;
-}
-.edit-btn.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
-.edit-btn:hover { background: var(--accent); border-color: var(--accent); }
+/* --- SKELETON LOADER --- */
+.skel { background: rgba(255,255,255,0.05); border-radius: 6px; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 0.8; } 100% { opacity: 0.4; } }
 
-/* =========================================
-   6. CANVAS VISUALIZER
-   ========================================= */
-canvas#audio-canvas {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  pointer-events: none; z-index: 1;
-  opacity: 0.4;
-  mix-blend-mode: soft-light;
-  border-radius: 24px 24px 0 0;
+.loading-view .banner-media { opacity: 0; }
+.loading-view .avatar-img { opacity: 0; }
+.loading-view .skel-avatar { position: absolute; inset:0; border-radius: 50%; }
+.loading-view .skel-title { width: 60%; height: 32px; margin-bottom: 10px; }
+.loading-view .skel-bio { width: 100%; height: 60px; }
+
+/* Utilities */
+.hidden { display: none !important; }
+
+/* Mobile */
+@media (max-width: 480px) {
+  .profile-card { border-radius: 0; min-height: 100vh; box-shadow: none; border: none; }
+  .card-header { height: 160px; }
+  .avatar-wrapper { width: 100px; height: 100px; }
+  .bio-text { font-size: 0.9rem; }
+}
+   .profile-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.audio-visualizer {
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
 }
 
-/* =========================================
-   7. SKELETON LOADER
-   ========================================= */
-.skeleton {
-  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+.stroke {
+  width: 4px;
+  height: 20px;
   border-radius: 6px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transition: background 0.2s linear;
 }
-@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-.s-text { height: 1em; width: 70%; margin: 0 auto; }
-.s-avatar { width: 100%; height: 100%; border-radius: 50%; }
-
-.hidden-imp { display: none !important; }
 
 </style>
 </head>
 <body>
 
-<!-- Background -->
+<!-- Background Layer -->
 <div class="bg-layer">
-  <div id="bg-container"></div>
-  <div class="overlay-vignette"></div>
-  <div class="overlay-noise"></div>
+  <div id="dynamic-bg-container"></div> <!-- Video or Image injected here -->
+  <div class="vignette"></div>
+  <div class="noise-overlay"></div>
 </div>
 
-<!-- Enter Screen -->
-<div id="enter-screen">
-  <div class="enter-text">Click to Enter</div>
-</div>
+<!-- Main Card -->
+   <div class="profile-wrapper">
+<main class="profile-card loading-view" id="main-card">
+  
+  <div class="card-header">
+    <div id="banner-container"></div> <!-- Banner injected here -->
+    <a href="#" class="edit-btn" id="btn-edit-profile">
+      <i class="ph-bold ph-pencil-simple"></i> Edit Profile
+    </a>
+  </div>
 
-<!-- Main Scene -->
-<div class="scene">
-  <main class="profile-card" id="card">
-    
-    <div class="banner-container">
-      <div id="banner-wrap" style="width:100%; height:100%;">
-        <div class="skeleton" style="width:100%; height:100%;"></div>
-      </div>
-      <!-- Visualizer Canvas draws over banner -->
-      <canvas id="audio-canvas"></canvas>
-      <a href="#" id="edit-btn" class="edit-btn"><i class="ph-bold ph-pencil-simple"></i> Edit</a>
+  <div class="card-body">
+    <div class="avatar-wrapper">
+      <img src="" id="ui-avatar" class="avatar-img">
+      <div class="skel skel-avatar"></div>
     </div>
 
-    <div class="card-content">
-      <div class="avatar-container">
-        <img id="ui-avatar" class="avatar-img hidden-imp">
-        <div id="skel-avatar" class="skeleton s-avatar"></div>
-        <div class="status-indicator"></div>
-      </div>
-
+    <div class="identity-row">
       <h1 id="ui-username" class="username">
-        <div class="skeleton s-text" style="width: 120px; height: 30px;"></div>
+        <!-- Text injected -->
+        <div class="skel skel-title"></div>
       </h1>
-
-      <div id="ui-bio" class="bio">
-        <div class="skeleton s-text" style="margin-bottom: 5px;"></div>
-        <div class="skeleton s-text" style="width: 50%;"></div>
-      </div>
-
-      <div class="stats-row">
-        <div class="stat"><i class="ph-bold ph-eye"></i> <span id="ui-views">--</span></div>
-        <div class="stat"><i class="ph-bold ph-calendar"></i> <span id="ui-joined">--</span></div>
-      </div>
+       <div class="audio-visualizer hidden" id="audio-visualizer">
+  <div class="stroke left"></div>
+  <div class="stroke right"></div>
+</div>
+      <div id="ui-badges" class="badges-container"></div>
     </div>
 
-  </main>
-</div>
+    <div id="ui-bio" class="bio-text">
+      <div class="skel skel-bio"></div>
+    </div>
 
+    <div class="card-footer">
+      <div class="stat-item">
+        <i class="ph-bold ph-eye"></i> <span id="ui-views">0</span> Views
+      </div>
+      <div class="stat-item">
+        <i class="ph-bold ph-calendar-blank"></i> <span id="ui-joined">2024</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
 <script>
 /**
  * ==========================================
- * HIGH PERFORMANCE PROFILE ENGINE
+ * PROFILE VIEWER ENGINE (CORS FIXED + VISUALIZER WORKING)
  * ==========================================
  */
 const CONFIG = {
@@ -309,283 +365,223 @@ const CONFIG = {
   supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
   defaults: {
     avatar: "https://cdn.discordapp.com/embed/avatars/0.png",
-    banner: "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=1000&auto=format&fit=crop"
+    banner: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  },
+  roles: {
+    'Admin': 'ph-crown',
+    'Verified': 'ph-seal-check',
+    'Member': 'ph-user'
   }
 };
 
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
-class ProfileEngine {
+class ProfileViewer {
   constructor() {
     this.dom = {
-      enter: document.getElementById('enter-screen'),
-      card: document.getElementById('card'),
-      bg: document.getElementById('bg-container'),
-      banner: document.getElementById('banner-wrap'),
+      card: document.getElementById('main-card'),
+      bgContainer: document.getElementById('dynamic-bg-container'),
+      bannerContainer: document.getElementById('banner-container'),
       avatar: document.getElementById('ui-avatar'),
-      skelAvatar: document.getElementById('skel-avatar'),
       username: document.getElementById('ui-username'),
+      badges: document.getElementById('ui-badges'),
       bio: document.getElementById('ui-bio'),
       views: document.getElementById('ui-views'),
       joined: document.getElementById('ui-joined'),
-      editBtn: document.getElementById('edit-btn'),
-      canvas: document.getElementById('audio-canvas')
+      editBtn: document.getElementById('btn-edit-profile')
     };
 
     this.audioCtx = null;
-    this.analyser = null;
-    this.source = null;
-    this.mediaElement = null; // The video/audio element
-    this.blobUrl = null;
-    
     this.init();
   }
 
   async init() {
-    // 1. Get Username
     let username = window.location.pathname.split('/@')[1];
-    
-    // Auth Fallback
+
     if (!username) {
       const { data: { user } } = await sb.auth.getUser();
       if (user) {
-        const { data } = await sb.from("profiles").select("username").eq("id", user.id).single();
-        if(data) username = data.username;
+        const { data } = await sb.from("profiles")
+          .select("username")
+          .eq("id", user.id)
+          .single();
+        if (data) username = data.username;
       }
     }
 
     if (!username) return this.renderError("User not found");
 
-    // 2. Fetch Data
     const { data: profile, error } = await sb
       .from("profiles")
       .select("*")
       .eq("username", username)
       .maybeSingle();
 
-    if (error || !profile) return this.renderError("Profile not found");
+    if (error || !profile)
+      return this.renderError("404: Profile Not Found");
 
-    // 3. Render
-    await this.prepareAssets(profile);
-    this.renderUI(profile);
-    this.setupInteractions(profile);
-    this.checkOwner(profile.id, profile.username);
+    await this.loadCustomFont(profile);
+    this.render(profile);
+    this.checkOwnership(profile.id, profile.username);
     this.incrementViews(profile.id);
   }
 
-  /* --- DATA & ASSET PREP --- */
-  async prepareAssets(data) {
-    // Set Theme
-    const accent = data.theme_color || '#9333ea';
+  render(data) {
+    document.title = `${data.username} | /six`;
+
+    const accent = data.theme_color || '#7b2cbf';
     document.documentElement.style.setProperty('--accent', accent);
     document.documentElement.style.setProperty('--accent-glow', accent + '66');
 
-    // Font Loading
-    if (data.username_font === 'custom' && data.custom_font_url) {
-      try {
-        const font = new FontFace('CustomFont', `url(${data.custom_font_url})`);
-        await font.load();
-        document.fonts.add(font);
-        document.documentElement.style.setProperty('--font-custom', 'CustomFont');
-      } catch(e) { console.warn("Font failed", e); }
-    }
-  }
-
-  /* --- UI RENDERING --- */
-  renderUI(data) {
-    document.title = `${data.username}`;
-
-    // Avatar
-    this.dom.avatar.src = data.avatar || CONFIG.defaults.avatar;
-    this.dom.avatar.onload = () => {
-      this.dom.avatar.classList.remove('hidden-imp');
-      this.dom.skelAvatar.classList.add('hidden-imp');
-    };
-
-    // Username
-    this.dom.username.innerHTML = `${data.username} ${data.role === 'Verified' ? '<i class="ph-fill ph-seal-check" style="color:var(--accent); font-size:0.8em;"></i>' : ''}`;
-    this.dom.username.className = `username fx-${data.username_effect || 'none'}`;
-    if(data.username_font === 'custom') this.dom.username.style.fontFamily = 'CustomFont, sans-serif';
-
-    // Stats
-    this.dom.views.innerText = (data.views || 0).toLocaleString();
-    this.dom.joined.innerText = new Date(data.created_at).toLocaleDateString(undefined, { month:'short', year:'numeric' });
-
-    // Background Media (The complex part)
-    this.setupBackground(data);
-
-    // Banner
-    const bannerUrl = data.banner_url || CONFIG.defaults.banner;
-    // If banner is same as background video, we don't need to load it twice, but for simplicity here we use img
-    this.dom.banner.innerHTML = `<img src="${bannerUrl}" class="banner-media">`;
-  }
-
-  async setupBackground(data) {
+    /* ===== BACKGROUND (CORS FIXED) ===== */
     if (data.bg_value && data.bg_type === "video") {
-      // PRO METHOD: Blob for CORS fixes + Memory cleanup
-      try {
-        const response = await fetch(data.bg_value);
-        const blob = await response.blob();
-        this.blobUrl = URL.createObjectURL(blob);
-        
-        const video = document.createElement('video');
-        video.src = this.blobUrl;
-        video.className = 'user-bg-media';
-        video.loop = true;
-        video.muted = false; // Will be unmuted on enter
-        video.playsInline = true;
-        video.crossOrigin = "anonymous";
-        
-        // Wait for data before showing
-        video.onloadeddata = () => video.classList.add('loaded');
-        
-        this.dom.bg.innerHTML = '';
-        this.dom.bg.appendChild(video);
-        this.mediaElement = video;
-
-      } catch (e) {
-        console.error("Video load error", e);
-        this.dom.bg.innerHTML = `<div style="width:100%;height:100%;background:radial-gradient(circle at center, var(--accent) 0%, #000 80%);"></div>`;
-      }
+      this.loadVideoWithCORSFix(data.bg_value);
+    } else if (data.bg_value) {
+      this.dom.bgContainer.innerHTML =
+        `<img src="${data.bg_value}" class="user-bg-media">`;
     } else {
-      // Image Background
-      const img = new Image();
-      img.src = data.bg_value || CONFIG.defaults.banner;
-      img.className = 'user-bg-media';
-      img.onload = () => img.classList.add('loaded');
-      this.dom.bg.innerHTML = '';
-      this.dom.bg.appendChild(img);
+      this.dom.bgContainer.innerHTML =
+        `<div style="width:100%;height:100%;background:radial-gradient(circle at center, ${accent}40 0%, transparent 70%)"></div>`;
     }
+
+    /* ===== HEADER ===== */
+    this.dom.avatar.src = data.avatar || CONFIG.defaults.avatar;
+
+    const bannerUrl = data.banner_url || CONFIG.defaults.banner;
+    if (bannerUrl.match(/\.(mp4|webm)$/)) {
+      this.dom.bannerContainer.innerHTML =
+        `<video src="${bannerUrl}" autoplay muted loop playsinline class="banner-media"></video>`;
+    } else {
+      this.dom.bannerContainer.innerHTML =
+        `<img src="${bannerUrl}" class="banner-media">`;
+    }
+
+    /* ===== USER INFO ===== */
+    this.dom.username.textContent = data.username;
+    this.dom.username.className =
+      `username fx-${data.username_effect || 'none'}`;
+
+    this.dom.bio.innerHTML =
+      this.escapeHtml(data.bio || "No biography provided.");
+
+    this.dom.views.innerText =
+      (data.views || 0).toLocaleString();
+
+    this.dom.joined.innerText =
+      new Date(data.created_at)
+        .toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
+
+    this.dom.card.classList.remove('loading-view');
   }
 
-  /* --- INTERACTIONS --- */
-  setupInteractions(data) {
-    // 1. Enter Screen Click
-    this.dom.enter.addEventListener('click', async () => {
-      this.dom.enter.classList.add('hidden');
-      this.dom.card.classList.add('visible');
-
-      // Play Audio/Video
-      if (this.mediaElement) {
-        this.mediaElement.volume = 0.5;
-        try {
-          await this.mediaElement.play();
-          this.initVisualizer();
-        } catch(e) { console.log("Autoplay prevented", e); }
-      }
-
-      // Typewriter Bio
-      this.typeWriter(data.bio || "Welcome to my profile.");
-    });
-
-    // 2. 3D Tilt Effect (Desktop Only)
-    if(window.matchMedia("(min-width: 768px)").matches) {
-      document.addEventListener('mousemove', (e) => this.handleTilt(e));
-      document.addEventListener('mouseleave', () => {
-        this.dom.card.style.transform = `rotateX(0) rotateY(0)`;
-      });
-    }
-  }
-
-  /* --- VISUALIZER ENGINE (CANVAS) --- */
-  initVisualizer() {
-    if (!this.mediaElement) return;
-
+  /* ===== CORS FIX METHOD ===== */
+  async loadVideoWithCORSFix(url) {
     try {
-      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      this.source = this.audioCtx.createMediaElementSource(this.mediaElement);
-      this.analyser = this.audioCtx.createAnalyser();
-      
-      this.source.connect(this.analyser);
-      this.analyser.connect(this.audioCtx.destination);
-      
-      this.analyser.fftSize = 64; // Low count for smoother, thicker bars
-      const bufferLength = this.analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-      
-      const canvas = this.dom.canvas;
-      const ctx = canvas.getContext('2d');
-      
-      // Handle resizing
-      const resize = () => {
-        canvas.width = canvas.parentElement.offsetWidth;
-        canvas.height = canvas.parentElement.offsetHeight;
-      };
-      resize();
-      window.addEventListener('resize', resize);
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
 
-      const renderFrame = () => {
-        requestAnimationFrame(renderFrame);
-        this.analyser.getByteFrequencyData(dataArray);
+      this.dom.bgContainer.innerHTML = `
+        <video
+          src="${objectUrl}"
+          class="user-bg-media"
+          autoplay
+          loop
+          playsinline
+          muted
+          preload="auto"
+          id="bg-video">
+        </video>
+      `;
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const barWidth = (canvas.width / bufferLength) * 2.5;
-        let x = 0;
+      const video = document.getElementById("bg-video");
 
-        for (let i = 0; i < bufferLength; i++) {
-          const barHeight = (dataArray[i] / 255) * canvas.height * 0.5; // Scale height
-          
-          // Gradient Color
-          const gradient = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - barHeight);
-          gradient.addColorStop(0, "rgba(255,255,255,0)");
-          gradient.addColorStop(1, "var(--accent)"); // This won't work in canvas directly, need computed style
-          
-          // Get actual color from CSS variable
-          const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-          ctx.fillStyle = accentColor;
-          ctx.globalAlpha = 0.5; // transparency
-          
-          // Draw rounded bars
-          ctx.fillRect(x, canvas.height - barHeight, barWidth - 2, barHeight);
-          
-          x += barWidth;
+      const startAudio = async () => {
+        video.muted = false;
+        await video.play().catch(() => {});
+
+        if (!this.audioCtx) {
+          this.initVisualizer(video);
         }
+
+        document.removeEventListener("click", startAudio);
+        document.removeEventListener("touchstart", startAudio);
       };
 
-      renderFrame();
+      document.addEventListener("click", startAudio);
+      document.addEventListener("touchstart", startAudio);
 
-    } catch (e) {
-      console.log("CORS restricted audio analysis. Visualizer disabled.", e);
+    } catch (err) {
+      console.error("Video load failed:", err);
     }
   }
 
-  /* --- UTILITIES --- */
-  handleTilt(e) {
-    const card = this.dom.card;
-    const { left, top, width, height } = card.getBoundingClientRect();
-    const x = (e.clientX - left - width / 2) / 25; // Sensitivity
-    const y = (e.clientY - top - height / 2) / 25;
-    
-    // Limit rotation
-    const rotateX = -y; 
-    const rotateY = x;
+  /* ===== VISUALIZER ===== */
+  initVisualizer(videoEl) {
+    const visualizer = document.getElementById("audio-visualizer");
+    if (!visualizer) return;
 
-    requestAnimationFrame(() => {
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    });
-  }
+    const left = visualizer.querySelector(".left");
+    const right = visualizer.querySelector(".right");
 
-  typeWriter(text) {
-    this.dom.bio.innerHTML = "";
-    let i = 0;
-    const speed = 30; 
-    
-    const type = () => {
-      if (i < text.length) {
-        this.dom.bio.innerHTML += text.charAt(i);
-        i++;
-        setTimeout(type, speed);
-      }
+    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = this.audioCtx.createMediaElementSource(videoEl);
+    const analyser = this.audioCtx.createAnalyser();
+
+    analyser.fftSize = 256;
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    source.connect(analyser);
+    analyser.connect(this.audioCtx.destination);
+
+    visualizer.classList.remove("hidden");
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+
+      analyser.getByteFrequencyData(dataArray);
+
+      let bass = 0;
+      for (let i = 0; i < 10; i++) bass += dataArray[i];
+      bass /= 10;
+
+      const intensity = bass / 255;
+
+      const height = 20 + intensity * 25;
+      const thickness = 4 + intensity * 6;
+      const hue = 270 + intensity * 80;
+      const glow = 10 + intensity * 40;
+
+      left.style.height = `${height}px`;
+      right.style.height = `${height * 0.8}px`;
+
+      left.style.width = `${thickness}px`;
+      right.style.width = `${thickness}px`;
+
+      left.style.background = `hsl(${hue}, 80%, 60%)`;
+      right.style.background = `hsl(${hue}, 80%, 60%)`;
+
+      left.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
+      right.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
     };
-    type();
+
+    animate();
   }
 
-  async checkOwner(pid, username) {
+  async checkOwnership(profileId, username) {
     const { data: { session } } = await sb.auth.getSession();
-    if (session && session.user.id === pid) {
+    if (session && session.user.id === profileId) {
       this.dom.editBtn.href = `/@${username}/edit`;
       this.dom.editBtn.classList.add('visible');
+    }
+  }
+
+  async loadCustomFont(data) {
+    if (data.username_font === 'custom' && data.custom_font_url) {
+      const font = new FontFace('CustomProfileFont',
+        `url(${data.custom_font_url})`);
+      await font.load();
+      document.fonts.add(font);
     }
   }
 
@@ -593,20 +589,20 @@ class ProfileEngine {
     sb.rpc('increment_views', { row_id: id });
   }
 
+  escapeHtml(str) {
+    return str.replace(/[&<>"']/g, m =>
+      ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m])
+    );
+  }
+
   renderError(msg) {
-    document.body.innerHTML = `<div style="color:#fff;font-family:sans-serif;">${msg}</div>`;
+    this.dom.card.innerHTML =
+      `<div style="padding:40px;text-align:center">${msg}</div>`;
   }
 }
 
-// Start
-document.addEventListener('DOMContentLoaded', () => new ProfileEngine());
-
-// Cleanup on unload to free RAM
-window.addEventListener('beforeunload', () => {
-  if (window.profileEngine && window.profileEngine.blobUrl) {
-    URL.revokeObjectURL(window.profileEngine.blobUrl);
-  }
-});
+document.addEventListener('DOMContentLoaded', () => new ProfileViewer());
 </script>
+
 </body>
 </html>
