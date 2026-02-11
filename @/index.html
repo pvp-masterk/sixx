@@ -277,6 +277,26 @@ body {
   justify-content: center;
   padding: 20px;
 }
+.audio-visualizer {
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.stroke {
+  width: 4px;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transition: background 0.2s linear;
+}
 
 </style>
 </head>
@@ -311,6 +331,10 @@ body {
         <!-- Text injected -->
         <div class="skel skel-title"></div>
       </h1>
+       <div class="audio-visualizer hidden" id="audio-visualizer">
+  <div class="stroke left"></div>
+  <div class="stroke right"></div>
+</div>
       <div id="ui-badges" class="badges-container"></div>
     </div>
 
@@ -422,18 +446,44 @@ class ProfileViewer {
     // 2. Background Layer (Immersive)
     if (data.bg_value) {
       if (data.bg_type === 'video') {
-        this.dom.bgContainer.innerHTML = `
-  <video
-    src="${data.bg_value}"
-    class="user-bg-media"
-    autoplay
-    loop
-    playsinline
-    muted
-    preload="auto"
-    id="bg-video">
-  </video>
-`;
+        if (data.bg_type === 'video') {
+  this.dom.bgContainer.innerHTML = `
+    <video
+      src="${data.bg_value}"
+      class="user-bg-media"
+      autoplay
+      loop
+      playsinline
+      muted
+      preload="auto"
+      id="bg-video">
+    </video>
+  `;
+
+  const bgVideo = document.getElementById("bg-video");
+
+  // Wait for user interaction
+  const startAudio = async () => {
+    bgVideo.muted = false;
+    bgVideo.volume = 0.6;
+
+    await bgVideo.play().catch(() => {});
+
+    // Resume audio context if needed
+    if (this.audioCtx && this.audioCtx.state === "suspended") {
+      await this.audioCtx.resume();
+    }
+
+    this.initVisualizer(bgVideo);
+
+    document.removeEventListener("click", startAudio);
+    document.removeEventListener("touchstart", startAudio);
+  };
+
+  document.addEventListener("click", startAudio);
+  document.addEventListener("touchstart", startAudio);
+}
+
 
       } else {
         this.dom.bgContainer.innerHTML = `<img src="${data.bg_value}" class="user-bg-media" alt="Background">`;
@@ -555,6 +605,60 @@ document.addEventListener("touchstart", enableAudio);
     `;
     this.dom.card.classList.remove('loading-view');
   }
+   initVisualizer(videoEl) {
+  const visualizer = document.getElementById("audio-visualizer");
+  const left = visualizer.querySelector(".left");
+  const right = visualizer.querySelector(".right");
+
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const source = audioCtx.createMediaElementSource(videoEl);
+  const analyser = audioCtx.createAnalyser();
+
+  analyser.fftSize = 256;
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  visualizer.classList.remove("hidden");
+
+  const animate = () => {
+    requestAnimationFrame(animate);
+
+    analyser.getByteFrequencyData(dataArray);
+
+    // Focus on bass (low frequencies)
+    let bass = 0;
+    for (let i = 0; i < 10; i++) {
+      bass += dataArray[i];
+    }
+    bass /= 10;
+
+    const intensity = bass / 255;
+
+    const height = 20 + intensity * 25;
+    const thickness = 4 + intensity * 6;
+
+    const hue = 270 + intensity * 80; // purple → pink shift
+    const glow = 10 + intensity * 40;
+
+    left.style.height = `${height}px`;
+    right.style.height = `${height * 0.8}px`;
+
+    left.style.width = `${thickness}px`;
+    right.style.width = `${thickness}px`;
+
+    left.style.background = `hsl(${hue}, 80%, 60%)`;
+    right.style.background = `hsl(${hue}, 80%, 60%)`;
+
+    left.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
+    right.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
+  };
+
+  animate();
+}
+
 }
 
 // Initialize
