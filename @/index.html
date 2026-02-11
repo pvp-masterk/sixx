@@ -2,607 +2,615 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Loading Profile... | /six</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Loading... | /six</title>
+<meta name="description" content="Profile Viewer">
 
-<!-- EXTERNAL ASSETS -->
+<!-- ASSETS -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;700&family=Orbitron:wght@600&family=Playfair+Display:ital,wght@0,600;1,600&family=UnifrakturMaguntia&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
 /* =========================================
-   1. CORE VARIABLES & THEME
+   1. CORE & RESET
    ========================================= */
 :root {
-  --bg-deep: #030303;
-  --glass-surface: rgba(15, 15, 15, 0.65);
+  --bg-dark: #050505;
+  --glass-bg: rgba(10, 10, 10, 0.6);
   --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.05);
-  
   --text-main: #ffffff;
-  --text-muted: #9ca3af;
-  
-  /* Dynamic Accent (Set by JS) */
-  --accent: #7b2cbf;
-  --accent-glow: rgba(123, 44, 191, 0.5);
-  
-  --radius-card: 24px;
-  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
+  --text-muted: #a1a1aa;
+  --accent: #7b2cbf; /* Default, overwritten by JS */
+  --accent-glow: rgba(123, 44, 191, 0.4);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
 body {
-  background-color: var(--bg-deep);
+  background: var(--bg-dark);
   color: var(--text-main);
   font-family: 'Inter', sans-serif;
-
-  min-height: 100vh;
-  overflow-x: hidden;
-
-  /* REMOVE THESE */
-  display: block;
-  padding: 0;
+  overflow: hidden; /* Prevent scroll on container */
+  height: 100vh;
+  width: 100vw;
+  cursor: none; /* Custom cursor */
+  user-select: none;
 }
+
+/* Custom Cursor */
+#cursor {
+  position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+  border: 1px solid rgba(255,255,255,0.5); border-radius: 50%;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, background 0.3s;
+  mix-blend-mode: difference;
+}
+#cursor.hovered { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-color: transparent; }
 
 /* =========================================
-   2. IMMERSIVE BACKGROUND SYSTEM
+   2. BACKGROUND & OVERLAYS
    ========================================= */
-.bg-layer {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-}
-
-
-/* Dynamic Background (User Image/Video) */
-.user-bg-media {
-  position: absolute;
-  inset: 0;
-
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-
-  transition:
-    filter 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.6s ease,
-    transform 0.6s ease;
-
-  will-change: filter, transform;
-}
-
-/* BLURRED MODE (default / guns.lol style) */
-.bg-blurred .user-bg-media {
-  filter: blur(32px) brightness(0.7);
-  transform: scale(1.08);
-  opacity: 0.9;
-}
-
-/* CLEAN CINEMATIC MODE */
-.bg-clean .user-bg-media {
-  filter: none;
-  transform: scale(1);
-  opacity: 1;
-}
-
-
-/* Noise Overlay */
-.noise-overlay {
-  position: absolute; inset: 0; pointer-events: none;
-  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
-  opacity: 0.12;
-   mix-blend-mode: overlay;
-}
-
-/* Vignette */
-.vignette {
-  background: radial-gradient(circle at center,
-    rgba(0,0,0,0) 0%,
-    rgba(0,0,0,0.6) 80%,
-    rgba(0,0,0,0.9) 100%
-  );
-}
-
-
-/* =========================================
-   3. THE GLASS CARD
-   ========================================= */
-.profile-card {
-  width: 100%; max-width: 550px;
-  background: var(--glass-surface);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-card);
-  box-shadow: 0 40px 100px -20px rgba(0,0,0,0.7);
-  overflow: hidden;
-  position: relative;
-  opacity: 0; transform: translateY(30px) scale(0.95);
-  animation: entrance 1s var(--ease-lux) forwards 0.2s;
-}
-
-@keyframes entrance {
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-/* Glossy Shine Reflection */
-.profile-card::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
-  background: linear-gradient(125deg, transparent 0%, rgba(255,255,255,0.03) 40%, transparent 60%);
-}
-
-/* =========================================
-   4. PROFILE CONTENT
-   ========================================= */
-.card-header { position: relative; width: 100%; height: 200px; overflow: hidden; background: #000; }
-
-/* Banner */
-.banner-media {
+.bg-layer { position: fixed; inset: 0; z-index: 0; }
+.bg-media {
   width: 100%; height: 100%; object-fit: cover;
-  mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
-  transition: transform 10s ease;
+  opacity: 0; transition: opacity 1.5s ease;
 }
-.profile-card:hover .banner-media { transform: scale(1.05); }
+.bg-media.loaded { opacity: 1; }
 
-/* Edit Button (Floating) */
-.edit-btn {
-  position: absolute; top: 20px; right: 20px; z-index: 10;
-  background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  color: #fff; padding: 8px 16px; border-radius: 20px;
-  font-size: 0.75rem; font-weight: 600; text-decoration: none;
-  display: flex; align-items: center; gap: 6px;
-  transition: 0.2s; opacity: 0; transform: translateY(-10px);
+.vignette {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.8) 100%);
 }
-.edit-btn.visible { opacity: 1; transform: translateY(0); }
+.noise {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* =========================================
+   3. CLICK TO ENTER
+   ========================================= */
+#enter-screen {
+  position: fixed; inset: 0; z-index: 50;
+  background: #000;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.8s var(--ease-out), pointer-events 0.8s;
+}
+#enter-screen.hidden { opacity: 0; pointer-events: none; }
+.enter-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem; letter-spacing: 2px;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* =========================================
+   4. 3D CARD CONTAINER
+   ========================================= */
+.perspective-container {
+  display: flex; align-items: center; justify-content: center;
+  height: 100vh; width: 100vw;
+  perspective: 1200px;
+  position: relative; z-index: 10;
+}
+
+.profile-card {
+  width: 500px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+  /* Initial hidden state */
+  opacity: 0; transform: translateY(50px) rotateX(10deg);
+  transition: box-shadow 0.3s ease;
+}
+/* Enhanced Drop Shadow */
+.profile-card::after {
+  content: ''; position: absolute; inset: 20px; z-index: -1;
+  background: var(--accent); opacity: 0; filter: blur(60px);
+  transition: opacity 1s ease;
+}
+.profile-card.active::after { opacity: 0.3; }
+
+/* =========================================
+   5. CARD CONTENT
+   ========================================= */
+.card-banner {
+  height: 180px; width: 100%;
+  border-radius: 24px 24px 0 0;
+  overflow: hidden; position: relative;
+  border-bottom: 1px solid var(--glass-border);
+}
+.banner-img { width: 100%; height: 100%; object-fit: cover; }
+
+.card-content {
+  padding: 0 30px 35px;
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+
+/* Avatar Area */
+.avatar-container {
+  position: relative; margin-top: -65px; margin-bottom: 15px;
+  width: 130px; height: 130px;
+  display: flex; justify-content: center; align-items: center;
+}
+
+/* Canvas Visualizer Layer */
+#visualizer-canvas {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 240px; height: 240px; /* Larger than avatar */
+  pointer-events: none; z-index: 0;
+}
+
+.avatar-img {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: #111;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.1);
+  position: relative; z-index: 2;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+/* Text Info */
+.username {
+  font-size: 1.8rem; font-weight: 700; color: #fff;
+  margin-bottom: 6px; position: relative; display: inline-block;
+}
+.badges {
+  display: flex; gap: 6px; justify-content: center; margin-bottom: 15px;
+}
+.badge {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; color: var(--text-muted);
+  display: flex; align-items: center; gap: 4px;
+}
+.badge i { color: var(--accent); }
+
+.bio {
+  font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.8);
+  margin-bottom: 25px; white-space: pre-wrap; font-weight: 300; width: 100%;
+}
+
+.stats {
+  display: flex; gap: 20px; width: 100%; justify-content: center;
+  padding-top: 20px; border-top: 1px solid var(--glass-border);
+}
+.stat { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.stat i { color: var(--accent); font-size: 1rem; }
+
+/* Edit Button */
+.edit-btn {
+  position: absolute; top: 15px; right: 15px;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; padding: 6px 12px; border-radius: 20px;
+  font-size: 0.75rem; text-decoration: none;
+  opacity: 0; transform: translateY(-10px); transition: 0.3s;
+}
+.edit-btn.show { opacity: 1; transform: translateY(0); }
 .edit-btn:hover { background: var(--accent); border-color: var(--accent); }
 
-.card-body {
-  padding: 0 32px 40px; margin-top: -60px; position: relative; z-index: 3;
-}
+/* FX Classes */
+.fx-glow { text-shadow: 0 0 15px var(--accent-glow); }
+.fx-rgb { animation: glitch 2s infinite; text-shadow: 2px 0 var(--accent), -2px 0 cyan; }
 
-/* Avatar */
-.avatar-wrapper {
-  width: 120px; height: 120px;
-  border-radius: 50%; padding: 4px;
-  background: rgba(20,20,20,0.8);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  margin-bottom: 16px;
-}
-.avatar-img {
-  width: 100%; height: 100%; border-radius: 50%;
-  object-fit: cover; background: #111;
-  display: block;
-}
-
-/* Username & Identity */
-.identity-row { margin-bottom: 12px; }
-
-/* --- USERNAME EFFECTS --- */
-.username {
-  font-size: 2rem; line-height: 1.1; margin-bottom: 6px;
-  display: inline-block;
-}
-
-/* 1. Neon Glow */
-.fx-glow {
-  color: #fff;
-  text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent), 0 0 40px var(--accent);
-}
-
-/* 2. RGB Glitch */
-.fx-rgb {
-  position: relative; color: #fff;
-  text-shadow: 2px 0 var(--accent), -2px 0 #00ffff;
-  animation: glitch-skew 3s infinite linear alternate-reverse;
-}
-@keyframes glitch-skew {
-  0% { transform: skew(0deg); }
-  20% { transform: skew(-2deg); }
-  40% { transform: skew(1deg); }
-  60% { transform: skew(-1deg); }
-  80% { transform: skew(2deg); }
-  100% { transform: skew(0deg); }
-}
-
-/* 3. Luxury Gradient */
-.fx-gradient {
-  background: linear-gradient(135deg, #fff 20%, var(--accent) 50%, #fff 80%);
-  background-size: 200% auto;
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  animation: shine 5s linear infinite;
-}
-@keyframes shine { to { background-position: 200% center; } }
-
-/* Role Badges */
-.badges-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.role-pill {
-  height: 24px; padding: 0 10px;
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 6px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-  color: var(--text-muted); display: flex; align-items: center; gap: 6px;
-  transition: 0.2s;
-}
-.role-pill:hover { border-color: var(--accent); color: #fff; background: rgba(255,255,255,0.08); }
-.role-pill i { color: var(--accent); font-size: 0.8rem; }
-
-/* Bio */
-.bio-text {
-  font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.8);
-  margin: 20px 0; white-space: pre-wrap; font-weight: 300;
-}
-
-/* Footer Stats */
-.card-footer {
-  border-top: 1px solid var(--glass-border);
-  padding-top: 20px; margin-top: 20px;
-  display: flex; gap: 24px;
-}
-.stat-item {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 0.8rem; color: var(--text-muted); font-weight: 500;
-}
-.stat-item i { color: var(--accent); font-size: 1rem; }
-
-/* --- SKELETON LOADER --- */
-.skel { background: rgba(255,255,255,0.05); border-radius: 6px; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 0.8; } 100% { opacity: 0.4; } }
-
-.loading-view .banner-media { opacity: 0; }
-.loading-view .avatar-img { opacity: 0; }
-.loading-view .skel-avatar { position: absolute; inset:0; border-radius: 50%; }
-.loading-view .skel-title { width: 60%; height: 32px; margin-bottom: 10px; }
-.loading-view .skel-bio { width: 100%; height: 60px; }
-
-/* Utilities */
-.hidden { display: none !important; }
+/* Loaders */
+.skel { background: rgba(255,255,255,0.08); border-radius: 4px; animation: pulse 1s infinite; }
+.skel-text { height: 1.5rem; width: 150px; margin: 0 auto 10px; }
+.skel-bio { height: 3rem; width: 100%; }
 
 /* Mobile */
-@media (max-width: 480px) {
-  .profile-card { border-radius: 0; min-height: 100vh; box-shadow: none; border: none; }
-  .card-header { height: 160px; }
-  .avatar-wrapper { width: 100px; height: 100px; }
-  .bio-text { font-size: 0.9rem; }
+@media(max-width: 600px) {
+  .profile-card { width: 90%; border-radius: 20px; }
+  .perspective-container { perspective: none; } /* Disable 3D on mobile for performance */
+  .profile-card { transform: none !important; } 
+  #cursor { display: none; }
 }
-   .profile-wrapper {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.audio-visualizer {
-  position: absolute;
-  right: 24px;
-  top: 24px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  pointer-events: none;
-}
-
-.stroke {
-  width: 4px;
-  height: 20px;
-  border-radius: 6px;
-  background: var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow);
-  transition: background 0.2s linear;
-}
-
 </style>
 </head>
 <body>
 
-<!-- Background Layer -->
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+
+<!-- Click Overlay -->
+<div id="enter-screen">
+  <div class="enter-text">[ CLICK TO ENTER ]</div>
+</div>
+
+<!-- Background -->
 <div class="bg-layer">
-  <div id="dynamic-bg-container"></div> <!-- Video or Image injected here -->
+  <div id="bg-container"></div>
   <div class="vignette"></div>
-  <div class="noise-overlay"></div>
+  <div class="noise"></div>
 </div>
 
-<!-- Main Card -->
-   <div class="profile-wrapper">
-<main class="profile-card loading-view" id="main-card">
-  
-  <div class="card-header">
-    <div id="banner-container"></div> <!-- Banner injected here -->
-    <a href="#" class="edit-btn" id="btn-edit-profile">
-      <i class="ph-bold ph-pencil-simple"></i> Edit Profile
-    </a>
-  </div>
-
-  <div class="card-body">
-    <div class="avatar-wrapper">
-      <img src="" id="ui-avatar" class="avatar-img">
-      <div class="skel skel-avatar"></div>
+<!-- Main UI -->
+<div class="perspective-container" id="tilt-wrapper">
+  <main class="profile-card" id="main-card">
+    
+    <div class="card-banner">
+      <div id="banner-container" style="width:100%;height:100%"></div>
+      <a href="#" class="edit-btn" id="btn-edit">
+        <i class="ph-bold ph-pencil-simple"></i> Edit
+      </a>
     </div>
 
-    <div class="identity-row">
-      <h1 id="ui-username" class="username">
-        <!-- Text injected -->
-        <div class="skel skel-title"></div>
-      </h1>
-       <div class="audio-visualizer hidden" id="audio-visualizer">
-  <div class="stroke left"></div>
-  <div class="stroke right"></div>
-</div>
-      <div id="ui-badges" class="badges-container"></div>
-    </div>
-
-    <div id="ui-bio" class="bio-text">
-      <div class="skel skel-bio"></div>
-    </div>
-
-    <div class="card-footer">
-      <div class="stat-item">
-        <i class="ph-bold ph-eye"></i> <span id="ui-views">0</span> Views
+    <div class="card-content">
+      <div class="avatar-container">
+        <!-- Canvas inserted here by JS -->
+        <canvas id="visualizer-canvas"></canvas>
+        <img src="" id="ui-avatar" class="avatar-img">
       </div>
-      <div class="stat-item">
-        <i class="ph-bold ph-calendar-blank"></i> <span id="ui-joined">2024</span>
+
+      <div id="ui-identity">
+        <div class="skel skel-text"></div>
+      </div>
+      
+      <div id="ui-badges" class="badges"></div>
+
+      <div id="ui-bio" class="bio">
+        <div class="skel skel-bio"></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><i class="ph-bold ph-eye"></i> <span id="ui-views">0</span></div>
+        <div class="stat"><i class="ph-bold ph-calendar"></i> <span id="ui-joined">-</span></div>
       </div>
     </div>
-  </div>
 
-</main>
+  </main>
 </div>
+
 <script>
 /**
  * ==========================================
- * PROFILE VIEWER ENGINE (CORS FIXED + VISUALIZER WORKING)
+ * HIGH PERFORMANCE PROFILE ENGINE
  * ==========================================
  */
+
+// --- CONFIG ---
 const CONFIG = {
   supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co", 
   supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
   defaults: {
     avatar: "https://cdn.discordapp.com/embed/avatars/0.png",
-    banner: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-  },
-  roles: {
-    'Admin': 'ph-crown',
-    'Verified': 'ph-seal-check',
-    'Member': 'ph-user'
+    banner: "https://i.pinimg.com/originals/2b/2b/34/2b2b34927d6e477611c977d24275037d.gif"
   }
 };
 
 const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
-class ProfileViewer {
+// --- AUDIO CONTROLLER (Canvas Visualizer) ---
+class AudioVisualizer {
+  constructor(videoElement, canvasId, color) {
+    this.video = videoElement;
+    this.canvas = document.getElementById(canvasId);
+    this.ctx = this.canvas.getContext('2d');
+    this.color = color;
+    this.active = false;
+    this.audioCtx = null;
+    this.analyser = null;
+    this.source = null;
+    
+    // Resize canvas for high DPI
+    const size = 300;
+    this.canvas.width = size;
+    this.canvas.height = size;
+  }
+
+  init() {
+    if(this.active) return;
+    
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      this.audioCtx = new AudioContext();
+      this.analyser = this.audioCtx.createAnalyser();
+      this.source = this.audioCtx.createMediaElementSource(this.video);
+      
+      this.source.connect(this.analyser);
+      this.analyser.connect(this.audioCtx.destination); // Connect to speakers
+      
+      this.analyser.fftSize = 256; // Balance between detail and performance
+      this.bufferLength = this.analyser.frequencyBinCount;
+      this.dataArray = new Uint8Array(this.bufferLength);
+      
+      this.active = true;
+      this.render();
+    } catch(e) {
+      console.log("Audio Context prevented (waiting for interaction)", e);
+    }
+  }
+
+  render() {
+    if(!this.active) return;
+    
+    requestAnimationFrame(this.render.bind(this));
+    
+    this.analyser.getByteFrequencyData(this.dataArray);
+    
+    const ctx = this.ctx;
+    const width = this.canvas.width;
+    const height = this.canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = 65; // Slightly larger than avatar radius (60px)
+    
+    ctx.clearRect(0, 0, width, height);
+    
+    ctx.beginPath();
+    // Create a circular spectrum
+    const bars = 60;
+    const step = (Math.PI * 2) / bars;
+    
+    for (let i = 0; i < bars; i++) {
+      // Map frequency data to bars (focus on bass/mids)
+      const value = this.dataArray[i % (this.bufferLength / 2)]; 
+      const barHeight = (value / 255) * 50; 
+      
+      const angle = i * step;
+      
+      // Start point (on circle edge)
+      const x1 = centerX + Math.cos(angle) * radius;
+      const y1 = centerY + Math.sin(angle) * radius;
+      
+      // End point (radiating out)
+      const x2 = centerX + Math.cos(angle) * (radius + barHeight);
+      const y2 = centerY + Math.sin(angle) * (radius + barHeight);
+      
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+    }
+    
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    
+    // Add glow
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = this.color;
+    
+    ctx.stroke();
+    ctx.shadowBlur = 0; // Reset for performance
+  }
+}
+
+// --- MAIN CONTROLLER ---
+class ProfileApp {
   constructor() {
-    this.dom = {
+    this.els = {
       card: document.getElementById('main-card'),
-      bgContainer: document.getElementById('dynamic-bg-container'),
-      bannerContainer: document.getElementById('banner-container'),
+      wrapper: document.getElementById('tilt-wrapper'),
+      bg: document.getElementById('bg-container'),
+      banner: document.getElementById('banner-container'),
       avatar: document.getElementById('ui-avatar'),
-      username: document.getElementById('ui-username'),
+      identity: document.getElementById('ui-identity'),
       badges: document.getElementById('ui-badges'),
       bio: document.getElementById('ui-bio'),
       views: document.getElementById('ui-views'),
       joined: document.getElementById('ui-joined'),
-      editBtn: document.getElementById('btn-edit-profile')
+      enterScreen: document.getElementById('enter-screen'),
+      editBtn: document.getElementById('btn-edit'),
+      cursor: document.getElementById('cursor')
     };
 
-    this.audioCtx = null;
+    this.state = {
+      user: null,
+      audioVisualizer: null,
+      videoBlobUrl: null
+    };
+
+    this.initCursor();
     this.init();
   }
 
+  // 1. Fetch Data
   async init() {
+    // Get username from URL or fallback to current auth user
     let username = window.location.pathname.split('/@')[1];
-
+    
     if (!username) {
       const { data: { user } } = await sb.auth.getUser();
       if (user) {
-        const { data } = await sb.from("profiles")
-          .select("username")
-          .eq("id", user.id)
-          .single();
-        if (data) username = data.username;
+        const { data } = await sb.from("profiles").select("username").eq("id", user.id).single();
+        if(data) username = data.username;
       }
     }
 
-    if (!username) return this.renderError("User not found");
+    if (!username) return this.showError("User not found");
 
-    const { data: profile, error } = await sb
+    const { data, error } = await sb
       .from("profiles")
       .select("*")
       .eq("username", username)
       .maybeSingle();
 
-    if (error || !profile)
-      return this.renderError("404: Profile Not Found");
+    if (error || !data) return this.showError("404 Not Found");
 
-    await this.loadCustomFont(profile);
-    this.render(profile);
-    this.checkOwnership(profile.id, profile.username);
-    this.incrementViews(profile.id);
+    this.state.user = data;
+    this.renderProfile(data);
+    this.setupInteractions();
+    
+    // Increment view count
+    sb.rpc('increment_views', { row_id: data.id });
   }
 
-  render(data) {
+  // 2. Render UI
+  renderProfile(data) {
     document.title = `${data.username} | /six`;
-
+    
     const accent = data.theme_color || '#7b2cbf';
     document.documentElement.style.setProperty('--accent', accent);
     document.documentElement.style.setProperty('--accent-glow', accent + '66');
 
-    /* ===== BACKGROUND (CORS FIXED) ===== */
-    if (data.bg_value && data.bg_type === "video") {
-      this.loadVideoWithCORSFix(data.bg_value);
-    } else if (data.bg_value) {
-      this.dom.bgContainer.innerHTML =
-        `<img src="${data.bg_value}" class="user-bg-media">`;
-    } else {
-      this.dom.bgContainer.innerHTML =
-        `<div style="width:100%;height:100%;background:radial-gradient(circle at center, ${accent}40 0%, transparent 70%)"></div>`;
-    }
+    // Avatar
+    this.els.avatar.src = data.avatar || CONFIG.defaults.avatar;
 
-    /* ===== HEADER ===== */
-    this.dom.avatar.src = data.avatar || CONFIG.defaults.avatar;
+    // Username & Effects
+    const nameEl = document.createElement('div');
+    nameEl.className = `username fx-${data.username_effect || 'none'}`;
+    nameEl.textContent = data.username;
+    this.els.identity.innerHTML = '';
+    this.els.identity.appendChild(nameEl);
 
+    // Badges (Example Logic)
+    const roles = { 'Admin': 'ph-crown', 'Verified': 'ph-seal-check' };
+    // Hardcoded example roles, replace with your DB logic
+    let badgeHTML = '';
+    if(data.id) badgeHTML += `<div class="badge"><i class="ph-fill ph-user"></i> Member</div>`;
+    this.els.badges.innerHTML = badgeHTML;
+
+    // Bio
+    this.els.bio.innerHTML = this.escapeHtml(data.bio || "No biography provided.");
+
+    // Stats
+    this.els.views.innerText = (data.views || 0).toLocaleString();
+    this.els.joined.innerText = new Date(data.created_at).toLocaleDateString();
+
+    // Banner
     const bannerUrl = data.banner_url || CONFIG.defaults.banner;
-    if (bannerUrl.match(/\.(mp4|webm)$/)) {
-      this.dom.bannerContainer.innerHTML =
-        `<video src="${bannerUrl}" autoplay muted loop playsinline class="banner-media"></video>`;
-    } else {
-      this.dom.bannerContainer.innerHTML =
-        `<img src="${bannerUrl}" class="banner-media">`;
-    }
+    this.els.banner.innerHTML = `<img src="${bannerUrl}" class="banner-img">`;
 
-    /* ===== USER INFO ===== */
-    this.dom.username.textContent = data.username;
-    this.dom.username.className =
-      `username fx-${data.username_effect || 'none'}`;
-
-    this.dom.bio.innerHTML =
-      this.escapeHtml(data.bio || "No biography provided.");
-
-    this.dom.views.innerText =
-      (data.views || 0).toLocaleString();
-
-    this.dom.joined.innerText =
-      new Date(data.created_at)
-        .toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
-
-    this.dom.card.classList.remove('loading-view');
+    // Background & Media Preparation
+    this.prepareBackground(data);
+    
+    // Check Ownership for Edit Button
+    this.checkOwner();
   }
 
-  /* ===== CORS FIX METHOD ===== */
-  async loadVideoWithCORSFix(url) {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
-
-      this.dom.bgContainer.innerHTML = `
-        <video
-          src="${objectUrl}"
-          class="user-bg-media"
-          autoplay
-          loop
-          playsinline
-          muted
-          preload="auto"
-          id="bg-video">
-        </video>
-      `;
-
-      const video = document.getElementById("bg-video");
-
-      const startAudio = async () => {
+  // 3. Background System (CORS & Performance)
+  async prepareBackground(data) {
+    if (data.bg_value && data.bg_type === "video") {
+      // Fetch Blob to handle CORS for visualizer
+      try {
+        const response = await fetch(data.bg_value);
+        const blob = await response.blob();
+        this.state.videoBlobUrl = URL.createObjectURL(blob);
+        
+        const video = document.createElement('video');
+        video.src = this.state.videoBlobUrl;
+        video.loop = true;
         video.muted = false;
-        await video.play().catch(() => {});
+        video.playsInline = true;
+        video.className = 'bg-media';
+        
+        this.els.bg.innerHTML = '';
+        this.els.bg.appendChild(video);
 
-        if (!this.audioCtx) {
-          this.initVisualizer(video);
-        }
+        // Init Visualizer Logic (Waiting for start)
+        this.state.audioVisualizer = new AudioVisualizer(
+          video, 
+          'visualizer-canvas', 
+          data.theme_color || '#7b2cbf'
+        );
 
-        document.removeEventListener("click", startAudio);
-        document.removeEventListener("touchstart", startAudio);
-      };
-
-      document.addEventListener("click", startAudio);
-      document.addEventListener("touchstart", startAudio);
-
-    } catch (err) {
-      console.error("Video load failed:", err);
+      } catch (e) {
+        console.error("Video Fetch Error", e);
+        this.els.bg.innerHTML = `<img src="${CONFIG.defaults.banner}" class="bg-media loaded">`;
+      }
+    } else {
+      // Image Background
+      const imgUrl = data.bg_value || CONFIG.defaults.banner;
+      this.els.bg.innerHTML = `<img src="${imgUrl}" class="bg-media loaded">`;
+      // Hide canvas if no audio
+      document.getElementById('visualizer-canvas').style.display = 'none';
     }
   }
 
-  /* ===== VISUALIZER ===== */
-  initVisualizer(videoEl) {
-    const visualizer = document.getElementById("audio-visualizer");
-    if (!visualizer) return;
+  // 4. Interaction (Click to Enter + Tilt)
+  setupInteractions() {
+    // Click to Enter
+    this.els.enterScreen.addEventListener('click', () => {
+      this.els.enterScreen.classList.add('hidden');
+      
+      // Reveal Card
+      this.els.card.style.opacity = '1';
+      this.els.card.style.transform = 'translateY(0) rotateX(0)';
+      this.els.card.classList.add('active');
 
-    const left = visualizer.querySelector(".left");
-    const right = visualizer.querySelector(".right");
+      // Play Media
+      const video = document.querySelector('video');
+      if (video) {
+        video.volume = 0.5;
+        video.play().then(() => {
+          video.classList.add('loaded');
+          // Start Visualizer
+          if(this.state.audioVisualizer) this.state.audioVisualizer.init();
+        }).catch(e => console.log("Play failed", e));
+      }
+    });
 
-    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const source = this.audioCtx.createMediaElementSource(videoEl);
-    const analyser = this.audioCtx.createAnalyser();
-
-    analyser.fftSize = 256;
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-    source.connect(analyser);
-    analyser.connect(this.audioCtx.destination);
-
-    visualizer.classList.remove("hidden");
-
-    const animate = () => {
-      requestAnimationFrame(animate);
-
-      analyser.getByteFrequencyData(dataArray);
-
-      let bass = 0;
-      for (let i = 0; i < 10; i++) bass += dataArray[i];
-      bass /= 10;
-
-      const intensity = bass / 255;
-
-      const height = 20 + intensity * 25;
-      const thickness = 4 + intensity * 6;
-      const hue = 270 + intensity * 80;
-      const glow = 10 + intensity * 40;
-
-      left.style.height = `${height}px`;
-      right.style.height = `${height * 0.8}px`;
-
-      left.style.width = `${thickness}px`;
-      right.style.width = `${thickness}px`;
-
-      left.style.background = `hsl(${hue}, 80%, 60%)`;
-      right.style.background = `hsl(${hue}, 80%, 60%)`;
-
-      left.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
-      right.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
-    };
-
-    animate();
+    // 3D Tilt Logic
+    if(window.innerWidth > 600) {
+      document.addEventListener('mousemove', (e) => this.handleTilt(e));
+    }
   }
 
-  async checkOwnership(profileId, username) {
+  handleTilt(e) {
+    const card = this.els.card;
+    const x = e.clientX;
+    const y = e.clientY;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    
+    // Calculate rotation (max 15deg)
+    const rotateX = ((y - h / 2) / h) * -15;
+    const rotateY = ((x - w / 2) / w) * 15;
+
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+  }
+
+  // Custom Cursor Logic
+  initCursor() {
+    const cursor = this.els.cursor;
+    
+    // Smooth follow using simpler logic for performance
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+
+    // Hover effects
+    document.querySelectorAll('a, button, .profile-card').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+    });
+  }
+
+  async checkOwner() {
     const { data: { session } } = await sb.auth.getSession();
-    if (session && session.user.id === profileId) {
-      this.dom.editBtn.href = `/@${username}/edit`;
-      this.dom.editBtn.classList.add('visible');
+    if (session && this.state.user && session.user.id === this.state.user.id) {
+      this.els.editBtn.classList.add('show');
+      this.els.editBtn.href = `/@${this.state.user.username}/edit`;
     }
-  }
-
-  async loadCustomFont(data) {
-    if (data.username_font === 'custom' && data.custom_font_url) {
-      const font = new FontFace('CustomProfileFont',
-        `url(${data.custom_font_url})`);
-      await font.load();
-      document.fonts.add(font);
-    }
-  }
-
-  incrementViews(id) {
-    sb.rpc('increment_views', { row_id: id });
   }
 
   escapeHtml(str) {
-    return str.replace(/[&<>"']/g, m =>
-      ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m])
-    );
+    const div = document.createElement('div');
+    div.innerText = str;
+    return div.innerHTML;
   }
 
-  renderError(msg) {
-    this.dom.card.innerHTML =
-      `<div style="padding:40px;text-align:center">${msg}</div>`;
+  showError(msg) {
+    this.els.enterScreen.style.display = 'none';
+    this.els.card.innerHTML = `<div style="padding:40px">${msg}</div>`;
+    this.els.card.style.opacity = 1;
+    this.els.card.style.transform = 'none';
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => new ProfileViewer());
-</script>
+// Start App
+document.addEventListener('DOMContentLoaded', () => new ProfileApp());
 
+</script>
 </body>
 </html>
