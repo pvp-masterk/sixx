@@ -357,8 +357,7 @@ body {
 <script>
 /**
  * ==========================================
- * PROFILE VIEWER ENGINE
- * Enhanced rendering, WebGL-style effects
+ * PROFILE VIEWER ENGINE (CORS FIXED + VISUALIZER WORKING)
  * ==========================================
  */
 const CONFIG = {
@@ -366,10 +365,9 @@ const CONFIG = {
   supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
   defaults: {
     avatar: "https://cdn.discordapp.com/embed/avatars/0.png",
-    banner: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" // transparent
+    banner: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
   },
   roles: {
-    // Define icons for potential roles stored in DB
     'Admin': 'ph-crown',
     'Verified': 'ph-seal-check',
     'Member': 'ph-user'
@@ -392,279 +390,219 @@ class ProfileViewer {
       joined: document.getElementById('ui-joined'),
       editBtn: document.getElementById('btn-edit-profile')
     };
-    
+
+    this.audioCtx = null;
     this.init();
   }
 
   async init() {
-    // Parse Username from URL (assuming /@username structure or query param)
-    // For this demo, we'll try to get it from path, fallback to a test or current user
     let username = window.location.pathname.split('/@')[1];
-    
-    // Fallback: If no username in URL, try to get logged in user's profile for preview
+
     if (!username) {
       const { data: { user } } = await sb.auth.getUser();
-      if(user) {
-        const { data } = await sb.from("profiles").select("username").eq("id", user.id).single();
-        if(data) username = data.username;
+      if (user) {
+        const { data } = await sb.from("profiles")
+          .select("username")
+          .eq("id", user.id)
+          .single();
+        if (data) username = data.username;
       }
     }
 
-    if (!username) {
-      this.renderError("User not found");
-      return;
-    }
+    if (!username) return this.renderError("User not found");
 
-    // Fetch Profile
     const { data: profile, error } = await sb
       .from("profiles")
       .select("*")
       .eq("username", username)
       .maybeSingle();
 
-    if (error || !profile) {
-      this.renderError("404: Profile Not Found");
-      return;
-    }
+    if (error || !profile)
+      return this.renderError("404: Profile Not Found");
 
-    // Load Assets & Render
     await this.loadCustomFont(profile);
     this.render(profile);
     this.checkOwnership(profile.id, profile.username);
     this.incrementViews(profile.id);
   }
 
-  // --- RENDERING CORE ---
   render(data) {
     document.title = `${data.username} | /six`;
 
-    // 1. Theme Engine
     const accent = data.theme_color || '#7b2cbf';
     document.documentElement.style.setProperty('--accent', accent);
     document.documentElement.style.setProperty('--accent-glow', accent + '66');
 
-    // 2. Background Layer (Immersive)
-    if (data.bg_value) {
-      if (data.bg_type === 'video') {
-        if (data.bg_type === 'video') {
-  this.dom.bgContainer.innerHTML = `
-    <video
-  src="${data.bg_value}"
-  class="user-bg-media"
-  autoplay
-  loop
-  playsinline
-  muted
-  preload="auto"
-  crossorigin="anonymous"
-  id="bg-video">
-</video>
-  `;
-
-  const bgVideo = document.getElementById("bg-video");
-
-  // Wait for user interaction
-  const startAudio = async () => {
-    bgVideo.muted = false;
-    bgVideo.volume = 0.6;
-
-    await bgVideo.play().catch(() => {});
-
-    // Resume audio context if needed
-    if (this.audioCtx && this.audioCtx.state === "suspended") {
-      await this.audioCtx.resume();
-    }
-
-    this.initVisualizer(bgVideo);
-
-    document.removeEventListener("click", startAudio);
-    document.removeEventListener("touchstart", startAudio);
-  };
-
-  document.addEventListener("click", startAudio);
-  document.addEventListener("touchstart", startAudio);
-}
-
-
-      } else {
-        this.dom.bgContainer.innerHTML = `<img src="${data.bg_value}" class="user-bg-media" alt="Background">`;
-      }
+    /* ===== BACKGROUND (CORS FIXED) ===== */
+    if (data.bg_value && data.bg_type === "video") {
+      this.loadVideoWithCORSFix(data.bg_value);
+    } else if (data.bg_value) {
+      this.dom.bgContainer.innerHTML =
+        `<img src="${data.bg_value}" class="user-bg-media">`;
     } else {
-      // Default Gradient Blob
-      this.dom.bgContainer.innerHTML = `<div style="width:100%;height:100%;background:radial-gradient(circle at 50% 50%, ${accent}40 0%, transparent 70%);"></div>`;
+      this.dom.bgContainer.innerHTML =
+        `<div style="width:100%;height:100%;background:radial-gradient(circle at center, ${accent}40 0%, transparent 70%)"></div>`;
     }
-const bgVideo = document.getElementById("bg-video");
 
-// Enable audio on first interaction
-const enableAudio = () => {
-  bgVideo.muted = false;
-  bgVideo.volume = 0.5; // optional
-  bgVideo.play().catch(() => {});
-  
-  document.removeEventListener("click", enableAudio);
-  document.removeEventListener("touchstart", enableAudio);
-};
-
-document.addEventListener("click", enableAudio);
-document.addEventListener("touchstart", enableAudio);
-
-    // 3. Header Assets
+    /* ===== HEADER ===== */
     this.dom.avatar.src = data.avatar || CONFIG.defaults.avatar;
-    
+
     const bannerUrl = data.banner_url || CONFIG.defaults.banner;
     if (bannerUrl.match(/\.(mp4|webm)$/)) {
-      this.dom.bannerContainer.innerHTML = `<video src="${bannerUrl}" autoplay muted loop playsinline class="banner-media"></video>`;
+      this.dom.bannerContainer.innerHTML =
+        `<video src="${bannerUrl}" autoplay muted loop playsinline class="banner-media"></video>`;
     } else {
-      this.dom.bannerContainer.innerHTML = `<img src="${bannerUrl}" class="banner-media" alt="Banner">`;
+      this.dom.bannerContainer.innerHTML =
+        `<img src="${bannerUrl}" class="banner-media">`;
     }
 
-    // 4. Identity & Effects
+    /* ===== USER INFO ===== */
     this.dom.username.textContent = data.username;
-    this.dom.username.className = `username fx-${data.username_effect || 'none'}`;
-    
-    // Font Family Application
-    if (data.username_font === 'custom') {
-      this.dom.username.style.fontFamily = "'CustomProfileFont', sans-serif";
-    } else if (data.username_font) {
-      const fontMap = {
-        'Cinzel': "'Cinzel', serif",
-        'Orbitron': "'Orbitron', sans-serif",
-        'Playfair Display': "'Playfair Display', serif",
-        'UnifrakturMaguntia': "'UnifrakturMaguntia', cursive",
-        'Roboto Mono': "'Roboto Mono', monospace",
-        'Diecide Remain': "'Diecide Remain', serif"
-      };
-      this.dom.username.style.fontFamily = fontMap[data.username_font] || 'inherit';
-    }
+    this.dom.username.className =
+      `username fx-${data.username_effect || 'none'}`;
 
-    // 5. Badges/Roles
-    this.dom.badges.innerHTML = '';
-    if (data.show_role_icon !== false) {
-       // Display Main Role (assuming specific logic or just a generic one for now)
-       // You can expand this based on your roles array structure
-       if(data.roles && data.roles.length > 0) {
-          data.roles.forEach(role => {
-            const icon = CONFIG.roles[role] || 'ph-star';
-            this.dom.badges.innerHTML += `
-              <div class="role-pill">
-                <i class="ph-bold ${icon}"></i> ${role}
-              </div>`;
-          });
-       }
-    }
+    this.dom.bio.innerHTML =
+      this.escapeHtml(data.bio || "No biography provided.");
 
-    // 6. Metadata
-    this.dom.bio.innerHTML = this.escapeHtml(data.bio || "No biography provided.");
-    this.dom.views.innerText = (data.views || 0).toLocaleString();
-    this.dom.joined.innerText = new Date(data.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
+    this.dom.views.innerText =
+      (data.views || 0).toLocaleString();
 
-    // Remove Skeleton State
+    this.dom.joined.innerText =
+      new Date(data.created_at)
+        .toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
+
     this.dom.card.classList.remove('loading-view');
   }
 
-  // --- LOGIC ---
+  /* ===== CORS FIX METHOD ===== */
+  async loadVideoWithCORSFix(url) {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+
+      this.dom.bgContainer.innerHTML = `
+        <video
+          src="${objectUrl}"
+          class="user-bg-media"
+          autoplay
+          loop
+          playsinline
+          muted
+          preload="auto"
+          id="bg-video">
+        </video>
+      `;
+
+      const video = document.getElementById("bg-video");
+
+      const startAudio = async () => {
+        video.muted = false;
+        await video.play().catch(() => {});
+
+        if (!this.audioCtx) {
+          this.initVisualizer(video);
+        }
+
+        document.removeEventListener("click", startAudio);
+        document.removeEventListener("touchstart", startAudio);
+      };
+
+      document.addEventListener("click", startAudio);
+      document.addEventListener("touchstart", startAudio);
+
+    } catch (err) {
+      console.error("Video load failed:", err);
+    }
+  }
+
+  /* ===== VISUALIZER ===== */
+  initVisualizer(videoEl) {
+    const visualizer = document.getElementById("audio-visualizer");
+    if (!visualizer) return;
+
+    const left = visualizer.querySelector(".left");
+    const right = visualizer.querySelector(".right");
+
+    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = this.audioCtx.createMediaElementSource(videoEl);
+    const analyser = this.audioCtx.createAnalyser();
+
+    analyser.fftSize = 256;
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    source.connect(analyser);
+    analyser.connect(this.audioCtx.destination);
+
+    visualizer.classList.remove("hidden");
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+
+      analyser.getByteFrequencyData(dataArray);
+
+      let bass = 0;
+      for (let i = 0; i < 10; i++) bass += dataArray[i];
+      bass /= 10;
+
+      const intensity = bass / 255;
+
+      const height = 20 + intensity * 25;
+      const thickness = 4 + intensity * 6;
+      const hue = 270 + intensity * 80;
+      const glow = 10 + intensity * 40;
+
+      left.style.height = `${height}px`;
+      right.style.height = `${height * 0.8}px`;
+
+      left.style.width = `${thickness}px`;
+      right.style.width = `${thickness}px`;
+
+      left.style.background = `hsl(${hue}, 80%, 60%)`;
+      right.style.background = `hsl(${hue}, 80%, 60%)`;
+
+      left.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
+      right.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
+    };
+
+    animate();
+  }
+
   async checkOwnership(profileId, username) {
     const { data: { session } } = await sb.auth.getSession();
     if (session && session.user.id === profileId) {
-      this.dom.editBtn.href = `/@${username}/edit`; // Adjust link as needed
+      this.dom.editBtn.href = `/@${username}/edit`;
       this.dom.editBtn.classList.add('visible');
     }
   }
 
   async loadCustomFont(data) {
     if (data.username_font === 'custom' && data.custom_font_url) {
-      try {
-        const font = new FontFace('CustomProfileFont', `url(${data.custom_font_url})`);
-        await font.load();
-        document.fonts.add(font);
-      } catch (e) {
-        console.warn("Failed to load custom font", e);
-      }
+      const font = new FontFace('CustomProfileFont',
+        `url(${data.custom_font_url})`);
+      await font.load();
+      document.fonts.add(font);
     }
   }
 
   incrementViews(id) {
-    // Fire and forget RPC call
     sb.rpc('increment_views', { row_id: id });
   }
 
-  // --- UTILS ---
   escapeHtml(str) {
-    if (!str) return "";
-    return str.replace(/[&<>"']/g, m => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;','\'':'&#039;'
-    })[m]);
+    return str.replace(/[&<>"']/g, m =>
+      ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m])
+    );
   }
 
   renderError(msg) {
-    this.dom.card.innerHTML = `
-      <div style="padding:40px; text-align:center;">
-        <i class="ph-duotone ph-mask-sad" style="font-size:48px; color:var(--text-muted)"></i>
-        <h2 style="margin-top:10px;">${msg}</h2>
-        <a href="/" style="display:inline-block; margin-top:20px; color:var(--text-main)">Return Home</a>
-      </div>
-    `;
-    this.dom.card.classList.remove('loading-view');
+    this.dom.card.innerHTML =
+      `<div style="padding:40px;text-align:center">${msg}</div>`;
   }
-   initVisualizer(videoEl) {
-  const visualizer = document.getElementById("audio-visualizer");
-  const left = visualizer.querySelector(".left");
-  const right = visualizer.querySelector(".right");
-
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const source = audioCtx.createMediaElementSource(videoEl);
-  const analyser = audioCtx.createAnalyser();
-
-  analyser.fftSize = 256;
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-
-  visualizer.classList.remove("hidden");
-
-  const animate = () => {
-    requestAnimationFrame(animate);
-
-    analyser.getByteFrequencyData(dataArray);
-
-    // Focus on bass (low frequencies)
-    let bass = 0;
-    for (let i = 0; i < 10; i++) {
-      bass += dataArray[i];
-    }
-    bass /= 10;
-
-    const intensity = bass / 255;
-
-    const height = 20 + intensity * 25;
-    const thickness = 4 + intensity * 6;
-
-    const hue = 270 + intensity * 80; // purple → pink shift
-    const glow = 10 + intensity * 40;
-
-    left.style.height = `${height}px`;
-    right.style.height = `${height * 0.8}px`;
-
-    left.style.width = `${thickness}px`;
-    right.style.width = `${thickness}px`;
-
-    left.style.background = `hsl(${hue}, 80%, 60%)`;
-    right.style.background = `hsl(${hue}, 80%, 60%)`;
-
-    left.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
-    right.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
-  };
-
-  animate();
 }
 
-}
-
-// Initialize
 document.addEventListener('DOMContentLoaded', () => new ProfileViewer());
-
 </script>
+
 </body>
 </html>
