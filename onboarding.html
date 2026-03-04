@@ -1,678 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claim Your Link | Onboarding</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8" />
+<title>/six - System Initialization</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-    <style>
-        /* --- CSS VARIABLES & RESET --- */
-        :root {
-            --bg-color: #050505;
-            --card-bg: rgba(20, 20, 20, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --accent: #6366f1; /* Indigo-500 */
-            --accent-hover: #4f46e5;
-            --text-main: #ffffff;
-            --text-dim: #a1a1aa;
-            --error: #ef4444;
-            --success: #10b981;
-            
-            --anim-curve: cubic-bezier(0.2, 0.8, 0.2, 1);
-            --anim-duration: 300ms;
-        }
+<!-- EXTERNAL LIBRARIES -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
+<!-- FONTS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-        body {
-            background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 25%);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow-x: hidden;
-        }
+<style>
+/* =========================================
+   1. HIGH-TECH OS VARIABLES & RESET
+   ========================================= */
+:root {
+  --c-bg: #030105;
+  --glass-surface: rgba(12, 6, 22, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  
+  --text-main: #f0f0f5;
+  --text-muted: #8f8ba0;
+  
+  --accent: #7b2cbf;
+  --accent-glow: rgba(123, 44, 191, 0.5);
+  --success: #4ade80;
+  --error: #ef4444;
+  
+  --font-main: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-brand: 'Cinzel', serif;
+  
+  --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-        /* --- LAYOUT --- */
-        .container {
-            width: 100%;
-            max-width: 900px;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: center;
-        }
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
 
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            .preview-section {
-                order: -1; /* Preview on top on mobile */
-                transform: scale(0.9);
-            }
-        }
+body {
+  background-color: var(--c-bg); color: var(--text-main); font-family: var(--font-main);
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; padding: 20px;
+}
 
-        /* --- PREVIEW CARD (Visual Feedback) --- */
-        .preview-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 0;
-            overflow: hidden;
-            width: 100%;
-            max-width: 350px;
-            margin: 0 auto;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s var(--anim-curve);
-        }
+/* Background Grid (Lag-Free) */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -2;
+  background: radial-gradient(circle at center, rgba(123, 44, 191, 0.15) 0%, transparent 60%);
+}
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+}
 
-        .preview-banner {
-            height: 100px;
-            background: linear-gradient(45deg, #333, #444);
-            background-size: cover;
-            background-position: center;
-        }
+/* =========================================
+   2. ONBOARDING GLASS CARD
+   ========================================= */
+.onboarding-wrapper {
+  width: 100%; max-width: 480px; position: relative; z-index: 10;
+  opacity: 0; transform: scale(0.95); animation: bootCard 1s var(--ease-snappy) forwards 0.2s;
+}
 
-        .preview-content {
-            padding: 0 20px 20px;
-            text-align: center;
-            margin-top: -40px;
-        }
+@keyframes bootCard { to { opacity: 1; transform: scale(1); } }
 
-        .preview-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 4px solid #1a1a1a;
-            background: #222;
-            margin: 0 auto 12px;
-            object-fit: cover;
-            background-size: cover;
-            background-position: center;
-        }
+.glass-panel {
+  background: var(--glass-surface);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px; padding: 40px; position: relative; overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.02);
+}
 
-        .preview-username {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
+/* Holographic Scanner Effect */
+.scanner-line {
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent);
+  opacity: 0.5; animation: scan 4s linear infinite; pointer-events: none; z-index: 20;
+}
+@keyframes scan {
+  0% { transform: translateY(-10px); }
+  50% { transform: translateY(400px); }
+  100% { transform: translateY(-10px); }
+}
 
-        .preview-bio {
-            font-size: 0.875rem;
-            color: var(--text-dim);
-            line-height: 1.4;
-        }
+/* =========================================
+   3. TYPOGRAPHY & HEADER
+   ========================================= */
+.brand-title {
+  font-family: var(--font-brand); font-size: 36px; font-weight: 700;
+  text-align: center; margin-bottom: 5px; letter-spacing: 2px;
+  background: linear-gradient(135deg, #fff, #e0aaff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 15px rgba(123,44,191,0.4));
+}
+.sys-status {
+  text-align: center; font-family: var(--font-mono); font-size: 10px; color: var(--accent);
+  text-transform: uppercase; letter-spacing: 4px; margin-bottom: 40px; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.sys-status::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 0.4; box-shadow: none; } 50% { opacity: 1; box-shadow: 0 0 10px var(--accent); } }
 
-        /* --- WIZARD FORM --- */
-        .wizard-container {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            padding: 30px;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            min-height: 420px; /* Fixed height for consistent animations */
-            display: flex;
-            flex-direction: column;
-        }
+/* Terminal Typing Text */
+.terminal-text {
+  font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);
+  margin-bottom: 24px; line-height: 1.6; min-height: 42px;
+}
+.cursor { display: inline-block; width: 8px; height: 14px; background: var(--text-main); vertical-align: middle; animation: blink 1s step-end infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        .progress-bar {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 30px;
-        }
+/* =========================================
+   4. INPUT TERMINAL
+   ========================================= */
+.input-group { position: relative; margin-bottom: 30px; }
+.input-wrapper {
+  position: relative; display: flex; align-items: center;
+  background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+  border-radius: 16px; overflow: hidden; transition: 0.3s var(--ease-snappy);
+}
+.input-prefix { padding: 0 16px; font-family: var(--font-mono); color: var(--accent); font-weight: 700; font-size: 16px; }
+.alias-input {
+  width: 100%; background: transparent; border: none; padding: 18px 16px 18px 0;
+  color: #fff; font-family: var(--font-mono); font-size: 16px; outline: none;
+}
+.alias-input::placeholder { color: rgba(255,255,255,0.2); }
 
-        .progress-step {
-            flex: 1;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            transition: background 0.3s;
-        }
-        .progress-step.active { background: var(--accent); }
+/* Input Validation States */
+.input-wrapper.focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(123,44,191,0.2); }
+.input-wrapper.success { border-color: var(--success); box-shadow: 0 0 20px rgba(74,222,128,0.2); }
+.input-wrapper.error { border-color: var(--error); box-shadow: 0 0 20px rgba(239,68,68,0.2); }
 
-        /* --- SLIDER MECHANISM --- */
-        .steps-wrapper {
-            display: flex;
-            width: 300%; /* 3 steps */
-            transition: transform var(--anim-duration) var(--anim-curve);
-            flex: 1;
-        }
+.status-msg {
+  position: absolute; bottom: -22px; left: 16px; font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
+}
+.status-msg.success { color: var(--success); }
+.status-msg.error { color: var(--error); }
+.status-msg.checking { color: var(--accent); }
 
-        .step {
-            width: 33.333%;
-            padding: 0 10px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            pointer-events: none; /* Prevent clicking hidden steps */
-        }
+/* =========================================
+   5. ACTION BUTTON
+   ========================================= */
+.init-btn {
+  width: 100%; padding: 18px; background: rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border); border-radius: 16px;
+  color: var(--text-muted); font-family: var(--font-mono); font-weight: 700; font-size: 13px;
+  text-transform: uppercase; letter-spacing: 4px; cursor: not-allowed; position: relative; overflow: hidden;
+  transition: 0.4s var(--ease-snappy);
+}
+.init-btn.active { background: var(--accent); border-color: var(--accent-glow); color: #fff; cursor: pointer; box-shadow: 0 10px 30px -10px var(--accent-glow); }
+.init-btn.active:hover { background: #8e3ee6; transform: translateY(-2px); box-shadow: 0 15px 40px -5px rgba(123,44,191,0.6); }
 
-        .step.active {
-            opacity: 1;
-            pointer-events: all;
-        }
+/* Button Scanning Glare */
+.init-btn::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: skewX(-20deg); transition: 0s;
+}
+.init-btn.active:hover::after { left: 150%; transition: 0.6s ease-in-out; }
 
-        /* --- FORM ELEMENTS --- */
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 8px;
-        }
+/* Loader state */
+.btn-loader { display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-        p.subtitle {
-            color: var(--text-dim);
-            font-size: 0.9rem;
-            margin-bottom: 24px;
-        }
+/* =========================================
+   6. OVERLAYS & UTILS
+   ========================================= */
+.fullscreen-loader {
+  position: fixed; inset: 0; background: var(--c-bg); z-index: 9999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.6s var(--ease-snappy), visibility 0.6s;
+}
+.fullscreen-loader.hidden { opacity: 0; visibility: hidden; }
 
-        .input-group {
-            position: relative;
-            margin-bottom: 10px;
-        }
+.fs-brand { font-family: var(--font-brand); font-size: 40px; color: #fff; margin-bottom: 20px; filter: drop-shadow(0 0 20px var(--accent)); animation: fsPulse 2s infinite; }
+@keyframes fsPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        input[type="text"],
-        textarea {
-            width: 100%;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            padding: 14px 16px;
-            border-radius: 12px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        textarea {
-            resize: none;
-            height: 120px;
-        }
-
-        input:focus, textarea:focus {
-            border-color: var(--accent);
-        }
-
-        /* Validation Status */
-        .validation-msg {
-            font-size: 0.85rem;
-            margin-top: 8px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .validation-msg.loading { color: var(--text-dim); }
-        .validation-msg.success { color: var(--success); }
-        .validation-msg.error { color: var(--error); }
-
-        /* File Upload */
-        .file-upload-box {
-            border: 1px dashed var(--glass-border);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-bottom: 15px;
-            background: rgba(0,0,0,0.2);
-        }
-        .file-upload-box:hover {
-            border-color: var(--accent);
-            background: rgba(99, 102, 241, 0.05);
-        }
-        .file-upload-box p { font-size: 0.9rem; font-weight: 500; }
-        .file-upload-box span { font-size: 0.75rem; color: var(--text-dim); display: block; margin-top: 4px; }
-        input[type="file"] { display: none; }
-
-        /* Buttons */
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: auto;
-            padding-top: 20px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-dim);
-        }
-        .btn-secondary:hover { color: var(--text-main); }
-
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-        }
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-        }
-        .btn-primary:disabled {
-            background: #333;
-            color: #666;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Spinner */
-        .spinner {
-            width: 14px;
-            height: 14px;
-            border: 2px solid var(--text-dim);
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-    </style>
+.toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: 1px solid var(--error); padding: 12px 24px; border-radius: 50px; color: #fff; font-family: var(--font-mono); font-size: 11px; opacity: 0; pointer-events: none; transition: 0.4s; z-index: 1000; box-shadow: 0 10px 30px rgba(239,68,68,0.2); }
+.toast.active { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <!-- VISUAL PREVIEW SECTION -->
-        <section class="preview-section">
-            <div class="preview-card" id="previewCard">
-                <div class="preview-banner" id="liveBanner"></div>
-                <div class="preview-content">
-                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="preview-avatar" id="liveAvatar" alt="Avatar">
-                    <h3 class="preview-username">@<span id="liveUsername">username</span></h3>
-                    <p class="preview-bio" id="liveBio">Your bio will appear here...</p>
-                </div>
-            </div>
-        </section>
+<!-- INITIAL LOADING SCREEN -->
+<div id="boot-screen" class="fullscreen-loader">
+  <div class="fs-brand">/SIX</div>
+  <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 4px;">AUTHENTICATING CONNECTION...</div>
+</div>
 
-        <!-- WIZARD SECTION -->
-        <section class="wizard-container">
-            <div class="progress-bar">
-                <div class="progress-step active" id="prog1"></div>
-                <div class="progress-step" id="prog2"></div>
-                <div class="progress-step" id="prog3"></div>
-            </div>
+<!-- ONBOARDING UI -->
+<main class="onboarding-wrapper">
+  <div class="glass-panel">
+    <div class="scanner-line"></div>
+    
+    <div class="brand-title">/SIX</div>
+    <div class="sys-status">Awaiting Registration</div>
 
-            <div class="steps-wrapper" id="stepsWrapper">
-                
-                <!-- STEP 1: USERNAME -->
-                <div class="step active" data-step="1">
-                    <h2>Claim your handle</h2>
-                    <p class="subtitle">Choose a unique username for your bio page.</p>
-                    
-                    <div class="input-group">
-                        <span style="position:absolute; left: 16px; top: 14px; color: var(--text-dim); font-weight: 500;">/</span>
-                        <input type="text" id="usernameInput" placeholder="username" style="padding-left: 30px;" autocomplete="off">
-                    </div>
-                    
-                    <div class="validation-msg" id="usernameStatus">
-                        <!-- Filled via JS -->
-                    </div>
-                </div>
-
-                <!-- STEP 2: BIO -->
-                <div class="step" data-step="2">
-                    <h2>About you</h2>
-                    <p class="subtitle">Tell the world who you are (optional).</p>
-                    
-                    <textarea id="bioInput" placeholder="I create content about..."></textarea>
-                </div>
-
-                <!-- STEP 3: VISUALS -->
-                <div class="step" data-step="3">
-                    <h2>Make it yours</h2>
-                    <p class="subtitle">Customize your look.</p>
-
-                    <label class="file-upload-box">
-                        <input type="file" id="avatarUpload" accept="image/*">
-                        <p>Upload Avatar</p>
-                        <span>Optional — Uses Discord avatar if skipped</span>
-                    </label>
-
-                    <label class="file-upload-box">
-                        <input type="file" id="bannerUpload" accept="image/*">
-                        <p>Upload Banner</p>
-                        <span>Optional — Uses Discord banner if skipped</span>
-                    </label>
-                </div>
-
-            </div>
-
-            <div class="controls">
-                <button class="btn btn-secondary" id="backBtn" style="visibility: hidden;">Back</button>
-                <button class="btn btn-primary" id="nextBtn" disabled>Next</button>
-            </div>
-        </section>
-
+    <div class="terminal-text">
+      <span id="typewriter"></span><span class="cursor"></span>
     </div>
 
-    <script>
-        // --- 1. SUPABASE CONFIGURATION ---
-        const SUPABASE_URL = 'https://tstsijdifhgmpaszqknr.supabase.co'; // REPLACE ME
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4'; // REPLACE ME
-        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <div class="input-group">
+      <div class="input-wrapper" id="inp-wrap">
+        <span class="input-prefix">@</span>
+        <input type="text" id="inp-alias" class="alias-input" placeholder="Enter desired alias" autocomplete="off" spellcheck="false" maxlength="16">
+      </div>
+      <div id="status-text" class="status-msg"></div>
+    </div>
 
-        // --- 2. STATE MANAGEMENT ---
-        let currentStep = 1;
-        const totalSteps = 3;
-        let userData = {
-            id: null,
-            username: '',
-            bio: '',
-            avatarFile: null,
-            bannerFile: null,
-            discordAvatarUrl: null,
-            discordBannerUrl: null
-        };
-        let isUsernameValid = false;
+    <button id="btn-submit" class="init-btn">
+      <span class="btn-text">Initialize Profile</span>
+      <div class="btn-loader"></div>
+    </button>
+  </div>
+</main>
 
-        // --- 3. DOM ELEMENTS ---
-        const stepsWrapper = document.getElementById('stepsWrapper');
-        const progressSteps = [document.getElementById('prog1'), document.getElementById('prog2'), document.getElementById('prog3')];
-        const nextBtn = document.getElementById('nextBtn');
-        const backBtn = document.getElementById('backBtn');
-        
-        // Input Elements
-        const usernameInput = document.getElementById('usernameInput');
-        const usernameStatus = document.getElementById('usernameStatus');
-        const bioInput = document.getElementById('bioInput');
-        const avatarUpload = document.getElementById('avatarUpload');
-        const bannerUpload = document.getElementById('bannerUpload');
+<div id="toast" class="toast">Error Message</div>
 
-        // Live Preview Elements
-        const liveUsername = document.getElementById('liveUsername');
-        const liveBio = document.getElementById('liveBio');
-        const liveAvatar = document.getElementById('liveAvatar');
-        const liveBanner = document.getElementById('liveBanner');
+<script>
+/**
+ * ==========================================
+ * HIGH-TECH ONBOARDING ENGINE
+ * ==========================================
+ */
+const CONFIG = {
+  supabaseUrl: "https://tstsijdifhgmpaszqknr.supabase.co", 
+  supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4",
+  typeText: "Connection secured.\nSystem requires a unique alias to generate your identity matrix. Enter your designation below."
+};
 
-        // --- 4. INITIALIZATION ---
-        async function init() {
-            // Check Auth
-            const { data: { session } } = await sb.auth.getSession();
-            if (!session) {
-                // Redirect to login if not authenticated
-                // window.location.href = '/login.html'; 
-                alert("Debug: User not logged in. Redirect logic would trigger here.");
-                return;
-            }
+const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
-            userData.id = session.user.id;
-            
-            // Get Discord Metadata Fallbacks
-            const metadata = session.user.user_metadata;
-            if(metadata) {
-                userData.discordAvatarUrl = metadata.avatar_url || null;
-                // Discord banners aren't always in metadata without specific scopes, but we check anyway
-                userData.discordBannerUrl = metadata.custom_claims?.global_name ? null : null; // Placeholder
-                
-                // Set initial preview if available
-                if(userData.discordAvatarUrl) liveAvatar.src = userData.discordAvatarUrl;
-            }
+class OnboardingOS {
+  constructor() {
+    this.userId = null;
+    this.typingTimer = null;
+    this.isAvailable = false;
+    
+    this.dom = {
+      bootScreen: document.getElementById('boot-screen'),
+      typewriter: document.getElementById('typewriter'),
+      inpWrap: document.getElementById('inp-wrap'),
+      input: document.getElementById('inp-alias'),
+      status: document.getElementById('status-text'),
+      btn: document.getElementById('btn-submit'),
+      btnText: document.querySelector('.btn-text'),
+      btnLoader: document.querySelector('.btn-loader'),
+      toast: document.getElementById('toast')
+    };
 
-            // Check if profile already exists
-            const { data: profile } = await sb
-                .from('profiles')
-                .select('username')
-                .eq('id', userData.id)
-                .maybeSingle();
+    this.init();
+  }
 
-            if (profile) {
-                // Redirect to existing profile
-                window.location.href = `/${profile.username}`;
-                return;
-            }
-        }
+  async init() {
+    // 1. Check Authentication
+    const { data: { session } } = await sb.auth.getSession();
+    
+    if (!session) {
+      // User is not logged in, redirect to homepage
+      window.location.href = '/';
+      return;
+    }
+    
+    this.userId = session.user.id;
 
-        init();
+    // 2. Check if Profile Already Exists
+    const { data: profile } = await sb.from('profiles').select('username').eq('id', this.userId).maybeSingle();
+    
+    if (profile && profile.username) {
+      // PROMPT REQUIREMENT: Redirect to /@username
+      window.location.href = `/@${profile.username}`;
+      return;
+    }
 
-        // --- 5. LOGIC: STEP 1 (USERNAME) ---
-        const usernameRegex = /^[a-z0-9_]{3,20}$/;
-        let debounceTimer;
+    // 3. Begin Onboarding Sequence
+    setTimeout(() => {
+      this.dom.bootScreen.classList.add('hidden');
+      this.startTypewriter();
+      this.setupListeners();
+    }, 1200);
+  }
 
-        usernameInput.addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase();
-            userData.username = val;
-            liveUsername.textContent = val || 'username'; // Update preview
-            
-            // Reset state
-            isUsernameValid = false;
-            nextBtn.disabled = true;
-            clearTimeout(debounceTimer);
+  startTypewriter() {
+    let i = 0;
+    const speed = 30; // ms per char
+    const type = () => {
+      if (i < CONFIG.typeText.length) {
+        this.dom.typewriter.innerHTML += CONFIG.typeText.charAt(i) === '\n' ? '<br>' : CONFIG.typeText.charAt(i);
+        i++;
+        setTimeout(type, speed);
+      }
+    };
+    type();
+  }
 
-            // Basic Validation
-            if (!val) {
-                usernameStatus.innerHTML = '';
-                return;
-            }
+  setupListeners() {
+    // Input styling
+    this.dom.input.addEventListener('focus', () => this.dom.inpWrap.classList.add('focus'));
+    this.dom.input.addEventListener('blur', () => this.dom.inpWrap.classList.remove('focus'));
 
-            if (!usernameRegex.test(val)) {
-                setStatus('error', 'Use 3-20 chars: a-z, 0-9, _');
-                return;
-            }
+    // Real-time Database Validation
+    this.dom.input.addEventListener('input', (e) => {
+      clearTimeout(this.typingTimer);
+      const val = e.target.value.trim().toLowerCase();
+      
+      // Auto-format: remove spaces and special chars (keep alphanumeric & underscores)
+      e.target.value = val.replace(/[^a-z0-9_]/g, '');
+      const cleanVal = e.target.value;
 
-            // Debounced API Check
-            setStatus('loading', 'Checking availability...');
-            debounceTimer = setTimeout(() => checkAvailability(val), 500);
-        });
+      this.resetStatus();
 
-        async function checkAvailability(username) {
-            try {
-                const { data, error } = await sb
-                    .from('profiles')
-                    .select('username')
-                    .eq('username', username)
-                    .maybeSingle(); // Use maybeSingle to avoid 406 on no rows
+      if (cleanVal.length === 0) return;
+      if (cleanVal.length < 3) {
+        this.setStatus("error", "Alias too short (Min 3 chars)");
+        return;
+      }
 
-                if (error && error.code !== 'PGRST116') {
-                    console.error(error);
-                    setStatus('error', 'Error checking username');
-                    return;
-                }
+      this.setStatus("checking", "Querying database...");
+      
+      // Debounce the database hit
+      this.typingTimer = setTimeout(() => this.checkAvailability(cleanVal), 600);
+    });
 
-                if (data) {
-                    setStatus('error', 'Username already taken');
-                } else {
-                    setStatus('success', 'Great! This username is available');
-                    isUsernameValid = true;
-                    nextBtn.disabled = false;
-                }
-            } catch (err) {
-                setStatus('error', 'Connection error');
-            }
-        }
+    // Submission
+    this.dom.btn.addEventListener('click', () => {
+      if (this.isAvailable && this.dom.btn.classList.contains('active')) {
+        this.registerAlias(this.dom.input.value);
+      }
+    });
 
-        function setStatus(type, msg) {
-            if(type === 'loading') {
-                usernameStatus.innerHTML = `<div class="spinner"></div><span class="loading">${msg}</span>`;
-            } else if (type === 'success') {
-                usernameStatus.innerHTML = `<span style="color:var(--success)">✔</span><span class="success">${msg}</span>`;
-            } else {
-                usernameStatus.innerHTML = `<span style="color:var(--error)">✖</span><span class="error">${msg}</span>`;
-            }
-        }
+    // Enter key support
+    this.dom.input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && this.isAvailable) this.registerAlias(this.dom.input.value);
+    });
+  }
 
-        // --- 6. LOGIC: STEP 2 (BIO) ---
-        bioInput.addEventListener('input', (e) => {
-            userData.bio = e.target.value;
-            liveBio.textContent = userData.bio || "Your bio will appear here...";
-        });
+  async checkAvailability(username) {
+    try {
+      const { data, error } = await sb.from('profiles').select('username').eq('username', username).maybeSingle();
+      
+      if (error) throw error;
+      
+      if (data) {
+        this.setStatus("error", "Alias already claimed");
+      } else {
+        this.setStatus("success", "Alias available");
+      }
+    } catch (err) {
+      this.setStatus("error", "Database connection error");
+    }
+  }
 
-        // --- 7. LOGIC: STEP 3 (FILES) ---
-        function handleFileSelect(e, type) {
-            const file = e.target.files[0];
-            if (!file) return;
+  setStatus(state, message) {
+    this.dom.inpWrap.className = `input-wrapper focus ${state}`;
+    this.dom.status.className = `status-msg ${state}`;
+    this.dom.status.innerText = message;
 
-            const objectUrl = URL.createObjectURL(file);
+    if (state === "success") {
+      this.isAvailable = true;
+      this.dom.btn.classList.add('active');
+    } else {
+      this.isAvailable = false;
+      this.dom.btn.classList.remove('active');
+    }
+  }
 
-            if (type === 'avatar') {
-                userData.avatarFile = file;
-                liveAvatar.src = objectUrl;
-            } else {
-                userData.bannerFile = file;
-                liveBanner.style.backgroundImage = `url(${objectUrl})`;
-            }
-        }
+  resetStatus() {
+    this.dom.inpWrap.className = 'input-wrapper focus';
+    this.dom.status.innerText = '';
+    this.isAvailable = false;
+    this.dom.btn.classList.remove('active');
+  }
 
-        avatarUpload.addEventListener('change', (e) => handleFileSelect(e, 'avatar'));
-        bannerUpload.addEventListener('change', (e) => handleFileSelect(e, 'banner'));
+  async registerAlias(username) {
+    this.setLoading(true);
+    
+    try {
+      // Create the profile in the database
+      const { error } = await sb.from('profiles').upsert({
+        id: this.userId,
+        username: username,
+        created_at: new Date(),
+        updated_at: new Date()
+      });
 
-        // --- 8. NAVIGATION & ANIMATION ---
-        
-        nextBtn.addEventListener('click', () => {
-            if (currentStep < totalSteps) {
-                changeStep(currentStep + 1);
-            } else {
-                finishOnboarding();
-            }
-        });
+      if (error) throw error;
 
-        backBtn.addEventListener('click', () => {
-            if (currentStep > 1) {
-                changeStep(currentStep - 1);
-            }
-        });
+      // Registration successful! Fake a high-tech loading completion
+      this.dom.status.className = `status-msg success`;
+      this.dom.status.innerText = "IDENTITY MATRIX ESTABLISHED. REROUTING...";
+      
+      setTimeout(() => {
+        // PROMPT REQUIREMENT: Redirect user to /@username
+        window.location.href = `/@${username}`;
+      }, 1500);
 
-        function changeStep(newStep) {
-            const direction = newStep > currentStep ? 'forward' : 'back';
-            currentStep = newStep;
+    } catch (err) {
+      this.showToast("Critical Error: Registration Failed.");
+      this.setLoading(false);
+    }
+  }
 
-            // 1. Update Animation (Slide)
-            // We use percentage logic: Step 1 = 0%, Step 2 = -33.33%, Step 3 = -66.66%
-            const translateVal = (currentStep - 1) * -33.333;
-            stepsWrapper.style.transform = `translateX(${translateVal}%)`;
+  setLoading(isLoading) {
+    this.dom.input.disabled = isLoading;
+    this.dom.btnText.style.display = isLoading ? 'none' : 'block';
+    this.dom.btnLoader.style.display = isLoading ? 'block' : 'none';
+    if(isLoading) {
+      this.dom.btn.classList.remove('active');
+      this.dom.btn.style.cursor = 'wait';
+    }
+  }
 
-            // 2. Manage Opacity classes
-            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+  showToast(msg) {
+    this.dom.toast.innerText = msg;
+    this.dom.toast.classList.add('active');
+    setTimeout(() => this.dom.toast.classList.remove('active'), 4000);
+  }
+}
 
-            // 3. Update Progress Bar
-            progressSteps.forEach((el, idx) => {
-                if (idx < currentStep) el.classList.add('active');
-                else el.classList.remove('active');
-            });
-
-            // 4. Update Buttons
-            backBtn.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
-            
-            if (currentStep === totalSteps) {
-                nextBtn.textContent = 'Finish & Create';
-                nextBtn.disabled = false; // Uploads are optional
-            } else {
-                nextBtn.textContent = 'Next';
-                // Validation logic for buttons
-                if (currentStep === 1) nextBtn.disabled = !isUsernameValid;
-                else nextBtn.disabled = false;
-            }
-        }
-
-        // --- 9. SUBMISSION LOGIC ---
-        async function finishOnboarding() {
-            nextBtn.textContent = 'Creating...';
-            nextBtn.disabled = true;
-
-            try {
-                let avatarUrl = userData.discordAvatarUrl;
-                let avatarPath = null;
-                let bannerUrl = null;
-                let bannerPath = null;
-
-                // Upload Avatar if selected
-                if (userData.avatarFile) {
-                    const ext = userData.avatarFile.name.split('.').pop();
-                    const fileName = `${userData.id}/avatar.${ext}`;
-                    
-                    const { data, error } = await sb.storage
-                        .from('avatars')
-                        .upload(fileName, userData.avatarFile, { upsert: true });
-
-                    if (!error) {
-                        avatarPath = data.path;
-                        const { data: { publicUrl } } = sb.storage.from('avatars').getPublicUrl(fileName);
-                        avatarUrl = publicUrl;
-                    }
-                }
-
-                // Upload Banner if selected
-                if (userData.bannerFile) {
-                    const ext = userData.bannerFile.name.split('.').pop();
-                    const fileName = `${userData.id}/banner.${ext}`;
-                    
-                    const { data, error } = await sb.storage
-                        .from('banners')
-                        .upload(fileName, userData.bannerFile, { upsert: true });
-
-                    if (!error) {
-                        bannerPath = data.path;
-                        const { data: { publicUrl } } = sb.storage.from('banners').getPublicUrl(fileName);
-                        bannerUrl = publicUrl;
-                    }
-                }
-
-                // INSERT Profile
-                const { error: insertError } = await sb
-                    .from('profiles')
-                    .insert({
-                        id: userData.id, // Matches auth.uid()
-                        username: userData.username,
-                        bio: userData.bio,
-                        avatar: avatarUrl,
-                        avatar_path: avatarPath,
-                        banner_url: bannerUrl,
-                        banner_path: bannerPath,
-                        onboarded: true,
-                        theme_color: '#6366f1' // default accent
-                    });
-
-                if (insertError) throw insertError;
-
-                // Redirect on success
-                window.location.href = `/${userData.username}`;
-
-            } catch (err) {
-                console.error(err);
-                alert("Something went wrong creating your profile: " + err.message);
-                nextBtn.textContent = 'Finish & Create';
-                nextBtn.disabled = false;
-            }
-        }
-
-    </script>
+// Start Engine
+document.addEventListener('DOMContentLoaded', () => {
+  new OnboardingOS();
+});
+</script>
 </body>
 </html>
