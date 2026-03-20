@@ -8,303 +8,356 @@
 <!-- EXTERNAL ASSETS -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;700&family=Orbitron:wght@600&family=Playfair+Display:ital,wght@0,600;1,600&family=UnifrakturMaguntia&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
 
 <style>
 /* =========================================
-   1. CORE VARIABLES & THEME (Matched to Homepage)
+   1. CORE VARIABLES & THEME
    ========================================= */
 :root {
-  --c-bg: #030105;
-  --text-main: #f0f0f5;
-  --text-muted: #8f8ba0;
-  
-  --glass-surface: rgba(12, 6, 22, 0.45);
+  --bg-deep: #030303;
+  --glass-surface: rgba(15, 15, 15, 0.65);
   --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.05);
   
-  /* Dynamic Accents (Overwritten by JS based on user theme) */
+  --text-main: #ffffff;
+  --text-muted: #9ca3af;
+  
+  /* Dynamic Accent (Set by JS) */
   --accent: #7b2cbf;
-  --accent-glow: rgba(123, 44, 191, 0.4);
+  --accent-glow: rgba(123, 44, 191, 0.5);
   
   --radius-card: 24px;
-  --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
-  --font-main: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background-color: var(--c-bg);
+  background-color: var(--bg-deep);
   color: var(--text-main);
-  font-family: var(--font-main);
+  font-family: 'Inter', sans-serif;
+
   min-height: 100vh;
   overflow-x: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+  /* REMOVE THESE */
+  display: block;
+  padding: 0;
 }
 
 /* =========================================
-   2. IMMERSIVE BACKGROUND & GRID SYSTEM
+   2. IMMERSIVE BACKGROUND SYSTEM
    ========================================= */
 .bg-layer {
-  position: fixed; inset: 0; z-index: -2; overflow: hidden;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
 }
 
-/* User's Custom Video/Image Background */
+
+/* Dynamic Background (User Image/Video) */
 .user-bg-media {
-  position: absolute; inset: 0; width: 100%; height: 100%;
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  transition: filter 0.8s var(--ease-snappy), opacity 0.8s var(--ease-snappy), transform 0.8s var(--ease-snappy);
+
+  transition:
+    filter 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s ease,
+    transform 0.6s ease;
+
   will-change: filter, transform;
 }
 
-/* Mode Switches */
-.bg-blurred .user-bg-media { filter: blur(40px) brightness(0.5); transform: scale(1.1); opacity: 0.8; }
-.bg-clean .user-bg-media { filter: brightness(0.7); transform: scale(1); opacity: 1; }
-
-/* Tech Grid Overlay (Same as homepage) */
-body::after {
-  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background-image: 
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size: 40px 40px;
-  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
-  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+/* BLURRED MODE (default / guns.lol style) */
+.bg-blurred .user-bg-media {
+  filter: blur(32px) brightness(0.7);
+  transform: scale(1.08);
+  opacity: 0.9;
 }
 
+/* CLEAN CINEMATIC MODE */
+.bg-clean .user-bg-media {
+  filter: none;
+  transform: scale(1);
+  opacity: 1;
+}
+
+
+/* Noise Overlay */
+.noise-overlay {
+  position: absolute; inset: 0; pointer-events: none;
+  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhZWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==');
+  opacity: 0.12;
+   mix-blend-mode: overlay;
+}
+
+/* Vignette */
 .vignette {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+  background: radial-gradient(circle at center,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0.6) 80%,
+    rgba(0,0,0,0.9) 100%
+  );
 }
+
 
 /* =========================================
-   3. THE GLASS PROFILE CARD
+   3. THE GLASS CARD
    ========================================= */
-.profile-wrapper {
-  width: 100%; max-width: 600px;
-  padding: 24px; position: relative; z-index: 10;
-}
-
 .profile-card {
+  width: 100%; max-width: 550px;
   background: var(--glass-surface);
-  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-card);
-  box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8);
+  box-shadow: 0 40px 100px -20px rgba(0,0,0,0.7);
   overflow: hidden;
   position: relative;
-  opacity: 0; transform: translateY(30px) scale(0.98);
-  animation: entrance 1s var(--ease-snappy) forwards 0.2s;
+  opacity: 0; transform: translateY(30px) scale(0.95);
+  animation: entrance 1s var(--ease-lux) forwards 0.2s;
 }
 
-/* Tech Card Edge Glow */
+@keyframes entrance {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Glossy Shine Reflection */
 .profile-card::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 10;
-  border-radius: var(--radius-card);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: linear-gradient(125deg, transparent 0%, rgba(255,255,255,0.03) 40%, transparent 60%);
 }
-
-@keyframes entrance { to { opacity: 1; transform: translateY(0) scale(1); } }
 
 /* =========================================
-   4. BANNER & HEADER (ENHANCED VISIBILITY)
+   4. PROFILE CONTENT
    ========================================= */
-.card-header { 
-  position: relative; width: 100%; 
-  height: 260px; /* Taller banner */
-  background: #000; 
-  border-bottom: 1px solid var(--glass-border);
-}
+.card-header { position: relative; width: 100%; height: 200px; overflow: hidden; background: #000; }
 
+/* Banner */
 .banner-media {
   width: 100%; height: 100%; object-fit: cover;
-  /* Subtler mask: keeps top 75% completely visible, smooth fade at the very bottom */
-  mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
   transition: transform 10s ease;
 }
 .profile-card:hover .banner-media { transform: scale(1.05); }
 
-/* Edit Profile Button */
+/* Edit Button (Floating) */
 .edit-btn {
-  position: absolute; top: 20px; right: 20px; z-index: 20;
-  background: rgba(10, 5, 20, 0.6); border: 1px solid var(--glass-border);
-  backdrop-filter: blur(12px);
-  color: #fff; padding: 10px 18px; border-radius: 12px;
-  font-family: var(--font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase;
-  text-decoration: none; display: flex; align-items: center; gap: 8px;
-  transition: 0.3s var(--ease-snappy); opacity: 0; transform: translateY(-10px);
+  position: absolute; top: 20px; right: 20px; z-index: 10;
+  background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  color: #fff; padding: 8px 16px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 600; text-decoration: none;
+  display: flex; align-items: center; gap: 6px;
+  transition: 0.2s; opacity: 0; transform: translateY(-10px);
 }
 .edit-btn.visible { opacity: 1; transform: translateY(0); }
-.edit-btn:hover { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+.edit-btn:hover { background: var(--accent); border-color: var(--accent); }
 
-/* Audio Visualizer (Tech Style) */
-.audio-visualizer {
-  position: absolute; bottom: 20px; right: 20px; z-index: 20;
-  display: flex; align-items: flex-end; gap: 4px; height: 30px;
-}
-.av-bar {
-  width: 4px; border-radius: 4px; background: var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow); transition: height 0.1s ease, background 0.2s linear;
-}
-
-/* =========================================
-   5. PROFILE CONTENT (BODY)
-   ========================================= */
 .card-body {
-  padding: 0 32px 32px; margin-top: -65px; position: relative; z-index: 10;
+  padding: 0 32px 40px; margin-top: -60px; position: relative; z-index: 3;
 }
 
-/* Avatar - Glowing Tech Ring */
+/* Avatar */
 .avatar-wrapper {
-  width: 130px; height: 130px;
-  border-radius: 24px; /* Squircle tech look */
-  padding: 4px;
-  background: var(--c-bg);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow);
-  margin-bottom: 20px;
-  position: relative;
-  transition: 0.4s var(--ease-snappy);
+  width: 120px; height: 120px;
+  border-radius: 50%; padding: 4px;
+  background: rgba(20,20,20,0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  margin-bottom: 16px;
 }
-.profile-card:hover .avatar-wrapper { border-color: var(--accent); transform: translateY(-4px); }
 .avatar-img {
-  width: 100%; height: 100%; border-radius: 20px;
-  object-fit: cover; background: #111; display: block;
+  width: 100%; height: 100%; border-radius: 50%;
+  object-fit: cover; background: #111;
+  display: block;
 }
 
-/* Username Info */
-.identity-row { margin-bottom: 16px; }
+/* Username & Identity */
+.identity-row { margin-bottom: 12px; }
 
+/* --- USERNAME EFFECTS --- */
 .username {
-  font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin-bottom: 8px;
-  display: inline-block; word-break: break-word;
+  font-size: 2rem; line-height: 1.1; margin-bottom: 6px;
+  display: inline-block;
 }
 
-/* Username FX */
-.fx-glow { color: #fff; text-shadow: 0 0 15px var(--accent-glow), 0 0 30px var(--accent); }
-.fx-rgb { position: relative; color: #fff; text-shadow: 2px 0 var(--accent), -2px 0 #00ffff; animation: glitch 3s infinite linear alternate-reverse; }
-.fx-gradient { background: linear-gradient(135deg, #fff 20%, var(--accent) 50%, #fff 80%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 5s linear infinite; }
+/* 1. Neon Glow */
+.fx-glow {
+  color: #fff;
+  text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent), 0 0 40px var(--accent);
+}
 
-@keyframes glitch { 0%, 100% { transform: skew(0deg); } 20% { transform: skew(-2deg); } 40% { transform: skew(2deg); } }
+/* 2. RGB Glitch */
+.fx-rgb {
+  position: relative; color: #fff;
+  text-shadow: 2px 0 var(--accent), -2px 0 #00ffff;
+  animation: glitch-skew 3s infinite linear alternate-reverse;
+}
+@keyframes glitch-skew {
+  0% { transform: skew(0deg); }
+  20% { transform: skew(-2deg); }
+  40% { transform: skew(1deg); }
+  60% { transform: skew(-1deg); }
+  80% { transform: skew(2deg); }
+  100% { transform: skew(0deg); }
+}
+
+/* 3. Luxury Gradient */
+.fx-gradient {
+  background: linear-gradient(135deg, #fff 20%, var(--accent) 50%, #fff 80%);
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: shine 5s linear infinite;
+}
 @keyframes shine { to { background-position: 200% center; } }
 
-/* Role Badges (Database Style) */
-.badges-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+/* Role Badges */
+.badges-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .role-pill {
-  padding: 6px 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);
-  border-left: 2px solid var(--accent); border-radius: 8px;
-  font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase;
-  color: #ddd; display: flex; align-items: center; gap: 6px; letter-spacing: 1px;
+  height: 24px; padding: 0 10px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-muted); display: flex; align-items: center; gap: 6px;
+  transition: 0.2s;
 }
-.role-pill i { color: var(--accent); font-size: 14px; }
+.role-pill:hover { border-color: var(--accent); color: #fff; background: rgba(255,255,255,0.08); }
+.role-pill i { color: var(--accent); font-size: 0.8rem; }
 
 /* Bio */
 .bio-text {
-  font-size: 15px; line-height: 1.7; color: #ccc; margin: 24px 0;
-  white-space: pre-wrap; font-weight: 400;
+  font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.8);
+  margin: 20px 0; white-space: pre-wrap; font-weight: 300;
 }
 
-/* Footer Stats (Bento/Terminal Style) */
+/* Footer Stats */
 .card-footer {
-  display: flex; gap: 16px; margin-top: 24px; padding-top: 24px;
-  border-top: 1px dashed rgba(255,255,255,0.1);
+  border-top: 1px solid var(--glass-border);
+  padding-top: 20px; margin-top: 20px;
+  display: flex; gap: 24px;
 }
-.stat-box {
-  background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border);
-  padding: 12px 16px; border-radius: 14px; flex: 1; min-width: 100px;
+.stat-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.8rem; color: var(--text-muted); font-weight: 500;
 }
-.stat-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block; letter-spacing: 1px; }
-.stat-val { font-size: 16px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px; }
-.stat-val i { color: var(--accent); }
+.stat-item i { color: var(--accent); font-size: 1rem; }
 
 /* --- SKELETON LOADER --- */
-.skel { background: rgba(255,255,255,0.05); border-radius: 8px; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+.skel { background: rgba(255,255,255,0.05); border-radius: 6px; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 0.8; } 100% { opacity: 0.4; } }
 
 .loading-view .banner-media { opacity: 0; }
 .loading-view .avatar-img { opacity: 0; }
-.loading-view .skel-avatar { position: absolute; inset: 0; border-radius: 20px; }
-.loading-view .skel-title { width: 60%; height: 36px; margin-bottom: 12px; }
-.loading-view .skel-bio { width: 100%; height: 80px; }
+.loading-view .skel-avatar { position: absolute; inset:0; border-radius: 50%; }
+.loading-view .skel-title { width: 60%; height: 32px; margin-bottom: 10px; }
+.loading-view .skel-bio { width: 100%; height: 60px; }
 
-/* Mobile Adaptations */
-@media (max-width: 500px) {
-  .profile-wrapper { padding: 0; max-width: 100%; }
-  .profile-card { border-radius: 0; min-height: 100vh; border: none; box-shadow: none; }
-  .card-header { height: 220px; }
-  .avatar-wrapper { width: 110px; height: 110px; margin-top: -55px; }
+/* Utilities */
+.hidden { display: none !important; }
+
+/* Mobile */
+@media (max-width: 480px) {
+  .profile-card { border-radius: 0; min-height: 100vh; box-shadow: none; border: none; }
+  .card-header { height: 160px; }
+  .avatar-wrapper { width: 100px; height: 100px; }
+  .bio-text { font-size: 0.9rem; }
 }
+   .profile-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.audio-visualizer {
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.stroke {
+  width: 4px;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transition: background 0.2s linear;
+}
+
 </style>
 </head>
-<body class="bg-blurred"> <!-- Change to bg-clean if you don't want blurred background -->
+<body>
 
 <!-- Background Layer -->
 <div class="bg-layer">
-  <div id="dynamic-bg-container"></div>
+  <div id="dynamic-bg-container"></div> <!-- Video or Image injected here -->
   <div class="vignette"></div>
+  <div class="noise-overlay"></div>
 </div>
 
-<!-- Main UI -->
-<div class="profile-wrapper">
-  <main class="profile-card loading-view" id="main-card">
-    
-    <div class="card-header">
-      <div id="banner-container" style="width: 100%; height: 100%;"></div>
-      
-      <a href="#" class="edit-btn" id="btn-edit-profile">
-        <i class="ph-bold ph-pencil-simple"></i> Config
-      </a>
+<!-- Main Card -->
+   <div class="profile-wrapper">
+<main class="profile-card loading-view" id="main-card">
+  
+  <div class="card-header">
+    <div id="banner-container"></div> <!-- Banner injected here -->
+    <a href="#" class="edit-btn" id="btn-edit-profile">
+      <i class="ph-bold ph-pencil-simple"></i> Edit Profile
+    </a>
+  </div>
 
-      <!-- Tech Visualizer -->
-      <div class="audio-visualizer hidden" id="audio-visualizer">
-        <div class="av-bar left"></div>
-        <div class="av-bar middle"></div>
-        <div class="av-bar right"></div>
-      </div>
+  <div class="card-body">
+    <div class="avatar-wrapper">
+      <img src="" id="ui-avatar" class="avatar-img">
+      <div class="skel skel-avatar"></div>
     </div>
 
-    <div class="card-body">
-      <div class="avatar-wrapper">
-        <img src="" id="ui-avatar" class="avatar-img">
-        <div class="skel skel-avatar"></div>
-      </div>
-
-      <div class="identity-row">
-        <h1 id="ui-username" class="username">
-          <div class="skel skel-title"></div>
-        </h1>
-        <div id="ui-badges" class="badges-container">
-          <!-- Filled by JS -->
-        </div>
-      </div>
-
-      <div id="ui-bio" class="bio-text">
-        <div class="skel skel-bio"></div>
-      </div>
-
-      <div class="card-footer">
-        <div class="stat-box">
-          <span class="stat-label">Profile Views</span>
-          <span class="stat-val"><i class="ph-bold ph-eye"></i> <span id="ui-views">0</span></span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-label">Entry</span>
-          <span class="stat-val"><i class="ph-bold ph-calendar-blank"></i> <span id="ui-joined">----</span></span>
-        </div>
-      </div>
-    </div>
-
-  </main>
+    <div class="identity-row">
+      <h1 id="ui-username" class="username">
+        <!-- Text injected -->
+        <div class="skel skel-title"></div>
+      </h1>
+       <div class="audio-visualizer hidden" id="audio-visualizer">
+  <div class="stroke left"></div>
+  <div class="stroke right"></div>
 </div>
+      <div id="ui-badges" class="badges-container"></div>
+    </div>
 
+    <div id="ui-bio" class="bio-text">
+      <div class="skel skel-bio"></div>
+    </div>
+
+    <div class="card-footer">
+      <div class="stat-item">
+        <i class="ph-bold ph-eye"></i> <span id="ui-views">0</span> Views
+      </div>
+      <div class="stat-item">
+        <i class="ph-bold ph-calendar-blank"></i> <span id="ui-joined">2024</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
 <script>
 /**
  * ==========================================
- * ADVANCED PROFILE VIEWER ENGINE 
+ * PROFILE VIEWER ENGINE (CORS FIXED + VISUALIZER WORKING)
  * ==========================================
  */
 const CONFIG = {
@@ -313,6 +366,11 @@ const CONFIG = {
   defaults: {
     avatar: "https://cdn.discordapp.com/embed/avatars/0.png",
     banner: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+  },
+  roles: {
+    'Admin': 'ph-crown',
+    'Verified': 'ph-seal-check',
+    'Member': 'ph-user'
   }
 };
 
@@ -343,12 +401,15 @@ class ProfileViewer {
     if (!username) {
       const { data: { user } } = await sb.auth.getUser();
       if (user) {
-        const { data } = await sb.from("profiles").select("username").eq("id", user.id).single();
+        const { data } = await sb.from("profiles")
+          .select("username")
+          .eq("id", user.id)
+          .single();
         if (data) username = data.username;
       }
     }
 
-    if (!username) return this.renderError("USER IDENTITY NOT FOUND");
+    if (!username) return this.renderError("User not found");
 
     const { data: profile, error } = await sb
       .from("profiles")
@@ -356,7 +417,8 @@ class ProfileViewer {
       .eq("username", username)
       .maybeSingle();
 
-    if (error || !profile) return this.renderError("ERROR 404: IDENTITY PURGED");
+    if (error || !profile)
+      return this.renderError("404: Profile Not Found");
 
     await this.loadCustomFont(profile);
     this.render(profile);
@@ -365,51 +427,54 @@ class ProfileViewer {
   }
 
   render(data) {
-    document.title = `${data.username} | /six SAIS`;
+    document.title = `${data.username} | /six`;
 
-    // Apply User Theme Accent
     const accent = data.theme_color || '#7b2cbf';
     document.documentElement.style.setProperty('--accent', accent);
     document.documentElement.style.setProperty('--accent-glow', accent + '66');
 
-    /* ===== BACKGROUND HANDLER ===== */
+    /* ===== BACKGROUND (CORS FIXED) ===== */
     if (data.bg_value && data.bg_type === "video") {
       this.loadVideoWithCORSFix(data.bg_value);
     } else if (data.bg_value) {
-      this.dom.bgContainer.innerHTML = `<img src="${data.bg_value}" class="user-bg-media">`;
+      this.dom.bgContainer.innerHTML =
+        `<img src="${data.bg_value}" class="user-bg-media">`;
     } else {
-      this.dom.bgContainer.innerHTML = `<div style="width:100%;height:100%;background:radial-gradient(circle at center, ${accent}20 0%, transparent 60%)"></div>`;
+      this.dom.bgContainer.innerHTML =
+        `<div style="width:100%;height:100%;background:radial-gradient(circle at center, ${accent}40 0%, transparent 70%)"></div>`;
     }
 
-    /* ===== MEDIA RENDER (BANNER & AVATAR) ===== */
+    /* ===== HEADER ===== */
     this.dom.avatar.src = data.avatar || CONFIG.defaults.avatar;
 
     const bannerUrl = data.banner_url || CONFIG.defaults.banner;
     if (bannerUrl.match(/\.(mp4|webm)$/)) {
-      this.dom.bannerContainer.innerHTML = `<video src="${bannerUrl}" autoplay muted loop playsinline class="banner-media"></video>`;
+      this.dom.bannerContainer.innerHTML =
+        `<video src="${bannerUrl}" autoplay muted loop playsinline class="banner-media"></video>`;
     } else {
-      this.dom.bannerContainer.innerHTML = `<img src="${bannerUrl}" class="banner-media">`;
+      this.dom.bannerContainer.innerHTML =
+        `<img src="${bannerUrl}" class="banner-media">`;
     }
 
-    /* ===== DATA RENDER ===== */
+    /* ===== USER INFO ===== */
     this.dom.username.textContent = data.username;
-    this.dom.username.className = `username fx-${data.username_effect || 'none'}`;
+    this.dom.username.className =
+      `username fx-${data.username_effect || 'none'}`;
 
-    this.dom.bio.innerHTML = this.escapeHtml(data.bio || "No system biography logged.");
-    this.dom.views.innerText = (data.views || 0).toLocaleString();
-    
-    const joinDate = new Date(data.created_at);
-    this.dom.joined.innerText = `${joinDate.getFullYear()}.${String(joinDate.getMonth()+1).padStart(2, '0')}.${String(joinDate.getDate()).padStart(2, '0')}`;
+    this.dom.bio.innerHTML =
+      this.escapeHtml(data.bio || "No biography provided.");
 
-    /* ===== RENDER BADGES (Fallback if role exists) ===== */
-    if(data.role) {
-      this.dom.badges.innerHTML = `<div class="role-pill"><i class="ph-fill ph-shield-check"></i> ${data.role}</div>`;
-    }
+    this.dom.views.innerText =
+      (data.views || 0).toLocaleString();
+
+    this.dom.joined.innerText =
+      new Date(data.created_at)
+        .toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
 
     this.dom.card.classList.remove('loading-view');
   }
 
-  /* ===== CORS VIDEO & VISUALIZER FIX ===== */
+  /* ===== CORS FIX METHOD ===== */
   async loadVideoWithCORSFix(url) {
     try {
       const response = await fetch(url);
@@ -417,7 +482,16 @@ class ProfileViewer {
       const objectUrl = URL.createObjectURL(blob);
 
       this.dom.bgContainer.innerHTML = `
-        <video src="${objectUrl}" class="user-bg-media" autoplay loop playsinline muted preload="auto" id="bg-video"></video>
+        <video
+          src="${objectUrl}"
+          class="user-bg-media"
+          autoplay
+          loop
+          playsinline
+          muted
+          preload="auto"
+          id="bg-video">
+        </video>
       `;
 
       const video = document.getElementById("bg-video");
@@ -425,8 +499,11 @@ class ProfileViewer {
       const startAudio = async () => {
         video.muted = false;
         await video.play().catch(() => {});
-        if (!this.audioCtx) this.initVisualizer(video);
-        
+
+        if (!this.audioCtx) {
+          this.initVisualizer(video);
+        }
+
         document.removeEventListener("click", startAudio);
         document.removeEventListener("touchstart", startAudio);
       };
@@ -435,42 +512,59 @@ class ProfileViewer {
       document.addEventListener("touchstart", startAudio);
 
     } catch (err) {
-      console.error("Video Background Fault:", err);
+      console.error("Video load failed:", err);
     }
   }
 
+  /* ===== VISUALIZER ===== */
   initVisualizer(videoEl) {
     const visualizer = document.getElementById("audio-visualizer");
     if (!visualizer) return;
 
-    const bars = [
-      visualizer.querySelector(".left"),
-      visualizer.querySelector(".middle"),
-      visualizer.querySelector(".right")
-    ];
+    const left = visualizer.querySelector(".left");
+    const right = visualizer.querySelector(".right");
 
     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const source = this.audioCtx.createMediaElementSource(videoEl);
     const analyser = this.audioCtx.createAnalyser();
 
-    analyser.fftSize = 64;
+    analyser.fftSize = 256;
     const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
     source.connect(analyser);
     analyser.connect(this.audioCtx.destination);
+
     visualizer.classList.remove("hidden");
 
     const animate = () => {
       requestAnimationFrame(animate);
+
       analyser.getByteFrequencyData(dataArray);
 
-      // Average out chunks for 3 bars
-      for(let i = 0; i < 3; i++) {
-        let val = dataArray[i * 4] / 255; 
-        let height = 10 + (val * 30);
-        bars[i].style.height = `${height}px`;
-      }
+      let bass = 0;
+      for (let i = 0; i < 10; i++) bass += dataArray[i];
+      bass /= 10;
+
+      const intensity = bass / 255;
+
+      const height = 20 + intensity * 25;
+      const thickness = 4 + intensity * 6;
+      const hue = 270 + intensity * 80;
+      const glow = 10 + intensity * 40;
+
+      left.style.height = `${height}px`;
+      right.style.height = `${height * 0.8}px`;
+
+      left.style.width = `${thickness}px`;
+      right.style.width = `${thickness}px`;
+
+      left.style.background = `hsl(${hue}, 80%, 60%)`;
+      right.style.background = `hsl(${hue}, 80%, 60%)`;
+
+      left.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
+      right.style.boxShadow = `0 0 ${glow}px hsl(${hue}, 80%, 60%)`;
     };
+
     animate();
   }
 
@@ -484,7 +578,8 @@ class ProfileViewer {
 
   async loadCustomFont(data) {
     if (data.username_font === 'custom' && data.custom_font_url) {
-      const font = new FontFace('CustomProfileFont', `url(${data.custom_font_url})`);
+      const font = new FontFace('CustomProfileFont',
+        `url(${data.custom_font_url})`);
       await font.load();
       document.fonts.add(font);
     }
@@ -495,11 +590,14 @@ class ProfileViewer {
   }
 
   escapeHtml(str) {
-    return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
+    return str.replace(/[&<>"']/g, m =>
+      ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m])
+    );
   }
 
   renderError(msg) {
-    this.dom.card.innerHTML = `<div style="padding:60px 20px;text-align:center;font-family:var(--font-mono);color:var(--accent-glow);letter-spacing:2px;">${msg}</div>`;
+    this.dom.card.innerHTML =
+      `<div style="padding:40px;text-align:center">${msg}</div>`;
   }
 }
 
