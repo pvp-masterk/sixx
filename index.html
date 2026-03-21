@@ -1,430 +1,557 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>/six</title>
 
-<!-- Fonts: Inter for the clean iOS look -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
 
 <style>
-/* ======================= 1. CORE VARIABLES (iOS Red Theme) ======================= */
+/* ======================= 1. CORE VARIABLES & 0-LAG RESET ======================= */
 :root {
-  --bg-main: #000000;
-  --bg-secondary: #0a0000;
-  
-  /* Red iOS Accents */
-  --c-accent: #ff3b30;
-  --c-accent-dark: #cc2e26;
-  --c-accent-glow: rgba(255, 59, 48, 0.2);
-  
-  /* Text */
-  --c-text-main: #f5f5f7;
-  --c-text-dim: #86868b;
-  
-  /* iOS Glass Elements */
-  --c-glass: rgba(28, 28, 30, 0.6);
-  --c-glass-hover: rgba(44, 44, 46, 0.8);
-  --c-glass-border: rgba(255, 255, 255, 0.05);
-  
-  /* Layout */
-  --radius-card: 28px;
-  --radius-btn: 14px;
-  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --ease-ios: cubic-bezier(0.25, 1, 0.5, 1);
-}
+  --c-bg: #050000;
+  --c-bg-alt: #0a0101;
+  --c-accent: #d00000;
+  --c-accent-dark: #7a0000;
+  --c-accent-glow: #ff3333;
+  --c-text-main: #e0e0e0;
+  --c-text-dim: #666;
 
-@font-face {
-  font-family: 'Diecide Remain';
-  src: url('fonts/DeicideRemain.otf') format('opentype');
-  font-display: swap;
+  --c-glass: rgba(10, 0, 0, 0.7);
+  --c-glass-border: rgba(255, 0, 0, 0.1);
+  --c-glass-border-hover: rgba(208, 0, 0, 0.8);
+
+
+  --font-main: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+
+
+
+
+
+
+
+
+
+
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; width: 100%; }
+html, body { height: 100%; width: 100%; background: var(--c-bg); color: var(--c-text-main); font-family: var(--font-main); overflow: hidden; line-height: 1.5; }
 
-body {
-  font-family: var(--font-main);
-  background: var(--bg-main);
-  color: var(--c-text-main);
-  overflow-x: hidden;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+/* Lag-Free Scanlines */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 900;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 1px, transparent 1px, transparent 2px);
+  background-size: 100% 4px;
 }
 
-/* Zero Lag Static Background Gradients */
-.bg-fixed {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: 
-    radial-gradient(circle at 15% 0%, #1f0000 0%, transparent 40%),
-    radial-gradient(circle at 85% 100%, #140000 0%, transparent 50%);
-}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--c-bg); }
+::-webkit-scrollbar-thumb { background: var(--c-accent-dark); }
+::-webkit-scrollbar-thumb:hover { background: var(--c-accent); }
 
-/* Hide Scrollbar for clean look */
-::-webkit-scrollbar { display: none; }
+svg.icon { width: 1.2em; height: 1.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; margin-bottom: 2px; }
 
-/* Icons */
-svg.icon { width: 1.2em; height: 1.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
-
-/* Non-chalant Brand Typography */
+/* The /six Brand Text Style */
 .brand-text {
-  font-family: var(--font-brand, 'Diecide Remain', serif);
-  color: #fff;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  font-family: var(--font-mono);
+  color: var(--c-accent);
+  text-shadow: 0 0 10px rgba(208, 0, 0, 0.4);
+  font-weight: 800;
+  letter-spacing: -1px;
 }
-.brand-red { color: var(--c-accent); }
 
-/* ======================= 2. iOS BENTO GRID LAYOUT ======================= */
+/* ======================= 2. BACKGROUND (Optimized) ======================= */
+.bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-blob {
+  position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.15;
+  will-change: transform; animation: breath 8s infinite alternate var(--ease);
+
+}
+.bg-blob.one { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(var(--c-accent), transparent 60%); }
+.bg-blob.two { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(var(--c-accent-dark), transparent 60%); animation-delay: -4s; }
+
+@keyframes breath { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+
+/* ======================= 3. LANDING EXPERIENCE ======================= */
+.landing-screen {
+  position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: #020000; transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.landing-screen.hidden { opacity: 0; pointer-events: none; transform: scale(1.02); }
+
+.landing-title { font-family: var(--font-mono); font-size: clamp(60px, 12vw, 150px); color: var(--c-accent); font-weight: 800; letter-spacing: -5px; opacity: 0; animation: fadeUp 0.8s var(--ease) forwards 0.1s; }
+.landing-sub { font-family: var(--font-mono); font-size: 14px; color: var(--c-text-dim); margin-top: -10px; opacity: 0; animation: fadeUp 0.8s var(--ease) forwards 0.3s; }
+
+.enter-btn {
+  margin-top: 50px; padding: 10px 30px; border: 1px solid var(--c-glass-border); background: transparent;
+  color: var(--c-text-dim); font-family: var(--font-mono); font-size: 12px; cursor: pointer; transition: 0.2s;
+  opacity: 0; animation: fadeUp 0.8s var(--ease) forwards 0.5s;
+
+
+}
+.enter-btn:hover { background: var(--c-accent); color: #fff; border-color: var(--c-accent); box-shadow: 0 0 20px rgba(208, 0, 0, 0.4); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ======================= 4. UI / NAV ======================= */
+.sidebar-trigger {
+  position: fixed; top: 30px; left: 30px; z-index: 100; width: 45px; height: 45px;
+  background: var(--c-glass); border: 1px solid var(--c-glass-border); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: 0.2s;
+
+
+}
+.sidebar-trigger:hover { border-color: var(--c-accent); color: var(--c-accent); }
+
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: #050000; border-right: 1px solid var(--c-glass-border);
+  z-index: 99; padding: 100px 30px 40px; transform: translateX(-100%); transition: transform 0.5s var(--ease); display: flex; flex-direction: column;
+}
+.sidebar.active { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
+
+.nav-item {
+  display: flex; align-items: center; gap: 15px; padding: 12px 15px; margin-bottom: 8px;
+  color: var(--c-text-dim); text-decoration: none; border-radius: 4px; transition: 0.2s; font-family: var(--font-mono); font-size: 13px; border-left: 2px solid transparent;
+
+}
+.nav-item:hover { color: #fff; background: rgba(255,0,0,0.03); border-left-color: var(--c-accent); padding-left: 20px; }
+
+/* ======================= 5. BRUTALIST GRID LAYOUT ======================= */
 .app-container {
-  position: relative; z-index: 10;
-  max-width: 1100px; margin: 0 auto;
-  padding: 80px 24px 60px;
-  opacity: 0; transform: translateY(15px);
-  animation: smoothFade 0.8s var(--ease-ios) forwards 0.2s;
+  position: relative; z-index: 10; max-width: 1100px; margin: 0 auto; padding: 100px 20px 60px;
+  opacity: 0; transform: translateY(15px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+
+
+
+
+
+
+
+
+
+
+}
+.app-container.visible { opacity: 1; transform: translateY(0); }
+
+/* Header & Buttons */
+.app-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--c-glass-border); }
+.header-brand { font-size: 32px; line-height: 1; }
+
+.btn-group { display: flex; gap: 10px; }
+.btn-ui {
+  padding: 10px 20px; background: rgba(255,0,0,0.02); border: 1px solid var(--c-glass-border); border-radius: 4px;
+  color: var(--c-text-dim); font-family: var(--font-mono); font-size: 12px; cursor: pointer; transition: 0.2s;
+}
+.btn-ui:hover { border-color: var(--c-accent); color: #fff; background: rgba(208, 0, 0, 0.1); }
+
+/* GRID */
+.grid-section { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media(min-width: 900px) {
+  .grid-section { grid-template-columns: repeat(12, 1fr); grid-auto-rows: minmax(160px, auto); }
+  .col-span-12 { grid-column: span 12; } .col-span-8 { grid-column: span 8; }
+  .col-span-6 { grid-column: span 6; } .col-span-4 { grid-column: span 4; }
+
 }
 
-@keyframes smoothFade { to { opacity: 1; transform: translateY(0); } }
-
-/* Header */
-.app-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 40px;
-}
-.header-left { display: flex; flex-direction: column; gap: 4px; }
-.header-brand { font-size: 32px; font-weight: 700; letter-spacing: -1px; display: flex; align-items: center; gap: 8px;}
-.header-brand .dot { width: 8px; height: 8px; background: var(--c-accent); border-radius: 50%; box-shadow: 0 0 10px var(--c-accent-glow); }
-
-.header-actions { display: flex; gap: 12px; }
-
-/* Buttons */
-.btn {
-  padding: 10px 18px;
-  background: var(--c-glass);
-  border: 1px solid var(--c-glass-border);
-  border-radius: var(--radius-btn);
-  color: #fff; font-weight: 500; font-size: 14px;
-  cursor: pointer; transition: all 0.2s var(--ease-ios);
-  display: flex; align-items: center; gap: 8px;
-  backdrop-filter: blur(20px);
-}
-.btn:hover { background: var(--c-glass-hover); transform: scale(0.98); }
-.btn-red { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
-.btn-red:hover { background: var(--c-accent-dark); }
-
-/* GRID SYSTEM */
-.grid-section { 
-  display: grid; 
-  grid-template-columns: 1fr; 
-  gap: 20px; 
-}
-@media(min-width: 850px) {
-  .grid-section { 
-    grid-template-columns: repeat(12, 1fr); 
-    grid-auto-rows: minmax(200px, auto);
-  }
-  .col-span-12 { grid-column: span 12; }
-  .col-span-8  { grid-column: span 8; }
-  .col-span-6  { grid-column: span 6; }
-  .col-span-4  { grid-column: span 4; }
-}
-
-/* CARDS - Zero Lag iOS Style */
+/* SHARP CARDS - Zero Lag Focus */
 .card {
-  background: var(--c-glass);
-  border: 1px solid var(--c-glass-border);
-  border-radius: var(--radius-card);
-  padding: 32px;
-  display: flex; flex-direction: column;
-  backdrop-filter: blur(30px) saturate(150%);
-  -webkit-backdrop-filter: blur(30px) saturate(150%);
-  transition: transform 0.3s var(--ease-ios), background 0.3s;
+  background: var(--c-glass); border: 1px solid var(--c-glass-border);
+  padding: 30px; position: relative; display: flex; flex-direction: column; transition: border-color 0.3s, background 0.3s;
+
+
+
+
+
+
 }
-.card:hover { background: var(--c-glass-hover); }
+.card:hover { border-color: var(--c-glass-border-hover); background: rgba(15, 0, 0, 0.8); }
 
-/* Typography inside cards */
-.section-title {
-  font-size: 16px; font-weight: 600; margin-bottom: 16px;
-  color: var(--c-text-dim);
-  display: flex; align-items: center; gap: 8px;
-  text-transform: lowercase;
+/* Clip-path for a brutalist chamfered corner */
+.card-cut { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%); }
+.card-cut::after {
+  content: ''; position: absolute; bottom: 0; right: 0; width: 20px; height: 20px;
+  background: var(--c-accent-dark); clip-path: polygon(100% 0, 0 100%, 100% 100%); opacity: 0.5; transition: 0.3s;
+
 }
-.desc-text { color: var(--c-text-main); font-size: 18px; font-weight: 500; line-height: 1.4; letter-spacing: -0.3px; margin-bottom: 24px; }
-.desc-sub { color: var(--c-text-dim); font-size: 14px; margin-top: auto; }
+.card:hover.card-cut::after { background: var(--c-accent); opacity: 1; }
 
-/* Status Indicators */
-.status-pill {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 8px 14px; background: rgba(0,0,0,0.4);
-  border-radius: 20px; font-size: 13px; font-weight: 600;
-  border: 1px solid var(--c-glass-border); width: fit-content;
-}
-.pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c-accent); animation: pulse 2s infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,59,48,0.4); } 70% { box-shadow: 0 0 0 8px rgba(255,59,48,0); } 100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); } }
+/* Content styling */
+.section-title { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--c-text-dim); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.card:hover .section-title { color: var(--c-accent); }
 
-/* Social Links */
-.social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; height: 100%; }
-.social-tile {
-  background: rgba(0,0,0,0.3); border-radius: 20px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-decoration: none; color: #fff; transition: 0.2s;
-  border: 1px solid transparent;
-}
-.social-tile:hover { background: rgba(255,255,255,0.05); transform: scale(0.97); }
-.social-tile svg { margin-bottom: 8px; }
+.desc-text { color: #bbb; font-size: 14px; margin-bottom: 20px; line-height: 1.6; font-family: var(--font-mono); }
 
-/* Timeline Minimal */
-.timeline { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
-.timeline-item { display: flex; gap: 16px; align-items: center; }
-.t-date { font-size: 13px; font-weight: 600; color: var(--c-text-dim); width: 60px; }
-.t-event { font-size: 15px; color: #fff; font-weight: 500; }
+/* Doctrine & Graveyard Lists */
+.minimal-list { list-style: none; padding: 0; margin: 0; }
+.minimal-list li { padding: 12px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); color: #999; font-size: 13px; font-family: var(--font-mono); display: flex; gap: 15px; }
+.minimal-list li:last-child { border-bottom: none; }
+.minimal-list .bullet { color: var(--c-accent-dark); }
+.card:hover .minimal-list .bullet { color: var(--c-accent); }
 
-/* Lists */
-.minimal-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
-.minimal-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 15px; color: var(--c-text-main); }
-.minimal-list li span { color: var(--c-text-dim); font-weight: 600; }
+.graveyard-name { text-decoration: line-through; color: #555; font-weight: 700; transition: 0.2s; }
+.minimal-list li:hover .graveyard-name { color: var(--c-accent); text-decoration: none; }
 
-/* ======================= 3. MODALS (iOS Style) ======================= */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  z-index: 2000; display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: opacity 0.3s var(--ease-ios);
-}
-.modal-overlay.active { opacity: 1; pointer-events: auto; }
+/* Timeline / History */
+.timeline-item { position: relative; padding-left: 20px; margin-bottom: 20px; border-left: 1px solid var(--c-glass-border); }
+.timeline-item::before { content: ''; position: absolute; left: -3px; top: 4px; width: 5px; height: 5px; background: var(--c-accent-dark); transition: 0.2s; }
+.card:hover .timeline-item::before { background: var(--c-accent); box-shadow: 0 0 8px var(--c-accent); }
+.t-date { font-family: var(--font-mono); font-size: 11px; color: var(--c-text-dim); margin-bottom: 4px; }
+.t-desc { font-size: 13px; color: #aaa; font-family: var(--font-mono); }
 
-.modal-box {
-  width: 90%; max-width: 400px;
-  background: rgba(20, 20, 22, 0.85); border: 1px solid var(--c-glass-border);
-  padding: 32px; border-radius: 32px; text-align: left;
-  transform: translateY(20px) scale(0.95); transition: all 0.4s var(--ease-ios);
-}
-.modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
+/* Socials Minimal */
+.social-link { display: flex; align-items: center; justify-content: space-between; padding: 15px; border: 1px solid var(--c-glass-border); margin-bottom: 10px; color: var(--c-text-dim); text-decoration: none; font-family: var(--font-mono); font-size: 12px; transition: 0.2s; }
+.social-link:hover { border-color: var(--c-accent); color: #fff; background: rgba(208, 0, 0, 0.05); }
 
-.modal-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; color: #fff; }
-.modal-close {
-  position: absolute; top: 24px; right: 24px;
-  width: 32px; height: 32px; background: rgba(255,255,255,0.1);
-  border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: #fff; border: none; transition: 0.2s;
-}
-.modal-close:hover { background: rgba(255,255,255,0.2); transform: scale(0.9); }
 
-/* Update Logs Specific */
-.log-entry { margin-top: 20px; border-bottom: 1px solid var(--c-glass-border); padding-bottom: 16px; }
-.log-entry:last-child { border: none; padding-bottom: 0; }
-.log-version { font-size: 12px; font-weight: 700; color: var(--c-accent); margin-bottom: 4px; }
-.log-text { font-size: 14px; color: var(--c-text-dim); line-height: 1.5; }
 
 /* Footer */
-footer { 
-  text-align: center; padding-top: 60px; color: var(--c-text-dim); font-size: 13px; 
+footer { text-align: left; padding-top: 40px; color: var(--c-text-dim); font-size: 11px; font-family: var(--font-mono); border-top: 1px solid var(--c-glass-border); margin-top: 40px; }
+
+
+
+/* ======================= 6. MODALS ======================= */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000;
+  display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s var(--ease);
+
+
 }
-</footer
+.modal-overlay.active { opacity: 1; pointer-events: auto; backdrop-filter: blur(5px); }
+
+.modal-box {
+  width: 100%; max-width: 450px; background: #050000; border: 1px solid var(--c-glass-border);
+  padding: 30px; transform: translateY(20px); transition: 0.3s var(--ease); max-height: 80vh; overflow-y: auto;
+
+
+}
+.modal-overlay.active .modal-box { transform: translateY(0); border-color: var(--c-accent-dark); box-shadow: 0 10px 40px rgba(0,0,0,0.9); }
+
+.modal-title { font-family: var(--font-mono); font-size: 16px; color: #fff; margin-bottom: 20px; border-bottom: 1px solid var(--c-glass-border); padding-bottom: 10px; }
+.close-modal { margin-top: 20px; font-family: var(--font-mono); font-size: 12px; color: var(--c-text-dim); cursor: pointer; display: inline-block; transition: 0.2s; }
+.close-modal:hover { color: var(--c-accent); }
+
+
+
+
+
+
+/* Update Logs specific */
+.log-entry { margin-bottom: 15px; }
+.log-version { color: var(--c-accent); font-family: var(--font-mono); font-size: 12px; font-weight: 700; }
+.log-desc { color: #aaa; font-size: 13px; font-family: var(--font-mono); margin-top: 4px; }
+
+
+/* User Card Placeholder */
+.user-card { padding: 15px; border: 1px solid var(--c-glass-border); margin-bottom: 30px; font-family: var(--font-mono); font-size: 12px; color: var(--c-text-dim); }
+
+
+
 
 </style>
 </head>
 <body>
 
-  <!-- Background Base (Zero Lag) -->
-  <div class="bg-fixed"></div>
+  <!-- Ambient bg -->
+  <div class="bg-fixed">
+    <div class="bg-blob one"></div>
+    <div class="bg-blob two"></div>
+  </div>
+
+  <!-- LANDING -->
+  <section id="landing" class="landing-screen">
+    <div class="landing-title">/six</div>
+    <div class="landing-sub">whatever.</div>
+    <button class="enter-btn" onclick="app.enter()">enter if you want.</button>
+  </section>
+
+  <!-- SIDEBAR TRIGGER -->
+  <div class="sidebar-trigger" onclick="app.toggleSidebar()">
+    <svg class="icon" viewBox="0 0 24 24"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+  </div>
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar" class="sidebar">
+    <div class="user-card" id="user-card">
+      logged in as: guest<br>
+      status: unverified
+    </div>
+    <div style="margin-bottom: 30px;">
+      <div class="brand-text" style="font-size: 24px;">/six</div>
+      <div style="font-size: 10px; color: #444; font-family: var(--font-mono);">main</div>
+    </div>
+    <div id="nav-links">
+      <a href="#about" class="nav-item" onclick="app.toggleSidebar()">> about.</a>
+      <a href="#doctrine" class="nav-item" onclick="app.toggleSidebar()">> laws.</a>
+      <a href="#graveyard" class="nav-item" onclick="app.toggleSidebar()">> graveyard.</a>
+      <a href="#history" class="nav-item" onclick="app.toggleSidebar()">> history.</a>
+    </div>
+  </nav>
 
   <!-- MAIN APP -->
-  <main class="app-container">
-    
-    <!-- Top Nav -->
+  <main id="main-app" class="app-container">
+
+    <!-- Header -->
     <header class="app-header">
-      <div class="header-left">
-        <div class="header-brand">
-          <span>/six</span>
-          <div class="dot"></div>
-        </div>
+      <div>
+        <div class="header-brand brand-text">/six</div>
+
+
+
       </div>
-      <div class="header-actions">
-        <button class="btn" onclick="app.toggleModal('updates-modal')">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M12 20v-8m0 0V4m0 8h8m-8 0H4"/></svg>
-          Updates
-        </button>
-        <button class="btn btn-red" onclick="app.toggleModal('login-modal')">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-          Auth
-        </button>
+      <div class="btn-group">
+        <button class="btn-ui" onclick="app.toggleLogs(true)">logs.</button>
+        <button class="btn-ui" onclick="app.toggleLogin(true)">login.</button>
+
+
+
+
+
+
       </div>
     </header>
 
-    <!-- iOS Bento Grid -->
+    <!-- BRUTALIST GRID -->
     <div class="grid-section">
 
-      <!-- 1. Identity -->
-      <section class="card col-span-8">
+      <!-- 1. ABOUT -->
+      <section class="card card-cut col-span-8" id="about">
         <h2 class="section-title">about.</h2>
-        <p class="desc-text">
-          we just play. formed in april 2025 by lair. <br>
-          known as sais. strictly spvp.
-        </p>
-        <div class="desc-sub">est. 2025 — not much else to say.</div>
+        <div style="display:flex; flex-direction:column; height:100%;">
+          <p class="desc-text">
+            we play minecraft. we kill people. we win. founded back in 2025 by love layer.<br><br>
+            if you are looking for an ordinary clan, look elsewhere. we exist, we play, we leave. thats lit it.
+          </p>
+        </div>
       </section>
 
-      <!-- 2. Socials -->
-      <section class="card col-span-4" style="padding: 20px;">
-        <div class="social-grid">
-          <a href="https://discord.gg/tu6rpKhenw" target="_blank" class="social-tile">
-            <svg class="icon" style="color:#fff" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM3 20a6 6 0 0 1 12 0v1H3v-1z"/></svg>
-            <span style="font-size: 13px; font-weight: 500;">discord.</span>
-            <span id="discord-count" style="font-size: 11px; color: var(--c-text-dim);">loading...</span>
+      <!-- 2. SOCIALS -->
+      <section class="card col-span-4" id="socials">
+        <h2 class="section-title">comms.</h2>
+        <div style="display:flex; flex-direction:column; justify-content:center; height:100%;">
+          <a href="https://discord.gg/tu6rpKhenw" target="_blank" class="social-link">
+            <span>discord.</span>
+            <span id="discord-count" style="color:#444;">...</span>
           </a>
-          <a href="https://tiktok.com/@xissais" target="_blank" class="social-tile">
-            <svg class="icon" style="color:#fff" viewBox="0 0 24 24"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
-            <span style="font-size: 13px; font-weight: 500;">media.</span>
+          <a href="https://tiktok.com/@xissais" target="_blank" class="social-link">
+            <span>media.</span>
+            <span style="color:#444;">tiktok</span>
           </a>
         </div>
       </section>
 
-      <!-- 3. Timeline / History -->
-      <section class="card col-span-4">
-        <h2 class="section-title">history.</h2>
-        <div class="timeline" id="timeline-container">
-          <!-- Populated by JS -->
-        </div>
-      </section>
-
-      <!-- 4. Philosophy / Requirements -->
-      <section class="card col-span-4">
-        <h2 class="section-title">requirements.</h2>
+      <!-- 3. DOCTRINE -->
+      <section class="card col-span-6" id="doctrine">
+        <h2 class="section-title">laws.</h2>
         <ul class="minimal-list">
-          <li><span>01</span> don't be weird.</li>
-          <li><span>02</span> be decent at the game.</li>
-          <li><span>03</span> no drama.</li>
-          <li><span>04</span> mic required.</li>
+          <li>
+            <span class="bullet">[1]</span>
+            <span>loading</span>
+          </li>
+          <li>
+            <span class="bullet">[2]</span>
+            <span>loading</span>
+          </li>
+          <li>
+            <span class="bullet">[3]</span>
+            <span>loading</span>
+          </li>
+          <li>
+            <span class="bullet">[4]</span>
+            <span>loading.</span>
+          </li>
         </ul>
       </section>
 
-      <!-- 5. Status / Server Info -->
-      <section class="card col-span-4">
-        <h2 class="section-title">status.</h2>
-        <div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px;">
-          <div class="status-pill">
-            <div class="pulse-dot"></div>
-            active season
+      <!-- 4. GRAVEYARD (Hall of Fame replacement) -->
+      <section class="card card-cut col-span-6" id="graveyard">
+        <h2 class="section-title">graveyard.</h2>
+        <p class="desc-text" style="font-size:12px; margin-bottom:10px;">clans/players who thought they could. they couldnt.</p>
+        <ul class="minimal-list">
+          <li>
+            <span class="bullet">x</span>
+            <span class="graveyard-name">loading</span>
+            <span style="margin-left:auto; color:#444;">loading</span>
+          </li>
+          <li>
+            <span class="bullet">x</span>
+            <span class="graveyard-name">loading</span>
+            <span style="margin-left:auto; color:#444;">loading</span>
+          </li>
+          <li>
+            <span class="bullet">x</span>
+            <span class="graveyard-name">loading</span>
+            <span style="margin-left:auto; color:#444;">loading</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- 5. HISTORY -->
+      <section class="card col-span-12" id="history">
+        <h2 class="section-title">history.</h2>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 10px;">
+          <div class="timeline-item">
+            <div class="t-date">APR 2025</div>
+            <div class="t-desc">loading</div>
           </div>
-          <div class="desc-sub">currently dominating.</div>
+          <div class="timeline-item">
+            <div class="t-date">MAY 2025</div>
+            <div class="t-desc">loading</div>
+          </div>
+          <div class="timeline-item">
+            <div class="t-date">JUN 2025</div>
+            <div class="t-desc">loading</div>
+          </div>
+          <div class="timeline-item">
+            <div class="t-date">PRESENT</div>
+            <div class="t-desc">loading</div>
+          </div>
+
         </div>
       </section>
 
     </div>
 
     <footer>
-      &copy; 2025 /six. simple as that.
+      > dir: main <br>
+      > status: gud
     </footer>
   </main>
 
-  <!-- MODALS -->
-  
-  <!-- 1. Update Logs Modal -->
-  <div id="updates-modal" class="modal-overlay" onclick="app.closeModalsOnOuterClick(event)">
+  <!-- LOGIN MODAL -->
+  <div id="login-modal" class="modal-overlay">
+
+
     <div class="modal-box">
-      <button class="modal-close" onclick="app.toggleModal('updates-modal')">
-        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <div class="modal-title">authenticate.</div>
+      <button class="btn-ui" style="width:100%; border-color:#5865F2; color:#fff;" onclick="app.login('discord')">
+        > init discord auth
       </button>
-      <div class="modal-title">updates.</div>
-      <div style="color: var(--c-text-dim); font-size: 14px; margin-bottom: 24px;">recent changes to the site.</div>
-      
-      <div class="log-entry">
-        <div class="log-version">v2.0 — Latest</div>
-        <div class="log-text">complete UI overhaul. removed clutter, added red minimal theme. zero lag. non-chalant aesthetic.</div>
-      </div>
-      <div class="log-entry">
-        <div class="log-version">v1.1</div>
-        <div class="log-text">added basic discord authentication and profile fetching.</div>
-      </div>
-      <div class="log-entry">
-        <div class="log-version">v1.0</div>
-        <div class="log-text">initial site launch.</div>
-      </div>
+      <div class="close-modal" onclick="app.toggleLogin(false)">cancel.</div>
     </div>
   </div>
 
-  <!-- 2. Login Modal -->
-  <div id="login-modal" class="modal-overlay" onclick="app.closeModalsOnOuterClick(event)">
-    <div class="modal-box" style="text-align: center; padding: 40px 24px;">
-      <button class="modal-close" onclick="app.toggleModal('login-modal')">
-        <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-      <div class="brand-text" style="font-size: 28px; margin-bottom: 8px;">/six</div>
-      <div style="color: var(--c-text-dim); font-size: 14px; margin-bottom: 32px;">authenticate to continue.</div>
-      
-      <button class="btn" style="width: 100%; justify-content: center; background: #5865F2; border: none;" onclick="app.login('discord')">
-        discord auth.
-      </button>
+  <!-- LOGS MODAL -->
+  <div id="logs-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">logs.</div>
+
+      <div class="log-entry">
+        <div class="log-version">v2.0.0</div>
+        <div class="log-desc">everything remade and now everything is lag free yes.</div>
+      </div>
+      <div class="log-entry">
+        <div class="log-version">v1.1.0</div>
+        <div class="log-desc">added some features nobody used.</div>
+      </div>
+      <div class="log-entry">
+        <div class="log-version">v1.0.0</div>
+        <div class="log-desc">release.</div>
+      </div>
+
+
+
+      <div class="close-modal" onclick="app.toggleLogs(false)">close.</div>
+
+
+
+
+
+
+
+
+
+
+
     </div>
   </div>
 
 <!-- LOGIC -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  // Supabase Init
+  // Supabase client instance
   const supabaseClient = supabase.createClient(
     "https://tstsijdifhgmpaszqknr.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
   );
 
-  const DATA = {
-    timeline: [
-      { date: "apr", event: "founded /six." },
-      { date: "may", event: "expanded roster." },
-      { date: "now", event: "running it." }
-    ]
-  };
+
+
+
+
+
+
+
 
   const app = {
     init: () => {
-      app.renderTimeline();
-      app.fetchDiscordStats();
       app.checkAuth();
-    },
+      app.fetchDiscordStats();
 
-    renderTimeline: () => {
-      const container = document.getElementById('timeline-container');
-      container.innerHTML = DATA.timeline.map(t => `
-        <div class="timeline-item">
-          <div class="t-date">${t.date}</div>
-          <div class="t-event">${t.event}</div>
-        </div>
-      `).join('');
-    },
-
-    toggleModal: (id) => {
-      const modal = document.getElementById(id);
-      modal.classList.toggle('active');
-    },
-
-    closeModalsOnOuterClick: (e) => {
-      if (e.target.classList.contains('modal-overlay')) {
-        e.target.classList.remove('active');
-      }
-    },
-
-    login: async (provider) => { 
-      if(provider === 'discord') {
-        await supabaseClient.auth.signInWithOAuth({provider:"discord"}); 
-      }
     },
 
     checkAuth: async () => {
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-          console.log("User logged in:", session.user.id);
-          // Can handle auth state UI updates here if needed later
+        if (!session) return;
+        const { data: profile } = await supabaseClient
+          .from("profiles").select("username, role").eq("id", session.user.id).maybeSingle();
+        
+        if (profile) {
+          document.getElementById("user-card").innerHTML = `
+            status: gud<br>
+            user: ${profile.username}<br>
+            role: ${profile.role || 'member'}
+          `;
         }
       } catch (err) {
-        console.warn("Not authenticated.");
+        // Silent catch for guest mode
       }
     },
 
+    enter: () => {
+      const landing = document.getElementById('landing');
+      landing.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+      setTimeout(() => {
+        landing.style.display = 'none';
+        document.getElementById('main-app').classList.add('visible');
+      }, 600);
+    },
+
+    toggleSidebar: () => { 
+      document.getElementById('sidebar').classList.toggle('active'); 
+    },
+    
+    toggleLogin: (show) => {
+      const modal = document.getElementById('login-modal');
+      show ? modal.classList.add('active') : modal.classList.remove('active');
+    },
+
+    toggleLogs: (show) => {
+      const modal = document.getElementById('logs-modal');
+      show ? modal.classList.add('active') : modal.classList.remove('active');
+
+    },
+
+    login: async (p) => { 
+      if(p==='discord') await supabaseClient.auth.signInWithOAuth({provider:"discord"}); 
+
+
+
+
+
+
+
+
+    },
+
     fetchDiscordStats: async () => {
-      const SERVER_ID = "1360258839429255208";
+      const SERVER_ID = "1482393252555522129";
       const countEl = document.getElementById("discord-count");
       if (!countEl) return;
 
@@ -432,14 +559,14 @@ footer {
         const res = await fetch(`https://discord.com/api/guilds/${SERVER_ID}/widget.json`);
         if (!res.ok) throw new Error("Widget disabled");
         const data = await res.json();
-        countEl.textContent = `${data.presence_count} online`;
+        countEl.innerHTML = `${data.presence_count} online`;
       } catch (err) {
-        countEl.textContent = "join us.";
+        countEl.textContent = "server";
       }
     }
   };
 
+  // Zero-lag init
   window.addEventListener('DOMContentLoaded', app.init);
 </script>
 </body>
-</html>
