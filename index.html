@@ -225,16 +225,16 @@ footer { text-align: left; padding-top: 40px; color: var(--c-text-dim); font-siz
   <!-- SIDEBAR -->
   <nav id="sidebar" class="sidebar">
     <div class="user-card" id="user-card">
-      system: guest<br>
+      logged in as: guest<br>
       status: unverified
     </div>
     <div style="margin-bottom: 30px;">
       <div class="brand-text" style="font-size: 24px;">/six</div>
-      <div style="font-size: 10px; color: #444; font-family: var(--font-mono);">dir/main</div>
+      <div style="font-size: 10px; color: #444; font-family: var(--font-mono);">main</div>
     </div>
     <div id="nav-links">
       <a href="#about" class="nav-item" onclick="app.toggleSidebar()">> about.</a>
-      <a href="#doctrine" class="nav-item" onclick="app.toggleSidebar()">> doctrine.</a>
+      <a href="#doctrine" class="nav-item" onclick="app.toggleSidebar()">> laws.</a>
       <a href="#graveyard" class="nav-item" onclick="app.toggleSidebar()">> graveyard.</a>
       <a href="#history" class="nav-item" onclick="app.toggleSidebar()">> history.</a>
     </div>
@@ -262,8 +262,8 @@ footer { text-align: left; padding-top: 40px; color: var(--c-text-dim); font-siz
         <h2 class="section-title">about.</h2>
         <div style="display:flex; flex-direction:column; height:100%;">
           <p class="desc-text">
-            we play minecraft. we hit people. usually we win. founded back in 2025 by someone who got bored.<br><br>
-            if you're looking for an ego trip, look elsewhere. we exist, we play, we leave. that's it.
+            we play minecraft. we kill people. we win. founded back in 2025 by love layer.<br><br>
+            if you are looking for an ordinary clan, look elsewhere. we exist, we play, we leave. thats lit it.
           </p>
         </div>
       </section>
@@ -285,23 +285,23 @@ footer { text-align: left; padding-top: 40px; color: var(--c-text-dim); font-siz
 
       <!-- 3. DOCTRINE -->
       <section class="card col-span-6" id="doctrine">
-        <h2 class="section-title">doctrine.</h2>
+        <h2 class="section-title">laws.</h2>
         <ul class="minimal-list">
           <li>
             <span class="bullet">[1]</span>
-            <span>don't be annoying.</span>
+            <span>loading</span>
           </li>
           <li>
             <span class="bullet">[2]</span>
-            <span>click faster than the other guy.</span>
+            <span>loading</span>
           </li>
           <li>
             <span class="bullet">[3]</span>
-            <span>we don't care about your past ranks.</span>
+            <span>loading</span>
           </li>
           <li>
             <span class="bullet">[4]</span>
-            <span>lose? just queue again.</span>
+            <span>loading.</span>
           </li>
         </ul>
       </section>
@@ -309,7 +309,7 @@ footer { text-align: left; padding-top: 40px; color: var(--c-text-dim); font-siz
       <!-- 4. GRAVEYARD (Hall of Fame replacement) -->
       <section class="card card-cut col-span-6" id="graveyard">
         <h2 class="section-title">graveyard.</h2>
-        <p class="desc-text" style="font-size:12px; margin-bottom:10px;">clans/players who thought they could. they couldn't.</p>
+        <p class="desc-text" style="font-size:12px; margin-bottom:10px;">clans/players who thought they could. they couldnt.</p>
         <ul class="minimal-list">
           <li>
             <span class="bullet">x</span>
@@ -355,8 +355,8 @@ footer { text-align: left; padding-top: 40px; color: var(--c-text-dim); font-siz
     </div>
 
     <footer>
-      > dir: /six/main <br>
-      > status: operational
+      > dir: main <br>
+      > status: gud
     </footer>
   </main>
 
@@ -374,7 +374,7 @@ footer { text-align: left; padding-top: 40px; color: var(--c-text-dim); font-siz
   <!-- LOGS MODAL -->
   <div id="logs-modal" class="modal-overlay">
     <div class="modal-box">
-      <div class="modal-title">sys_logs.</div>
+      <div class="modal-title">logs.</div>
       
       <div class="log-entry">
         <div class="log-version">v2.0.0</div>
@@ -417,9 +417,9 @@ footer { text-align: left; padding-top: 40px; color: var(--c-text-dim); font-siz
         
         if (profile) {
           document.getElementById("user-card").innerHTML = `
-            system: active<br>
+            status: gud<br>
             user: ${profile.username}<br>
-            clearance: ${profile.role || 'member'}
+            role: ${profile.role || 'member'}
           `;
         }
       } catch (err) {
