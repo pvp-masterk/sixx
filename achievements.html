@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>/six - achievements</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
+
+<style>
+/* ======================= 1. CORE VARIABLES & 0-LAG RESET ======================= */
+:root {
+  --c-bg: #050000;
+  --c-bg-alt: #0a0101;
+  --c-accent: #d00000;
+  --c-accent-dark: #7a0000;
+  --c-text-main: #e0e0e0;
+  --c-text-dim: #666;
+  
+  --c-glass: rgba(10, 0, 0, 0.7);
+  --c-glass-border: rgba(255, 0, 0, 0.1);
+  --c-glass-border-hover: rgba(208, 0, 0, 0.8);
+  
+  --font-main: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; width: 100%; background: var(--c-bg); color: var(--c-text-main); font-family: var(--font-main); overflow-x: hidden; line-height: 1.5; }
+
+/* Lag-Free Scanlines */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 900;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.2), rgba(0,0,0,0.2) 1px, transparent 1px, transparent 2px);
+  background-size: 100% 4px;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--c-bg); }
+::-webkit-scrollbar-thumb { background: var(--c-accent-dark); }
+::-webkit-scrollbar-thumb:hover { background: var(--c-accent); }
+
+svg.icon { width: 1.2em; height: 1.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; margin-bottom: 2px; }
+
+/* Brand Text */
+.brand-text {
+  font-family: var(--font-mono); color: var(--c-accent);
+  text-shadow: 0 0 10px rgba(208, 0, 0, 0.4); font-weight: 800; letter-spacing: -1px;
+}
+
+/* ======================= 2. BACKGROUND (Optimized) ======================= */
+.bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-blob {
+  position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.15;
+  will-change: transform; animation: breath 8s infinite alternate var(--ease);
+}
+.bg-blob.one { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(var(--c-accent), transparent 60%); }
+.bg-blob.two { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(var(--c-accent-dark), transparent 60%); animation-delay: -4s; }
+
+@keyframes breath { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+
+/* ======================= 3. UI / NAV ======================= */
+.sidebar-trigger {
+  position: fixed; top: 30px; left: 30px; z-index: 100; width: 45px; height: 45px;
+  background: var(--c-glass); border: 1px solid var(--c-glass-border); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center; color: #fff; cursor: pointer; transition: 0.2s;
+}
+.sidebar-trigger:hover { border-color: var(--c-accent); color: var(--c-accent); }
+
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: #050000; border-right: 1px solid var(--c-glass-border);
+  z-index: 99; padding: 100px 30px 40px; transform: translateX(-100%); transition: transform 0.5s var(--ease); display: flex; flex-direction: column;
+}
+.sidebar.active { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.8); }
+
+.nav-item {
+  display: flex; align-items: center; gap: 15px; padding: 12px 15px; margin-bottom: 8px;
+  color: var(--c-text-dim); text-decoration: none; border-radius: 4px; transition: 0.2s; font-family: var(--font-mono); font-size: 13px; border-left: 2px solid transparent;
+}
+.nav-item:hover, .nav-item.active { color: #fff; background: rgba(255,0,0,0.03); border-left-color: var(--c-accent); padding-left: 20px; }
+.nav-item.active { color: var(--c-accent); }
+
+/* ======================= 4. BRUTALIST GRID LAYOUT ======================= */
+.app-container {
+  position: relative; z-index: 10; max-width: 1100px; margin: 0 auto; padding: 100px 20px 60px;
+  animation: fadeUp 0.6s var(--ease) forwards;
+}
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Header & Buttons */
+.app-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--c-glass-border); }
+.header-brand { font-size: 32px; line-height: 1; }
+
+.btn-group { display: flex; gap: 10px; }
+.btn-ui {
+  padding: 10px 20px; background: rgba(255,0,0,0.02); border: 1px solid var(--c-glass-border); border-radius: 4px;
+  color: var(--c-text-dim); font-family: var(--font-mono); font-size: 12px; cursor: pointer; transition: 0.2s; text-decoration: none;
+}
+.btn-ui:hover { border-color: var(--c-accent); color: #fff; background: rgba(208, 0, 0, 0.1); }
+
+/* GRID */
+.grid-section { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media(min-width: 900px) {
+  .grid-section { grid-template-columns: repeat(12, 1fr); grid-auto-rows: minmax(160px, auto); }
+  .col-span-12 { grid-column: span 12; } .col-span-8 { grid-column: span 8; }
+  .col-span-6 { grid-column: span 6; } .col-span-4 { grid-column: span 4; }
+}
+
+/* SHARP CARDS */
+.card {
+  background: var(--c-glass); border: 1px solid var(--c-glass-border);
+  padding: 30px; position: relative; display: flex; flex-direction: column; transition: border-color 0.3s, background 0.3s;
+}
+.card:hover { border-color: var(--c-glass-border-hover); background: rgba(15, 0, 0, 0.8); }
+
+.card-cut { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%); }
+.card-cut::after {
+  content: ''; position: absolute; bottom: 0; right: 0; width: 20px; height: 20px;
+  background: var(--c-accent-dark); clip-path: polygon(100% 0, 0 100%, 100% 100%); opacity: 0.5; transition: 0.3s;
+}
+.card:hover.card-cut::after { background: var(--c-accent); opacity: 1; }
+
+/* Content styling */
+.section-title { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--c-text-dim); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.card:hover .section-title { color: var(--c-accent); }
+
+.desc-text { color: #bbb; font-size: 14px; margin-bottom: 20px; line-height: 1.6; font-family: var(--font-mono); }
+
+/* Lists & Stats */
+.minimal-list { list-style: none; padding: 0; margin: 0; }
+.minimal-list li { padding: 12px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); color: #999; font-size: 13px; font-family: var(--font-mono); display: flex; gap: 15px; }
+.minimal-list li:last-child { border-bottom: none; }
+.minimal-list .bullet { color: var(--c-accent-dark); min-width: 25px; }
+.card:hover .minimal-list .bullet { color: var(--c-accent); }
+
+.stat-block { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
+.stat-val { font-size: 32px; font-weight: 900; color: #fff; line-height: 1; letter-spacing: -2px; }
+.stat-label { font-size: 11px; color: var(--c-text-dim); font-family: var(--font-mono); text-transform: uppercase; }
+
+.graveyard-name { text-decoration: line-through; color: #555; font-weight: 700; transition: 0.2s; }
+.minimal-list li:hover .graveyard-name { color: var(--c-accent); text-decoration: none; }
+
+/* Footer */
+footer { text-align: left; padding-top: 40px; color: var(--c-text-dim); font-size: 11px; font-family: var(--font-mono); border-top: 1px solid var(--c-glass-border); margin-top: 40px; }
+
+/* ======================= 5. MODALS ======================= */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000;
+  display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s var(--ease);
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; backdrop-filter: blur(5px); }
+
+.modal-box {
+  width: 100%; max-width: 450px; background: #050000; border: 1px solid var(--c-glass-border);
+  padding: 30px; transform: translateY(20px); transition: 0.3s var(--ease); max-height: 80vh; overflow-y: auto;
+}
+.modal-overlay.active .modal-box { transform: translateY(0); border-color: var(--c-accent-dark); box-shadow: 0 10px 40px rgba(0,0,0,0.9); }
+
+.modal-title { font-family: var(--font-mono); font-size: 16px; color: #fff; margin-bottom: 20px; border-bottom: 1px solid var(--c-glass-border); padding-bottom: 10px; }
+.close-modal { margin-top: 20px; font-family: var(--font-mono); font-size: 12px; color: var(--c-text-dim); cursor: pointer; display: inline-block; transition: 0.2s; }
+.close-modal:hover { color: var(--c-accent); }
+
+.user-card { padding: 15px; border: 1px solid var(--c-glass-border); margin-bottom: 30px; font-family: var(--font-mono); font-size: 12px; color: var(--c-text-dim); }
+
+</style>
+</head>
+<body>
+
+  <!-- Ambient bg -->
+  <div class="bg-fixed">
+    <div class="bg-blob one"></div>
+    <div class="bg-blob two"></div>
+  </div>
+
+  <!-- SIDEBAR TRIGGER -->
+  <div class="sidebar-trigger" onclick="app.toggleSidebar()">
+    <svg class="icon" viewBox="0 0 24 24"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+  </div>
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar" class="sidebar">
+    <div class="user-card" id="user-card">
+      system: guest<br>
+      status: unverified
+    </div>
+    <div style="margin-bottom: 30px;">
+      <div class="brand-text" style="font-size: 24px;">/six</div>
+      <div style="font-size: 10px; color: #444; font-family: var(--font-mono);">dir/achievements</div>
+    </div>
+    <div id="nav-links">
+      <a href="index.html" class="nav-item">> index.</a>
+      <a href="#" class="nav-item active">> achievements.</a>
+    </div>
+  </nav>
+
+  <!-- MAIN APP (No landing screen, loads directly) -->
+  <main id="main-app" class="app-container">
+    
+    <!-- Header -->
+    <header class="app-header">
+      <div>
+        <div class="header-brand brand-text">/six/achievements</div>
+      </div>
+      <div class="btn-group">
+        <a href="index.html" class="btn-ui">return.</a>
+      </div>
+    </header>
+
+    <!-- BRUTALIST GRID -->
+    <div class="grid-section">
+
+      <!-- 1. ACCOLADES -->
+      <section class="card card-cut col-span-8">
+        <h2 class="section-title">accolades.</h2>
+        <p class="desc-text">we showed up. we took their money. we left. here's the hardware.</p>
+        <ul class="minimal-list">
+          <li>
+            <span class="bullet">[1st]</span>
+            <span style="color:#fff;">summer clash 2025</span>
+            <span style="margin-left:auto; color:#444;">$500 prize</span>
+          </li>
+          <li>
+            <span class="bullet">[1st]</span>
+            <span style="color:#fff;">sweatfest invitational</span>
+            <span style="margin-left:auto; color:#444;">flawless run</span>
+          </li>
+          <li>
+            <span class="bullet">[2nd]</span>
+            <span style="color:#fff;">winter brawl (we lagged)</span>
+            <span style="margin-left:auto; color:#444;">server issue</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- 2. STATS -->
+      <section class="card col-span-4" style="justify-content:center;">
+        <h2 class="section-title">metrics.</h2>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div class="stat-block">
+            <span class="stat-val">94.2%</span>
+            <span class="stat-label">overall winrate</span>
+          </div>
+          <div class="stat-block">
+            <span class="stat-val brand-text">42</span>
+            <span class="stat-label">highest w-streak</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. RETIREMENTS / DISBANDMENTS -->
+      <section class="card col-span-6">
+        <h2 class="section-title">forced retirements.</h2>
+        <p class="desc-text" style="font-size:12px; margin-bottom:15px;">clans that stopped queuing or fully disbanded after catching the L from us.</p>
+        <ul class="minimal-list">
+          <li>
+            <span class="bullet">rip</span>
+            <span class="graveyard-name">clan_eclipse</span>
+            <span style="margin-left:auto; color:#444;">quit cord</span>
+          </li>
+          <li>
+            <span class="bullet">rip</span>
+            <span class="graveyard-name">team_overdrive</span>
+            <span style="margin-left:auto; color:#444;">rebranded</span>
+          </li>
+          <li>
+            <span class="bullet">rip</span>
+            <span class="graveyard-name">apex_pvp</span>
+            <span style="margin-left:auto; color:#444;">deleted server</span>
+          </li>
+          <li>
+            <span class="bullet">rip</span>
+            <span class="graveyard-name">some toxic guys</span>
+            <span style="margin-left:auto; color:#444;">cried in dms</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- 4. MILESTONES -->
+      <section class="card card-cut col-span-6">
+        <h2 class="section-title">milestones.</h2>
+        <ul class="minimal-list">
+          <li>
+            <span class="bullet">></span>
+            <span>hit #1 on the ranked ladder.</span>
+            <span style="margin-left:auto; color:#666; font-size:11px;">may 2025</span>
+          </li>
+          <li>
+            <span class="bullet">></span>
+            <span>won 3 back-to-back 8v8s.</span>
+            <span style="margin-left:auto; color:#666; font-size:11px;">jun 2025</span>
+          </li>
+          <li>
+            <span class="bullet">></span>
+            <span>made the rival leader forfeit mid-game.</span>
+            <span style="margin-left:auto; color:#666; font-size:11px;">jul 2025</span>
+          </li>
+          <li>
+            <span class="bullet">></span>
+            <span>survived a 4v8 handicap and won.</span>
+            <span style="margin-left:auto; color:#666; font-size:11px;">aug 2025</span>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+
+    <footer>
+      > dir: /six/achievements <br>
+      > status: unmatched
+    </footer>
+  </main>
+
+<!-- LOGIC -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+  // Supabase client instance (optional for this page, keeping for consistency)
+  const supabaseClient = supabase.createClient(
+    "https://tstsijdifhgmpaszqknr.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzdHNpamRpZmhnbXBhc3pxa25yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NzA1NTIsImV4cCI6MjA3ODU0NjU1Mn0.8AvcLNL-6PIlfw2FUeLcMC9atefZmZAyUQBOquGpVo4"
+  );
+
+  const app = {
+    init: () => {
+      app.checkAuth();
+    },
+
+    checkAuth: async () => {
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
+        const { data: profile } = await supabaseClient
+          .from("profiles").select("username, role").eq("id", session.user.id).maybeSingle();
+        
+        if (profile) {
+          document.getElementById("user-card").innerHTML = `
+            system: active<br>
+            user: ${profile.username}<br>
+            clearance: ${profile.role || 'member'}
+          `;
+        }
+      } catch (err) {
+        // Silent catch for guest mode
+      }
+    },
+
+    toggleSidebar: () => { 
+      document.getElementById('sidebar').classList.toggle('active'); 
+    }
+  };
+
+  // Zero-lag init
+  window.addEventListener('DOMContentLoaded', app.init);
+</script>
+</body>
+</html>
